@@ -3,6 +3,7 @@
 use App\Http\Livewire\Requisitioner\Itenerary\IteneraryCreate;
 use App\Http\Livewire\Requisitioner\TransactionsIndex;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersCreate;
+use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersIndex;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersShow;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,8 @@ Route::middleware([
     })->name('dashboard');
     Route::get('/transactions', TransactionsIndex::class)->name('transactions.index');
     Route::get('/travel-orders/create', TravelOrdersCreate::class)->name('travel-orders.create');
+    Route::get('/travel-orders', TravelOrdersIndex::class)->name('travel-orders.index');
     Route::get('/travel-orders/{travel_order}', TravelOrdersShow::class)->name('travel-orders.show');
     Route::get('/itenerary/create', IteneraryCreate::class)->name('itenerary.create');
+    
 });

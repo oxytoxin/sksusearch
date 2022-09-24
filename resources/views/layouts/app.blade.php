@@ -67,7 +67,7 @@
                                         <a href="#" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                                             Closed Disbursement Vouchers</a>
                                     </div>
-                                    <x-sidenav-link href="#" :active="request()->routeIs('mytravelorders')">
+                                    <x-sidenav-link href="{{ route('requisitioner.travel-orders.index') }}" :active="request()->routeIs('requisitioner.travel-orders.index')">
                                         Travel Orders
                                     </x-sidenav-link>
                                 </div>
