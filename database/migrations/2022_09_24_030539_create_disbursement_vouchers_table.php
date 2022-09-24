@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('mop_id')->index();
             $table->foreignId('current_step_id')->index();
             $table->foreignId('previous_step_id')->index();
+            $table->foreignId('signatory_id')->index();
             $table->string('tracking_number');
             $table->string('cheque_number')->nullable();
             $table->date('closed_date')->nullable();
