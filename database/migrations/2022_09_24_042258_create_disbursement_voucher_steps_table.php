@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('process');
             $table->string('recipient');
+            $table->string('sender')->nullable();
             $table->timestamps();
         });
     }

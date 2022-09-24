@@ -19,6 +19,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 1000,
             'process' => 'Forwarded to',
             'recipient' => 'Signatory',
+            'sender' => 'by Requisitioner',
         ]);
 
         DisbursementVoucherStep::create([
@@ -31,30 +32,35 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 3000,
             'process' => 'Forwarded to',
             'recipient' => 'ICU',
+            'sender' => 'by Signatory',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 4000,
             'process' => 'Received in',
             'recipient' => 'ICU',
+            'sender' => 'by ICU Staff (Pre-Audit)',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 5000,
             'process' => 'Forwarded to',
             'recipient' => 'Budget Office',
+            'sender' => 'by ICU Staff',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 6000,
             'process' => 'Received in',
             'recipient' => 'Budget Office',
+            'sender' => 'by Budget Office Staff',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 7000,
             'process' => 'Forwarded to',
             'recipient' => 'Accounting Office',
+            'sender' => 'by Budget Office Staff',
         ]);
 
         DisbursementVoucherStep::create([
@@ -67,6 +73,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 9000,
             'process' => 'Received in',
             'recipient' => 'Accounting Office',
+            'sender' => 'by Accounting Office Staff',
         ]);
 
         DisbursementVoucherStep::create([
@@ -85,78 +92,83 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 12000,
             'process' => 'Forwarded to',
             'recipient' => 'President\'s Office',
+            'sender' => 'by Accounting Officer Staff',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 13000,
             'process' => 'Received in',
             'recipient' => 'President\'s Office',
+            'sender' => 'by Office of the President Staff',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 14000,
-            'process' => 'Received in',
-            'recipient' => 'President\'s Office',
+            'process' => 'Forwarded to',
+            'recipient' => 'Cashier',
+            'sender' => 'by Office of the President Staff',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 15000,
-            'process' => 'Forwarded to',
+            'process' => 'Received in',
             'recipient' => 'Cashier',
+            'sender' => 'Cashier',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 16000,
-            'process' => 'Received in',
-            'recipient' => 'Cashier',
-        ]);
-
-        DisbursementVoucherStep::create([
-            'id' => 17000,
             'process' => 'Cheque/ADA made for',
             'recipient' => 'Requisitioner',
         ]);
 
         DisbursementVoucherStep::create([
-            'id' => 18000,
+            'id' => 17000,
             'process' => 'Forwarded to',
             'recipient' => 'ICU',
+            'sender' => 'Cashier',
+        ]);
+
+        DisbursementVoucherStep::create([
+            'id' => 18000,
+            'process' => 'Received in',
+            'recipient' => 'ICU',
+            'sender' => 'by ICU Staff (Post-Audit)',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 19000,
-            'process' => 'Received in',
-            'recipient' => 'ICU',
+            'process' => 'Forwarded to',
+            'recipient' => 'Archiver',
+            'sender' => 'by ICU Staff (Post-Audit)',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 20000,
-            'process' => 'Forwarded to',
-            'recipient' => 'Archiver',
+            'process' => 'Received in',
+            'recipient' => 'Archiving Unit',
+            'sender' => 'by Archiver',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 21000,
-            'process' => 'Received in',
-            'recipient' => 'Archiving Unit',
+            'process' => 'Document Archived in',
+            'recipient' => 'SEARCH',
+            'sender' => 'by Archiver',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 22000,
-            'process' => 'Document Archived in',
-            'recipient' => 'SEARCH',
+            'process' => 'Forwarded to',
+            'recipient' => 'COA',
+            'sender' => 'Archiver',
         ]);
 
         DisbursementVoucherStep::create([
             'id' => 23000,
-            'process' => 'Forwarded to',
-            'recipient' => 'COA',
-        ]);
-
-        DisbursementVoucherStep::create([
-            'id' => 24000,
             'process' => 'Received in',
             'recipient' => 'COA',
+            'sender' => 'by COA Staff',
         ]);
     }
 }
