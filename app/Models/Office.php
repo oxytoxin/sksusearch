@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Office extends Model
 {
     use HasFactory;
+
+    public function employee_informations()
+    {
+        return $this->hasMany(EmployeeInformation::class);
+    }
+
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class);
+    }
 }

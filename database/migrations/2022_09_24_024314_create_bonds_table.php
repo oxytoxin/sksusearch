@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('amount');
             $table->date('validity_date');
-            $table->foreignId('employee_id')->index();
+            $table->foreignId('user_id')->index();
             $table->timestamps();
         });
     }

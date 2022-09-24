@@ -13,11 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('cash_advances', function (Blueprint $table) {
+        Schema::create('travel_order_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('travel_order_id')->index();
-            $table->foreignId('disbursement_voucher_id')->index();
-            $table->date('due_date');
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cash_advances');
+        Schema::dropIfExists('travel_order_types');
     }
 };
