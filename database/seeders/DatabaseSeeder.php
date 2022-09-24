@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             VoucherTypeSeeder::class,
             VoucherSubTypeSeeder::class,
             MopSeeder::class,
+            DisbursementVoucherStepSeeder::class,
+            TravelOrderTypeSeeder::class,
         ]);
     }
 }

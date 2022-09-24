@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Mop extends Model
 {
     use HasFactory;
+
+    public function disbursement_vouchers()
+    {
+        return $this->hasMany(DisbursementVoucher::class);
+    }
 }

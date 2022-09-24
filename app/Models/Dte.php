@@ -17,4 +17,9 @@ class Dte extends Model
             set: fn ($value) => $value * 100,
         );
     }
+
+    public function philippine_region()
+    {
+        return $this->belongsTo(PhilippineRegion::class);
+    }
 }

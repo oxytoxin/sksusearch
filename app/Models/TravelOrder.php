@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Position extends Model
+class TravelOrder extends Model
 {
     use HasFactory;
 
-    public function employee_informations()
+    public function cash_advances()
     {
-        return $this->hasMany(EmployeeInformation::class);
+        return $this->hasMany(CashAdvance::class);
     }
 }
