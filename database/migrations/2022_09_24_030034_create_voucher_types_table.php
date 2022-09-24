@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('voucher_types', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('voucher_category_id')->index();
             $table->string('name');
             $table->timestamps();
         });

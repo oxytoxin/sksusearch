@@ -22,6 +22,10 @@ class DatabaseSeeder extends Seeder
             PositionSeeder::class,
             EmployeeInformationSeeder::class,
             DteSeeder::class,
+            VoucherCategorySeeder::class,
+            VoucherTypeSeeder::class,
+            VoucherSubTypeSeeder::class,
+            MopSeeder::class,
         ]);
     }
 }
