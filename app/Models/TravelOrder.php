@@ -49,4 +49,9 @@ class TravelOrder extends Model
     {
         return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->withPivot('is_approved');
     }
+
+    public function sidenotes()
+    {
+        return $this->morphMany(Sidenotes::class, 'sidenoteable');
+    }
 }

@@ -15,6 +15,6 @@ Route::middleware([
     })->name('dashboard');
     Route::get('/transactions', TransactionsIndex::class)->name('transactions.index');
     Route::get('/travel-orders/create', TravelOrdersCreate::class)->name('travel-orders.create');
-    Route::get('/travel-orders/{travel_order}/show', TravelOrdersShow::class)->name('travel-orders.show');
+    Route::get('/travel-orders/{travel_order}', TravelOrdersShow::class)->name('travel-orders.show');
     Route::get('/itenerary/create', IteneraryCreate::class)->name('itenerary.create');
 });

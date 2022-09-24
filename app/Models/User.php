@@ -111,4 +111,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(TravelOrder::class, 'travel_order_signatories', 'user_id', 'travel_order_id')->withPivot('is_approved');
     }
+
+    public function sidenotes()
+    {
+        return $this->hasMany(Sidenote::class);
+    }
 }
