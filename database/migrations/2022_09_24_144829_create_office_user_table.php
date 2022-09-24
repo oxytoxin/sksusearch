@@ -13,8 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('iteneraries', function (Blueprint $table) {
+        Schema::create('office_user', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('office_id')->index();
+            $table->foreignId('user_id')->index();
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('iteneraries');
+        Schema::dropIfExists('office_user');
     }
 };

@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class VoucherType extends Model
 {
     use HasFactory;
+
+    public function voucher_category()
+    {
+        return $this->belongsTo(VoucherCategory::class);
+    }
+
+    public function voucher_subtypes()
+    {
+        return $this->hasMany(VoucherSubType::class);
+    }
 }

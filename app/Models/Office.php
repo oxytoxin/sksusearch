@@ -18,4 +18,19 @@ class Office extends Model
     {
         return $this->belongsTo(Campus::class);
     }
+
+    public function head()
+    {
+        return $this->belongsTo(User::class, 'head_id');
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_user_id');
+    }
+
+    public function officers_in_charge()
+    {
+        return $this->belongsToMany(User::class, 'office_user', 'office_id', 'user_id');
+    }
 }

@@ -13,4 +13,9 @@ class Campus extends Model
     {
         return $this->belongsTo(User::class, 'admin_user_id');
     }
+
+    public function offices()
+    {
+        return $this->hasMany(Office::class);
+    }
 }

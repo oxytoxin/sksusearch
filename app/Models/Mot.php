@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Mot extends Model
 {
     use HasFactory;
+
+    public function itenerary_entries()
+    {
+        return $this->hasMany(IteneraryEntry::class);
+    }
 }

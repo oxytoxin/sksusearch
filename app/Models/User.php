@@ -81,4 +81,24 @@ class User extends Authenticatable
     {
         return $this->hasMany(DisbursementVoucher::class, 'signatory_id');
     }
+
+    public function offices_in_charge()
+    {
+        return $this->belongsToMany(Office::class, 'office_user', 'user_id', 'office_id');
+    }
+
+    public function office_headed()
+    {
+        return $this->hasOne(Office::class, 'head_id');
+    }
+
+    public function office_administered()
+    {
+        return $this->hasOne(Office::class, 'admin_user_id');
+    }
+
+    public function iteneraries()
+    {
+        return $this->hasMany(Itenerary::class);
+    }
 }

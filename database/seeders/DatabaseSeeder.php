@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             MopSeeder::class,
             DisbursementVoucherStepSeeder::class,
             TravelOrderTypeSeeder::class,
+            MotSeeder::class,
         ]);
     }
 }

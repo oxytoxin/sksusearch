@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class VoucherSubType extends Model
 {
     use HasFactory;
+
+    public function voucher_types()
+    {
+        return $this->belongsTo(VoucherType::class);
+    }
 }

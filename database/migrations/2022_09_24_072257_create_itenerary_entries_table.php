@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('place');
             $table->time('departure_time');
             $table->time('arrival_time');
-            $table->time('departure_time');
             $table->integer('transportation_expenses');
             $table->integer('other_expenses');
             $table->timestamps();

@@ -20,9 +20,6 @@ return new class extends Migration
             $table->foreignId('campus_id')->index();
             $table->foreignId('head_id')->index()->nullable();
             $table->foreignId('admin_user_id')->index()->nullable();
-            $table->foreignId('OIC_id_1')->index()->nullable();
-            $table->foreignId('OIC_id_2')->index()->nullable();
-            $table->foreignId('OIC_id_3')->index()->nullable();
             $table->string('email')->unique()->nullable();
             $table->timestamps();
         });

@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('travel_orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('travel_order_type_id')->index();
-            $table->foreignId('itenerary_id')->index();
             $table->date('date_from');
             $table->date('date_to');
             $table->text('purpose');
