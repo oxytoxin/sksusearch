@@ -14,4 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', TestComponent::class);
+Route::middleware('auth')->get('/', TestComponent::class);

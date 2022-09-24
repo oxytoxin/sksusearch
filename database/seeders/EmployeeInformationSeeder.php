@@ -24,98 +24,98 @@ class EmployeeInformationSeeder extends Seeder
                 'email' => 'juliealbano@sksu.edu.ph',
                 'password' => Hash::make('albano123'),
             ],
-            // [
-            //     'email' => 'lynettepeniero@sksu.edu.ph',
-            //     'password' => Hash::make('peniero123'),
-            // ],
-            // [
-            //     'email' => 'helenespartero@sksu.edu.ph',
-            //     'password' => Hash::make('espartero123'),
-            // ],
-            // [
-            //     'email' => 'rodelyndalayap@sksu.edu.ph',
-            //     'password' => Hash::make('dalayap123'),
-            // ],
-            // [
-            //     'email' => 'sionybrunio@sksu.edu.ph',
-            //     'password' => Hash::make('brunio123'),
-            // ],
-            // [
-            //     'email' => 'rositarizaldo@sksu.edu.ph',
-            //     'password' => Hash::make('rizaldo123'),
-            // ],
-            // [
-            //     'email' => 'dennismeriales@sksu.edu.ph',
-            //     'password' => Hash::make('meriales123'),
-            // ],
-            // [
-            //     'email' => 'noraisayasin@sksu.edu.ph',
-            //     'password' => Hash::make('yasin123'),
-            // ],
-            // [
-            //     'email' => 'lanialcon@sksu.edu.ph',
-            //     'password' => Hash::make('alcon123'),
-            // ],
-            // [
-            //     'email' => 'rebeccasubillaga@sksu.edu.ph',
-            //     'password' => Hash::make('subillaga123'),
-            // ],
-            // [
-            //     'email' => 'susiedaza@sksu.edu.ph',
-            //     'password' => Hash::make('daza123'),
-            // ],
-            // [
-            //     'email' => 'leonciodulin@sksu.edu.ph',
-            //     'password' => Hash::make('dulin123'),
-            // ],
-            // [
-            //     'email' => 'benedictrabut@sksu.edu.ph',
-            //     'password' => Hash::make('rabut123'),
-            // ],
-            // [
-            //     'email' => 'kristinemaeampas@sksu.edu.ph',
-            //     'password' => Hash::make('ampas123'),
-            // ],
-            // [
-            //     'email' => 'alnequinoveba@sksu.edu.ph',
-            //     'password' => Hash::make('quinoveba123'),
-            // ],
-            // [
-            //     'email' => 'lilibethedano@sksu.edu.ph',
-            //     'password' => Hash::make('edano123'),
-            // ],
-            // [
-            //     'email' => 'vivenciocalixtro@sksu.edu.ph',
-            //     'password' => Hash::make('calixtro123'),
-            // ],
-            // [
-            //     'email' => 'jesherpalomaria@sksu.edu.ph',
-            //     'password' => Hash::make('palomaria123'),
-            // ],
-            // [
-            //     'email' => 'reyfuentebilla@sksu.edu.ph',
-            //     'password' => Hash::make('fuentebilla123'),
-            // ],
-            // [
-            //     'email' => 'annerilllorio@sksu.edu.ph',
-            //     'password' => Hash::make('lorio123'),
-            // ],
-            // [
-            //     'email' => 'maryjeanfalsario@sksu.edu.ph',
-            //     'password' => Hash::make('falsario123'),
-            // ],
-            // [
-            //     'email' => 'amiramaegumanoy@sksu.edu.ph',
-            //     'password' => Hash::make('gumanoy123'),
-            // ],
-            // [
-            //     'email' => 'hassanalabusama@sksu.edu.ph',
-            //     'password' => Hash::make('abusama123'),
-            // ],
-            // [
-            //     'email' => 'gracepedrola@sksu.edu.ph',
-            //     'password' => Hash::make('pedrola123'),
-            // ],
+            [
+                'email' => 'lynettepeniero@sksu.edu.ph',
+                'password' => Hash::make('peniero123'),
+            ],
+            [
+                'email' => 'helenespartero@sksu.edu.ph',
+                'password' => Hash::make('espartero123'),
+            ],
+            [
+                'email' => 'rodelyndalayap@sksu.edu.ph',
+                'password' => Hash::make('dalayap123'),
+            ],
+            [
+                'email' => 'sionybrunio@sksu.edu.ph',
+                'password' => Hash::make('brunio123'),
+            ],
+            [
+                'email' => 'rositarizaldo@sksu.edu.ph',
+                'password' => Hash::make('rizaldo123'),
+            ],
+            [
+                'email' => 'dennismeriales@sksu.edu.ph',
+                'password' => Hash::make('meriales123'),
+            ],
+            [
+                'email' => 'noraisayasin@sksu.edu.ph',
+                'password' => Hash::make('yasin123'),
+            ],
+            [
+                'email' => 'lanialcon@sksu.edu.ph',
+                'password' => Hash::make('alcon123'),
+            ],
+            [
+                'email' => 'rebeccasubillaga@sksu.edu.ph',
+                'password' => Hash::make('subillaga123'),
+            ],
+            [
+                'email' => 'susiedaza@sksu.edu.ph',
+                'password' => Hash::make('daza123'),
+            ],
+            [
+                'email' => 'leonciodulin@sksu.edu.ph',
+                'password' => Hash::make('dulin123'),
+            ],
+            [
+                'email' => 'benedictrabut@sksu.edu.ph',
+                'password' => Hash::make('rabut123'),
+            ],
+            [
+                'email' => 'kristinemaeampas@sksu.edu.ph',
+                'password' => Hash::make('ampas123'),
+            ],
+            [
+                'email' => 'alnequinoveba@sksu.edu.ph',
+                'password' => Hash::make('quinoveba123'),
+            ],
+            [
+                'email' => 'lilibethedano@sksu.edu.ph',
+                'password' => Hash::make('edano123'),
+            ],
+            [
+                'email' => 'vivenciocalixtro@sksu.edu.ph',
+                'password' => Hash::make('calixtro123'),
+            ],
+            [
+                'email' => 'jesherpalomaria@sksu.edu.ph',
+                'password' => Hash::make('palomaria123'),
+            ],
+            [
+                'email' => 'reyfuentebilla@sksu.edu.ph',
+                'password' => Hash::make('fuentebilla123'),
+            ],
+            [
+                'email' => 'annerilllorio@sksu.edu.ph',
+                'password' => Hash::make('lorio123'),
+            ],
+            [
+                'email' => 'maryjeanfalsario@sksu.edu.ph',
+                'password' => Hash::make('falsario123'),
+            ],
+            [
+                'email' => 'amiramaegumanoy@sksu.edu.ph',
+                'password' => Hash::make('gumanoy123'),
+            ],
+            [
+                'email' => 'hassanalabusama@sksu.edu.ph',
+                'password' => Hash::make('abusama123'),
+            ],
+            [
+                'email' => 'gracepedrola@sksu.edu.ph',
+                'password' => Hash::make('pedrola123'),
+            ],
             // [
             //     'email' => 'nestoralcon@sksu.edu.ph',
             //     'password' => Hash::make('alcon123'),
@@ -1646,235 +1646,235 @@ class EmployeeInformationSeeder extends Seeder
             'position_id' => 13,
         ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'LYNETTE G. PENIERO',
-        //     'first_name' => 'LYNETTE',
-        //     'last_name' => 'PENIERO',
-        //     'user_id' => 3,
-        //     'role_id' => 2,
-        //     'office_id' => 9,
-        //     'position_id' => 14,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'LYNETTE G. PENIERO',
+            'first_name' => 'LYNETTE',
+            'last_name' => 'PENIERO',
+            'user_id' => 3,
+            'role_id' => 2,
+            'office_id' => 9,
+            'position_id' => 14,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'HELEN M. ESPARTERO',
-        //     'first_name' => 'HELEN',
-        //     'last_name' => 'ESPARTERO',
-        //     'user_id' => 4,
-        //     'role_id' => 2,
-        //     'office_id' => 10,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'HELEN M. ESPARTERO',
+            'first_name' => 'HELEN',
+            'last_name' => 'ESPARTERO',
+            'user_id' => 4,
+            'role_id' => 2,
+            'office_id' => 10,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'RODELYN M. DALAYAP, PhD',
-        //     'first_name' => 'RODELYN',
-        //     'last_name' => 'DALAYAP',
-        //     'user_id' => 5,
-        //     'role_id' => 2,
-        //     'office_id' => 11,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'RODELYN M. DALAYAP, PhD',
+            'first_name' => 'RODELYN',
+            'last_name' => 'DALAYAP',
+            'user_id' => 5,
+            'role_id' => 2,
+            'office_id' => 11,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'SIONY S. BRUNIO, PhD',
-        //     'first_name' => 'SIONY',
-        //     'last_name' => 'BRUNIO',
-        //     'user_id' => 6,
-        //     'role_id' => 2,
-        //     'office_id' => 12,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'SIONY S. BRUNIO, PhD',
+            'first_name' => 'SIONY',
+            'last_name' => 'BRUNIO',
+            'user_id' => 6,
+            'role_id' => 2,
+            'office_id' => 12,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'ROSITA T. RIZALDO, PhD',
-        //     'first_name' => 'ROSITA',
-        //     'last_name' => 'RIZALDO',
-        //     'user_id' => 7,
-        //     'role_id' => 2,
-        //     'office_id' => 13,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'ROSITA T. RIZALDO, PhD',
+            'first_name' => 'ROSITA',
+            'last_name' => 'RIZALDO',
+            'user_id' => 7,
+            'role_id' => 2,
+            'office_id' => 13,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'DENNIS M. MERIALES, PhD',
-        //     'first_name' => 'DENNIS',
-        //     'last_name' => 'MERIALES',
-        //     'user_id' => 8,
-        //     'role_id' => 2,
-        //     'office_id' => 14,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'DENNIS M. MERIALES, PhD',
+            'first_name' => 'DENNIS',
+            'last_name' => 'MERIALES',
+            'user_id' => 8,
+            'role_id' => 2,
+            'office_id' => 14,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'NORAISA K. YASIN, PhD',
-        //     'first_name' => 'NORAISA',
-        //     'last_name' => 'YASIN',
-        //     'user_id' => 9,
-        //     'role_id' => 2,
-        //     'office_id' => 15,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'NORAISA K. YASIN, PhD',
+            'first_name' => 'NORAISA',
+            'last_name' => 'YASIN',
+            'user_id' => 9,
+            'role_id' => 2,
+            'office_id' => 15,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'LANI B. ALCON, MPA',
-        //     'first_name' => 'LANI',
-        //     'last_name' => 'ALCON',
-        //     'user_id' => 10,
-        //     'role_id' => 2,
-        //     'office_id' => 16,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'LANI B. ALCON, MPA',
+            'first_name' => 'LANI',
+            'last_name' => 'ALCON',
+            'user_id' => 10,
+            'role_id' => 2,
+            'office_id' => 16,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'REBECCA D. SUBILLAGA, EdD-ELT',
-        //     'first_name' => 'REBECCA',
-        //     'last_name' => 'SUBILLAGA',
-        //     'user_id' => 11,
-        //     'role_id' => 2,
-        //     'office_id' => 17,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'REBECCA D. SUBILLAGA, EdD-ELT',
+            'first_name' => 'REBECCA',
+            'last_name' => 'SUBILLAGA',
+            'user_id' => 11,
+            'role_id' => 2,
+            'office_id' => 17,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'SUSIE D. DAZA, MS',
-        //     'first_name' => 'SUSIE',
-        //     'last_name' => 'DAZA',
-        //     'user_id' => 12,
-        //     'role_id' => 2,
-        //     'office_id' => 18,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'SUSIE D. DAZA, MS',
+            'first_name' => 'SUSIE',
+            'last_name' => 'DAZA',
+            'user_id' => 12,
+            'role_id' => 2,
+            'office_id' => 18,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'LEONCIO B. DULIN',
-        //     'first_name' => 'LEONCIO',
-        //     'last_name' => 'DULIN',
-        //     'user_id' => 13,
-        //     'role_id' => 2,
-        //     'office_id' => 19,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'LEONCIO B. DULIN',
+            'first_name' => 'LEONCIO',
+            'last_name' => 'DULIN',
+            'user_id' => 13,
+            'role_id' => 2,
+            'office_id' => 19,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'BENEDICT A. RABUT, DIT',
-        //     'first_name' => 'BENEDICT',
-        //     'last_name' => 'RABUT',
-        //     'user_id' => 14,
-        //     'role_id' => 2,
-        //     'office_id' => 20,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'BENEDICT A. RABUT, DIT',
+            'first_name' => 'BENEDICT',
+            'last_name' => 'RABUT',
+            'user_id' => 14,
+            'role_id' => 2,
+            'office_id' => 20,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'KRISTINE MAE H. AMPAS, MIT',
-        //     'first_name' => 'KRISTINE MAE',
-        //     'last_name' => 'AMPAS',
-        //     'user_id' => 15,
-        //     'role_id' => 2,
-        //     'office_id' => 21,
-        //     'position_id' => 15,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'KRISTINE MAE H. AMPAS, MIT',
+            'first_name' => 'KRISTINE MAE',
+            'last_name' => 'AMPAS',
+            'user_id' => 15,
+            'role_id' => 2,
+            'office_id' => 21,
+            'position_id' => 15,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'ALNE D. QUINOVEBA, PhD',
-        //     'first_name' => 'ALNE',
-        //     'last_name' => 'QUINOVEBA',
-        //     'user_id' => 16,
-        //     'role_id' => 2,
-        //     'office_id' => 22,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'ALNE D. QUINOVEBA, PhD',
+            'first_name' => 'ALNE',
+            'last_name' => 'QUINOVEBA',
+            'user_id' => 16,
+            'role_id' => 2,
+            'office_id' => 22,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'Lilibeth B. EDAÑO, EdD',
-        //     'first_name' => 'Lilibeth',
-        //     'last_name' => 'EDAÑO',
-        //     'user_id' => 17,
-        //     'role_id' => 2,
-        //     'office_id' => 23,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'Lilibeth B. EDAÑO, EdD',
+            'first_name' => 'Lilibeth',
+            'last_name' => 'EDAÑO',
+            'user_id' => 17,
+            'role_id' => 2,
+            'office_id' => 23,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'VIVENCIO L. CALIXTRO, JR., EdD',
-        //     'first_name' => 'VIVENCIO',
-        //     'last_name' => 'CALIXTRO',
-        //     'user_id' => 18,
-        //     'role_id' => 2,
-        //     'office_id' => 24,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'VIVENCIO L. CALIXTRO, JR., EdD',
+            'first_name' => 'VIVENCIO',
+            'last_name' => 'CALIXTRO',
+            'user_id' => 18,
+            'role_id' => 2,
+            'office_id' => 24,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'JESHER Y. PALOMARIA, CPA',
-        //     'first_name' => 'JESHER',
-        //     'last_name' => 'PALOMARIA',
-        //     'user_id' => 19,
-        //     'role_id' => 4,
-        //     'office_id' => 25,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'JESHER Y. PALOMARIA, CPA',
+            'first_name' => 'JESHER',
+            'last_name' => 'PALOMARIA',
+            'user_id' => 19,
+            'role_id' => 4,
+            'office_id' => 25,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'REY S. FUENTEBILLA, MAT',
-        //     'first_name' => 'REY',
-        //     'last_name' => 'FUENTEBILLA',
-        //     'user_id' => 20,
-        //     'role_id' => 2,
-        //     'office_id' => 26,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'REY S. FUENTEBILLA, MAT',
+            'first_name' => 'REY',
+            'last_name' => 'FUENTEBILLA',
+            'user_id' => 20,
+            'role_id' => 2,
+            'office_id' => 26,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'ANNERILL R. LORIO, MS',
-        //     'first_name' => 'ANNERILL',
-        //     'last_name' => 'LORIO',
-        //     'user_id' => 21,
-        //     'role_id' => 2,
-        //     'office_id' => 27,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'ANNERILL R. LORIO, MS',
+            'first_name' => 'ANNERILL',
+            'last_name' => 'LORIO',
+            'user_id' => 21,
+            'role_id' => 2,
+            'office_id' => 27,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'MARY JEAN S. FALSARIO, EdD',
-        //     'first_name' => 'MARY JEAN',
-        //     'last_name' => 'FALSARIO',
-        //     'user_id' => 22,
-        //     'role_id' => 2,
-        //     'office_id' => 28,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'MARY JEAN S. FALSARIO, EdD',
+            'first_name' => 'MARY JEAN',
+            'last_name' => 'FALSARIO',
+            'user_id' => 22,
+            'role_id' => 2,
+            'office_id' => 28,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'AMIRA MAE C. GUMANOY, PhD',
-        //     'first_name' => 'AMIRA MAE ',
-        //     'last_name' => 'GUMANOY',
-        //     'user_id' => 23,
-        //     'role_id' => 2,
-        //     'office_id' => 29,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'AMIRA MAE C. GUMANOY, PhD',
+            'first_name' => 'AMIRA MAE ',
+            'last_name' => 'GUMANOY',
+            'user_id' => 23,
+            'role_id' => 2,
+            'office_id' => 29,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'HASSANAL P. ABUSAMA, MS',
-        //     'first_name' => 'HASSANAL',
-        //     'last_name' => 'ABUSAMA',
-        //     'user_id' => 24,
-        //     'role_id' => 2,
-        //     'office_id' => 30,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'HASSANAL P. ABUSAMA, MS',
+            'first_name' => 'HASSANAL',
+            'last_name' => 'ABUSAMA',
+            'user_id' => 24,
+            'role_id' => 2,
+            'office_id' => 30,
+            'position_id' => 12,
+        ]);
 
-        // DB::table('employee_information')->insert([
-        //     'full_name' => 'GRACE R. PEDROLA, RN',
-        //     'first_name' => 'GRACE',
-        //     'last_name' => 'PEDROLA',
-        //     'user_id' => 25,
-        //     'role_id' => 2,
-        //     'office_id' => 31,
-        //     'position_id' => 12,
-        // ]);
+        DB::table('employee_information')->insert([
+            'full_name' => 'GRACE R. PEDROLA, RN',
+            'first_name' => 'GRACE',
+            'last_name' => 'PEDROLA',
+            'user_id' => 25,
+            'role_id' => 2,
+            'office_id' => 31,
+            'position_id' => 12,
+        ]);
 
         // DB::table('employee_information')->insert([
         //     'full_name' => 'ENGR. NESTOR ALCON',

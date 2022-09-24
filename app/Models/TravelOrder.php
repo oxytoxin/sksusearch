@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class TravelOrder extends Model
 {
@@ -15,6 +16,11 @@ class TravelOrder extends Model
         'date_to' => 'date',
         'has_registration' => 'boolean',
     ];
+
+    public static function generateTrackingCode(): string
+    {
+        return Str::uuid()->toString();
+    }
 
     protected function registrationAmount(): Attribute
     {
