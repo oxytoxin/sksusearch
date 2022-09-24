@@ -39,4 +39,14 @@ class TravelOrder extends Model
     {
         return $this->hasMany(Itenerary::class);
     }
+
+    public function applicants()
+    {
+        return $this->belongsToMany(User::class, 'travel_order_applicants', 'travel_order_id', 'user_id');
+    }
+
+    public function signatories()
+    {
+        return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->withPivot('is_approved');
+    }
 }

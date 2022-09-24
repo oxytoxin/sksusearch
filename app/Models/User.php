@@ -101,4 +101,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Itenerary::class);
     }
+
+    public function travel_order_applications()
+    {
+        return $this->belongsToMany(TravelOrder::class, 'travel_order_applicants', 'user_id', 'travel_order_id');
+    }
+
+    public function travel_order_signatories()
+    {
+        return $this->belongsToMany(TravelOrder::class, 'travel_order_signatories', 'user_id', 'travel_order_id')->withPivot('is_approved');
+    }
 }

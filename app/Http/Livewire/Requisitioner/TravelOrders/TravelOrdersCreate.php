@@ -19,6 +19,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class TravelOrdersCreate extends Component implements HasForms
@@ -29,7 +30,7 @@ class TravelOrdersCreate extends Component implements HasForms
 
     public $applicants = [];
 
-    public $signatory;
+    public $signatories = [];
 
     public $purpose;
 
@@ -59,18 +60,17 @@ class TravelOrdersCreate extends Component implements HasForms
             MultiSelect::make('applicants')
                 ->required()
                 ->options(EmployeeInformation::pluck('full_name', 'user_id')),
-            Select::make('signatory')
-                ->searchable()
+            MultiSelect::make('signatories')
                 ->required()
                 ->options(EmployeeInformation::pluck('full_name', 'user_id')),
             Textarea::make('purpose')
                 ->required(),
             Grid::make(2)->schema([
-                Toggle::make('has_registration')->default(false),
+                Toggle::make('has_registration')->reactive()->default(false),
                 TextInput::make('registration_amount')
                     ->numeric()
-                    ->visible(fn ($get) => $get('has_registration'))
-                    ->required(fn ($get) => $get('has_registration')),
+                    ->visible(fn ($get) => $get('has_registration') == true)
+                    ->required(fn ($get) => $get('has_registration') == true),
             ]),
             Grid::make(2)->schema([
                 Flatpickr::make('date_from')
@@ -78,7 +78,7 @@ class TravelOrdersCreate extends Component implements HasForms
                     ->required(),
                 Flatpickr::make('date_to')
                     ->disableTime()
-                    ->after(fn ($get) => $get('date_from'))
+                    ->afterOrEqual(fn ($get) => $get('date_from'))
                     ->required(),
             ]),
             Fieldset::make('Destination')->schema([
@@ -108,6 +108,7 @@ class TravelOrdersCreate extends Component implements HasForms
     public function save()
     {
         $this->validate();
+        DB::beginTransaction();
         $to = TravelOrder::create([
             'tracking_code' => TravelOrder::generateTrackingCode(),
             'travel_order_type_id' => $this->travel_order_type_id,
@@ -121,6 +122,9 @@ class TravelOrdersCreate extends Component implements HasForms
             'philippine_city_id' => PhilippineCity::firstWhere('city_municipality_code', $this->city_code)?->id,
             'other_details' => $this->other_details,
         ]);
+        $to->applicants()->attach($this->applicants);
+        $to->signatories()->attach($this->signatories);
+        DB::commit();
         Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
 
         return redirect()->route('requisitioner.travel-orders.show', $to);
