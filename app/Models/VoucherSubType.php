@@ -13,4 +13,9 @@ class VoucherSubType extends Model
     {
         return $this->belongsTo(VoucherType::class);
     }
+
+    public function related_documents_list()
+    {
+        return $this->hasOne(RelatedDocumentsList::class);
+    }
 }

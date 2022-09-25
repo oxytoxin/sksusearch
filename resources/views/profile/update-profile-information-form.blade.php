@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="description">
-        {{ __('Update your account\'s profile information and email address.') }}
+        {{ __('Update your account\'s profile information.') }}
     </x-slot>
 
     <x-slot name="form">
@@ -21,12 +21,14 @@
         <!-- Name -->
         <div class="col-span-6 sm:col-span-4">
             <h4 class="block text-sm font-medium text-gray-700">Name: {{ $this->user->employee_information->full_name }}</h4>
-            {{-- <x-jet-label for="name" value="{{ __('Name') }}" />
-            <x-jet-input id="name" type="text" class="block w-full mt-1" wire:model.defer="state.name" autocomplete="name" />
-            <x-jet-input-error for="name" class="mt-2" /> --}}
         </div>
 
         <!-- Email -->
+        <div class="col-span-6 sm:col-span-4">
+            <h4 class="block text-sm font-medium text-gray-700">Email: {{ $this->user->email }}</h4>
+        </div>
+
+        <!-- Birthday -->
         <div class="col-span-6 sm:col-span-4">
             <x-jet-label for="email" value="{{ __('Email') }}" />
             <x-jet-input id="email" type="email" class="block w-full mt-1" wire:model.defer="state.email" />
@@ -50,7 +52,7 @@
         </div>
     </x-slot>
 
-    <x-slot name="actions">
+    {{-- <x-slot name="actions">
         <x-jet-action-message class="mr-3" on="saved">
             {{ __('Saved.') }}
         </x-jet-action-message>
@@ -58,5 +60,5 @@
         <x-jet-button wire:loading.attr="disabled" wire:target="photo">
             {{ __('Save') }}
         </x-jet-button>
-    </x-slot>
+    </x-slot> --}}
 </x-jet-form-section>
