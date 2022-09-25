@@ -9,8 +9,8 @@ class PhilippineRegion extends Model
 {
     use HasFactory;
 
-    public function dtes()
+    public function dte()
     {
-        return $this->hasMany(Dte::class);
+        return $this->hasOne(Dte::class);
     }
 }

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->time('departure_time');
             $table->time('arrival_time');
             $table->integer('transportation_expenses');
-            $table->integer('other_expenses');
+            $table->integer('other_expenses')->default(0);
             $table->timestamps();
         });
     }

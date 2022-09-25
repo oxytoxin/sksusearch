@@ -104,12 +104,12 @@ class User extends Authenticatable
 
     public function travel_order_applications()
     {
-        return $this->belongsToMany(TravelOrder::class, 'travel_order_applicants', 'user_id', 'travel_order_id');
+        return $this->belongsToMany(TravelOrder::class, 'travel_order_applicants', 'user_id', 'travel_order_id')->withTimestamps();
     }
 
     public function travel_order_signatories()
     {
-        return $this->belongsToMany(TravelOrder::class, 'travel_order_signatories', 'user_id', 'travel_order_id')->withPivot('is_approved');
+        return $this->belongsToMany(TravelOrder::class, 'travel_order_signatories', 'user_id', 'travel_order_id')->withPivot('is_approved')->withTimestamps();
     }
 
     public function sidenotes()

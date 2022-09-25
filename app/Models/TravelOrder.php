@@ -30,6 +30,11 @@ class TravelOrder extends Model
         );
     }
 
+    public function travel_order_type()
+    {
+        return $this->belongsTo(TravelOrderType::class);
+    }
+
     public function cash_advances()
     {
         return $this->hasMany(CashAdvance::class);
@@ -62,16 +67,31 @@ class TravelOrder extends Model
 
     public function applicants()
     {
-        return $this->belongsToMany(User::class, 'travel_order_applicants', 'travel_order_id', 'user_id');
+        return $this->belongsToMany(User::class, 'travel_order_applicants', 'travel_order_id', 'user_id')->withTimestamps();
     }
 
     public function signatories()
     {
-        return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->withPivot('is_approved');
+        return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->withPivot('is_approved')->withTimestamps();
     }
 
     public function sidenotes()
     {
         return $this->morphMany(Sidenotes::class, 'sidenoteable');
+    }
+
+    public function philippine_region()
+    {
+        return $this->belongsTo(PhilippineRegion::class);
+    }
+
+    public function philippine_province()
+    {
+        return $this->belongsTo(PhilippineProvince::class);
+    }
+
+    public function philippine_city()
+    {
+        return $this->belongsTo(PhilippineCity::class);
     }
 }
