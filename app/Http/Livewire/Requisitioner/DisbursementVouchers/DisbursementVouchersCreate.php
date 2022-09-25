@@ -23,7 +23,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
 {
     use InteractsWithForms;
     public $tracking_number;
-    public $payee;
+    // public $payee;
 
     public VoucherSubType $voucher_subtype;
 
@@ -70,6 +70,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 'self' => 'Self',
                                 'others' => 'Others',
                             ])
+                            ->visible(fn () => !in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                             ->default('self')
                             ->afterStateUpdated(function ($state, $set) {
                                 if ($state == 'self') {
@@ -96,13 +97,16 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 TextInput::make('purpose'),
                                 Grid::make(3)->schema([
                                     TextInput::make('responsibility_center')
-                                        ->required(),
+                                        ->required()
+                                        ->required(fn () => in_array($this->voucher_subtype->id,[1,2,6,7])),
                                     TextInput::make('mfo_pap')
                                         ->label('MFO/PAP')
-                                        ->required(),
+                                        ->required()
+                                        ->required(fn () => in_array($this->voucher_subtype->id,[1,2,6,7])),
                                     TextInput::make('amount')
                                         ->numeric()
-                                        ->required(),
+                                        ->required()
+                                        ->required(fn () => in_array($this->voucher_subtype->id,[1,2,6,7])),
                                 ]),
                             ])
                             ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
@@ -116,7 +120,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                 Step::make('DV Signatories')
                     ->description('Select the appropriate signatory for the disbursement voucher.')
                     ->schema([
-                        // ...
+                        
                     ]),
                 Step::make('Preview DV')
                     ->description('Review and confirm information for submission.')

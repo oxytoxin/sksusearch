@@ -1,6 +1,15 @@
 <x-forms::field-wrapper :id="$getId()" :label="$getLabel()" :label-sr-only="$isLabelHidden()" :helper-text="$getHelperText()" :hint="$getHint()"
 	:hint-icon="$getHintIcon()" :required="$isRequired()" :state-path="$getStatePath()">
-
+@php
+	$particulars = $evaluate(fn($get) => $get('disbursement_voucher_particulars'));
+	$mop = $evaluate(fn($get) => $get('mode_of_payment'));
+	$total_amount =0;
+	
+	foreach ($particulars as $particular){
+		$total_amount +=$particular['amount'];
+	}
+	
+@endphp
 	<div x-data="{ state: $wire.entangle('{{ $getStatePath() }}').defer }">
 		{{-- {{ $employee_id }} --}}
 		{{-- {{ $evaluate(fn($get) => $get('activity_name')) }} --}}
@@ -68,10 +77,6 @@
 					<div class="flex h-full px-2 py-1 text-center border-r-2 border-black">
 						<span class="text-sm font-extrabold">Mode of Payment</span>
 					</div>
-					@php
-						$mop = $evaluate(fn($get) => $get('mode_of_payment'));
-						
-					@endphp
 					<div class="flex py-1 ml-10 space-x-2">
 						<div class="relative flex items-start">
 							<div class="flex items-center h-5">
@@ -155,7 +160,7 @@
 					</div>
 					<div class="flex w-1/2 h-full text-left border-r-2 border-black">
 						<span class="flex pl-2 my-auto font-extrabold uppercase print:text-10 text-serif">
-							{{ $evaluate(fn($get) => $get('employee_id')) }} </span>
+							{{ $evaluate(fn($get) => $get('payee')) }} </span>
 					</div>
 					<div class="flex w-64 h-full px-2 py-1 text-left border-r-2 border-black">
 						<span class="pb-3 text-xs font-extrabold">TIN/Employee No.:</span>
@@ -187,16 +192,26 @@
 				</div>
 				<div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-10">
 					<div class="w-1/2 text-center border-r-2 border-black h-44">
-						{{ $evaluate(fn($get) => $get('activity_name')) }}
+						
+						@foreach ($particulars as $particular)
+							{{ $particular['purpose'] }}
+						@endforeach
+						
 					</div>
 					<div class="w-64 text-center border-r-2 border-black h-44">
-						{{ $evaluate(fn($get) => $get('responsibility_center')) }}
+						@foreach ($particulars as $particular)
+							{{ $particular['responsibility_center'] }}
+						@endforeach
 					</div>
 					<div class="text-center border-r-2 border-black h-44 w-36">
-						{{ $evaluate(fn($get) => $get('mfo_pap')) }}
+						@foreach ($particulars as $particular)
+							{{ $particular['mfo_pap'] }}
+						@endforeach
 					</div>
 					<div class="text-right h-44 w-36">
-						{{ $evaluate(fn($get) => $get('amount')) }}
+						@foreach ($particulars as $particular)
+							{{ $particular['amount'] }}
+						@endforeach
 					</div>
 				</div>
 				<div class="flex items-start min-w-full col-span-8 font-serif border-black print:text-12">
@@ -210,7 +225,7 @@
 						&nbsp
 					</div>
 					<div class="h-auto text-right border-t-2 border-black print:text-10 w-36">
-						{{ $evaluate(fn($get) => $get('amount')) }}
+						{{ $total_amount}}
 					</div>
 				</div>
 				<div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black">
