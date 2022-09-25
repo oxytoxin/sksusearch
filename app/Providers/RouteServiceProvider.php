@@ -39,6 +39,16 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/custom/requisitioner.php'));
             Route::middleware('web')
                 ->group(base_path('routes/custom/offices.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/custom/signatory.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/custom/icu.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/custom/accounting.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/custom/cashier.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/custom/archiver.php'));
         });
     }
 

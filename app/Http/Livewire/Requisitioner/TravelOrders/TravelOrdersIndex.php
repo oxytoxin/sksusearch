@@ -35,7 +35,7 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
     {
         return[
             Action::make('view')
-            ->url(fn (TravelOrder $record): string => route('requisitioner.travel-orders.show', $record))
+            ->url(fn (TravelOrder $record): string => route('requisitioner.travel-orders.view', $record))
             ->icon('heroicon-o-eye'),
             Action::make('print')
             ->visible(function($record){
