@@ -61,6 +61,7 @@ class IteneraryCreate extends Component implements HasForms
                             'data' => [
                                 'date' => $day->toDateString(),
                                 'per_diem' => $per_diem,
+                                'original_per_diem' => $per_diem,
                                 'total_expenses' => 0,
                                 'breakfast' => false,
                                 'lunch' => false,
@@ -84,10 +85,10 @@ class IteneraryCreate extends Component implements HasForms
                         ->required(),
                     TextInput::make('per_diem')->disabled(),
                     Fieldset::make('Coverage')->schema([
-                        Toggle::make('breakfast')->inline(false),
-                        Toggle::make('lunch')->inline(false),
-                        Toggle::make('dinner')->inline(false),
-                        Toggle::make('lodging')->inline(false),
+                        Toggle::make('breakfast')->inline(false)->reactive(),
+                        Toggle::make('lunch')->inline(false)->reactive(),
+                        Toggle::make('dinner')->inline(false)->reactive(),
+                        Toggle::make('lodging')->inline(false)->reactive(),
                     ])->columns(4),
                     Repeater::make('itenerary_entries')->schema([
                         Select::make('mot_id')
@@ -101,6 +102,7 @@ class IteneraryCreate extends Component implements HasForms
                                 ->required(),
                             Flatpickr::make('arrival_time')
                                 ->disableDate()
+                                ->afterOrEqual('departure_time')
                                 ->required(),
 
                         ]),
@@ -123,6 +125,8 @@ class IteneraryCreate extends Component implements HasForms
         foreach ($this->itenerary_entries as $entry) {
             $coverage[] = [
                 'date' => $entry['data']['date'],
+                'per_diem' => $entry['data']['per_diem'],
+                'total_expenses' => $entry['data']['total_expenses'],
                 'breakfast' => $entry['data']['breakfast'],
                 'lunch' => $entry['data']['lunch'],
                 'dinner' => $entry['data']['dinner'],
@@ -151,6 +155,8 @@ class IteneraryCreate extends Component implements HasForms
         }
         DB::commit();
         Notification::make()->title('Operation Success')->body('Itenerary has been created.')->success()->send();
+
+        return redirect()->route('requisitioner.itenerary.show', ['itenerary' => $itenerary]);
     }
 
     public function mount()
@@ -161,6 +167,21 @@ class IteneraryCreate extends Component implements HasForms
     public function render()
     {
         foreach ($this->itenerary_entries as  $key => $entry) {
+            $original_per_diem = $entry['data']['original_per_diem'];
+            $per_diem = $original_per_diem;
+            if ($entry['data']['breakfast']) {
+                $per_diem -= $original_per_diem * 0.1;
+            }
+            if ($entry['data']['lunch']) {
+                $per_diem -= $original_per_diem * 0.1;
+            }
+            if ($entry['data']['dinner']) {
+                $per_diem -= $original_per_diem * 0.1;
+            }
+            if ($entry['data']['lodging']) {
+                $per_diem -= $original_per_diem * 0.5;
+            }
+            $this->itenerary_entries[$key]['data']['per_diem'] = $per_diem;
             $this->itenerary_entries[$key]['data']['total_expenses'] = collect($entry['data']['itenerary_entries'])->sum('transportation_expenses') + collect($entry['data']['itenerary_entries'])->sum('other_expenses');
         }
 
