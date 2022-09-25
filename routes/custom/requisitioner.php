@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Livewire\Requisitioner\Itenerary\IteneraryCreate;
+use App\Http\Livewire\Requisitioner\Itenerary\IteneraryShow;
 use App\Http\Livewire\Requisitioner\TransactionsIndex;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersCreate;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersIndex;
@@ -19,5 +20,5 @@ Route::middleware([
     Route::get('/travel-orders', TravelOrdersIndex::class)->name('travel-orders.index');
     Route::get('/travel-orders/{travel_order}', TravelOrdersShow::class)->name('travel-orders.show');
     Route::get('/itenerary/create', IteneraryCreate::class)->name('itenerary.create');
-    
+    Route::get('/itenerary/{itenerary}', IteneraryShow::class)->name('itenerary.show');
 });
