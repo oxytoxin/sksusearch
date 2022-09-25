@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCreate;
 use App\Http\Livewire\Requisitioner\Itenerary\IteneraryCreate;
 use App\Http\Livewire\Requisitioner\Itenerary\IteneraryShow;
 use App\Http\Livewire\Requisitioner\TransactionsIndex;
@@ -21,4 +22,5 @@ Route::middleware([
     Route::get('/travel-orders/{travel_order}', TravelOrdersShow::class)->name('travel-orders.show');
     Route::get('/itenerary/create', IteneraryCreate::class)->name('itenerary.create');
     Route::get('/itenerary/{itenerary}', IteneraryShow::class)->name('itenerary.show');
+    Route::get('/disbursement-vouchers/{voucher_subtype}/create', DisbursementVouchersCreate::class)->name('disbursement-vouchers.create');
 });
