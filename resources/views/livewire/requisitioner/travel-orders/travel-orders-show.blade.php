@@ -75,7 +75,7 @@
                             </span>
                             @if (isset($signatories))
                             @foreach ($signatories as $signatory)
-                            <span class="block pt-16 font-semibold tracking-wide text-center text-black text-md underline">
+                            <span class="block pt-16 font-semibold tracking-wide text-center text-black underline text-md">
                                 {{ $signatory->full_name}}
                             </span>
 
@@ -200,7 +200,7 @@
                             </span>
                             @if (isset($signatories))
                             @foreach ($signatories as $signatory)
-                            <span class="block pt-16 font-semibold tracking-wide text-center text-black text-md underline">
+                            <span class="block pt-16 font-semibold tracking-wide text-center text-black underline text-md">
                                 {{ $signatory->full_name}}
                             </span>
 
