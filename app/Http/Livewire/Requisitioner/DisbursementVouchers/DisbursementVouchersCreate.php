@@ -6,12 +6,12 @@ use App\Models\Mop;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
 use App\Models\VoucherSubType;
+use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ViewField;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
@@ -22,8 +22,10 @@ use Livewire\Component;
 class DisbursementVouchersCreate extends Component implements HasForms
 {
     use InteractsWithForms;
+
     public $tracking_number;
-    // public $payee;
+
+    public $payee;
 
     public VoucherSubType $voucher_subtype;
 
@@ -54,15 +56,23 @@ class DisbursementVouchersCreate extends Component implements HasForms
                             ->reactive()
                             ->afterStateUpdated(function ($set, $state) {
                                 $to = TravelOrder::find($state);
-                                $itenerary = $to->iteneraries()->whereUserId(auth()->id())->first();
-                                $set('disbursement_voucher_particulars', [
-                                    [
-                                        'purpose' => $to->purpose,
-                                        'responsibility_center' => '',
-                                        'mfo_pap' => '',
-                                        'amount' => $to->total_amount,
-                                    ],
-                                ]);
+                                if ($to) {
+                                    $itenerary = $to->iteneraries()->whereUserId(auth()->id())->first();
+                                    $amount = $to->registration_amount;
+                                    foreach ($itenerary['coverage'] as $entry) {
+                                        $amount += $entry['per_diem'];
+                                    }
+                                    $set('disbursement_voucher_particulars', [
+                                        [
+                                            'purpose' => $to->purpose,
+                                            'responsibility_center' => '',
+                                            'mfo_pap' => '',
+                                            'amount' => $amount,
+                                        ],
+                                    ]);
+                                } else {
+                                    $set('disbursement_voucher_particulars', []);
+                                }
                             }),
                         Radio::make('payee_mode')
                             ->label('Payee Mode')
@@ -70,7 +80,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 'self' => 'Self',
                                 'others' => 'Others',
                             ])
-                            ->visible(fn () => !in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                            ->visible(fn () => ! in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                             ->default('self')
                             ->afterStateUpdated(function ($state, $set) {
                                 if ($state == 'self') {
@@ -98,37 +108,42 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 Grid::make(3)->schema([
                                     TextInput::make('responsibility_center')
                                         ->required()
-                                        ->required(fn () => in_array($this->voucher_subtype->id,[1,2,6,7])),
+                                        ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
                                     TextInput::make('mfo_pap')
                                         ->label('MFO/PAP')
                                         ->required()
-                                        ->required(fn () => in_array($this->voucher_subtype->id,[1,2,6,7])),
+                                        ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
                                     TextInput::make('amount')
                                         ->numeric()
                                         ->required()
-                                        ->required(fn () => in_array($this->voucher_subtype->id,[1,2,6,7])),
+                                        ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
                                 ]),
                             ])
+                            ->visible(fn ($get) => $get('travel_order_id'))
                             ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                             ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
                     ]),
                 Step::make('Review Related Documents')
                     ->description('Ensure all the required documents are complete before proceeding.')
                     ->schema([
-                        // ...
+                        Card::make()
+                            ->schema([
+                                ViewField::make('related_documents_list')->disableLabel()->view('components.disbursement_vouchers.related_documents'),
+                            ]),
                     ]),
                 Step::make('DV Signatories')
                     ->description('Select the appropriate signatory for the disbursement voucher.')
                     ->schema([
-                        
+                        Card::make()
+                            ->schema([]),
                     ]),
                 Step::make('Preview DV')
                     ->description('Review and confirm information for submission.')
                     ->schema([
                         Card::make()
-                        ->schema([
-                            ViewField::make('voucher_preview')->label("Voucher Preview")->view('components.forms.voucher-preview')
-                        ])  
+                            ->schema([
+                                ViewField::make('voucher_preview')->label('Voucher Preview')->view('components.forms.voucher-preview'),
+                            ]),
                     ]),
             ])->skippable(),
         ];
@@ -136,9 +151,8 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public function mount()
     {
-        $this->form->fill(
-            ["tracking_number"=>"DV_".now()->format('Y').'-'.now()->format('m').'-'.rand(1,999),'payee_mode'=>'self','payee'=>auth()->user()->employee_information->full_name]
-        );
+        $this->tracking_number = 'DV_'.now()->format('Y').'-'.now()->format('m').'-'.rand(1, 999);
+        $this->form->fill();
     }
 
     public function render()
