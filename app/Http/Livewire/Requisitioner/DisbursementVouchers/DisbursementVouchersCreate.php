@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
+use App\Models\EmployeeInformation;
 use App\Models\Mop;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
@@ -36,92 +37,94 @@ class DisbursementVouchersCreate extends Component implements HasForms
                 Step::make('DV Main Information Form')
                     ->description('Fill up the form for the disbursement voucher.')
                     ->schema([
-                        Select::make('voucher_subtype_id')
-                            ->label('Disbursement Voucher for')
-                            ->options(VoucherSubType::all()->pluck('name', 'id'))
-                            ->disabled()
-                            ->default($this->voucher_subtype->id),
-                        Select::make('travel_order_id')
-                            ->label('Travel Order')
-                            ->searchable()
-                            ->preload()
-                            ->visible(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
-                            ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
-                            ->options(TravelOrder::approved()
-                                ->whereHas('iteneraries', function ($query) {
-                                    $query->whereUserId(auth()->id());
-                                })
-                                ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS)
-                                ->pluck('tracking_code', 'id'))
-                            ->reactive()
-                            ->afterStateUpdated(function ($set, $state) {
-                                $to = TravelOrder::find($state);
-                                if ($to) {
-                                    $itenerary = $to->iteneraries()->whereUserId(auth()->id())->first();
-                                    $amount = $to->registration_amount;
-                                    foreach ($itenerary['coverage'] as $entry) {
-                                        $amount += $entry['per_diem'];
+                        Card::make()->schema([
+                            Select::make('voucher_subtype_id')
+                                ->label('Disbursement Voucher for')
+                                ->options(VoucherSubType::all()->pluck('name', 'id'))
+                                ->disabled()
+                                ->default($this->voucher_subtype->id),
+                            Select::make('travel_order_id')
+                                ->label('Travel Order')
+                                ->searchable()
+                                ->preload()
+                                ->visible(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                                ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                                ->options(TravelOrder::approved()
+                                    ->whereHas('iteneraries', function ($query) {
+                                        $query->whereUserId(auth()->id());
+                                    })
+                                    ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS)
+                                    ->pluck('tracking_code', 'id'))
+                                ->reactive()
+                                ->afterStateUpdated(function ($set, $state) {
+                                    $to = TravelOrder::find($state);
+                                    if ($to) {
+                                        $itenerary = $to->iteneraries()->whereUserId(auth()->id())->first();
+                                        $amount = $to->registration_amount;
+                                        foreach ($itenerary['coverage'] as $entry) {
+                                            $amount += $entry['per_diem'];
+                                        }
+                                        $set('disbursement_voucher_particulars', [
+                                            [
+                                                'purpose' => $to->purpose,
+                                                'responsibility_center' => '',
+                                                'mfo_pap' => '',
+                                                'amount' => $amount,
+                                            ],
+                                        ]);
+                                    } else {
+                                        $set('disbursement_voucher_particulars', []);
                                     }
-                                    $set('disbursement_voucher_particulars', [
-                                        [
-                                            'purpose' => $to->purpose,
-                                            'responsibility_center' => '',
-                                            'mfo_pap' => '',
-                                            'amount' => $amount,
-                                        ],
-                                    ]);
-                                } else {
-                                    $set('disbursement_voucher_particulars', []);
-                                }
-                            }),
-                        Radio::make('payee_mode')
-                            ->label('Payee Mode')
-                            ->options([
-                                'self' => 'Self',
-                                'others' => 'Others',
-                            ])
-                            ->visible(fn () => ! in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
-                            ->default('self')
-                            ->afterStateUpdated(function ($state, $set) {
-                                if ($state == 'self') {
-                                    $set('payee', auth()->user()->employee_information->full_name);
-                                } else {
-                                    $set('payee', '');
-                                }
-                            })
-                            ->inline()
-                            ->reactive(),
-                        Grid::make(2)->schema([
-                            TextInput::make('payee')
-                                ->disabled(fn ($get) => $get('payee_mode') == 'self')
-                                ->required()
-                                ->placeholder('Enter payee name')
-                                ->default(auth()->user()->employee_information->full_name),
-                            Select::make('mop_id')
-                                ->label('Mode of Payment')
-                                ->options(Mop::pluck('name', 'id'))
-                                ->required(),
+                                }),
+                            Radio::make('payee_mode')
+                                ->label('Payee Mode')
+                                ->options([
+                                    'self' => 'Self',
+                                    'others' => 'Others',
+                                ])
+                                ->visible(fn () => ! in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                                ->default('self')
+                                ->afterStateUpdated(function ($state, $set) {
+                                    if ($state == 'self') {
+                                        $set('payee', auth()->user()->employee_information->full_name);
+                                    } else {
+                                        $set('payee', '');
+                                    }
+                                })
+                                ->inline()
+                                ->reactive(),
+                            Grid::make(2)->schema([
+                                TextInput::make('payee')
+                                    ->disabled(fn ($get) => $get('payee_mode') == 'self')
+                                    ->required()
+                                    ->placeholder('Enter payee name')
+                                    ->default(auth()->user()->employee_information->full_name),
+                                Select::make('mop_id')
+                                    ->label('Mode of Payment')
+                                    ->options(Mop::pluck('name', 'id'))
+                                    ->required(),
+                            ]),
+                            Repeater::make('disbursement_voucher_particulars')
+                                ->schema([
+                                    TextInput::make('purpose'),
+                                    Grid::make(3)->schema([
+                                        TextInput::make('responsibility_center')
+                                            ->required()
+                                            ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
+                                        TextInput::make('mfo_pap')
+                                            ->label('MFO/PAP')
+                                            ->required()
+                                            ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
+                                        TextInput::make('amount')
+                                            ->numeric()
+                                            ->required()
+                                            ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
+                                    ]),
+                                ])
+                                ->visible(fn ($get) => $get('travel_order_id'))
+                                ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                                ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
                         ]),
-                        Repeater::make('disbursement_voucher_particulars')
-                            ->schema([
-                                TextInput::make('purpose'),
-                                Grid::make(3)->schema([
-                                    TextInput::make('responsibility_center')
-                                        ->required()
-                                        ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
-                                    TextInput::make('mfo_pap')
-                                        ->label('MFO/PAP')
-                                        ->required()
-                                        ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
-                                    TextInput::make('amount')
-                                        ->numeric()
-                                        ->required()
-                                        ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
-                                ]),
-                            ])
-                            ->visible(fn ($get) => $get('travel_order_id'))
-                            ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
-                            ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
                     ]),
                 Step::make('Review Related Documents')
                     ->description('Ensure all the required documents are complete before proceeding.')
@@ -131,11 +134,17 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ViewField::make('related_documents_list')->disableLabel()->view('components.disbursement_vouchers.related_documents'),
                             ]),
                     ]),
-                Step::make('DV Signatories')
+                Step::make('DV Signatory')
                     ->description('Select the appropriate signatory for the disbursement voucher.')
                     ->schema([
                         Card::make()
-                            ->schema([]),
+                            ->schema([
+                                Select::make('signatory_id')
+                                    ->label('Signatory')
+                                    ->searchable()
+                                    ->required()
+                                    ->options(EmployeeInformation::whereIn('position_id', [5, 12, 13, 11, 14, 15, 16, 17, 18, 19, 20, 21, 25])->pluck('full_name', 'user_id')),
+                            ]),
                     ]),
                 Step::make('Preview DV')
                     ->description('Review and confirm information for submission.')
@@ -145,7 +154,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ViewField::make('voucher_preview')->label('Voucher Preview')->view('components.forms.voucher-preview'),
                             ]),
                     ]),
-            ])->skippable(),
+            ]),
         ];
     }
 

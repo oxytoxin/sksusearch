@@ -209,10 +209,9 @@
                                 $signatory_details;
                                 $full_name;
                                 if ($evaluate(fn($get) => $get('signatory_id')) != null) {
-                                    $signatory_details = \App\Models\Employee_information::findOrFail($evaluate(fn($get) => $get('signatory_id')));
+                                    $signatory_details = \App\Models\EmployeeInformation::firstWhere('user_id', $evaluate(fn($get) => $get('signatory_id')));
                                     $temp;
                                     if (isset($signatory_details)) {
-                                        # code...
                                         $temp = explode(',', $signatory_details->full_name);
                                     } else {
                                         $temp = ['none'];
@@ -226,8 +225,8 @@
                                 {{ isset($full_name) ? $full_name : 'none' }}
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
                             <p class="font-extrabold capitalize print:text-10">
-                                {{ isset($signatory_details) ? $signatory_details->position->position_desc : 'none' }} <span class="lowercase">of</span>
-                                {{ isset($signatory_details) ? $signatory_details->office->office_name : 'none' }}</p>
+                                {{ isset($signatory_details) ? $signatory_details->position->description : 'none' }} <span class="lowercase">of</span>
+                                {{ isset($signatory_details) ? $signatory_details->office->name : 'none' }}</p>
                         </div>
                     </div>
                 </div>
