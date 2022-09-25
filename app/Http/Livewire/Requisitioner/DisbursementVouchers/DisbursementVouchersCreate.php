@@ -9,8 +9,10 @@ use App\Models\VoucherSubType;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\ViewField;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -20,6 +22,8 @@ use Livewire\Component;
 class DisbursementVouchersCreate extends Component implements HasForms
 {
     use InteractsWithForms;
+    public $tracking_number;
+    public $payee;
 
     public VoucherSubType $voucher_subtype;
 
@@ -117,15 +121,20 @@ class DisbursementVouchersCreate extends Component implements HasForms
                 Step::make('Preview DV')
                     ->description('Review and confirm information for submission.')
                     ->schema([
-                        // ...
+                        Card::make()
+                        ->schema([
+                            ViewField::make('voucher_preview')->label("Voucher Preview")->view('components.forms.voucher-preview')
+                        ])  
                     ]),
-            ]),
+            ])->skippable(),
         ];
     }
 
     public function mount()
     {
-        $this->form->fill();
+        $this->form->fill(
+            ["tracking_number"=>"DV_".now()->format('Y').'-'.now()->format('m').'-'.rand(1,999),'payee_mode'=>'self','payee'=>auth()->user()->employee_information->full_name]
+        );
     }
 
     public function render()

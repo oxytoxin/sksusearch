@@ -11,6 +11,14 @@ module.exports = {
     ],
     theme: {
         extend: {
+            fontSize:{
+                '12':'12px',
+                '10':'10px',
+                '8':'8px',
+            },
+            screens: {
+                'print': { 'raw': 'print' },
+            },
             fontFamily: {
                 sans: ['Rubik', ...defaultTheme.fontFamily.sans],
             },
