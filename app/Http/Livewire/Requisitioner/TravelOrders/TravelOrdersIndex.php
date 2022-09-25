@@ -45,13 +45,6 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
             ->icon('heroicon-o-printer'),
         ];
     }
-
-    protected function getTableFilters(): array
-{
-    return [
-        Filter::make('pivot.is_approved')->toggle()
-    ];
-}
     
     public function render()
     {
