@@ -74,4 +74,13 @@ class TravelOrder extends Model
     {
         return $this->belongsTo(PhilippineCity::class);
     }
+
+    public function scopeApproved($query)
+    {
+        $query->whereDoesntHave('iteneraries', function ($query) {
+            $query->where('user_id', auth()->id());
+        })->whereDoesntHave('signatories', function ($query) {
+            $query->where('is_approved', false);
+        });
+    }
 }

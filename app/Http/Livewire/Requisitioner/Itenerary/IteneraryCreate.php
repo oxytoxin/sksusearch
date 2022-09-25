@@ -39,37 +39,38 @@ class IteneraryCreate extends Component implements HasForms
                 ->label('Travel Order')
                 ->searchable()
                 ->preload()
-                ->options(TravelOrder::whereDoesntHave('iteneraries', function ($query) {
-                    $query->where('user_id', auth()->id());
-                })->whereDoesntHave('signatories', function ($query) {
-                    $query->where('is_approved', false);
-                })
+                ->options(TravelOrder::approved()
+                    ->whereHas('applicants', function ($query) {
+                        $query->whereUserId(auth()->id());
+                    })
                     ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS)
                     ->pluck('tracking_code', 'id'))
                 ->afterStateUpdated(function () {
                     $to = TravelOrder::with('philippine_region.dte')->find($this->travel_order_id);
-                    $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
                     $entries = [];
-                    foreach ($days as  $day) {
-                        if ($day != $to->date_to) {
-                            $per_diem = $to->philippine_region->dte->amount;
-                        } else {
-                            $per_diem = $to->philippine_region->dte->amount / 2;
+                    if (! $to) {
+                        $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
+                        foreach ($days as  $day) {
+                            if ($day != $to->date_to) {
+                                $per_diem = $to->philippine_region->dte->amount;
+                            } else {
+                                $per_diem = $to->philippine_region->dte->amount / 2;
+                            }
+                            $entries[Str::uuid()->toString()] = [
+                                'type' => 'new_entry',
+                                'data' => [
+                                    'date' => $day->toDateString(),
+                                    'per_diem' => $per_diem,
+                                    'original_per_diem' => $per_diem,
+                                    'total_expenses' => 0,
+                                    'breakfast' => false,
+                                    'lunch' => false,
+                                    'dinner' => false,
+                                    'lodging' => false,
+                                    'itenerary_entries' => [],
+                                ],
+                            ];
                         }
-                        $entries[Str::uuid()->toString()] = [
-                            'type' => 'new_entry',
-                            'data' => [
-                                'date' => $day->toDateString(),
-                                'per_diem' => $per_diem,
-                                'original_per_diem' => $per_diem,
-                                'total_expenses' => 0,
-                                'breakfast' => false,
-                                'lunch' => false,
-                                'dinner' => false,
-                                'lodging' => false,
-                                'itenerary_entries' => [],
-                            ],
-                        ];
                     }
                     $this->itenerary_entries = $entries;
                 })

@@ -5,7 +5,9 @@
             {{ $this->form }}
         </div>
         <div>
-            <x-filament-support::button type="submit" wire:target='save'>Save</x-filament-support::button>
+            @if ($travel_order_id)
+                <x-filament-support::button type="submit" wire:target='save'>Save</x-filament-support::button>
+            @endif
         </div>
         
     </form>

@@ -1,11 +1,12 @@
 <div>
     <h4>Create Travel Order</h4>
-   <div class="mt-4">
-    <form wire:submit.prevent='save'>
+    <form wire:submit.prevent='save' class="flex flex-col gap-4">
         <div>
             {{ $this->form }}
         </div>
-        <x-filament-support::button type="submit" wire:target='save' class="mt-5 hover:bg-primary">Save</x-filament-support::button>
+        <div>
+            <x-filament-support::button type="submit" wire:target='save'>Save</x-filament-support::button>
+        </div>
     </form>
-   </div>
+</div>
 </div>
