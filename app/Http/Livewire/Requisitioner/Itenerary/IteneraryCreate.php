@@ -40,6 +40,9 @@ class IteneraryCreate extends Component implements HasForms
                 ->searchable()
                 ->preload()
                 ->options(TravelOrder::approved()
+                    ->whereDoesntHave('iteneraries', function ($query) {
+                        $query->where('user_id', auth()->id());
+                    })
                     ->whereHas('applicants', function ($query) {
                         $query->whereUserId(auth()->id());
                     })

@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Livewire\Icu\IcuDashboard;
-use App\Http\Livewire\Signatory\TravelOrders\TravelOrdersIndex;
+use App\Http\Livewire\ICU\IcuDashboard;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([

@@ -42,7 +42,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                             ->visible(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                             ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                             ->options(TravelOrder::approved()
-
+                                ->whereHas('iteneraries', function ($query) {
+                                    $query->whereUserId(auth()->id());
+                                })
                                 ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS)
                                 ->pluck('tracking_code', 'id'))
                             ->reactive()
