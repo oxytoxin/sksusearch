@@ -24,7 +24,7 @@
 <body class="antialiased">
     <x-jet-banner />
 
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-white">
         @livewire('navigation-menu')
 
         <!-- Page Content -->
@@ -98,10 +98,8 @@
                                     x-transition:leave-end = 'opacity-0 scale-95' class="origin-top-left">
                                      <a href="{{ route('requisitioner.travel-orders.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                                             My Travel Orders</a>
-                                        <a href="#" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                                            Pending Travel Orders</a>
-                                        <a href="#" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                                            Approved Travel Orders</a>
+                                            <a href="#" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                                            Travel orders to sign</a> 
                                     </div>
                                     </div>
                                 </div>
