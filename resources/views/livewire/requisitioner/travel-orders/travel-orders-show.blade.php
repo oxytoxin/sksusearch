@@ -1,5 +1,5 @@
-<div>
-     <div class="col-span-2">
+<div >
+     <div id="print_to" class="col-span-2">
      <div class="flex justify-between w-full p-6 border-b-4 border-black print:flex">
       <div id="header" class="flex w-full ml-3 text-left">
                 <div class="inline my-auto"><img src="http://sksu.edu.ph/wp-content/uploads/2020/09/512x512-1.png"
@@ -270,52 +270,26 @@
       @endif
       
       @endif
-       
-       {{-- @if ($travel_order->isDraft == true)
-        <button wire:click="deleteTO('{{ $travel_order->to_type }}')" id="printto"
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white bg-red-500 rounded-full w-sm hover:bg-red-200 hover:text-primary-500 active:bg-primary-500 active:text-white">Delete
-            Travel Order</button>
-        <a href="{{route('travel-order', ['id'=>3,'isEdit'=>1,'travelOrderID'=>$travelorderID])}}"
-            id="printto"
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">Edit
-            Travel Order</a>
-        @else
-        @if ($isSignatory==1)
-        <button wire:click="declineTO('{{ $travel_order->to_type }}')" id="decline"
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white bg-red-500 rounded-full w-sm hover:bg-red-200 hover:text-primary-500 active:bg-primary-500 active:text-white">Decline
-            Travel Order</button>
-        <button wire:click="approveTO('{{ $travel_order->to_type }}')" id="approve"
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full bg-primary-500 w-sm hover:bg-indigo-200 hover:text-primary-500 active:bg-primary-500 active:text-white">Approve
-            Travel Order</button>
-        <button x-on:click="showModal = true" id="side_note_show"
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white bg-indigo-800 rounded-full w-sm hover:bg-indigo-200 hover:text-primary-500 active:bg-primary-500 active:text-white">Add
-            Side Note</button>
-        @else
-         <a href="{{route('print-to', [$travelorderID])}}" target="_blank" id="printto"
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">Print
-            Travel Order</a>
-        @endif
-        @endif
-        @else --}}
-        {{-- <div class="w-full">
-            <div class="m-6 divide-y divide-black divide-solid print:divide-y-2">
-                <div class="flex py-10 my-auto">
-                    <span
-                        class="mx-auto text-5xl font-extrabold tracking-wide text-black uppercase print:text-xl">travel
-                        order not found</span>
-                </div>
-            </div>
-
-        </div>
-        <a href="#" id="printto"
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider rounded-full w-sm bg-primary-500 text-primary-200 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">Go
-            to dashboard</a> --}}
-        {{-- @endif --}}
-
      </div>
      <div class="flex justify-center">
-      <a href="#" target="_blank" id="printto"
+      <button type="button" value="click" onclick="printDiv('print_to')" id="printto"
             class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">
-            Print Travel Order</a>
+            Print Travel Order
+      </button>
       </div>
+       @push('scripts')
+   <script>
+		function printDiv(divName){
+			var printContents = document.getElementById(divName).innerHTML;
+			var originalContents = document.body.innerHTML;
+
+			document.body.innerHTML = printContents;
+
+			window.print();
+
+			document.body.innerHTML = originalContents;
+
+		}
+	</script>
+    @endpush
 </div>
