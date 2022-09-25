@@ -270,9 +270,7 @@
       @endif
       
       @endif
-        <a href="#" target="_blank" id="printto"
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">Print
-            Travel Order</a>
+       
        {{-- @if ($travel_order->isDraft == true)
         <button wire:click="deleteTO('{{ $travel_order->to_type }}')" id="printto"
             class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white bg-red-500 rounded-full w-sm hover:bg-red-200 hover:text-primary-500 active:bg-primary-500 active:text-white">Delete
@@ -315,4 +313,9 @@
         {{-- @endif --}}
 
      </div>
+     <div class="flex justify-center">
+      <a href="#" target="_blank" id="printto"
+            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">
+            Print Travel Order</a>
+      </div>
 </div>
