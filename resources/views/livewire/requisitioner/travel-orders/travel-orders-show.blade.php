@@ -179,13 +179,13 @@
                                 to proceed to <strong>
                                     @if ($travel_order->other_details!="")
                                     {{$travel_order->other_details == null ? '' :$travel_order->other_details}},
-                                    {{$travel_order->philippine_city_id == null ? 'City Not Set': $travel_order->city->city_municipality_description}},
-                                    {{$travel_order->philippine_province_id == null ? 'Province Not Set':$travel_order->province->province_description}},
-                                    {{$travel_order->philippine_region_id == null ? 'City Not Set':$travel_order->region->region_description }}
+                                    {{$travel_order->philippine_city_id == null ? 'City Not Set': $travel_order->philippine_city->city_municipality_description}},
+                                    {{$travel_order->philippine_province_id == null ? 'Province Not Set':$travel_order->philippine_province->province_description}},
+                                    {{$travel_order->philippine_region_id == null ? 'City Not Set':$travel_order->philippine_region->region_description }}
                                     @else
-                                    {{$travel_order->philippine_city_id == null ? 'City Not Set': $travel_order->city->city_municipality_description}},
-                                    {{$travel_order->philippine_province_id == null ? 'Province Not Set':$travel_order->province->province_description}},
-                                    {{$travel_order->philippine_region_id == null ? 'Region Not Set':$travel_order->region->region_description }}
+                                    {{$travel_order->philippine_city_id == null ? 'City Not Set': $travel_order->philippine_city->city_municipality_description}},
+                                    {{$travel_order->philippine_province_id == null ? 'Province Not Set':$travel_order->philippine_province->province_description}},
+                                    {{$travel_order->philippine_region_id == null ? 'Region Not Set':$travel_order->philippine_region->region_description }}
                                     @endif
                                 </strong>
                                 on the
