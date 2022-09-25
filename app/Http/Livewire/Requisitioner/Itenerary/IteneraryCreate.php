@@ -59,7 +59,7 @@ class IteneraryCreate extends Component implements HasForms
                             } else {
                                 $per_diem = $to->philippine_region->dte->amount / 2;
                             }
-                           
+
                             $entries[Str::uuid()->toString()] = [
                                 'type' => 'new_entry',
                                 'data' => [
@@ -76,7 +76,7 @@ class IteneraryCreate extends Component implements HasForms
                             ];
                         }
                     }
-                    
+
                     $this->itenerary_entries = $entries;
                 })
                 ->reactive(),
