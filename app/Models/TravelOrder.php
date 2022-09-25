@@ -40,29 +40,9 @@ class TravelOrder extends Model
         return $this->hasMany(CashAdvance::class);
     }
 
-    public function region()
-    {
-        return $this->belongsTo(PhilippineRegion::class, 'philippine_region_id');
-    }
-
-    public function province()
-    {
-        return $this->belongsTo(PhilippineProvince::class, 'philippine_province_id');
-    }
-
-    public function city()
-    {
-        return $this->belongsTo(PhilippineCity::class, 'philippine_city_id');
-    }
-
     public function iteneraries()
     {
         return $this->hasMany(Itenerary::class);
-    }
-
-    public function travel_order_type()
-    {
-        return $this->belongsTo(TravelOrderType::class, 'travel_order_type_id');
     }
 
     public function applicants()
