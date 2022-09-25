@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             TravelOrderTypeSeeder::class,
             MotSeeder::class,
             ActivityLogTypeSeeder::class,
+            RelatedDocumentsListSeeder::class,
         ]);
     }
 }
