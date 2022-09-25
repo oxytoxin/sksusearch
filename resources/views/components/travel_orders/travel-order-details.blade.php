@@ -1,5 +1,10 @@
 @php
 $travel_order = App\Models\TravelOrder::with(['travel_order_type', 'philippine_region', 'philippine_province', 'philippine_city'])->find($getLivewire()->travel_order_id);
+$itenerary_entries = $getLivewire()->itenerary_entries;
+$amount=$travel_order->registration_amount;
+foreach ($itenerary_entries as $value) {
+    $amount +=$value['data']['per_diem'];
+}
 @endphp
 
 <div>
@@ -15,6 +20,8 @@ $travel_order = App\Models\TravelOrder::with(['travel_order_type', 'philippine_r
             <p>Province: {{ $travel_order->philippine_province->province_description }}</p>
             <p>City: {{ $travel_order->philippine_city->city_municipality_description }}</p>
             <p>Other Details: {{ $travel_order->other_details ?? 'None provided.' }}</p>
+            <p>Registration Fee: {{ $travel_order->registration_amount ?? 'None provided.' }}</p>
+            <p>Total Amount: {{ $amount }}</p>
         </div>
     @endif
 </div>

@@ -54,6 +54,7 @@ class TravelOrdersCreate extends Component implements HasForms
     {
         return [
             Select::make('travel_order_type_id')
+                ->label("Travel order type")
                 ->options(TravelOrderType::pluck('name', 'id'))
                 ->reactive()
                 ->required(),
