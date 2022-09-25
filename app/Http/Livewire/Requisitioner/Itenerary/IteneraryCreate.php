@@ -51,7 +51,7 @@ class IteneraryCreate extends Component implements HasForms
                 ->afterStateUpdated(function () {
                     $to = TravelOrder::with('philippine_region.dte')->find($this->travel_order_id);
                     $entries = [];
-                    if (! $to) {
+                    if (isset($to)) {
                         $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
                         foreach ($days as  $day) {
                             if ($day != $to->date_to) {
@@ -59,6 +59,7 @@ class IteneraryCreate extends Component implements HasForms
                             } else {
                                 $per_diem = $to->philippine_region->dte->amount / 2;
                             }
+
                             $entries[Str::uuid()->toString()] = [
                                 'type' => 'new_entry',
                                 'data' => [
@@ -75,6 +76,7 @@ class IteneraryCreate extends Component implements HasForms
                             ];
                         }
                     }
+
                     $this->itenerary_entries = $entries;
                 })
                 ->reactive(),
