@@ -209,7 +209,7 @@
                     <div class="h-auto text-center border-r-2 border-black w-36">
                         &nbsp
                     </div>
-                    <div class="h-auto text-right border-t-2 border-black print:text-10 w-36">
+                    <div class="h-auto text-right border-t-4 border-double border-black print:text-10 w-36">
                         {{ $total_amount }}
                     </div>
                 </div>
