@@ -7,7 +7,7 @@
                 <div class="-mt-4 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
                     <div class="mt-4 ml-4">
                         <h3 class="text-primary-900 text-lg font-medium leading-6">Travel Order Details</h3>
-                        <p class="text-primary-500 mt-4 text-sm">STracking Code: {{ $travel_order->tracking_code }}</p>
+                        <p class="text-primary-500 mt-4 text-sm">Tracking Code: {{ $travel_order->tracking_code }}</p>
                         <p class="text-primary-500 mt-1 text-sm">Travel Order Type:
                             {{ $travel_order->travel_order_type->name }}</p>
                         <p class="text-primary-500 mt-1 text-sm">Date Range:
