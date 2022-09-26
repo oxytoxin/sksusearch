@@ -40,9 +40,9 @@ class TravelOrder extends Model
         return $this->hasMany(CashAdvance::class);
     }
 
-    public function iteneraries()
+    public function itineraries()
     {
-        return $this->hasMany(Itenerary::class);
+        return $this->hasMany(Itinerary::class);
     }
 
     public function applicants()

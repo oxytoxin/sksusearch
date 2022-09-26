@@ -9,8 +9,8 @@ class Mot extends Model
 {
     use HasFactory;
 
-    public function itenerary_entries()
+    public function itinerary_entries()
     {
-        return $this->hasMany(IteneraryEntry::class);
+        return $this->hasMany(ItineraryEntry::class);
     }
 }

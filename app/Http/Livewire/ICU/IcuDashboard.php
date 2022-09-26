@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Icu;
+namespace App\Http\Livewire\ICU;
 
 use Livewire\Component;
 

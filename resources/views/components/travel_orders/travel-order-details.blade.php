@@ -1,8 +1,8 @@
 @php
 $travel_order = App\Models\TravelOrder::with(['travel_order_type', 'philippine_region', 'philippine_province', 'philippine_city'])->find($getLivewire()->travel_order_id);
-$itenerary_entries = $getLivewire()->itenerary_entries;
+$itinerary_entries = $getLivewire()->itinerary_entries;
 $amount = $travel_order->registration_amount;
-foreach ($itenerary_entries as $value) {
+foreach ($itinerary_entries as $value) {
     $amount += $value['data']['per_diem'];
 }
 @endphp

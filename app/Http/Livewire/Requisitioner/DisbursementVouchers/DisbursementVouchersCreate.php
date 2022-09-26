@@ -62,7 +62,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->visible(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->options(TravelOrder::approved()
-                                    ->whereHas('iteneraries', function ($query) {
+                                    ->whereHas('itineraries', function ($query) {
                                         $query->whereUserId(auth()->id());
                                     })
                                     ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS)
@@ -71,9 +71,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->afterStateUpdated(function ($set, $state) {
                                     $to = TravelOrder::find($state);
                                     if ($to) {
-                                        $itenerary = $to->iteneraries()->whereUserId(auth()->id())->first();
+                                        $itinerary = $to->itineraries()->whereUserId(auth()->id())->first();
                                         $amount = $to->registration_amount;
-                                        foreach ($itenerary['coverage'] as $entry) {
+                                        foreach ($itinerary['coverage'] as $entry) {
                                             $amount += $entry['per_diem'];
                                         }
                                         $set('disbursement_voucher_particulars', [
@@ -94,7 +94,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     'self' => 'Self',
                                     'others' => 'Others',
                                 ])
-                                ->visible(fn () => ! in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                                ->visible(fn () => !in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->default('self')
                                 ->afterStateUpdated(function ($state, $set) {
                                     if ($state == 'self') {
@@ -131,7 +131,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ]),
                                 ])
                                 ->minItems(1)
-                                ->visible(fn ($get) => $get('travel_order_id') || ! in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                                ->visible(fn ($get) => $get('travel_order_id') || !in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
                         ]),
@@ -196,7 +196,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
         }
         $dv->activity_logs()->create([
             'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
-            'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
+            'description' => $dv->current_step->process . ' ' . $dv->signatory->employee_information->full_name . ' ' . $dv->current_step->sender,
         ]);
         DB::commit();
         Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
@@ -206,7 +206,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public function mount()
     {
-        $this->tracking_number = 'DV_'.now()->format('Y').'-'.now()->format('m').'-'.rand(1, 999);
+        $this->tracking_number = 'DV_' . now()->format('Y') . '-' . now()->format('m') . '-' . rand(1, 999);
         $this->form->fill();
     }
 

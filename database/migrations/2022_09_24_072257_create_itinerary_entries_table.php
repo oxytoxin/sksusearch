@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('itenerary_entries', function (Blueprint $table) {
+        Schema::create('itinerary_entries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('itenerary_id')->index();
+            $table->foreignId('itinerary_id')->index();
             $table->foreignId('mot_id')->index();
             $table->date('date');
             $table->string('place');
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('itenerary_entries');
+        Schema::dropIfExists('itinerary_entries');
     }
 };

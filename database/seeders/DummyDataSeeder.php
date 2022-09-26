@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\ActivityLogType;
 use App\Models\DisbursementVoucher;
-use App\Models\Itenerary;
+use App\Models\Itinerary;
 use App\Models\TravelOrder;
 use App\Models\User;
 use Carbon\CarbonPeriod;
@@ -60,11 +60,11 @@ class DummyDataSeeder extends Seeder
                     'lunch' => false,
                     'dinner' => false,
                     'lodging' => false,
-                    'itenerary_entries' => [],
+                    'itinerary_entries' => [],
                 ],
             ];
         }
-        $itenerary = Itenerary::create([
+        $itinerary = Itinerary::create([
             'user_id' => 1,
             'travel_order_id' => $to->id,
             'coverage' => $entries,
@@ -77,7 +77,7 @@ class DummyDataSeeder extends Seeder
             'mop_id' => 1,
             'payee' => $user->employee_information->full_name,
             'travel_order_id' => $to->id,
-            'tracking_number' => 'DV_'.now()->format('Y').'-'.now()->format('m').'-'.rand(1, 999),
+            'tracking_number' => 'DV_' . now()->format('Y') . '-' . now()->format('m') . '-' . rand(1, 999),
             'submitted_at' => now(),
             'current_step_id' => 1000,
             'previous_step_id' => 1000,
@@ -90,7 +90,7 @@ class DummyDataSeeder extends Seeder
         ]);
         $dv->activity_logs()->create([
             'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
-            'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
+            'description' => $dv->current_step->process . ' ' . $dv->signatory->employee_information->full_name . ' ' . $dv->current_step->sender,
         ]);
         $to->applicants()->sync([1]);
         $to->signatories()->sync([1]);

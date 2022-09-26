@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Itenerary extends Model
+class Itinerary extends Model
 {
     use HasFactory;
 
@@ -23,8 +23,8 @@ class Itenerary extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function itenerary_entries()
+    public function itinerary_entries()
     {
-        return $this->hasMany(IteneraryEntry::class);
+        return $this->hasMany(ItineraryEntry::class);
     }
 }
