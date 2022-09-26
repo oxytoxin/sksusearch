@@ -24,6 +24,35 @@
 							@endif
 						@endif
 						<p class="text-primary-500 mt-1 text-sm">Purpose: {{ $travel_order->purpose }}</p>
+
+						@if ($travel_order->signatories()->firstWhere('is_approved', false) == null)
+							@if ($travel_order->iteneraries()->firstWhere('user_id', auth()->id()))
+								<a target="_blank"
+									href="{{ route('requisitioner.itenerary.show', ['itenerary' => $travel_order->iteneraries()->firstWhere('user_id', auth()->id())]) }}"
+									class="text-sm bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 float-right flex w-fit rounded-full px-4 py-2 active:ring-2 active:ring-offset-2">
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+										stroke="currentColor" class="h-auto w-5">
+										<path stroke-linecap="round" stroke-linejoin="round"
+											d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+										<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+									</svg>
+									<span class="pl-2">
+										View Itenerary
+
+								</a>
+							@else
+								<a target="_blank" href="{{ route('requisitioner.itenerary.create') }}"
+									class="text-sm bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 float-right flex w-fit rounded-full px-4 py-2 active:ring-2 active:ring-offset-2">
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+										stroke="currentColor" class="h-auto w-5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+									<span class="pl-2">
+										Create Itenerary
+									</span>
+								</a>
+							@endif
+						@endif
 					</div>
 				</div>
 			</div>
