@@ -1,6 +1,10 @@
 const colors = require('tailwindcss/colors')
 const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
+    presets: [
+      
+        require('./vendor/wireui/wireui/tailwind.config.js')
+    ],
     content: [
         './resources/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
@@ -8,9 +12,15 @@ module.exports = {
         './vendor/laravel/jetstream/**/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
+        './vendor/wireui/wireui/resources/**/*.blade.php',
+        './vendor/wireui/wireui/ts/**/*.ts',
+        './vendor/wireui/wireui/src/View/**/*.php'
     ],
     theme: {
         extend: {
+            spacing :{
+                'screen-70':"70vh"
+            },
             fontSize:{
                 '12':'12px',
                 '10':'10px',

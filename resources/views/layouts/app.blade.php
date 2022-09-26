@@ -15,6 +15,7 @@
             display: none !important;
         }
     </style>
+    @wireUiScripts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     @livewireScripts
@@ -26,7 +27,7 @@
 
     <div class="min-h-screen bg-primary-100">
         @livewire('navigation-menu')
-
+        
         <!-- Page Content -->
         <main>
             <div x-data="{ opensidebar: false }" x-cloak>
@@ -152,7 +153,7 @@
                 </main>
             </div>
     </div>
-
+    <x-dialog z-index="z-50" blur="md" align="center" />
     </main>
     </div>
 

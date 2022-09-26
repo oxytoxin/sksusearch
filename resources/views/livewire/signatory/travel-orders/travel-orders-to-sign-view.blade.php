@@ -1,9 +1,12 @@
 <div class="">
+	@php
+		$total_amount = $travel_order->registration_amount;
+	@endphp
 	<div class="grid grid-cols-1 lg:grid-cols-3">
 		<div class="col-span-1 flex-row lg:col-span-2">
 
-			<div class="border-primary-200 rounded-md border-b bg-white px-4 py-5 sm:px-6 md:rounded-none md:rounded-tl-lg">
-				<div class="-mt-4 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
+			<div class="border-primary-200 rounded-md border-b bg-white px-4 py-5 sm:px-6 md:rounded-none md:rounded-t-lg">
+				<div class="-mt-4 -ml-4 block flex-wrap items-center justify-between sm:flex-nowrap">
 					<div class="mt-4 ml-4">
 						<h3 class="text-primary-900 text-lg font-medium leading-6">Travel Order Details</h3>
 						<p class="text-primary-500 mt-4 text-sm">Tracking Code: {{ $travel_order->tracking_code }}</p>
@@ -27,15 +30,37 @@
 							@endif
 						@endif
 						<p class="text-primary-500 mt-1 text-sm">Purpose: {{ $travel_order->purpose }}</p>
-
+						<p class="text-primary-500 mt-1">Registration Fee: <span
+								class="">{{ $travel_order->registration_amount > 0 ? $travel_order->registration_amount : 'N/A' }}</span>
+						</p>
+						{{-- <p class="text-primary-500 mt-1">Total Amount: <span class="">{{ $total_amount }}</span>
+						</p> --}}
+						<div class="flex w-full justify-between">
+                            <span>&nbsp</span>
+							<div class="flex space-x-3">
+                                <button class="flex text-sm text-primary-600 hover:text-primary-400" wire:click.prevent="approve">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                        <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                                      </svg>
+                                    <span class="">Approve Travel Order</span>                                      
+                                </button>
+                                <button class="flex text-sm text-red-500 hover:text-red-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                        <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                                      </svg>
+                                      <span class="">Reject Travel Order</span>      
+                                </button>
+                            </div>
+						</div>
 					</div>
+
 				</div>
 			</div>
 
-			<div class="border-primary-200 mt-5 rounded-md border-b bg-white px-4 py-5 sm:px-6 md:rounded-none md:rounded-bl-lg">
+			<div class="border-primary-200 mt-2 rounded-md border-b bg-white px-4 py-5 sm:px-6 md:rounded-none md:rounded-b-lg">
 				<div class="-mt-4 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
 					<div class="mt-4 ml-4">
-						<h3 class="text-primary-900 text-lg font-medium leading-6">Status</h3>
+						<h3 class="text-primary-900 text-lg font-medium leading-6"></h3>
 						@foreach ($travel_order->signatories as $signatory)
 							<p class="text-primary-500 mt-4 text-sm">Signatory:
 								{{ $signatory->employee_information->full_name }}</p>
@@ -52,32 +77,36 @@
 		</div>
 
 		<div
-			class="border-primary-300 col-span-1 ml-4 rounded-md border-b bg-white px-4 py-5 md:rounded-l-none md:rounded-r-3xl">
+			class="border-primary-300 max-h-screen-70 soft-scrollbar col-span-1 ml-4 overflow-y-auto rounded-md border-b bg-white px-4 py-5">
 			<div class="mt-6 flow-root">
 				<ul role="list" class="divide-primary-200 -my-5 divide-y">
 					<div class="flex w-full justify-between">
-						<h3 class="text-primary-600 text-sm font-semibold">Notes</h3>
-						<button type="button" wire:click="showMore()" class="flex text-center my-auto px-4 ">
-                            <span class="my-auto text-sm"> Add note</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-auto h-3 my-auto">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                        </button>
+						<h3 class="text-primary-600 text-lg font-semibold">Notes</h3>
+						<button type="button" wire:click="$set('modal',true)" class="my-auto flex px-4 text-center">
+							<span class="my-auto text-sm"> Add note</span>
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+								stroke="currentColor" class="my-auto h-3 w-auto">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+							</svg>
+						</button>
+
 					</div>
 					@if ($travel_order->sidenotes->count() >= 1)
-						@foreach ($travel_order->sidenotes()->limit($limit) as $sidenote)
-							<li class="py-5">
-								<div class="relative focus-within:ring-2 focus-within:ring-indigo-500">
-									<h3 class="text-primary-800 text-sm font-semibold">
-										<span class="absolute inset-0" aria-hidden="true"></span>
-										{{ $sidenote->user->employee_information->full_name }}
-									</h3>
-									<p class="text-primary-600 line-clamp-2 mt-1 text-sm">
-										{{ $sidenote->user->content }}</p>
-									<p class="text-primary-300 mt-1 text-right text-sm">
-										{{ $sidenote->created_at->format('M d, Y') }}</p>
-								</div>
-							</li>
+
+						@foreach ($travel_order->sidenotes as $sidenote)
+							@if (!($loop->index + 1 > $limit))
+								<li class="py-5">
+									<div class="relative focus-within:ring-2 focus-within:ring-indigo-500">
+										<h3 class="text-primary-800 flex justify-between text-sm font-semibold">
+											<span class="absolute inset-0" aria-hidden="true"></span>
+											<span class="flex">{{ $sidenote->user->employee_information->full_name }}</span>
+											<span class="flex">{{ $sidenote->created_at->format('M d, Y') }}</span>
+										</h3>
+										<p class="text-primary-600 line-clamp-2 mt-1 text-sm">
+											{{ $sidenote->content }}</p>
+									</div>
+								</li>
+							@endif
 						@endforeach
 					@else
 						<li class="py-5">
@@ -92,7 +121,7 @@
 
 				</ul>
 			</div>
-			@if ($travel_order->sidenotes->count() >= $limit)
+			@if ($travel_order->sidenotes->count() > $limit)
 				<div class="mt-6">
 					<button type="button" wire:click="showMore()"
 						class="text-primary-700 border-primary-300 hover:bg-primary-50 flex w-full items-center justify-center rounded-md border bg-white px-4 py-2 text-sm font-medium shadow-sm">View
@@ -102,5 +131,15 @@
 		</div>
 
 	</div>
+
+	<x-modal.card title="Add Note" blur wire:model.defer="modal" class="text-primary-600">
+		<form wire:submit.prevent='addNote' class="space=y=2 flex-col">
+			<x-textarea class="text-primary-800 placeholder:text-primary-200" label="Your notes" placeholder="Write your notes"
+				wire:model.defer="note" />
+			<x-button type="submit" class="text-primary-900 border-primary-800 mt-2"><span class="text-primary-900">Save
+					Note</span></x-button>
+		</form>
+
+	</x-modal.card>
 
 </div>

@@ -4,7 +4,7 @@
 
 			<div class="border-primary-200 rounded-md border-b bg-white px-4 py-5 sm:px-6 md:rounded-none md:rounded-tl-lg">
 				<div class="-mt-4 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
-					<div class="mt-4 ml-4">
+					<div class="mt-4 ml-4 w-full">
 						<h3 class="text-primary-900 text-lg font-medium leading-6">Travel Order Details</h3>
 						<p class="text-primary-500 mt-4 text-sm">Tracking Code: {{ $travel_order->tracking_code }}</p>
 						<p class="text-primary-500 mt-1 text-sm">Travel Order Type: {{ $travel_order->travel_order_type->name }}</p>
@@ -48,7 +48,7 @@
 										<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
 									</svg>
 									<span class="pl-2">
-										Create Itenerary
+										Create Itinerary
 									</span>
 								</a>
 							@endif
