@@ -46,7 +46,7 @@ class IteneraryCreate extends Component implements HasForms
                     ->whereHas('applicants', function ($query) {
                         $query->whereUserId(auth()->id());
                     })
-                    ->whereIn('travel_order_type_id', [TravelOrderType::OFFICIAL_BUSINESS,TravelOrderType::OFFICIAL_TIME])
+                    ->whereIn('travel_order_type_id', [TravelOrderType::OFFICIAL_BUSINESS, TravelOrderType::OFFICIAL_TIME])
                     ->pluck('tracking_code', 'id'))
                 ->afterStateUpdated(function () {
                     $to = TravelOrder::with('philippine_region.dte')->find($this->travel_order_id);
@@ -54,14 +54,14 @@ class IteneraryCreate extends Component implements HasForms
                     if (isset($to)) {
                         $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
                         foreach ($days as  $day) {
-                            if($to->travel_order_type_id == 1){
+                            if ($to->travel_order_type_id == 1) {
                                 if ($day != $to->date_to) {
                                     $per_diem = $to->philippine_region->dte->amount;
                                 } else {
                                     $per_diem = $to->philippine_region->dte->amount / 2;
                                 }
-                            }else{
-                                $per_diem =0;
+                            } else {
+                                $per_diem = 0;
                             }
 
                             $entries[Str::uuid()->toString()] = [
@@ -117,7 +117,7 @@ class IteneraryCreate extends Component implements HasForms
 
                         ]),
                         Grid::make(2)->schema([
-                            TextInput::make('transportation_expenses')->required()->numeric()->reactive(),
+                            TextInput::make('transportation_expenses')->default(0)->required()->numeric()->reactive(),
                             TextInput::make('other_expenses')->default(0)->numeric()->reactive(),
                         ]),
                     ]),
@@ -191,8 +191,14 @@ class IteneraryCreate extends Component implements HasForms
             if ($entry['data']['lodging']) {
                 $per_diem -= $original_per_diem * 0.5;
             }
+            $transportation_expenses = 0;
+            $other_expenses = 0;
+            foreach ($entry['data']['itenerary_entries'] as $expense) {
+                $transportation_expenses += $expense['transportation_expenses'] == '' ? 0 : $expense['transportation_expenses'];
+                $other_expenses += $expense['other_expenses'] == '' ? 0 : $expense['other_expenses'];
+            }
             $this->itenerary_entries[$key]['data']['per_diem'] = $per_diem;
-            $this->itenerary_entries[$key]['data']['total_expenses'] = collect($entry['data']['itenerary_entries'])->sum('transportation_expenses') + collect($entry['data']['itenerary_entries'])->sum('other_expenses');
+            $this->itenerary_entries[$key]['data']['total_expenses'] = $transportation_expenses + $other_expenses;
         }
 
         return view('livewire.requisitioner.itenerary.itenerary-create');
