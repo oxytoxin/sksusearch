@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             MotSeeder::class,
             ActivityLogTypeSeeder::class,
             RelatedDocumentsListSeeder::class,
+            FundClusterSeeder::class,
         ]);
         if (app()->environment('local')) {
             $this->call([

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\DisbursementVoucherStep;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DisbursementVoucherStepSeeder extends Seeder
@@ -70,7 +69,7 @@ class DisbursementVoucherStepSeeder extends Seeder
 
         DisbursementVoucherStep::create([
             'id' => 8000,
-            'process' => 'For preparation of ORS/BURS',
+            'process' => 'Received in',
             'recipient' => 'Accounting Office',
             'sender' => 'by Accounting Office Staff',
             'office_id' => 3,
@@ -78,7 +77,7 @@ class DisbursementVoucherStepSeeder extends Seeder
 
         DisbursementVoucherStep::create([
             'id' => 9000,
-            'process' => 'Received in',
+            'process' => 'For preparation of ORS/BURS',
             'recipient' => 'Accounting Office',
             'sender' => 'by Accounting Office Staff',
             'office_id' => 3,
@@ -97,6 +96,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'process' => 'For certification by',
             'recipient' => 'Chief Accountant',
             'sender' => 'by Accounting Office Staff',
+            'office_id' => 3,
         ]);
 
         DisbursementVoucherStep::create([
@@ -159,7 +159,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'process' => 'Forwarded to',
             'recipient' => 'Archiver',
             'sender' => 'by ICU Staff (Post-Audit)',
-            
+
         ]);
 
         DisbursementVoucherStep::create([
