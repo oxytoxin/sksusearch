@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('iteneraries', function (Blueprint $table) {
+        Schema::create('itineraries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('travel_order_id')->index();
             $table->foreignId('user_id')->index();
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('iteneraries');
+        Schema::dropIfExists('itineraries');
     }
 };

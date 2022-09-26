@@ -1,6 +1,6 @@
 <div class="">
-	<div class="grid grid-cols-1 lg:grid-cols-3">
-		<div class="col-span-1 flex-row lg:col-span-2">
+    <div class="grid grid-cols-1 lg:grid-cols-3">
+        <div class="col-span-1 flex-row lg:col-span-2">
 
 			<div class="border-primary-200 rounded-md border-b bg-white px-4 py-5 sm:px-6 md:rounded-none md:rounded-tl-lg">
 				<div class="-mt-4 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
@@ -25,19 +25,17 @@
 						@endif
 						<p class="text-primary-500 mt-1 text-sm">Purpose: {{ $travel_order->purpose }}</p>
 
-						@if ($travel_order->signatories()->firstWhere('is_approved', false) == null)
-							@if ($travel_order->iteneraries()->firstWhere('user_id', auth()->id()))
-								<a target="_blank"
-									href="{{ route('requisitioner.itenerary.show', ['itenerary' => $travel_order->iteneraries()->firstWhere('user_id', auth()->id())]) }}"
-									class="text-sm bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 float-right flex w-fit rounded-full px-4 py-2 active:ring-2 active:ring-offset-2">
-									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-										stroke="currentColor" class="h-auto w-5">
-										<path stroke-linecap="round" stroke-linejoin="round"
-											d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-										<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-									</svg>
-									<span class="pl-2">
-										View Itenerary
+                        @if ($travel_order->signatories()->firstWhere('is_approved', false) == null)
+                            @if ($travel_order->itineraries()->firstWhere('user_id', auth()->id()))
+                                <a target="_blank" href="{{ route('requisitioner.itinerary.show', ['itinerary' => $travel_order->itineraries()->firstWhere('user_id', auth()->id())]) }}"
+                                    class="text-sm bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 float-right flex w-fit rounded-full px-4 py-2 active:ring-2 active:ring-offset-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-auto w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span class="pl-2">
+                                        View Itenerary
 
 								</a>
 							@else
@@ -57,63 +55,61 @@
 				</div>
 			</div>
 
-			<div class="border-primary-200 mt-5 rounded-md border-b bg-white px-4 py-5 sm:px-6 md:rounded-none md:rounded-bl-lg">
-				<div class="-mt-4 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
-					<div class="mt-4 ml-4">
-						<h3 class="text-primary-900 text-lg font-medium leading-6">Status</h3>
-						@foreach ($travel_order->signatories as $signatory)
-							<p class="text-primary-500 mt-4 text-sm">Signatory: {{ $signatory->employee_information->full_name }}</p>
-							<p class="text-primary-500 mt-1 text-sm">Approval Status:
-								{{ $signatory->pivot->is_approved ? 'Approved' : 'Pending' }}</p>
-							<p class="text-primary-500 mt-1 text-sm">Date Approved:
-								{{ $signatory->pivot->is_approved ? $signatory->pivot->updated_at->format('F d, Y') : 'Unavailable' }}</p>
-						@endforeach
+            <div class="border-primary-200 mt-5 rounded-md border-b bg-white px-4 py-5 sm:px-6 md:rounded-none md:rounded-bl-lg">
+                <div class="-mt-4 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
+                    <div class="mt-4 ml-4">
+                        <h3 class="text-primary-900 text-lg font-medium leading-6">Status</h3>
+                        @foreach ($travel_order->signatories as $signatory)
+                            <p class="text-primary-500 mt-4 text-sm">Signatory: {{ $signatory->employee_information->full_name }}</p>
+                            <p class="text-primary-500 mt-1 text-sm">Approval Status:
+                                {{ $signatory->pivot->is_approved ? 'Approved' : 'Pending' }}</p>
+                            <p class="text-primary-500 mt-1 text-sm">Date Approved:
+                                {{ $signatory->pivot->is_approved ? $signatory->pivot->updated_at->format('F d, Y') : 'Unavailable' }}</p>
+                        @endforeach
 
-					</div>
-				</div>
-			</div>
-		</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		<div
-			class="border-primary-300 col-span-1 ml-4 rounded-md border-b bg-white px-4 py-5 md:rounded-l-none md:rounded-r-3xl">
-			<div class="mt-6 flow-root">
-				<ul role="list" class="divide-primary-200 -my-5 divide-y">
-					<h3 class="text-primary-600 text-md font-semibold">Notes</h3>
-					@if ($travel_order->sidenotes->count() >= 1)
-						@foreach ($travel_order->sidenotes as $sidenote)
-							<li class="py-5">
-								<div class="relative focus-within:ring-2 focus-within:ring-indigo-500">
-									<h3 class="text-primary-800 text-sm font-semibold">
-										<span class="absolute inset-0" aria-hidden="true"></span>
-										{{ $sidenote->user->employee_information->full_name }}
-									</h3>
-									<p class="text-primary-600 line-clamp-2 mt-1 text-sm">{{ $sidenote->user->content }}</p>
-									<p class="text-primary-300 mt-1 text-right text-sm">{{ $sidenote->created_at->format('M d, Y') }}</p>
-								</div>
-							</li>
-						@endforeach
-					@else
-						<li class="py-5">
-							<div class="relative focus-within:ring-2 focus-within:ring-indigo-500">
-								<h3 class="text-primary-300 text-sm font-light italic">
-									<span class="absolute inset-0" aria-hidden="true"></span>
-									Nothing to show
-								</h3>
-							</div>
-						</li>
-					@endif
+        <div class="border-primary-300 col-span-1 ml-4 rounded-md border-b bg-white px-4 py-5 md:rounded-l-none md:rounded-r-3xl">
+            <div class="mt-6 flow-root">
+                <ul role="list" class="divide-primary-200 -my-5 divide-y">
+                    <h3 class="text-primary-600 text-md font-semibold">Notes</h3>
+                    @if ($travel_order->sidenotes->count() >= 1)
+                        @foreach ($travel_order->sidenotes as $sidenote)
+                            <li class="py-5">
+                                <div class="relative focus-within:ring-2 focus-within:ring-indigo-500">
+                                    <h3 class="text-primary-800 text-sm font-semibold">
+                                        <span class="absolute inset-0" aria-hidden="true"></span>
+                                        {{ $sidenote->user->employee_information->full_name }}
+                                    </h3>
+                                    <p class="text-primary-600 line-clamp-2 mt-1 text-sm">{{ $sidenote->user->content }}</p>
+                                    <p class="text-primary-300 mt-1 text-right text-sm">{{ $sidenote->created_at->format('M d, Y') }}</p>
+                                </div>
+                            </li>
+                        @endforeach
+                    @else
+                        <li class="py-5">
+                            <div class="relative focus-within:ring-2 focus-within:ring-indigo-500">
+                                <h3 class="text-primary-300 text-sm font-light italic">
+                                    <span class="absolute inset-0" aria-hidden="true"></span>
+                                    Nothing to show
+                                </h3>
+                            </div>
+                        </li>
+                    @endif
 
-				</ul>
-			</div>
-			@if ($travel_order->sidenotes->count() >= 1)
-				<div class="mt-6">
-					<a href="#"
-						class="text-primary-700 border-primary-300 hover:bg-primary-50 flex w-full items-center justify-center rounded-md border bg-white px-4 py-2 text-sm font-medium shadow-sm">View
-						all</a>
-				</div>
-			@endif
-		</div>
+                </ul>
+            </div>
+            @if ($travel_order->sidenotes->count() >= 1)
+                <div class="mt-6">
+                    <a href="#" class="text-primary-700 border-primary-300 hover:bg-primary-50 flex w-full items-center justify-center rounded-md border bg-white px-4 py-2 text-sm font-medium shadow-sm">View
+                        all</a>
+                </div>
+            @endif
+        </div>
 
-	</div>
+    </div>
 
 </div>

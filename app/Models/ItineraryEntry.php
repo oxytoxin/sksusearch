@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class IteneraryEntry extends Model
+class ItineraryEntry extends Model
 {
     use HasFactory;
 
@@ -32,9 +32,9 @@ class IteneraryEntry extends Model
         );
     }
 
-    public function itenerary()
+    public function itinerary()
     {
-        return $this->belongsTo(Itenerary::class);
+        return $this->belongsTo(Itinerary::class);
     }
 
     public function mot()

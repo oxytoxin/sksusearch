@@ -18,11 +18,13 @@ return new class extends Migration
             $table->foreignId('voucher_subtype_id')->index();
             $table->foreignId('user_id')->index();
             $table->foreignId('signatory_id')->index();
+            $table->boolean('certified_by_accountant')->default(false);
             $table->foreignId('mop_id')->index();
             $table->foreignId('travel_order_id')->index()->nullable();
             $table->string('tracking_number');
             $table->string('payee');
             $table->string('cheque_number')->nullable();
+            $table->string('ors_burs')->nullable();
             $table->string('dv_number')->nullable();
             $table->date('due_date')->nullable();
             $table->date('closed_at')->nullable();

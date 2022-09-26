@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Livewire\Requisitioner\Itenerary;
+namespace App\Http\Livewire\Requisitioner\Itinerary;
 
 use App\Forms\Components\Flatpickr;
-use App\Models\Itenerary;
+use App\Models\Itinerary;
 use App\Models\Mot;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
@@ -24,13 +24,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
-class IteneraryCreate extends Component implements HasForms
+class ItineraryCreate extends Component implements HasForms
 {
     use InteractsWithForms;
 
     public $travel_order_id;
 
-    public $itenerary_entries = [];
+    public $itinerary_entries = [];
 
     public function getFormSchema()
     {
@@ -40,7 +40,7 @@ class IteneraryCreate extends Component implements HasForms
                 ->searchable()
                 ->preload()
                 ->options(TravelOrder::approved()
-                    ->whereDoesntHave('iteneraries', function ($query) {
+                    ->whereDoesntHave('itineraries', function ($query) {
                         $query->where('user_id', auth()->id());
                     })
                     ->whereHas('applicants', function ($query) {
@@ -75,20 +75,20 @@ class IteneraryCreate extends Component implements HasForms
                                     'lunch' => false,
                                     'dinner' => false,
                                     'lodging' => false,
-                                    'itenerary_entries' => [],
+                                    'itinerary_entries' => [],
                                 ],
                             ];
                         }
                     }
 
-                    $this->itenerary_entries = $entries;
+                    $this->itinerary_entries = $entries;
                 })
                 ->reactive(),
             Placeholder::make('travel_order_details')
                 ->visible(fn ($get) => $get('travel_order_id'))
                 ->view('components.travel_orders.travel-order-details'),
 
-            Builder::make('itenerary_entries')->blocks([
+            Builder::make('itinerary_entries')->blocks([
                 Block::make('new_entry')->schema([
                     Flatpickr::make('date')
                         ->disableTime()
@@ -100,7 +100,7 @@ class IteneraryCreate extends Component implements HasForms
                         Toggle::make('dinner')->inline(false)->reactive(),
                         Toggle::make('lodging')->inline(false)->reactive(),
                     ])->columns(4),
-                    Repeater::make('itenerary_entries')->schema([
+                    Repeater::make('itinerary_entries')->schema([
                         Select::make('mot_id')
                             ->options(Mot::pluck('name', 'id'))
                             ->label('Mode of Transportation')
@@ -132,7 +132,7 @@ class IteneraryCreate extends Component implements HasForms
         $this->form->validate();
         DB::beginTransaction();
         $coverage = [];
-        foreach ($this->itenerary_entries as $entry) {
+        foreach ($this->itinerary_entries as $entry) {
             $coverage[] = [
                 'date' => $entry['data']['date'],
                 'per_diem' => $entry['data']['per_diem'],
@@ -144,16 +144,16 @@ class IteneraryCreate extends Component implements HasForms
             ];
         }
 
-        $itenerary = Itenerary::create([
+        $itinerary = Itinerary::create([
             'user_id' => auth()->id(),
             'travel_order_id' => $this->travel_order_id,
             'coverage' => $coverage,
         ]);
 
-        foreach ($this->itenerary_entries as $itenerary_entry) {
-            foreach ($itenerary_entry['data']['itenerary_entries'] as $entry) {
-                $itenerary->itenerary_entries()->create([
-                    'date' => $itenerary_entry['data']['date'],
+        foreach ($this->itinerary_entries as $itinerary_entry) {
+            foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
+                $itinerary->itinerary_entries()->create([
+                    'date' => $itinerary_entry['data']['date'],
                     'mot_id' => $entry['mot_id'],
                     'place' => $entry['place'],
                     'departure_time' => $entry['departure_time'],
@@ -164,9 +164,9 @@ class IteneraryCreate extends Component implements HasForms
             }
         }
         DB::commit();
-        Notification::make()->title('Operation Success')->body('Itenerary has been created.')->success()->send();
+        Notification::make()->title('Operation Success')->body('Itinerary has been created.')->success()->send();
 
-        return redirect()->route('requisitioner.itenerary.show', ['itenerary' => $itenerary]);
+        return redirect()->route('requisitioner.itinerary.show', ['itinerary' => $itinerary]);
     }
 
     public function mount()
@@ -176,7 +176,7 @@ class IteneraryCreate extends Component implements HasForms
 
     public function render()
     {
-        foreach ($this->itenerary_entries as  $key => $entry) {
+        foreach ($this->itinerary_entries as  $key => $entry) {
             $original_per_diem = $entry['data']['original_per_diem'];
             $per_diem = $original_per_diem;
             if ($entry['data']['breakfast']) {
@@ -193,14 +193,14 @@ class IteneraryCreate extends Component implements HasForms
             }
             $transportation_expenses = 0;
             $other_expenses = 0;
-            foreach ($entry['data']['itenerary_entries'] as $expense) {
+            foreach ($entry['data']['itinerary_entries'] as $expense) {
                 $transportation_expenses += $expense['transportation_expenses'] == '' ? 0 : $expense['transportation_expenses'];
                 $other_expenses += $expense['other_expenses'] == '' ? 0 : $expense['other_expenses'];
             }
-            $this->itenerary_entries[$key]['data']['per_diem'] = $per_diem;
-            $this->itenerary_entries[$key]['data']['total_expenses'] = $transportation_expenses + $other_expenses;
+            $this->itinerary_entries[$key]['data']['per_diem'] = $per_diem;
+            $this->itinerary_entries[$key]['data']['total_expenses'] = $transportation_expenses + $other_expenses;
         }
 
-        return view('livewire.requisitioner.itenerary.itenerary-create');
+        return view('livewire.requisitioner.itinerary.itinerary-create');
     }
 }

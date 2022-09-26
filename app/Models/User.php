@@ -54,7 +54,7 @@ class User extends Authenticatable
      */
     public function getProfilePhotoUrlAttribute()
     {
-        return 'https://ui-avatars.com/api/?name='.urlencode($this->employee_information->full_name).'&color=7F9CF5&background=EBF4FF';
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->employee_information->full_name) . '&color=7F9CF5&background=EBF4FF';
     }
 
     public function employee_information()
@@ -97,9 +97,9 @@ class User extends Authenticatable
         return $this->hasOne(Office::class, 'admin_user_id');
     }
 
-    public function iteneraries()
+    public function itineraries()
     {
-        return $this->hasMany(Itenerary::class);
+        return $this->hasMany(Itinerary::class);
     }
 
     public function travel_order_applications()
