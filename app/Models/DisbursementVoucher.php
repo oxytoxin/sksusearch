@@ -13,6 +13,7 @@ class DisbursementVoucher extends Model
         'closed_at' => 'immutable_date',
         'submitted_at' => 'immutable_date',
         'due_date' => 'immutable_date',
+        'journal_date' => 'immutable_date',
         'draft' => 'array',
     ];
 

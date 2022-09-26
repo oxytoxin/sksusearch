@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Offices;
 
+use App\Forms\Components\Flatpickr;
 use App\Models\ActivityLogType;
 use App\Models\DisbursementVoucher;
 use App\Models\FundCluster;
@@ -49,7 +50,7 @@ class OfficeDashboard extends Component implements HasTable
                         'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                         'description' => $record->current_step->process.' '.$record->current_step->recipient.' by '.auth()->user()->employee_information->full_name,
                     ]);
-                    if ($record->current_step_id == 8000) {
+                    if ($record->current_step_id == 6000 || $record->current_step_id == 9000) {
                         $record->update([
                             'current_step_id' => $record->current_step_id + 1000,
                         ]);
@@ -87,24 +88,25 @@ class OfficeDashboard extends Component implements HasTable
                 $record->update([
                     'ors_burs' => $data['ors_burs'],
                     'fund_cluster_id' => $data['fund_cluster_id'],
-                    'current_step_id' => $record->current_step_id + 1000,
                 ]);
-                $record->refresh();
                 $record->activity_logs()->create([
                     'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
-                    'description' => $record->current_step->process,
+                    'description' => 'ORS/BURS and Fund Cluster assigned to Disbursement Voucher',
                 ]);
                 DB::commit();
                 Notification::make()->title('ORS/BURS and Fund Cluster updated.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 9000)
-                ->form(function () {
+                ->visible(fn ($record) => $record->current_step_id == 7000 && (blank($record->ors_burs) || blank($record->fund_cluster_id)))
+                ->form(function ($record) {
                     return [
                         Select::make('fund_cluster_id')
+                            ->label('Fund Cluster')
                             ->options(FundCluster::pluck('name', 'id'))
+                            ->default($record->fund_cluster_id)
                             ->required(),
                         TextInput::make('ors_burs')
                             ->label('ORS/BURS')
+                            ->default($record->ors_burs)
                             ->required(),
                     ];
                 })
@@ -113,21 +115,46 @@ class OfficeDashboard extends Component implements HasTable
                 DB::beginTransaction();
                 $record->update([
                     'dv_number' => $data['dv_number'],
-                    'current_step_id' => $record->current_step_id + 1000,
+                    'journal_date' => $data['journal_date'],
                 ]);
                 $record->refresh();
                 $record->activity_logs()->create([
                     'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
-                    'description' => $record->current_step->process.' '.$record->current_step->recipient,
+                    'description' => 'Disbursement Voucher verified.',
                 ]);
                 DB::commit();
                 Notification::make()->title('Disbursement Voucher verified.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 10000)
+                ->visible(fn ($record) => $record->current_step_id == 10000 && blank($record->journal_date) && blank($record->dv_number))
                 ->form(function () {
                     return [
                         TextInput::make('dv_number')
                             ->label('DV Number')
+                            ->required(),
+                        Flatpickr::make('journal_date')
+                            ->disableTime()
+                            ->required(),
+                    ];
+                })
+                ->requiresConfirmation(),
+            Action::make('cheque_ada')->label('Cheque/ADA')->button()->action(function ($record, $data) {
+                DB::beginTransaction();
+                $record->update([
+                    'cheque_number' => $data['cheque_number'],
+                    'current_step_id' => $record->current_step_id + 1000,
+                ]);
+                $record->activity_logs()->create([
+                    'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
+                    'description' => 'Cheque/ADA made for requisitioner.',
+                ]);
+                DB::commit();
+                Notification::make()->title('Cheque/ADA made for requisitioner.')->success()->send();
+            })
+                ->visible(fn ($record) => $record->current_step_id == 15000 && blank($record->cheque_number))
+                ->form(function () {
+                    return [
+                        TextInput::make('cheque_number')
+                            ->label('Cheque number/ADA')
                             ->required(),
                     ];
                 })
@@ -138,7 +165,9 @@ class OfficeDashboard extends Component implements HasTable
 
     private function canBeForwarded($record)
     {
-        return ($record->current_step->process == 'Received in' && ! in_array($record->current_step_id, [8000, 11000, 16000]))
+        return ($record->current_step->process == 'Received in' && ! in_array($record->current_step_id, [7000, 11000, 15000]))
+            || ($record->current_step_id == 7000 && filled($record->ors_burs) && filled($record->fund_cluster_id))
+            || ($record->current_step_id == 10000 && filled($record->journal_date) && filled($record->dv_number))
             || ($record->current_step_id == 11000 && $record->certified_by_accountant)
             || ($record->current_step_id == 16000 && filled($record->cheque_number));
     }

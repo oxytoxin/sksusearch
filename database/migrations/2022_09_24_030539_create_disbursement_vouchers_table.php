@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('dv_number')->nullable();
             $table->date('due_date')->nullable();
             $table->date('closed_at')->nullable();
+            $table->date('journal_date')->nullable();
             $table->date('submitted_at')->nullable();
             $table->json('draft')->nullable();
             $table->foreignId('fund_cluster_id')->nullable()->index();

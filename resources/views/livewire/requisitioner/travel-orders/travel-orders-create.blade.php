@@ -1,4 +1,4 @@
-<div>
+<div x-data x-cloak>
     <h4>Create Travel Order</h4>
     <form wire:submit.prevent='save' class="flex flex-col gap-4">
         <div>
@@ -8,5 +8,4 @@
             <x-filament-support::button type="submit" wire:target='save'>Save</x-filament-support::button>
         </div>
     </form>
-</div>
 </div>

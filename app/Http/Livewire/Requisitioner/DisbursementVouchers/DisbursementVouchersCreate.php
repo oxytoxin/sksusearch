@@ -94,7 +94,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     'self' => 'Self',
                                     'others' => 'Others',
                                 ])
-                                ->visible(fn () => !in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                                ->visible(fn () => ! in_array($this->voucher_subtype->voucher_type_id, [1, 2]))
                                 ->default('self')
                                 ->afterStateUpdated(function ($state, $set) {
                                     if ($state == 'self') {
@@ -107,7 +107,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->reactive(),
                             Grid::make(2)->schema([
                                 TextInput::make('payee')
-                                    ->disabled(fn ($get) => $get('payee_mode') == 'self')
+                                    ->disabled(fn ($get) => $get('payee_mode') == 'self' || in_array($this->voucher_subtype->voucher_type_id, [1, 2]))
                                     ->required()
                                     ->placeholder('Enter payee name')
                                     ->default(auth()->user()->employee_information->full_name),
@@ -131,7 +131,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ]),
                                 ])
                                 ->minItems(1)
-                                ->visible(fn ($get) => $get('travel_order_id') || !in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                                ->visible(fn ($get) => $get('travel_order_id') || ! in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
                         ]),
@@ -196,7 +196,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
         }
         $dv->activity_logs()->create([
             'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
-            'description' => $dv->current_step->process . ' ' . $dv->signatory->employee_information->full_name . ' ' . $dv->current_step->sender,
+            'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
         ]);
         DB::commit();
         Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
@@ -206,7 +206,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public function mount()
     {
-        $this->tracking_number = 'DV_' . now()->format('Y') . '-' . now()->format('m') . '-' . rand(1, 999);
+        $this->tracking_number = 'DV_'.now()->format('Y').'-'.now()->format('m').'-'.rand(1, 999);
         $this->form->fill();
     }
 

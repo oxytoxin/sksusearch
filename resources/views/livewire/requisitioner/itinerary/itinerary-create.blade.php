@@ -1,4 +1,4 @@
-<div>
+<div x-data x-cloak>
     <h4 class="mb-4 text-lg font-semibold">Create Itinerary</h4>
     <form wire:submit.prevent='save' class="flex flex-col gap-4">
         <div>
