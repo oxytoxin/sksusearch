@@ -32,5 +32,10 @@ class DatabaseSeeder extends Seeder
             ActivityLogTypeSeeder::class,
             RelatedDocumentsListSeeder::class,
         ]);
+        if (app()->environment('local')) {
+            $this->call([
+                DummyDataSeeder::class,
+            ]);
+        }
     }
 }
