@@ -123,8 +123,8 @@ class TravelOrdersCreate extends Component implements HasForms
             'philippine_city_id' => PhilippineCity::firstWhere('city_municipality_code', $this->city_code)?->id,
             'other_details' => $this->other_details,
         ]);
-        $to->applicants()->attach($this->applicants);
-        $to->signatories()->attach($this->signatories);
+        $to->applicants()->sync($this->applicants);
+        $to->signatories()->sync($this->signatories);
         DB::commit();
         Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
 
