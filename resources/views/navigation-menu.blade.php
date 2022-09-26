@@ -11,7 +11,7 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-4 sm:-my-px sm:ml-10 sm:flex">
+                <div class="hidden space-x-4 sm:-my-px sm:ml-14 sm:flex ">
                     <x-jet-nav-link href="{{ route('office.dashboard') }}" :active="request()->routeIs('office.dashboard')">
                         {{ __('Office Dashboard') }}
                     </x-jet-nav-link>

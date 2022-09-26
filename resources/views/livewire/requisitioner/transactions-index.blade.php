@@ -47,7 +47,7 @@
 										x-transition:enter-start=" opacity-100 scale-0" x-transition:enter-end=" opacity-100 scale-100 "
 										x-transition:leave="transition ease-in duration-300" x-transition:leave-start=" opacity-100 scale-100"
 										x-transition:leave-end=" opacity-0 scale-0"
-										class="grid gap-1 px-2 py-3 mx-6 ml-10 text-left origin-top-left rounded-tl-none bg-primary-100 rounded-3xl lg:gap-6">
+										class="grid gap-1 px-2 py-3 mx-6 ml-10 text-left origin-top-left rounded-tl-none bg-primary-300 rounded-3xl lg:gap-6">
 										@foreach ($type->voucher_subtypes as $subtype)
 											<a
 												class="px-3 py-2 mt-1 text-left rounded-lg hover:scale-105 hover:bg-primary-800 hover:text-primary-100 active:ring-primary-400 active:ring-2 active:ring-offset-2 active:ring-offset-white"

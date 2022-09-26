@@ -46,7 +46,7 @@ class IteneraryCreate extends Component implements HasForms
                     ->whereHas('applicants', function ($query) {
                         $query->whereUserId(auth()->id());
                     })
-                    ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS)
+                    ->whereIn('travel_order_type_id', [TravelOrderType::OFFICIAL_BUSINESS,TravelOrderType::OFFICIAL_TIME])
                     ->pluck('tracking_code', 'id'))
                 ->afterStateUpdated(function () {
                     $to = TravelOrder::with('philippine_region.dte')->find($this->travel_order_id);
@@ -54,10 +54,14 @@ class IteneraryCreate extends Component implements HasForms
                     if (isset($to)) {
                         $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
                         foreach ($days as  $day) {
-                            if ($day != $to->date_to) {
-                                $per_diem = $to->philippine_region->dte->amount;
-                            } else {
-                                $per_diem = $to->philippine_region->dte->amount / 2;
+                            if($to->travel_order_type_id == 1){
+                                if ($day != $to->date_to) {
+                                    $per_diem = $to->philippine_region->dte->amount;
+                                } else {
+                                    $per_diem = $to->philippine_region->dte->amount / 2;
+                                }
+                            }else{
+                                $per_diem =0;
                             }
 
                             $entries[Str::uuid()->toString()] = [

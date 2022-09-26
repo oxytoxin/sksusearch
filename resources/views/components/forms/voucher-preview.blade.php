@@ -1,5 +1,15 @@
 <x-forms::field-wrapper :id="$getId()" :label="$getLabel()" :label-sr-only="$isLabelHidden()" :helper-text="$getHelperText()" :hint="$getHint()" :hint-icon="$getHintIcon()" :required="$isRequired()" :state-path="$getStatePath()">
-
+@php
+	$particulars = $evaluate(fn($get) => $get('disbursement_voucher_particulars'));
+	$mop = $evaluate(fn($get) => $get('mop_id'));
+	$total_amount =0;
+	
+	foreach ($particulars as $particular){
+		$total_amount +=$particular['amount'];
+	}
+	
+@endphp
+	
     <div x-data="{ state: $wire.entangle('{{ $getStatePath() }}').defer }">
         <div id="dvPrint" style="flex border-collapse  max-w-8xl print:block print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
             <div class="grid grid-cols-8 border-4 border-collapse border-black">
@@ -48,7 +58,7 @@
                     </div>
                     <div class="row-span-1 pb-6 border-l border-black">
                         <p class="mx-auto ml-1 font-serif text-xs font-extrabold text-black capitalize print:text-12">
-                            date
+                            date <span class="ml-2"> {{ date("Y-m-d") }}</span>
                         </p>
                         <p class="mx-auto ml-1 font-serif text-xs font-extrabold text-black print:text-12">
                             DV No.
@@ -60,29 +70,25 @@
                     <div class="flex h-full px-2 py-1 text-center border-r-2 border-black">
                         <span class="text-sm font-extrabold">Mode of Payment</span>
                     </div>
-                    @php
-                        $mop = $evaluate(fn($get) => $get('mode_of_payment'));
-                        
-                    @endphp
                     <div class="flex py-1 ml-10 space-x-2">
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
-                                @if ($mop == 'MD5')
-                                    <input id="comments" aria-describedby="comments-description" name="comments" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled checked>
+                                @if ($mop == '1')
+                                    <input id="comments" aria-describedby="comments-description" name="comments" type="checkbox" class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" readonly disabled checked>
                                 @else
                                     <input id="comments" aria-describedby="comments-description" name="comments" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled>
                                 @endif
 
                             </div>
                             <div class="ml-1 text-sm">
-                                <label class="font-medium text-black">MD5</label>
+                                <label class="font-medium text-black">MDS</label>
 
                             </div>
                         </div>
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
-                                @if ($mop == 'Commercial Check')
-                                    <input id="candidates" aria-describedby="candidates-description" name="candidates" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled checked>
+                                @if ($mop == '2')
+                                    <input id="candidates" aria-describedby="candidates-description" name="candidates" type="checkbox" class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" readonly disabled checked>
                                 @else
                                     <input id="candidates" aria-describedby="candidates-description" name="candidates" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled>
                                 @endif
@@ -95,8 +101,8 @@
                         </div>
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
-                                @if ($mop == 'ADA')
-                                    <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled checked>
+                                @if ($mop == '3')
+                                    <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" readonly disabled checked>
                                 @else
                                     <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled>
                                 @endif
@@ -109,8 +115,8 @@
                         </div>
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
-                                @if ($mop == 'Others')
-                                    <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled checked>
+                                @if ($mop == 4)
+                                    <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" readonly disabled checked>
                                 @else
                                     <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled>
                                 @endif
@@ -121,7 +127,7 @@
 
                             </div>
                         </div>
-                        @if ($mop == 'Others')
+                        @if ($mop ==4)
                             <div class="relative flex items-start">
 
                                 <div class="ml-1 text-sm">
@@ -139,7 +145,7 @@
                     </div>
                     <div class="flex w-1/2 h-full text-left border-r-2 border-black">
                         <span class="flex pl-2 my-auto font-extrabold uppercase print:text-10 text-serif">
-                            {{ $evaluate(fn($get) => $get('employee_id')) }} </span>
+                            {{  $evaluate(fn($get) => $get('payee'))  }} </span>
                     </div>
                     <div class="flex w-64 h-full px-2 py-1 text-left border-r-2 border-black">
                         <span class="pb-3 text-xs font-extrabold">TIN/Employee No.:</span>
@@ -170,18 +176,28 @@
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-10">
-                    <div class="w-1/2 text-center border-r-2 border-black h-44">
-                        {{ $evaluate(fn($get) => $get('activity_name')) }}
-                    </div>
-                    <div class="w-64 text-center border-r-2 border-black h-44">
-                        {{ $evaluate(fn($get) => $get('responsibility_center')) }}
-                    </div>
-                    <div class="text-center border-r-2 border-black h-44 w-36">
-                        {{ $evaluate(fn($get) => $get('mfo_pap')) }}
-                    </div>
-                    <div class="text-right h-44 w-36">
-                        {{ $evaluate(fn($get) => $get('amount')) }}
-                    </div>
+					<div class="w-1/2 text-center border-r-2 border-black h-44">
+						
+						@foreach ($particulars as $particular)
+							{{ $particular['purpose'] }}
+						@endforeach
+						
+					</div>
+					<div class="w-64 text-center border-r-2 border-black h-44">
+						@foreach ($particulars as $particular)
+							{{ $particular['responsibility_center'] }}
+						@endforeach
+					</div>
+					<div class="text-center border-r-2 border-black h-44 w-36">
+						@foreach ($particulars as $particular)
+							{{ $particular['mfo_pap'] }}
+						@endforeach
+					</div>
+					<div class="text-right h-44 w-36">
+						@foreach ($particulars as $particular)
+							{{ $particular['amount'] }}
+						@endforeach
+					</div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-black print:text-12">
                     <div class="w-1/2 h-auto text-center border-t-2 border-r-2 border-black">
@@ -194,7 +210,7 @@
                         &nbsp
                     </div>
                     <div class="h-auto text-right border-t-2 border-black print:text-10 w-36">
-                        {{ $evaluate(fn($get) => $get('amount')) }}
+                        {{ $total_amount }}
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black">
@@ -360,6 +376,7 @@
                     <div class="w-1/2 space-y-1 border-r-2 border-black print:text-8">
                         <div class="flex w-20 h-auto text-center border-r border-black print:h-8 print:w-16">
                             <span class="flex mx-auto my-auto print:text-12">Date</span>
+                           
                         </div>
                     </div>
                     <div class="w-1/2 space-y-1 print:text-8">
