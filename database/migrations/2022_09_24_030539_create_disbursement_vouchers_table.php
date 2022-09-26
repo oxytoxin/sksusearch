@@ -29,8 +29,8 @@ return new class extends Migration
             $table->date('submitted_at')->nullable();
             $table->json('draft')->nullable();
             $table->foreignId('fund_cluster_id')->nullable()->index();
-            $table->foreignId('current_step_id')->index();
-            $table->foreignId('previous_step_id')->index();
+            $table->foreignId('current_step_id')->nullable()->index();
+            $table->foreignId('previous_step_id')->nullable()->index();
             $table->timestamps();
         });
     }
