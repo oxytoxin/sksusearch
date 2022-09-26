@@ -23,10 +23,12 @@ return new class extends Migration
             $table->string('tracking_number');
             $table->string('payee');
             $table->string('cheque_number')->nullable();
+            $table->string('dv_number')->nullable();
             $table->date('due_date')->nullable();
             $table->date('closed_at')->nullable();
             $table->date('submitted_at')->nullable();
             $table->json('draft')->nullable();
+            $table->foreignId('fund_cluster_id')->nullable()->index();
             $table->foreignId('current_step_id')->index();
             $table->foreignId('previous_step_id')->index();
             $table->timestamps();
