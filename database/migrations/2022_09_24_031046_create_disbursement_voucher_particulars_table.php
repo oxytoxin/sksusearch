@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('disbursement_voucher_particulars', function (Blueprint $table) {
             $table->id();
             $table->foreignId('disbursement_voucher_id')->index();
-            $table->string('purpose');
+            $table->text('purpose');
             $table->integer('amount');
             $table->string('responsibility_center');
             $table->string('mfo_pap');
