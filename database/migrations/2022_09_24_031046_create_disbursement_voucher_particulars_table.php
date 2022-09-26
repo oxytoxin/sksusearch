@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('disbursement_voucher_particulars', function (Blueprint $table) {
             $table->id();
             $table->foreignId('disbursement_voucher_id')->index();
-            $table->string('name');
+            $table->string('purpose');
             $table->integer('amount');
             $table->string('responsibility_center');
             $table->string('mfo_pap');
-            $table->integer('suggested_amount');
+            $table->integer('suggested_amount')->default(0);
             $table->timestamps();
         });
     }

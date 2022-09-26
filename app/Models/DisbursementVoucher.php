@@ -10,8 +10,9 @@ class DisbursementVoucher extends Model
     use HasFactory;
 
     protected $casts = [
-        'closed_date' => 'immutable_date',
-        'submitted_date' => 'immutable_date',
+        'closed_at' => 'immutable_date',
+        'submitted_at' => 'immutable_date',
+        'due_date' => 'immutable_date',
         'draft' => 'array',
     ];
 
@@ -45,13 +46,13 @@ class DisbursementVoucher extends Model
         return $this->belongsTo(DisbursementVoucherStep::class, 'previous_step_id');
     }
 
-    public function cash_advance()
-    {
-        return $this->hasOne(CashAdvance::class);
-    }
-
     public function disbursement_voucher_particulars()
     {
         return $this->hasMany(DisbursementVoucherParticular::class);
+    }
+
+    public function activity_logs()
+    {
+        return $this->morphMany(ActivityLog::class, 'loggable');
     }
 }

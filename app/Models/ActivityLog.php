@@ -9,6 +9,11 @@ class ActivityLog extends Model
 {
     use HasFactory;
 
+    public function loggable()
+    {
+        return $this->morphTo();
+    }
+
     public function activity_log_type()
     {
         return $this->belongsTo(ActivityLogType::class);

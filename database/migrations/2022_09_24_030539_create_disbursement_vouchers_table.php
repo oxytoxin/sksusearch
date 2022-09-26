@@ -19,14 +19,16 @@ return new class extends Migration
             $table->foreignId('user_id')->index();
             $table->foreignId('signatory_id')->index();
             $table->foreignId('mop_id')->index();
-            $table->foreignId('current_step_id')->index();
-            $table->foreignId('previous_step_id')->index();
+            $table->foreignId('travel_order_id')->index()->nullable();
             $table->string('tracking_number');
             $table->string('payee');
             $table->string('cheque_number')->nullable();
-            $table->date('closed_date')->nullable();
-            $table->date('submitted_date')->nullable();
+            $table->date('due_date')->nullable();
+            $table->date('closed_at')->nullable();
+            $table->date('submitted_at')->nullable();
             $table->json('draft')->nullable();
+            $table->foreignId('current_step_id')->index();
+            $table->foreignId('previous_step_id')->index();
             $table->timestamps();
         });
     }

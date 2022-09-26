@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
+use App\Models\ActivityLogType;
+use App\Models\DisbursementVoucher;
 use App\Models\EmployeeInformation;
 use App\Models\Mop;
 use App\Models\TravelOrder;
@@ -18,6 +20,8 @@ use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class DisbursementVouchersCreate extends Component implements HasForms
@@ -26,7 +30,15 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public $tracking_number;
 
+    public $travel_order_id;
+
+    public $disbursement_voucher_particulars = [];
+
     public $payee;
+
+    public $mop_id;
+
+    public $signatory_id;
 
     public VoucherSubType $voucher_subtype;
 
@@ -106,22 +118,20 @@ class DisbursementVouchersCreate extends Component implements HasForms
                             ]),
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
-                                    TextInput::make('purpose'),
+                                    TextInput::make('purpose')->required(),
                                     Grid::make(3)->schema([
                                         TextInput::make('responsibility_center')
-                                            ->required()
-                                            ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
+                                            ->required(),
                                         TextInput::make('mfo_pap')
                                             ->label('MFO/PAP')
-                                            ->required()
-                                            ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
+                                            ->required(),
                                         TextInput::make('amount')
                                             ->numeric()
-                                            ->required()
-                                            ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
+                                            ->required(),
                                     ]),
                                 ])
-                                ->visible(fn ($get) => $get('travel_order_id'))
+                                ->minItems(1)
+                                ->visible(fn ($get) => $get('travel_order_id') || ! in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
                         ]),
@@ -154,8 +164,44 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ViewField::make('voucher_preview')->label('Voucher Preview')->view('components.forms.voucher-preview'),
                             ]),
                     ]),
-            ]),
+            ])->submitAction(view('components.forms.save-voucher')),
         ];
+    }
+
+    public function save()
+    {
+        $this->validate();
+        DB::beginTransaction();
+
+        $dv = DisbursementVoucher::create([
+            'voucher_subtype_id' => $this->voucher_subtype->id,
+            'user_id' => auth()->id(),
+            'signatory_id' => $this->signatory_id,
+            'mop_id' => $this->mop_id,
+            'payee' => $this->payee,
+            'travel_order_id' => $this->travel_order_id,
+            'tracking_number' => $this->tracking_number,
+            'submitted_at' => now(),
+            'current_step_id' => 1000,
+            'previous_step_id' => 1000,
+        ]);
+
+        foreach ($this->disbursement_voucher_particulars as $key => $particulars) {
+            $dv->disbursement_voucher_particulars()->create([
+                'purpose' => $particulars['purpose'],
+                'responsibility_center' => $particulars['responsibility_center'],
+                'mfo_pap' => $particulars['mfo_pap'],
+                'amount' => $particulars['amount'],
+            ]);
+        }
+        $dv->activity_logs()->create([
+            'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
+            'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
+        ]);
+        DB::commit();
+        Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
+
+        return redirect('/');
     }
 
     public function mount()

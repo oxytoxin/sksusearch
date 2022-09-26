@@ -1,6 +1,6 @@
 <div>
     <h3>Create Disbursement Voucher</h3>
-    <div>
+    <form wire:submit.prevent='save'>
         {{ $this->form }}
-    </div>
+    </form>
 </div>
