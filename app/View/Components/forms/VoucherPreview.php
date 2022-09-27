@@ -4,7 +4,7 @@ namespace App\View\Components\forms;
 
 use Illuminate\View\Component;
 
-class voucher-preview extends Component
+class VoucherPreview extends Component
 {
     /**
      * Create a new component instance.

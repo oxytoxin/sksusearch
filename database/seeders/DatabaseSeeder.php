@@ -29,7 +29,6 @@ class DatabaseSeeder extends Seeder
             DisbursementVoucherStepSeeder::class,
             TravelOrderTypeSeeder::class,
             MotSeeder::class,
-            ActivityLogTypeSeeder::class,
             RelatedDocumentsListSeeder::class,
             FundClusterSeeder::class,
         ]);

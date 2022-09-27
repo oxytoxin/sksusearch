@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
             $table->morphs('loggable');
-            $table->foreignId('activity_log_type_id')->index();
             $table->text('description');
             $table->text('remarks')->nullable();
             $table->timestamps();

@@ -25,7 +25,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 2000,
             'process' => 'Received by',
             'recipient' => 'Requisitioner',
-            'sender' => 'Requisitioner',
+            'sender' => null,
             'return_step_id' => 1000,
         ]);
         DisbursementVoucherStep::create([
@@ -154,7 +154,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 17000,
             'process' => 'Received in',
             'recipient' => 'Cashier',
-            'sender' => 'Cashier',
+            'sender' => 'by Cashier Staff',
             'office_id' => 52,
             'return_step_id' => 16000,
         ]);
@@ -163,7 +163,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 18000,
             'process' => 'Cheque/ADA made for',
             'recipient' => 'Requisitioner',
-            'sender' => 'Cashier',
+            'sender' => 'by Cashier Staff',
             'office_id' => 52,
             'return_step_id' => 16000,
         ]);
@@ -172,7 +172,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 19000,
             'process' => 'Forwarded to',
             'recipient' => 'ICU',
-            'sender' => 'Cashier',
+            'sender' => 'by Cashier Staff',
             'office_id' => 5,
             'return_step_id' => 19000,
         ]);
@@ -214,7 +214,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 24000,
             'process' => 'Forwarded to',
             'recipient' => 'COA',
-            'sender' => 'Archiver',
+            'sender' => 'by Archiver',
             'return_step_id' => 24000,
         ]);
 

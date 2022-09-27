@@ -3,7 +3,6 @@
 namespace App\Http\Livewire\Offices;
 
 use App\Forms\Components\Flatpickr;
-use App\Models\ActivityLogType;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
 use App\Models\FundCluster;
@@ -12,6 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -49,7 +49,6 @@ class OfficeDashboard extends Component implements HasTable
                     ]);
                     $record->refresh();
                     $record->activity_logs()->create([
-                        'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                         'description' => $record->current_step->process.' '.$record->current_step->recipient.' by '.auth()->user()->employee_information->full_name,
                     ]);
                     if ($record->current_step_id == 8000 || $record->current_step_id == 11000) {
@@ -58,7 +57,6 @@ class OfficeDashboard extends Component implements HasTable
                         ]);
                         $record->refresh();
                         $record->activity_logs()->create([
-                            'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                             'description' => $record->current_step->process,
                         ]);
                     }
@@ -82,7 +80,6 @@ class OfficeDashboard extends Component implements HasTable
                     }
                     $record->refresh();
                     $record->activity_logs()->create([
-                        'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                         'description' => $record->current_step->process.' '.$record->current_step->recipient.' by '.auth()->user()->employee_information->full_name,
                         'remarks' => $data['remarks'] ?? null,
                     ]);
@@ -107,7 +104,6 @@ class OfficeDashboard extends Component implements HasTable
                     'fund_cluster_id' => $data['fund_cluster_id'],
                 ]);
                 $record->activity_logs()->create([
-                    'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                     'description' => 'ORS/BURS and Fund Cluster assigned to Disbursement Voucher',
                 ]);
                 DB::commit();
@@ -136,7 +132,6 @@ class OfficeDashboard extends Component implements HasTable
                 ]);
                 $record->refresh();
                 $record->activity_logs()->create([
-                    'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                     'description' => 'Disbursement Voucher verified.',
                 ]);
                 DB::commit();
@@ -161,7 +156,6 @@ class OfficeDashboard extends Component implements HasTable
                     'current_step_id' => $record->current_step_id + 1000,
                 ]);
                 $record->activity_logs()->create([
-                    'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                     'description' => 'Cheque/ADA made for requisitioner.',
                 ]);
                 DB::commit();
@@ -184,7 +178,6 @@ class OfficeDashboard extends Component implements HasTable
                 ]);
                 $record->refresh();
                 $record->activity_logs()->create([
-                    'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                     'description' => 'Disbursement Voucher returned to '.$record->current_step->recipient,
                     'remarks' => $data['remarks'] ?? null,
                 ]);
@@ -206,7 +199,31 @@ class OfficeDashboard extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
-            ViewAction::make('view')->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_view', ['disbursement_voucher' => $record])),
+            ActionGroup::make([
+                ViewAction::make('progress')
+                    ->label('Progress')
+                    ->icon('ri-loader-4-fill')
+                    ->button()
+                    ->outlined()
+                    ->modalHeading('Disbursement Voucher Progress')
+                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_progress', [
+                        'disbursement_voucher' => $record,
+                        'steps' => DisbursementVoucherStep::where('id', '>', 2000)->get(),
+                    ])),
+                ViewAction::make('logs')
+                    ->label('Activity Timeline')
+                    ->icon('ri-list-check-2')
+                    ->button()
+                    ->outlined()
+                    ->modalHeading('Disbursement Voucher Activity Timeline')
+                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_logs', [
+                        'disbursement_voucher' => $record,
+                    ])),
+                ViewAction::make('view')
+                    ->label('Preview')
+                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_view', ['disbursement_voucher' => $record])),
+            ])->icon('ri-eye-line'),
+
         ];
     }
 
