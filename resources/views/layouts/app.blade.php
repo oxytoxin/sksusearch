@@ -29,114 +29,75 @@
 	<div class="min-h-screen bg-primary-100">
 		@livewire('navigation-menu')
 
-		<div x-data="{ opensidebar: false }" x-cloak>
+		<div>
 			<!-- Static sidebar for desktop -->
 			<div class="hidden md:fixed md:flex md:h-full md:w-64 md:flex-col">
 				<!-- Sidebar component, swap this element with another sidebar if you like -->
 				<div class="flex flex-col flex-1 min-h-0 bg-white shadow-lg">
 					<div class="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
-
-						<nav class="flex-1 px-2 mt-5 space-y-1">
-
-							{{-- <x-sidenav-link href="{{ route('requisitioner.dashboard') }}" :active="request()->routeIs('requisitioner.dashboard')">
-								My Dashboard
-							</x-sidenav-link>
-							<x-sidenav-link href="{{ route('office.dashboard') }}" :active="request()->routeIs('office.dashboard')">
-								Office Dashboard
-							</x-sidenav-link> --}}
-							<div class="space-y-1" x-data="{ open: false }">
-								<!-- Current: "bg-primary-100 text-primary-900", Default: "bg-white text-primary-600 hover:bg-primary-50 hover:text-primary-900" -->
-								<button x-on:click="open=!open" type="button"
-									class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left bg-white rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
-									aria-controls="sub-menu-1" aria-expanded="false">
-									<!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
-									<svg
-										:class="open ?
-										    'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
-										    'flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400'"
-										class="" viewBox="0 0 20 20" aria-hidden="true">
-										<path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
-									</svg>
-									Disbursement Vouchers
-								</button>
-								<!-- Expandable link section, show/hide based on state. -->
-								<div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300'
-									x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
-									x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100'
-									x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
-									<a href="#"
-										class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-										Pending Disbursement Vouchers</a>
-									<a href="#"
-										class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-										Unliquidated Disbursement Vouchers</a>
-									<a href="#"
-										class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-										Closed Disbursement Vouchers</a>
-								</div>
-							</div>
-
-							<div class="space-y-1" x-data="{ open: false }">
-								<button x-on:click="open=!open" type="button"
-									class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left bg-white rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
-									aria-controls="sub-menu-1" aria-expanded="false">
-									<!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
-									<svg
-										:class="open ?
-										    'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
-										    'flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400'"
-										class="" viewBox="0 0 20 20" aria-hidden="true">
-										<path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
-									</svg>
-									Travel Orders
-								</button>
-								<!-- Expandable link section, show/hide based on state. -->
-								<div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300'
-									x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
-									x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100'
-									x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
-									<a href="{{ route('requisitioner.travel-orders.index') }}"
-										class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-										My Travel Orders
-									</a>
-									@if (in_array(auth()->user()->employee_information->position_id, [
-									    5,
-									    12,
-									    13,
-									    11,
-									    14,
-									    15,
-									    16,
-									    17,
-									    18,
-									    19,
-									    20,
-									    21,
-									    25,
-									]))
-										<a href="{{ route('signatory.travel-orders.index') }}"
-											class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-											Travel orders to sign
-										</a>
-									@endif
-
-								</div>
-							</div>
-						</nav>
+						<x-sidenav />
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="flex flex-col flex-1 md:pl-64">
-			<div class="sticky top-0 z-10 pt-1 pl-1 bg-primary-100 sm:pl-3 sm:pt-3 md:hidden">
-				<button type="button" x-on:click="opensidebar = true"
-					class="text-primary-500 hover:text-primary-900 -ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+			<div class="relative z-40 flex flex-row sm:pl-3 sm:pt-3 md:hidden" x-data="{ opensidebar: false }" x-cloak>
+				<div class="fixed inset-0 bg-opacity-75 bg-primary-500" x-show = 'opensidebar' 
+				x-transition:enter = ''
+				x-transition:enter-start =  ''
+				x-transition:enter-end =  ''
+				x-transition:leave =  ''
+				x-transition:leave-start = '' 
+				x-transition:leave-end = '' ></div>
+				<div class="fixed inset-0 z-40 flex" x-show = 'opensidebar' 
+				x-transition:enter = ''
+				x-transition:enter-start =  ''
+				x-transition:enter-end =  ''
+				x-transition:leave =  ''
+				x-transition:leave-start = '' 
+				x-transition:leave-end = '' >
+					<div class="relative flex flex-col flex-1 w-full max-w-xs pt-5 pb-4 bg-white" x-show = 'opensidebar' 
+					x-transition:enter = ''
+					x-transition:enter-start =  ''
+					x-transition:enter-end =  ''
+					x-transition:leave =  ''
+					x-transition:leave-start = '' 
+					x-transition:leave-end = '' >
+						<div class="absolute top-0 right-0 pt-2 -mr-12">
+							<button type="button" x-on:click="opensidebar = false"
+								class="flex items-center justify-center w-10 h-10 ml-1 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+								<span class="sr-only">Close sidebar</span>
+								<!-- Heroicon name: outline/x-mark -->
+								<svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+									stroke-width="1.5" stroke="currentColor" aria-hidden="true" x-show = 'opensidebar' 
+									x-transition:enter = 'transition ease-out duration-1000'
+									x-transition:enter-start =  'transform rotate-180 opacity-80'
+									x-transition:enter-end =  'transform rotate-0 opacity-100'>
+									<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+								</svg>
+							</button>
+						</div>
+						<div class="flex" :class="opensidebar == true ? 'bg-white' : 'bg-transparent'" x-show='opensidebar'
+							x-transition:enter='transition ease-out duration-500' x-transition:enter-start='' x-transition:enter-end=''
+							x-transition:leave='' x-transition:leave-start='' x-transition:leave-end=''>
+							<x-sidenav />
+						</div>
+						<div class="flex-shrink-0 w-14" aria-hidden="true">
+							<!-- Dummy element to force sidebar to shrink to fit close icon -->
+						  </div>
+					</div>
+				</div>
+				<button  x-on:click="opensidebar = true" type="button" class="px-4 py-3 text-gray-600 border-r border-primary-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden">
 					<span class="sr-only">Open sidebar</span>
-					<!-- Heroicon name: outline/bars-3 -->
-					<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-						stroke="currentColor" aria-hidden="true">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-					</svg>
+					<!-- Heroicon name: outline/bars-3-bottom-left -->
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-auto text-primary-700"
+						x-show = 'opensidebar == false' 
+						x-transition:enter = 'transition ease-out duration-1000'
+						x-transition:enter-start =  'transform rotate-180 opacity-80'
+						x-transition:enter-end =  'transform rotate-0 opacity-100'
+					>
+						<path stroke-linecap="round" stroke-linejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5" />
+					</svg>					  
 				</button>
 			</div>
 			<main class="flex-1">
