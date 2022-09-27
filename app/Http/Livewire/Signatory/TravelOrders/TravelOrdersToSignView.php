@@ -45,12 +45,13 @@ class TravelOrdersToSignView extends Component
 
     public function approve(){
     
-        $this->travel_order->signatories()->update(["is_approved" => true,]);
+        $temp=$this->travel_order->signatories()->wherePivot('user_id',auth()->id())->update(["is_approved" => true,]);
         $this->dialog()->success(
             $title = 'Approved',
             $description = 'Travel order approved!',
             $icon = 'success',
         );
+        
     }
     
 }
