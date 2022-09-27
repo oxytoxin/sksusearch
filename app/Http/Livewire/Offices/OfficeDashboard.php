@@ -5,7 +5,9 @@ namespace App\Http\Livewire\Offices;
 use App\Forms\Components\Flatpickr;
 use App\Models\ActivityLogType;
 use App\Models\DisbursementVoucher;
+use App\Models\DisbursementVoucherStep;
 use App\Models\FundCluster;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -50,7 +52,7 @@ class OfficeDashboard extends Component implements HasTable
                         'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                         'description' => $record->current_step->process.' '.$record->current_step->recipient.' by '.auth()->user()->employee_information->full_name,
                     ]);
-                    if ($record->current_step_id == 6000 || $record->current_step_id == 9000) {
+                    if ($record->current_step_id == 8000 || $record->current_step_id == 11000) {
                         $record->update([
                             'current_step_id' => $record->current_step_id + 1000,
                         ]);
@@ -66,21 +68,36 @@ class OfficeDashboard extends Component implements HasTable
             })
                 ->visible(fn ($record) => $record->current_step->process == 'Forwarded to')
                 ->requiresConfirmation(),
-            Action::make('Forward')->button()->action(function ($record) {
+            Action::make('Forward')->button()->action(function ($record, $data) {
                 if ($this->canBeForwarded($record)) {
                     DB::beginTransaction();
-                    $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
-                    ]);
+                    if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
+                        $record->update([
+                            'current_step_id' => $record->current_step_id + 1000,
+                        ]);
+                    } else {
+                        $record->update([
+                            'current_step_id' => $record->previous_step_id,
+                        ]);
+                    }
                     $record->refresh();
                     $record->activity_logs()->create([
                         'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
                         'description' => $record->current_step->process.' '.$record->current_step->recipient.' by '.auth()->user()->employee_information->full_name,
+                        'remarks' => $data['remarks'] ?? null,
                     ]);
                     DB::commit();
                     Notification::make()->title('Document Forwarded')->success()->send();
                 }
             })
+                ->form(function () {
+                    return [
+                        RichEditor::make('remarks')
+                            ->label('Remarks (Optional)')
+                            ->fileAttachmentsDisk('remarks'),
+                    ];
+                })
+                ->modalWidth('4xl')
                 ->visible(fn ($record) => $this->canBeForwarded($record))
                 ->requiresConfirmation(),
             Action::make('ors_burs')->label('ORS/BURS')->button()->action(function ($record, $data) {
@@ -96,7 +113,7 @@ class OfficeDashboard extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('ORS/BURS and Fund Cluster updated.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 7000 && (blank($record->ors_burs) || blank($record->fund_cluster_id)))
+                ->visible(fn ($record) => $record->current_step_id == 9000 && (blank($record->ors_burs) || blank($record->fund_cluster_id)))
                 ->form(function ($record) {
                     return [
                         Select::make('fund_cluster_id')
@@ -125,7 +142,7 @@ class OfficeDashboard extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement Voucher verified.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 10000 && blank($record->journal_date) && blank($record->dv_number))
+                ->visible(fn ($record) => $record->current_step_id == 12000 && blank($record->journal_date) && blank($record->dv_number))
                 ->form(function () {
                     return [
                         TextInput::make('dv_number')
@@ -150,7 +167,7 @@ class OfficeDashboard extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Cheque/ADA made for requisitioner.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 15000 && blank($record->cheque_number))
+                ->visible(fn ($record) => $record->current_step_id == 17000 && blank($record->cheque_number))
                 ->form(function () {
                     return [
                         TextInput::make('cheque_number')
@@ -159,17 +176,47 @@ class OfficeDashboard extends Component implements HasTable
                     ];
                 })
                 ->requiresConfirmation(),
+            Action::make('return')->button()->action(function ($record, $data) {
+                DB::beginTransaction();
+                $record->update([
+                    'current_step_id' => $data['return_step_id'],
+                    'previous_step_id' => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', $record->current_step->recipient)->first()->id,
+                ]);
+                $record->refresh();
+                $record->activity_logs()->create([
+                    'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
+                    'description' => 'Disbursement Voucher returned to '.$record->current_step->recipient,
+                    'remarks' => $data['remarks'] ?? null,
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement Voucher returned.')->success()->send();
+            })
+                ->color('danger')
+                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to')
+                ->form(function () {
+                    return [
+                        Select::make('return_step_id')
+                            ->label('Return to')
+                            ->options(fn ($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
+                            ->required(),
+                        RichEditor::make('remarks')
+                            ->label('Remarks (Optional)')
+                            ->fileAttachmentsDisk('remarks'),
+                    ];
+                })
+                ->modalWidth('4xl')
+                ->requiresConfirmation(),
             ViewAction::make('view')->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_view', ['disbursement_voucher' => $record])),
         ];
     }
 
     private function canBeForwarded($record)
     {
-        return ($record->current_step->process == 'Received in' && ! in_array($record->current_step_id, [7000, 11000, 15000]))
-            || ($record->current_step_id == 7000 && filled($record->ors_burs) && filled($record->fund_cluster_id))
-            || ($record->current_step_id == 10000 && filled($record->journal_date) && filled($record->dv_number))
-            || ($record->current_step_id == 11000 && $record->certified_by_accountant)
-            || ($record->current_step_id == 16000 && filled($record->cheque_number));
+        return ($record->current_step->process == 'Received in' && ! in_array($record->current_step_id, [9000, 13000, 17000]))
+            || ($record->current_step_id == 9000 && filled($record->ors_burs) && filled($record->fund_cluster_id))
+            || ($record->current_step_id == 12000 && filled($record->journal_date) && filled($record->dv_number))
+            || ($record->current_step_id == 13000 && $record->certified_by_accountant)
+            || ($record->current_step_id == 18000 && filled($record->cheque_number));
     }
 
     public function render()
