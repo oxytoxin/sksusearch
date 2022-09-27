@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
-use App\Models\ActivityLogType;
 use App\Models\DisbursementVoucher;
 use App\Models\EmployeeInformation;
 use App\Models\Mop;
@@ -182,8 +181,8 @@ class DisbursementVouchersCreate extends Component implements HasForms
             'travel_order_id' => $this->travel_order_id,
             'tracking_number' => $this->tracking_number,
             'submitted_at' => now(),
-            'current_step_id' => 1000,
-            'previous_step_id' => 1000,
+            'current_step_id' => 3000,
+            'previous_step_id' => 2000,
         ]);
 
         foreach ($this->disbursement_voucher_particulars as $key => $particulars) {
@@ -195,13 +194,12 @@ class DisbursementVouchersCreate extends Component implements HasForms
             ]);
         }
         $dv->activity_logs()->create([
-            'activity_log_type_id' => ActivityLogType::DISBURSEMENT_VOUCHER_LOG,
             'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
         ]);
         DB::commit();
         Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
 
-        return redirect('/');
+        return redirect()->route('requisitioner.disbursement-vouchers.index');
     }
 
     public function mount()

@@ -9,49 +9,52 @@ use WireUi\Traits\Actions;
 class TravelOrdersToSignView extends Component
 {
     use Actions;
+
     public TravelOrder $travel_order;
 
-    public $modal=false;
+    public $modal = false;
+
     public $limit = 2;
-    public $note="";
+
+    public $note = '';
 
     public function render()
     {
         return view('livewire.signatory.travel-orders.travel-orders-to-sign-view');
     }
 
-    public function showDialog(){
-    
+    public function showDialog()
+    {
     }
 
-    public function showMore(){
-        $this->limit+=5;    
+    public function showMore()
+    {
+        $this->limit += 5;
     }
 
-    public function addNote(){
-    
-        $this->validate(["note"=>"required|min:10"]);
+    public function addNote()
+    {
+        $this->validate(['note' => 'required|min:10']);
 
-        $notes = $this->travel_order->sidenotes()->create(['content'=>$this->note,'user_id'=>auth()->id()]);
+        $notes = $this->travel_order->sidenotes()->create(['content' => $this->note, 'user_id' => auth()->id()]);
         $this->modal = false;
-        $this->note = "";
+        $this->note = '';
+        $this->travel_order->refresh();
         $this->dialog()->success(
             $title = 'Note attached',
             $description = 'Your note has been attached and saved!',
             $icon = 'success',
         );
-    
     }
 
-    public function approve(){
-    
-        $temp=$this->travel_order->signatories()->wherePivot('user_id',auth()->id())->update(["is_approved" => true,]);
+    public function approve()
+    {
+        $temp = $this->travel_order->signatories()->wherePivot('user_id', auth()->id())->update(['is_approved' => true]);
+        $this->travel_order->refresh();
         $this->dialog()->success(
             $title = 'Approved',
             $description = 'Travel order approved!',
             $icon = 'success',
         );
-        
     }
-    
 }

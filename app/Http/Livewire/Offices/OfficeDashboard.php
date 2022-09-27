@@ -172,9 +172,14 @@ class OfficeDashboard extends Component implements HasTable
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
+                if ($record->current_step_id < $record->previous_step_id) {
+                    $previous_step_id = $record->previous_step_id;
+                } else {
+                    $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', $record->current_step->recipient)->first()->id;
+                }
                 $record->update([
                     'current_step_id' => $data['return_step_id'],
-                    'previous_step_id' => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', $record->current_step->recipient)->first()->id,
+                    'previous_step_id' => $previous_step_id,
                 ]);
                 $record->refresh();
                 $record->activity_logs()->create([

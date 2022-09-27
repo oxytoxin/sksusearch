@@ -13,9 +13,4 @@ class ActivityLog extends Model
     {
         return $this->morphTo();
     }
-
-    public function activity_log_type()
-    {
-        return $this->belongsTo(ActivityLogType::class);
-    }
 }
