@@ -38,12 +38,12 @@
 
 						<nav class="flex-1 px-2 mt-5 space-y-1">
 
-							<x-sidenav-link href="{{ route('requisitioner.dashboard') }}" :active="request()->routeIs('requisitioner.dashboard')">
+							{{-- <x-sidenav-link href="{{ route('requisitioner.dashboard') }}" :active="request()->routeIs('requisitioner.dashboard')">
 								My Dashboard
 							</x-sidenav-link>
 							<x-sidenav-link href="{{ route('office.dashboard') }}" :active="request()->routeIs('office.dashboard')">
 								Office Dashboard
-							</x-sidenav-link>
+							</x-sidenav-link> --}}
 							<div class="space-y-1" x-data="{ open: false }">
 								<!-- Current: "bg-primary-100 text-primary-900", Default: "bg-white text-primary-600 hover:bg-primary-50 hover:text-primary-900" -->
 								<button x-on:click="open=!open" type="button"
