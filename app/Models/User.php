@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -55,6 +56,11 @@ class User extends Authenticatable
     public function getProfilePhotoUrlAttribute()
     {
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->employee_information->full_name) . '&color=7F9CF5&background=EBF4FF';
+    }
+
+    protected function name(): Attribute
+    {
+        return new Attribute(get: fn($value) => $this->employee_information->full_name );
     }
 
     public function employee_information()

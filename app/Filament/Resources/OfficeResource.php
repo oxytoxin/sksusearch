@@ -64,7 +64,7 @@ class OfficeResource extends Resource
                     ->sortable(),
                 TextColumn::make('code')->searchable()->sortable(),
                 TextColumn::make('campus.name')->searchable()->sortable(),
-                TextColumn::make('head.email')->default('Not Added')->searchable()->sortable(),
+                TextColumn::make('head.name')->default('Not Added')->searchable()->sortable(),
             ])
             ->filters([
                 //

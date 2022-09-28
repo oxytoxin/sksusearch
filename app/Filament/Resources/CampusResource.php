@@ -62,7 +62,7 @@ class CampusResource extends Resource
                 TextColumn::make('address')->searchable()->sortable()->limit(20)
                     ->tooltip(fn ($record): string => "{$record->address}"),
                 TextColumn::make('campus_code')->searchable()->sortable(),
-                TextColumn::make('admin.full_name')->default('Not Added')->searchable()->sortable(),
+                TextColumn::make('admin.name')->default('Not Added')->searchable()->sortable(),
             ])
             ->filters([
                 //

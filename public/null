@@ -1,0 +1,5 @@
+Office::first()
+Office::get()
+Office::find(2)
+Office::find(2)->head
+Office::find(2)
