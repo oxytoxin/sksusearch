@@ -19,7 +19,8 @@ module.exports = {
     theme: {
         extend: {
             spacing :{
-                'screen-70':"70vh"
+                'screen-70':"70vh",
+                'screen-80':"80vh"
             },
             fontSize:{
                 '12':'12px',
