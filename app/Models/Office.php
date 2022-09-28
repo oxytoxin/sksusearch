@@ -24,6 +24,11 @@ class Office extends Model
         return $this->belongsTo(User::class, 'head_id');
     }
 
+    public function heads()
+    {
+        return $this->hasOne(EmployeeInformation::class, 'id', 'head_id');
+    }
+
     public function admin()
     {
         return $this->belongsTo(User::class, 'admin_user_id');
