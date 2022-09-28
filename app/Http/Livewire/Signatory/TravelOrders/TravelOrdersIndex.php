@@ -26,8 +26,11 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
             Tables\Columns\TextColumn::make('date_to')->label('To')->date()->searchable(),
             Tables\Columns\TextColumn::make('approved')->label('Status')
                 ->formatStateUsing(fn ($record) => ! $record->signatories->contains('pivot.is_approved', false) ? 'Approved' : 'Pending'),
-
+            Tables\Columns\TextColumn::make('signed')->label('Signed')
+                ->formatStateUsing(fn ($record) =>  $record->signatories()->wherePivot('user_id',auth()->id())->value('is_approved') ? 'Signed' : 'Pending'),
+                
         ];
+      
     }
 
     protected function getTableActions()
