@@ -269,8 +269,8 @@ class EmployeeInformationSeeder extends Seeder
                 'password' => Hash::make('pasquin123'),
             ],
             [
-                'email' => 'rolandohechanova@sksu.edu.ph',
-                'password' => Hash::make('hechanova123'),
+                'email' => 'samsonmolao@sksu.edu.ph',
+                'password' => Hash::make('molao123'),
             ],
             [
                 'email' => 'tarhatausman@sksu.edu.ph',
