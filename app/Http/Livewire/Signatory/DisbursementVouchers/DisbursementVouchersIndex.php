@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Signatory\DisbursementVouchers;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
@@ -31,7 +32,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
             TextColumn::make('submitted_at')
                 ->label('Date Submitted')
                 ->dateTime('h:i A F j, Y'),
-            TextColumn::make('status')->formatStateUsing(fn ($record) => ($record->current_step_id > 4000 && $record->previous_step_id > 4000) ? 'To Sign' : 'Signed'),
+            TextColumn::make('status')->formatStateUsing(fn ($record) => ($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign'),
         ];
     }
 
@@ -82,6 +83,40 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->visible(fn ($record) => $record->current_step_id == 4000)
+                ->requiresConfirmation(),
+            Action::make('return')->button()->action(function ($record, $data) {
+                DB::beginTransaction();
+                if ($record->current_step_id < $record->previous_step_id) {
+                    $previous_step_id = $record->previous_step_id;
+                } else {
+                    $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', $record->current_step->recipient)->first()->id;
+                }
+                $record->update([
+                    'current_step_id' => $data['return_step_id'],
+                    'previous_step_id' => $previous_step_id,
+                ]);
+                $record->refresh();
+                $record->activity_logs()->create([
+                    'description' => 'Disbursement Voucher returned to '.$record->current_step->recipient,
+                    'remarks' => $data['remarks'] ?? null,
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement Voucher returned.')->success()->send();
+            })
+                ->color('danger')
+                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to')
+                ->form(function () {
+                    return [
+                        Select::make('return_step_id')
+                            ->label('Return to')
+                            ->options(fn ($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
+                            ->required(),
+                        RichEditor::make('remarks')
+                            ->label('Remarks (Optional)')
+                            ->fileAttachmentsDisk('remarks'),
+                    ];
+                })
+                ->modalWidth('4xl')
                 ->requiresConfirmation(),
             ActionGroup::make([
                 ViewAction::make('progress')
