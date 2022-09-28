@@ -1621,7 +1621,7 @@ class EmployeeInformationSeeder extends Seeder
                 'password' => Hash::make('gab123'),
             ],
             [
-                'email' => 'sksuadmin@admin.com',
+                'email' => 'sksusearch@sksu.edu.ph',
                 'password' => Hash::make('superadmin123'),
             ],
         ]);

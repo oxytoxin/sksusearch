@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,7 +12,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser, HasName
 {
     use HasApiTokens;
     use HasFactory;
@@ -58,9 +60,15 @@ class User extends Authenticatable
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->employee_information->full_name) . '&color=7F9CF5&background=EBF4FF';
     }
 
+
     protected function name(): Attribute
     {
-        return new Attribute(get: fn($value) => $this->employee_information->full_name );
+        return new Attribute(get: fn ($value) => $this->employee_information->full_name);
+    }
+
+    public function canAccessFilament(): bool
+    {
+        return $this->email == 'sksusearch@sksu.edu.ph';
     }
 
     public function employee_information()
