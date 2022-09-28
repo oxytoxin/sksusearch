@@ -78,8 +78,8 @@ class DummyDataSeeder extends Seeder
             'travel_order_id' => $to->id,
             'tracking_number' => 'DV_'.now()->format('Y').'-'.now()->format('m').'-'.rand(1, 999),
             'submitted_at' => now(),
-            'current_step_id' => 1000,
-            'previous_step_id' => 1000,
+            'current_step_id' => 3000,
+            'previous_step_id' => null,
         ]);
         $dv->disbursement_voucher_particulars()->create([
             'purpose' => $to->purpose,

@@ -52,7 +52,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     Notification::make()->title('Document Received')->success()->send();
                 }
             })
-                ->visible(fn ($record) => $record->current_step_id == 1000)
+                ->visible(fn ($record) => $record->current_step_id == 3000)
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
@@ -81,7 +81,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     ];
                 })
                 ->modalWidth('4xl')
-                ->visible(fn ($record) => $record->current_step_id == 2000)
+                ->visible(fn ($record) => $record->current_step_id == 4000)
                 ->requiresConfirmation(),
             ActionGroup::make([
                 ViewAction::make('progress')
