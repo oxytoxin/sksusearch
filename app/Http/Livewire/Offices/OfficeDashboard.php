@@ -181,7 +181,7 @@ class OfficeDashboard extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 13000 && blank($record->certified_by_accountant))
+                ->visible(fn ($record) => $record->current_step_id == 13000 && ! $record->certified_by_accountant)
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
