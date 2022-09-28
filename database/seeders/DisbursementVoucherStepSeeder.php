@@ -119,7 +119,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'process' => 'For certification by',
             'recipient' => 'Chief Accountant',
             'sender' => 'by Accounting Office Staff',
-            'office_id' => 3,
+            'office_id' => 25,
             'return_step_id' => 10000,
         ]);
 

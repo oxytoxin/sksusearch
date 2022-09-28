@@ -170,6 +170,19 @@ class OfficeDashboard extends Component implements HasTable
                     ];
                 })
                 ->requiresConfirmation(),
+            Action::make('certify')->button()->action(function ($record) {
+                DB::beginTransaction();
+                $record->update([
+                    'certified_by_accountant' => true,
+                ]);
+                $record->activity_logs()->create([
+                    'description' => 'Disbursement voucher certified.',
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement voucher certified.')->success()->send();
+            })
+                ->visible(fn ($record) => $record->current_step_id == 13000 && blank($record->certified_by_accountant))
+                ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
                 if ($record->current_step_id < $record->previous_step_id) {
