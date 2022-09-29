@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ModeOfTransportResource\Pages;
-use App\Filament\Resources\ModeOfTransportResource\RelationManagers;
-use App\Models\ModeOfTransport;
-use App\Models\Mot;
+use App\Filament\Resources\VoucherSubTypeResource\Pages;
+use App\Filament\Resources\VoucherSubTypeResource\RelationManagers;
+use App\Models\VoucherSubType;
+use App\Models\VoucherType;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -16,24 +17,27 @@ use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ModeOfTransportResource extends Resource
+class VoucherSubTypeResource extends Resource
 {
-    protected static ?string $model = Mot::class;
+    protected static ?string $model = VoucherSubType::class;
 
-    protected static ?string $modelLabel = 'Mode Of Transport';
+    protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
 
-    protected static ?string $navigationIcon = 'heroicon-o-truck';
+    protected static ?int $navigationSort = 10;
 
-    protected static ?int $navigationSort = 13;
+    protected static ?string $navigationLabel = 'Sub Type';
 
-    protected static ?string $navigationLabel = 'Mode Of Transport';
-
-    protected static ?string $navigationGroup = 'Others';
+    protected static ?string $navigationGroup = 'Vouchers';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                Select::make('voucher_type_id')
+                    ->label('Type')
+                    ->options(VoucherType::pluck('name', 'id'))
+                    ->searchable()
+                    ->required(),
                 TextInput::make('name')->required(),
             ]);
     }
@@ -52,6 +56,8 @@ class ModeOfTransportResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('voucher_types.name')
+                    ->label('Type')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
             ])
             ->filters([
@@ -76,9 +82,9 @@ class ModeOfTransportResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListModeOfTransports::route('/'),
-            'create' => Pages\CreateModeOfTransport::route('/create'),
-            'edit' => Pages\EditModeOfTransport::route('/{record}/edit'),
+            'index' => Pages\ListVoucherSubTypes::route('/'),
+            'create' => Pages\CreateVoucherSubType::route('/create'),
+            'edit' => Pages\EditVoucherSubType::route('/{record}/edit'),
         ];
     }
 }

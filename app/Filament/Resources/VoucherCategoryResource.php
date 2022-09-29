@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ModeOfTransportResource\Pages;
-use App\Filament\Resources\ModeOfTransportResource\RelationManagers;
-use App\Models\ModeOfTransport;
-use App\Models\Mot;
+use App\Filament\Resources\VoucherCategoryResource\Pages;
+use App\Filament\Resources\VoucherCategoryResource\RelationManagers;
+use App\Models\VoucherCategory;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
@@ -16,19 +15,19 @@ use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ModeOfTransportResource extends Resource
+class VoucherCategoryResource extends Resource
 {
-    protected static ?string $model = Mot::class;
+    protected static ?string $model = VoucherCategory::class;
 
-    protected static ?string $modelLabel = 'Mode Of Transport';
+    protected static ?string $modelLabel = 'Voucher Categories';
 
-    protected static ?string $navigationIcon = 'heroicon-o-truck';
+    protected static ?string $navigationIcon = 'heroicon-o-folder';
 
-    protected static ?int $navigationSort = 13;
+    protected static ?int $navigationSort = 8;
 
-    protected static ?string $navigationLabel = 'Mode Of Transport';
+    protected static ?string $navigationLabel = 'Category';
 
-    protected static ?string $navigationGroup = 'Others';
+    protected static ?string $navigationGroup = 'Vouchers';
 
     public static function form(Form $form): Form
     {
@@ -76,9 +75,9 @@ class ModeOfTransportResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListModeOfTransports::route('/'),
-            'create' => Pages\CreateModeOfTransport::route('/create'),
-            'edit' => Pages\EditModeOfTransport::route('/{record}/edit'),
+            'index' => Pages\ListVoucherCategories::route('/'),
+            'create' => Pages\CreateVoucherCategory::route('/create'),
+            'edit' => Pages\EditVoucherCategory::route('/{record}/edit'),
         ];
     }
 }

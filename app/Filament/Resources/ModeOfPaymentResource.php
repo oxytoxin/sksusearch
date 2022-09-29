@@ -25,7 +25,7 @@ class ModeOfPaymentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 12;
 
     protected static ?string $navigationLabel = 'Mode Of Payment';
 

@@ -24,7 +24,7 @@ class DailyTravelExpensesResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 11;
 
     protected static ?string $navigationLabel = 'Daily Travel Expenses (DTE)';
 
