@@ -24,12 +24,10 @@ class DatabaseSeeder extends Seeder
             DteSeeder::class,
             VoucherCategorySeeder::class,
             VoucherTypeSeeder::class,
-            VoucherSubTypeSeeder::class,
             MopSeeder::class,
             DisbursementVoucherStepSeeder::class,
             TravelOrderTypeSeeder::class,
             MotSeeder::class,
-            RelatedDocumentsListSeeder::class,
             FundClusterSeeder::class,
         ]);
         if (app()->environment('local')) {
