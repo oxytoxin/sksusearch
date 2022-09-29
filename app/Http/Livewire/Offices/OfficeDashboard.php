@@ -49,7 +49,7 @@ class OfficeDashboard extends Component implements HasTable
                     ]);
                     $record->refresh();
                     $record->activity_logs()->create([
-                        'description' => $record->current_step->process.' '.$record->current_step->recipient.' by '.auth()->user()->employee_information->full_name,
+                        'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
                     ]);
                     if ($record->current_step_id == 8000 || $record->current_step_id == 11000) {
                         $record->update([
@@ -80,7 +80,7 @@ class OfficeDashboard extends Component implements HasTable
                     }
                     $record->refresh();
                     $record->activity_logs()->create([
-                        'description' => $record->current_step->process.' '.$record->current_step->recipient.' by '.auth()->user()->employee_information->full_name,
+                        'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
                         'remarks' => $data['remarks'] ?? null,
                     ]);
                     DB::commit();
@@ -181,7 +181,7 @@ class OfficeDashboard extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 13000 && ! $record->certified_by_accountant)
+                ->visible(fn ($record) => $record->current_step_id == 13000 && !$record->certified_by_accountant)
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
@@ -196,7 +196,7 @@ class OfficeDashboard extends Component implements HasTable
                 ]);
                 $record->refresh();
                 $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher returned to '.$record->current_step->recipient,
+                    'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient,
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
@@ -247,7 +247,7 @@ class OfficeDashboard extends Component implements HasTable
 
     private function canBeForwarded($record)
     {
-        return ($record->current_step->process == 'Received in' && ! in_array($record->current_step_id, [9000, 13000, 17000]))
+        return ($record->current_step->process == 'Received in' && !in_array($record->current_step_id, [9000, 13000, 17000]))
             || ($record->current_step_id == 9000 && filled($record->ors_burs) && filled($record->fund_cluster_id))
             || ($record->current_step_id == 12000 && filled($record->journal_date) && filled($record->dv_number))
             || ($record->current_step_id == 13000 && $record->certified_by_accountant)

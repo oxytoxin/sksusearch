@@ -14,9 +14,11 @@ class CreateVoucherSubType extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
+        $documents = $data['documents'];
+        unset($data['documents']);
         $subtype = VoucherSubType::create($data);
         $subtype->related_documents_list()->create([
-            'documents' => []
+            'documents' => $documents
         ]);
         return $subtype;
     }

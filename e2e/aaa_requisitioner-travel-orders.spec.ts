@@ -30,28 +30,18 @@ test('requisitioner can create travel order', async ({ page }) => {
     await page.locator('text=Travel order type * Select an option >> select').selectOption('1');
 
     // Click text=Applicants * CHRISTINE P. ABO, PhDJULIE E. ALBANO, PhDLYNETTE G. PENIEROHELEN M. >> [placeholder="Select an option"]
-    await page.locator('text=Applicants * CHRISTINE P. ABO, PhDJULIE E. ALBANO, PhDLYNETTE G. PENIEROHELEN M. >> [placeholder="Select an option"]').click();
+    await page.locator('.choices__inner >> nth=0').click();
+    await page.locator('id=choices--applicants-item-choice-1').click();
+    await page.keyboard.down('Escape');
 
-    // Click #choices--applicants-item-choice-1
-    await page.locator('#choices--applicants-item-choice-1').click();
-
-    // Click .min-h-screen > div > .hidden > div > div
-    await page.locator('.min-h-screen > div > .hidden > div > div').click();
-
-    // Click text=Signatories * CHRISTINE P. ABO, PhDJULIE E. ALBANO, PhDLYNETTE G. PENIEROHELEN M >> [placeholder="Select an option"]
-    await page.locator('text=Signatories * CHRISTINE P. ABO, PhDJULIE E. ALBANO, PhDLYNETTE G. PENIEROHELEN M >> [placeholder="Select an option"]').click();
-
-    // Click #choices--signatories-item-choice-5
-    await page.locator('#choices--signatories-item-choice-5').click();
-
-    // Click .min-h-screen > div > .hidden > div > div
-    await page.locator('.min-h-screen > div > .hidden > div > div').click();
+    await page.locator('.choices__inner >> nth=1').click();
+    await page.locator('id=choices--signatories-item-choice-5').click();
+    await page.keyboard.down('Escape');
 
     // Fill textarea
     await page.locator('textarea').fill('This is a test travel order.');
 
-    // Click .min-h-screen > div > .hidden > div > div
-    await page.locator('.min-h-screen > div > .hidden > div > div').click();
+    await page.locator('main').click();
 
     // Click button[role="switch"]
     await page.locator('button[role="switch"]').click();

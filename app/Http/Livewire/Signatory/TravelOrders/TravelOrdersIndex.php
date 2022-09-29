@@ -13,9 +13,7 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
 
     protected function getTableQuery()
     {
-        return TravelOrder::whereHas('signatories', function ($query) {
-            $query->where('user_id', auth()->id());
-        });
+        return TravelOrder::whereRelation('signatories', 'user_id', auth()->id());
     }
 
     protected function getTableColumns(): array
@@ -27,10 +25,9 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
             Tables\Columns\TextColumn::make('approved')->label('Status')
                 ->formatStateUsing(fn ($record) => ! $record->signatories->contains('pivot.is_approved', false) ? 'Approved' : 'Pending'),
             Tables\Columns\TextColumn::make('signed')->label('Signed')
-                ->formatStateUsing(fn ($record) =>  $record->signatories()->wherePivot('user_id',auth()->id())->value('is_approved') ? 'Signed' : 'Pending'),
-                
+                ->formatStateUsing(fn ($record) => $record->signatories()->wherePivot('user_id', auth()->id())->value('is_approved') ? 'Signed' : 'Pending'),
+
         ];
-      
     }
 
     protected function getTableActions()

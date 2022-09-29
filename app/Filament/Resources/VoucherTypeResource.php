@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VoucherTypeResource\Pages;
 use App\Filament\Resources\VoucherTypeResource\RelationManagers;
+use App\Filament\Resources\VoucherTypeResource\RelationManagers\VoucherSubtypesRelationManager;
 use App\Models\VoucherCategory;
 use App\Models\VoucherType;
 use Filament\Forms;
@@ -76,7 +77,7 @@ class VoucherTypeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            VoucherSubtypesRelationManager::class,
         ];
     }
 

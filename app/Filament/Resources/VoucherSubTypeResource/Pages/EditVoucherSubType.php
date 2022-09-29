@@ -5,6 +5,7 @@ namespace App\Filament\Resources\VoucherSubTypeResource\Pages;
 use App\Filament\Resources\VoucherSubTypeResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditVoucherSubType extends EditRecord
 {
@@ -15,5 +16,22 @@ class EditVoucherSubType extends EditRecord
         return [
             // Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        $documents = $data['documents'];
+        unset($data['documents']);
+        $record->update($data);
+        $record->related_documents_list->first()->update([
+            'documents' => $documents
+        ]);
+        return $record;
+    }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['documents'] = $this->record->related_documents_list->documents;
+        return $data;
     }
 }

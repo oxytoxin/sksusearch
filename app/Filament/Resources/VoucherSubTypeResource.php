@@ -7,13 +7,19 @@ use App\Filament\Resources\VoucherSubTypeResource\RelationManagers;
 use App\Models\VoucherSubType;
 use App\Models\VoucherType;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Layout;
+use Filament\Tables\Filters\MultiSelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -38,7 +44,13 @@ class VoucherSubTypeResource extends Resource
                     ->options(VoucherType::pluck('name', 'id'))
                     ->searchable()
                     ->required(),
-                TextInput::make('name')->required(),
+                TextInput::make('name')
+                    ->required(),
+                Grid::make(1)->schema([
+                    TagsInput::make('documents')
+                        ->placeholder('Add document (Press Enter)')
+                        ->label('Required Documents')
+                ])
             ]);
     }
 
@@ -56,12 +68,14 @@ class VoucherSubTypeResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('voucher_types.name')
+                TextColumn::make('voucher_type.name')
                     ->label('Type')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
             ])
             ->filters([
-                //
+                MultiSelectFilter::make('voucher_type_id')
+                    ->label('Type')
+                    ->options(VoucherType::pluck('name', 'id')),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

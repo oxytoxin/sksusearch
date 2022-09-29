@@ -9,7 +9,7 @@ class VoucherSubType extends Model
 {
     use HasFactory;
 
-    public function voucher_types()
+    public function voucher_type()
     {
         return $this->belongsTo(VoucherType::class);
     }

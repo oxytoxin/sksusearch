@@ -60,11 +60,9 @@ test('requisitioner can create disbursement voucher', async ({ page }) => {
     // Click button:has-text("Next")
     await page.locator('button:has-text("Next")').click();
 
-    // Click #dv-signatory >> text=Select an option
     await page.locator('#dv-signatory >> text=Select an option').click();
-
-    // Click text=RODELYN M. DALAYAP, PhD
-    await page.locator('text=RODELYN M. DALAYAP, PhD').click();
+    await page.locator('id=choices--signatory_id-item-choice-1').click();
+    await page.keyboard.down('Escape');
 
     // Click button:has-text("Next")
     await page.locator('button:has-text("Next")').click();

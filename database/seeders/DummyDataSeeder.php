@@ -34,6 +34,8 @@ class DummyDataSeeder extends Seeder
             'philippine_city_id' => 1,
             'other_details' => '',
         ]);
+        $to->applicants()->sync([1]);
+        $to->signatories()->sync([1 => ['is_approved' => true]]);
 
         $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
         $entries = [];
@@ -49,18 +51,15 @@ class DummyDataSeeder extends Seeder
             }
 
             $entries[Str::uuid()->toString()] = [
-                'type' => 'new_entry',
-                'data' => [
-                    'date' => $day->toDateString(),
-                    'per_diem' => $per_diem,
-                    'original_per_diem' => $per_diem,
-                    'total_expenses' => 0,
-                    'breakfast' => false,
-                    'lunch' => false,
-                    'dinner' => false,
-                    'lodging' => false,
-                    'itinerary_entries' => [],
-                ],
+                'date' => $day->toDateString(),
+                'per_diem' => $per_diem,
+                'original_per_diem' => $per_diem,
+                'total_expenses' => 0,
+                'breakfast' => false,
+                'lunch' => false,
+                'dinner' => false,
+                'lodging' => false,
+                'itinerary_entries' => [],
             ];
         }
         $itinerary = Itinerary::create([
@@ -76,7 +75,7 @@ class DummyDataSeeder extends Seeder
             'mop_id' => 1,
             'payee' => $user->employee_information->full_name,
             'travel_order_id' => $to->id,
-            'tracking_number' => 'DV_'.now()->format('Y').'-'.now()->format('m').'-'.rand(1, 999),
+            'tracking_number' => 'DV_' . now()->format('Y') . '-' . now()->format('m') . '-' . rand(1, 999),
             'submitted_at' => now(),
             'current_step_id' => 3000,
             'previous_step_id' => null,
@@ -88,9 +87,7 @@ class DummyDataSeeder extends Seeder
             'amount' => 1000,
         ]);
         $dv->activity_logs()->create([
-            'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
+            'description' => $dv->current_step->process . ' ' . $dv->signatory->employee_information->full_name . ' ' . $dv->current_step->sender,
         ]);
-        $to->applicants()->sync([1]);
-        $to->signatories()->sync([1]);
     }
 }

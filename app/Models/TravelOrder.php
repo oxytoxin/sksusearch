@@ -35,11 +35,6 @@ class TravelOrder extends Model
         return $this->belongsTo(TravelOrderType::class);
     }
 
-    public function cash_advances()
-    {
-        return $this->hasMany(CashAdvance::class);
-    }
-
     public function itineraries()
     {
         return $this->hasMany(Itinerary::class);
@@ -57,7 +52,7 @@ class TravelOrder extends Model
 
     public function sidenotes()
     {
-        return $this->morphMany(Sidenotes::class, 'sidenoteable');
+        return $this->morphMany(Sidenote::class, 'sidenoteable');
     }
 
     public function philippine_region()
