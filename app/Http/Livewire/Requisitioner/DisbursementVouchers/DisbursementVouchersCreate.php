@@ -112,18 +112,15 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->default(auth()->user()->employee_information->full_name),
                                 Select::make('mop_id')
                                     ->label('Mode of Payment')
-                                    ->options(Mop::pluck('name', 'id'))
-                                    ->required(),
+                                    ->options(Mop::pluck('name', 'id')),
                             ]),
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
                                     TextInput::make('purpose')->required(),
                                     Grid::make(3)->schema([
-                                        TextInput::make('responsibility_center')
-                                            ->required(),
+                                        TextInput::make('responsibility_center'),
                                         TextInput::make('mfo_pap')
-                                            ->label('MFO/PAP')
-                                            ->required(),
+                                            ->label('MFO/PAP'),
                                         TextInput::make('amount')
                                             ->numeric()
                                             ->required(),
