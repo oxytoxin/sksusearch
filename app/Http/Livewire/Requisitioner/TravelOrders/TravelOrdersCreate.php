@@ -63,7 +63,7 @@ class TravelOrdersCreate extends Component implements HasForms
                 ->options(EmployeeInformation::pluck('full_name', 'user_id')),
             MultiSelect::make('signatories')
                 ->required()
-                ->options(EmployeeInformation::whereIn('position_id', [5, 12, 13, 11, 14, 15, 16, 17, 18, 19, 20, 21, 25])->pluck('full_name', 'user_id')),
+                ->options(EmployeeInformation::pluck('full_name', 'user_id')),
             Textarea::make('purpose')
                 ->required(),
             Grid::make(2)->schema([

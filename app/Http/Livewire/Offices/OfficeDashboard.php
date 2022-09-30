@@ -86,6 +86,8 @@ class OfficeDashboard extends Component implements HasTable
                     ]);
                     DB::commit();
                     Notification::make()->title('Document Forwarded')->success()->send();
+                } else {
+                    Notification::make()->title('Document cannot be forwarded.')->body('Document may have been updated. Please refresh this page.')->success()->send();
                 }
             })
                 ->form(function () {
