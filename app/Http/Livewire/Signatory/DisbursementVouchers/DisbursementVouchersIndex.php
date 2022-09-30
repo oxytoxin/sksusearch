@@ -47,7 +47,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     ]);
                     $record->refresh();
                     $record->activity_logs()->create([
-                        'description' => $record->current_step->process.' '.auth()->user()->employee_information->full_name,
+                        'description' => $record->current_step->process . ' ' . auth()->user()->employee_information->full_name,
                     ]);
                     DB::commit();
                     Notification::make()->title('Document Received')->success()->send();
@@ -68,7 +68,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 }
                 $record->refresh();
                 $record->activity_logs()->create([
-                    'description' => $record->current_step->process.' '.$record->current_step->recipient.' by '.auth()->user()->employee_information->full_name,
+                    'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
@@ -97,7 +97,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 ]);
                 $record->refresh();
                 $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher returned to '.$record->current_step->recipient,
+                    'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient,
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
@@ -140,7 +140,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     ])),
                 ViewAction::make('view')
                     ->label('Preview')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_view', ['disbursement_voucher' => $record])),
+                    ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record]), true),
             ])->icon('ri-eye-line'),
         ];
     }

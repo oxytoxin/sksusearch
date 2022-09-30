@@ -239,7 +239,8 @@ class OfficeDashboard extends Component implements HasTable
                     ])),
                 ViewAction::make('view')
                     ->label('Preview')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_view', ['disbursement_voucher' => $record])),
+                    ->openUrlInNewTab()
+                    ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record]), true),
             ])->icon('ri-eye-line'),
 
         ];
