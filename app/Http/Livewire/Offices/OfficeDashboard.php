@@ -33,8 +33,9 @@ class OfficeDashboard extends Component implements HasTable
         return [
             TextColumn::make('tracking_number'),
             TextColumn::make('user.employee_information.full_name')
-                ->label('Applicant'),
-            TextColumn::make('submitted_at')->dateTime('h:i A F d, Y'),
+                ->label('Requisitioner'),
+            TextColumn::make('submitted_at')->dateTime('F d, Y'),
+            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars','amount')->label('Amount')->money('php'),
         ];
     }
 

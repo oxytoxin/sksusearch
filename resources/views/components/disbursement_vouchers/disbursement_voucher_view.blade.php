@@ -124,27 +124,33 @@
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-10">
-                    <div class="w-1/2 text-center border-r-2 border-black h-44">
-
+                    <div class="w-1/2 pl-2 text-left border-r-2 border-black h-44">
+                        <div class="flex flex-col">                                                            
                         @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                            {{ $particular->purpose }}
+                            <span>{{ $particular->purpose }}</span>
                         @endforeach
-
+                        </div>
                     </div>
                     <div class="w-64 text-center border-r-2 border-black h-44">
+                        <div class="flex flex-col">                                                        
                         @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                            {{ $particular->responsibility_center }}
+                            <span>{{ $particular->responsibility_center }}</span>
                         @endforeach
+                            </div>
                     </div>
                     <div class="text-center border-r-2 border-black h-44 w-36">
+                        <div class="flex flex-col">                            
                         @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                            {{ $particular->mfo_pap }}
+                            <span>{{ $particular->mfo_pap }}</span>
                         @endforeach
+                            </div>
                     </div>
                     <div class="text-right h-44 w-36">
+                        <div class="flex flex-col">                            
                         @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                            {{ $particular->amount }}
+                            <span>{{ $particular->amount }}</span>
                         @endforeach
+                            </div>
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-black print:text-12">

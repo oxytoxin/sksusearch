@@ -29,9 +29,11 @@ class DisbursementVouchersIndex extends Component implements HasTable
     {
         return [
             TextColumn::make('tracking_number'),
+            TextColumn::make('payee')->label('Requisitioner'),
+            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars','amount')->label('Amount')->money('php'),
             TextColumn::make('submitted_at')
                 ->label('Date Submitted')
-                ->dateTime('h:i A F j, Y'),
+                ->dateTime('F j, Y'),
             TextColumn::make('status')->formatStateUsing(fn ($record) => ($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign'),
         ];
     }

@@ -28,6 +28,8 @@ class DisbursementVouchersIndex extends Component implements HasTable
     {
         return [
             TextColumn::make('tracking_number'),
+            TextColumn::make('payee')->label('Requisitioner'),
+            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars','amount')->label('Amount')->money('php'),
         ];
     }
 

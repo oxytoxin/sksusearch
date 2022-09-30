@@ -176,27 +176,33 @@
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-10">
-                    <div class="w-1/2 text-center border-r-2 border-black h-44">
-
+                    <div class="w-1/2 pl-2 text-left border-r-2 border-black h-44">
+                        <div class="flex flex-col">
                         @foreach ($particulars as $particular)
                             {{ $particular['purpose'] }}
                         @endforeach
-
+                        </div>
                     </div>
                     <div class="w-64 text-center border-r-2 border-black h-44">
+                        <div class="flex flex-col">
                         @foreach ($particulars as $particular)
                             {{ $particular['responsibility_center'] }}
                         @endforeach
+                        </div>
                     </div>
                     <div class="text-center border-r-2 border-black h-44 w-36">
+                        <div class="flex flex-col">
                         @foreach ($particulars as $particular)
                             {{ $particular['mfo_pap'] }}
                         @endforeach
+                        </div>
                     </div>
                     <div class="text-right h-44 w-36">
+                        <div class="flex flex-col">
                         @foreach ($particulars as $particular)
                             {{ $particular['amount'] }}
                         @endforeach
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-black print:text-12">
