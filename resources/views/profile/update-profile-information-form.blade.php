@@ -28,37 +28,5 @@
             <h4 class="block text-sm font-medium text-gray-700">Email: {{ $this->user->email }}</h4>
         </div>
 
-        <!-- Birthday -->
-        <div class="col-span-6 sm:col-span-4">
-            <x-jet-label for="email" value="{{ __('Email') }}" />
-            <x-jet-input id="email" type="email" class="block w-full mt-1" wire:model.defer="state.email" />
-            <x-jet-input-error for="email" class="mt-2" />
-
-            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && !$this->user->hasVerifiedEmail())
-                <p class="mt-2 text-sm">
-                    {{ __('Your email address is unverified.') }}
-
-                    <button type="button" class="text-sm text-gray-600 underline hover:text-gray-900" wire:click.prevent="sendEmailVerification">
-                        {{ __('Click here to re-send the verification email.') }}
-                    </button>
-                </p>
-
-                @if ($this->verificationLinkSent)
-                    <p v-show="verificationLinkSent" class="mt-2 text-sm font-medium text-green-600">
-                        {{ __('A new verification link has been sent to your email address.') }}
-                    </p>
-                @endif
-            @endif
-        </div>
     </x-slot>
-
-    {{-- <x-slot name="actions">
-        <x-jet-action-message class="mr-3" on="saved">
-            {{ __('Saved.') }}
-        </x-jet-action-message>
-
-        <x-jet-button wire:loading.attr="disabled" wire:target="photo">
-            {{ __('Save') }}
-        </x-jet-button>
-    </x-slot> --}}
 </x-jet-form-section>

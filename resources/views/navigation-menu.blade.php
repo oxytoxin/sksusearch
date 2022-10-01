@@ -12,9 +12,11 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-4 sm:-my-px sm:ml-14 sm:flex ">
-                    <x-jet-nav-link href="{{ route('office.dashboard') }}" :active="request()->routeIs('office.dashboard')">
-                        {{ __('Office Dashboard') }}
-                    </x-jet-nav-link>
+                    @if (in_array(auth()->user()->employee_information?->office_id, [2, 3, 5, 25, 51, 52]))
+                        <x-jet-nav-link href="{{ route('office.dashboard') }}" :active="request()->routeIs('office.dashboard')">
+                            {{ __('Office Dashboard') }}
+                        </x-jet-nav-link>
+                    @endif
                     <x-jet-nav-link href="{{ route('requisitioner.dashboard') }}" :active="request()->routeIs('requisitioner.dashboard')">
                         {{ __('My Dashboard') }}
                     </x-jet-nav-link>

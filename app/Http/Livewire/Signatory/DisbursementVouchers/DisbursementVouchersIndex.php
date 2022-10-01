@@ -30,7 +30,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
         return [
             TextColumn::make('tracking_number'),
             TextColumn::make('payee')->label('Requisitioner'),
-            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars','amount')->label('Amount')->money('php'),
+            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),
             TextColumn::make('submitted_at')
                 ->label('Date Submitted')
                 ->dateTime('F j, Y'),
@@ -55,7 +55,13 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     Notification::make()->title('Document Received')->success()->send();
                 }
             })
-                ->visible(fn ($record) => $record->current_step_id == 3000)
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->current_step_id == 3000;
+                })
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
@@ -84,7 +90,13 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     ];
                 })
                 ->modalWidth('4xl')
-                ->visible(fn ($record) => $record->current_step_id == 4000)
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->current_step_id == 4000;
+                })
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
@@ -106,7 +118,13 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
-                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to')
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->current_step->process != 'Forwarded to';
+                })
                 ->form(function () {
                     return [
                         Select::make('return_step_id')

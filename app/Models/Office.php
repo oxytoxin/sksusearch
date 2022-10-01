@@ -38,4 +38,9 @@ class Office extends Model
     {
         return $this->belongsToMany(User::class, 'office_user', 'office_id', 'user_id');
     }
+
+    public function disbursement_voucher_starting_step()
+    {
+        return $this->hasOne(DisbursementVoucherStep::class)->ofMany('id', 'MIN');
+    }
 }

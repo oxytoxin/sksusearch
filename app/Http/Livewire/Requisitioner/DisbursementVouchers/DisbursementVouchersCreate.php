@@ -10,6 +10,7 @@ use App\Models\TravelOrderType;
 use App\Models\VoucherSubType;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -137,7 +138,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                     ->schema([
                         Card::make()
                             ->schema([
-                                ViewField::make('related_documents_list')->disableLabel()->view('components.disbursement_vouchers.related_documents'),
+                                Placeholder::make('related_documents_list')->disableLabel()->content(fn () => view('components.disbursement_vouchers.related_documents', [
+                                    'voucher_subtype' => $this->voucher_subtype,
+                                ])),
                             ]),
                     ]),
                 Step::make('DV Signatory')

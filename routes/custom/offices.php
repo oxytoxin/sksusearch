@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Livewire\Offices\OfficeDashboard;
+use App\Http\Livewire\Offices\OfficeDisbursementVouchersIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([

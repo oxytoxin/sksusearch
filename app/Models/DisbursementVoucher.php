@@ -15,6 +15,7 @@ class DisbursementVoucher extends Model
         'due_date' => 'immutable_date',
         'journal_date' => 'immutable_date',
         'draft' => 'array',
+        'related_documents' => 'array',
     ];
 
     public function voucher_subtype()

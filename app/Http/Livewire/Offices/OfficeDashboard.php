@@ -2,17 +2,13 @@
 
 namespace App\Http\Livewire\Offices;
 
-use App\Forms\Components\Flatpickr;
+use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
-use App\Models\FundCluster;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -21,11 +17,25 @@ use Livewire\Component;
 
 class OfficeDashboard extends Component implements HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithTable, OfficeDashboardActions;
+
+    public function mount()
+    {
+        if (!in_array(auth()->user()->employee_information?->office_id, [2, 3, 5, 25, 51, 52])) {
+            abort(403);
+        }
+    }
+
+    public function render()
+    {
+        return view('livewire.offices.office-dashboard');
+    }
+
+
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereRelation('current_step', 'office_id', '=', auth()->user()->employee_information->office_id);
+        return DisbursementVoucher::whereRelation('current_step', 'office_id', '=', auth()->user()->employee_information->office_id)->latest();
     }
 
     protected function getTableColumns()
@@ -35,144 +45,18 @@ class OfficeDashboard extends Component implements HasTable
             TextColumn::make('user.employee_information.full_name')
                 ->label('Requisitioner'),
             TextColumn::make('submitted_at')->dateTime('F d, Y'),
-            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars','amount')->label('Amount')->money('php'),
+            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),
         ];
     }
 
     protected function getTableActions()
     {
         return [
-            Action::make('Receive')->button()->action(function (DisbursementVoucher $record) {
-                if ($record->current_step->process == 'Forwarded to') {
-                    DB::beginTransaction();
-                    $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
-                    ]);
-                    $record->refresh();
-                    $record->activity_logs()->create([
-                        'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
-                    ]);
-                    if ($record->current_step_id == 8000 || $record->current_step_id == 11000) {
-                        $record->update([
-                            'current_step_id' => $record->current_step_id + 1000,
-                        ]);
-                        $record->refresh();
-                        $record->activity_logs()->create([
-                            'description' => $record->current_step->process,
-                        ]);
-                    }
-                    DB::commit();
-                    Notification::make()->title('Document Received')->success()->send();
-                }
-            })
-                ->visible(fn ($record) => $record->current_step->process == 'Forwarded to')
-                ->requiresConfirmation(),
-            Action::make('Forward')->button()->action(function ($record, $data) {
-                if ($this->canBeForwarded($record)) {
-                    DB::beginTransaction();
-                    if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
-                        $record->update([
-                            'current_step_id' => $record->current_step_id + 1000,
-                        ]);
-                    } else {
-                        $record->update([
-                            'current_step_id' => $record->previous_step_id,
-                        ]);
-                    }
-                    $record->refresh();
-                    $record->activity_logs()->create([
-                        'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
-                        'remarks' => $data['remarks'] ?? null,
-                    ]);
-                    DB::commit();
-                    Notification::make()->title('Document Forwarded')->success()->send();
-                } else {
-                    Notification::make()->title('Document cannot be forwarded.')->body('Document may have been updated. Please refresh this page.')->success()->send();
-                }
-            })
-                ->form(function () {
-                    return [
-                        RichEditor::make('remarks')
-                            ->label('Remarks (Optional)')
-                            ->fileAttachmentsDisk('remarks'),
-                    ];
-                })
-                ->modalWidth('4xl')
-                ->visible(fn ($record) => $this->canBeForwarded($record))
-                ->requiresConfirmation(),
-            Action::make('ors_burs')->label('ORS/BURS')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                $record->update([
-                    'ors_burs' => $data['ors_burs'],
-                    'fund_cluster_id' => $data['fund_cluster_id'],
-                ]);
-                $record->activity_logs()->create([
-                    'description' => 'ORS/BURS and Fund Cluster assigned to Disbursement Voucher',
-                ]);
-                DB::commit();
-                Notification::make()->title('ORS/BURS and Fund Cluster updated.')->success()->send();
-            })
-                ->visible(fn ($record) => $record->current_step_id == 9000 && (blank($record->ors_burs) || blank($record->fund_cluster_id)))
-                ->form(function ($record) {
-                    return [
-                        Select::make('fund_cluster_id')
-                            ->label('Fund Cluster')
-                            ->options(FundCluster::pluck('name', 'id'))
-                            ->default($record->fund_cluster_id)
-                            ->required(),
-                        TextInput::make('ors_burs')
-                            ->label('ORS/BURS')
-                            ->default($record->ors_burs)
-                            ->required(),
-                    ];
-                })
-                ->requiresConfirmation(),
-            Action::make('verify')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                $record->update([
-                    'dv_number' => $data['dv_number'],
-                    'journal_date' => $data['journal_date'],
-                ]);
-                $record->refresh();
-                $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher verified.',
-                ]);
-                DB::commit();
-                Notification::make()->title('Disbursement Voucher verified.')->success()->send();
-            })
-                ->visible(fn ($record) => $record->current_step_id == 12000 && blank($record->journal_date) && blank($record->dv_number))
-                ->form(function () {
-                    return [
-                        TextInput::make('dv_number')
-                            ->label('DV Number')
-                            ->required(),
-                        Flatpickr::make('journal_date')
-                            ->disableTime()
-                            ->required(),
-                    ];
-                })
-                ->requiresConfirmation(),
-            Action::make('cheque_ada')->label('Cheque/ADA')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                $record->update([
-                    'cheque_number' => $data['cheque_number'],
-                    'current_step_id' => $record->current_step_id + 1000,
-                ]);
-                $record->activity_logs()->create([
-                    'description' => 'Cheque/ADA made for requisitioner.',
-                ]);
-                DB::commit();
-                Notification::make()->title('Cheque/ADA made for requisitioner.')->success()->send();
-            })
-                ->visible(fn ($record) => $record->current_step_id == 17000 && blank($record->cheque_number))
-                ->form(function () {
-                    return [
-                        TextInput::make('cheque_number')
-                            ->label('Cheque number/ADA')
-                            ->required(),
-                    ];
-                })
-                ->requiresConfirmation(),
+            ...$this->commonActions(),
+            ...$this->budgetOfficeActions(),
+            ...$this->accountingActions(),
+            ...$this->cashierActions(),
+            ...$this->icuActions(),
             Action::make('certify')->button()->action(function ($record) {
                 DB::beginTransaction();
                 $record->update([
@@ -220,46 +104,8 @@ class OfficeDashboard extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
-            ActionGroup::make([
-                ViewAction::make('progress')
-                    ->label('Progress')
-                    ->icon('ri-loader-4-fill')
-                    ->button()
-                    ->outlined()
-                    ->modalHeading('Disbursement Voucher Progress')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_progress', [
-                        'disbursement_voucher' => $record,
-                        'steps' => DisbursementVoucherStep::where('id', '>', 2000)->get(),
-                    ])),
-                ViewAction::make('logs')
-                    ->label('Activity Timeline')
-                    ->icon('ri-list-check-2')
-                    ->button()
-                    ->outlined()
-                    ->modalHeading('Disbursement Voucher Activity Timeline')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_logs', [
-                        'disbursement_voucher' => $record,
-                    ])),
-                ViewAction::make('view')
-                    ->label('Preview')
-                    ->openUrlInNewTab()
-                    ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record]), true),
-            ])->icon('ri-eye-line'),
+            ...$this->viewActions(),
 
         ];
-    }
-
-    private function canBeForwarded($record)
-    {
-        return ($record->current_step->process == 'Received in' && !in_array($record->current_step_id, [9000, 13000, 17000]))
-            || ($record->current_step_id == 9000 && filled($record->ors_burs) && filled($record->fund_cluster_id))
-            || ($record->current_step_id == 12000 && filled($record->journal_date) && filled($record->dv_number))
-            || ($record->current_step_id == 13000 && $record->certified_by_accountant)
-            || ($record->current_step_id == 18000 && filled($record->cheque_number));
-    }
-
-    public function render()
-    {
-        return view('livewire.offices.office-dashboard');
     }
 }
