@@ -104,9 +104,10 @@ class EmployeeInformationResource extends Resource
             ->columns([
                 TextColumn::make('full_name')->searchable(['first_name', 'last_name'])->sortable(),
                 TextColumn::make('position.description')->searchable()->sortable()->limit(20)
-                    ->tooltip(fn ($record): string => "{$record->position->description}"),
+                    ->tooltip(fn ($record): string => "{$record->position->description}")->default('No Position'),
                 TextColumn::make('office.name')->searchable()->sortable()->limit(20)
-                    ->tooltip(fn ($record): string => "{$record->office->name}"),
+                    ->tooltip(fn ($record): string => isset($record->office->name) ? "{$record->office->name}" : "No Office")
+                    ->default('No Office'),
             ])
             ->filters([
                 //

@@ -35,8 +35,12 @@ class EditEmployeeInformation extends EditRecord
         $employee = EmployeeInformation::with(['user', 'office'])->find($data['id']);
         if ($employee) {
             $data['email'] = $employee->user->email;
-            $data['campus'] = $employee->office->campus_id;
             $data['office_id'] = $employee->office_id;
+            if( isset( $employee->office) ){
+                $data['campus'] = $employee->office->campus_id;
+            }else{
+                $data['campus'] = "";
+            }
         }
 
         return $data;
