@@ -2,13 +2,12 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ModeOfTransportResource\Pages;
-use App\Filament\Resources\ModeOfTransportResource\RelationManagers;
-use App\Models\ModeOfTransport;
-use App\Models\Mot;
+use App\Filament\Resources\FundClusterResource\Pages;
+use App\Filament\Resources\FundClusterResource\RelationManagers;
+use App\Models\FundCluster;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Form; 
+use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
@@ -16,17 +15,17 @@ use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ModeOfTransportResource extends Resource
+class FundClusterResource extends Resource
 {
-    protected static ?string $model = Mot::class;
+    protected static ?string $model = FundCluster::class;
 
-    protected static ?string $modelLabel = 'Mode Of Transport';
+    protected static ?string $modelLabel = 'Fund Cluster';
 
-    protected static ?string $navigationIcon = 'heroicon-o-truck';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
 
-    protected static ?int $navigationSort = 13;
+    protected static ?int $navigationSort = 14;
 
-    protected static ?string $navigationLabel = 'Mode Of Transport';
+    protected static ?string $navigationLabel = 'Fund Clusters';
 
     protected static ?string $navigationGroup = 'Others';
 
@@ -35,6 +34,7 @@ class ModeOfTransportResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')->required(),
+              
             ]);
     }
 
@@ -59,26 +59,26 @@ class ModeOfTransportResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->color('success'),
+                ->color('success'),
             ])
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-
+    
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-
+    
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListModeOfTransports::route('/'),
-            'create' => Pages\CreateModeOfTransport::route('/create'),
-            'edit' => Pages\EditModeOfTransport::route('/{record}/edit'),
+            'index' => Pages\ListFundClusters::route('/'),
+            'create' => Pages\CreateFundCluster::route('/create'),
+            'edit' => Pages\EditFundCluster::route('/{record}/edit'),
         ];
-    }
+    }    
 }
