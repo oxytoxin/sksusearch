@@ -26,7 +26,7 @@ class EditVoucherSubType extends EditRecord
             unset($data['documents']);
         }
         $record->update($data);
-        $record->related_documents_list->first()->update([
+        $record->related_documents_list->update([
             'documents' => $documents
         ]);
         return $record;
@@ -34,9 +34,7 @@ class EditVoucherSubType extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        if (isset($data['documents'])) {
-            $data['documents'] = $this->record->related_documents_list->documents;
-        }
+        $data['documents'] = $this->record->related_documents_list->documents;
         return $data;
     }
 }
