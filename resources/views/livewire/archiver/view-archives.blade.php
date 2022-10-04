@@ -3,6 +3,6 @@
         <h2 class="font-light capitalize text-primary-600">Archives / Archived Documents</h2>
     </div>
     <div>
-
+        {{ $this->table }}
     </div>
 </div>
