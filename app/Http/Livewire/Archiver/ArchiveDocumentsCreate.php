@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Archiver;
 
 use App\Forms\Components\Flatpickr;
 use App\Models\DisbursementVoucher;
+use Closure;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -16,13 +17,25 @@ class ArchiveDocumentsCreate extends Component implements HasForms
 {
     use InteractsWithForms;
 
+    public $disbursement_voucher_id;
+
+    public $journal_date;
+
+    public $attachment;
+
     protected function getFormSchema()
     {
         return [
             Select::make('disbursement_voucher_id')
                 ->label('Disbursement Voucher')
-                ->options(DisbursementVoucher::all()->pluck('tracking_number', 'id'))
                 ->searchable()
+                ->preload()
+                ->options(DisbursementVoucher::all()->pluck('tracking_number', 'id'))
+                ->reactive()
+                ->afterStateUpdated(function ($set, $state) {
+                    $dv = DisbursementVoucher::find($state);
+                    $set('payee', $dv->payee);
+                })
                 ->required(),
             TextInput::make('document_code')
                 ->label('Document Code')
