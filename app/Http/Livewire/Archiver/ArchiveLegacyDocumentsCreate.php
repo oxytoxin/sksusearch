@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Http\Livewire\Archiver;
 
 use Livewire\Component;
 
@@ -8,6 +8,6 @@ class ArchiveLegacyDocumentsCreate extends Component
 {
     public function render()
     {
-        return view('livewire.archive-legacy-documents-create');
+        return view('livewire.archiver.archive-legacy-documents-create');
     }
 }

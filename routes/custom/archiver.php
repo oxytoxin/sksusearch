@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Livewire\Accounting\AccountingDashboard;
-use App\Http\Livewire\ArchiveDocumentsCreate;
-use App\Http\Livewire\ArchiveDocumentsEdit;
-use App\Http\Livewire\ArchiveLegacyDocumentsCreate;
-use App\Http\Livewire\ArchiveLegacyDocumentsEdit;
+use App\Http\Livewire\Archiver\ArchiveDocumentsCreate;
+use App\Http\Livewire\Archiver\ArchiveDocumentsEdit;
+use App\Http\Livewire\Archiver\ArchiveLegacyDocumentsCreate;
+use App\Http\Livewire\Archiver\ArchiveLegacyDocumentsEdit;
 use App\Http\Livewire\Archiver\ArchiverDashboard;
 use App\Http\Livewire\Archiver\ViewArchives;
 use App\Http\Livewire\Cashier\CashierDashboard;
