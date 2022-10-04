@@ -80,8 +80,11 @@
                     Archived Documents
                 </a>
                 @if (in_array(auth()->user()->employee_information->position_id, [24]))
-                    <a href="{{ route('requisitioner.travel-orders.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                    <a href="{{ route('archiver.archive-doc.create') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                         Upload Documents
+                    </a>
+                    <a href="{{ route('archiver.archive-leg-doc.create') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                        Upload Legacy Documents
                     </a>
                     <a href="{{ route('requisitioner.travel-orders.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                         Assign Documents

@@ -6,6 +6,7 @@ use App\Forms\Components\Flatpickr;
 use App\Models\DisbursementVoucher;
 use Closure;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -26,7 +27,9 @@ class ArchiveDocumentsCreate extends Component implements HasForms
     protected function getFormSchema()
     {
         return [
+            Grid::make(4)->schema([            
             Select::make('disbursement_voucher_id')
+                ->columnSpan(4)
                 ->label('Disbursement Voucher')
                 ->searchable()
                 ->preload()
@@ -38,30 +41,36 @@ class ArchiveDocumentsCreate extends Component implements HasForms
                 })
                 ->required(),
             TextInput::make('document_code')
+                ->columnSpan(2)
                 ->label('Document Code')
                 ->disabled()
                 ->required(),
             TextInput::make('payee')
+                ->columnSpan(2)
                 ->label('Payee')
                 ->disabled()
                 ->required(),
+           
+            TextInput::make('dv_number')
+                ->columnSpan(2)
+                ->label('DV Number')
+                ->required(),
             TextInput::make('cheque_number')
                 ->label('ADA/Cheque Number')
-                ->disabled()
-                ->required(),
-            Textarea::make('particular')
-                ->label('Particular')
                 ->disabled()
                 ->required(),
             Flatpickr::make('journal_date')
                 ->label('Journal Date')
                 ->disableTime()
                 ->required(),
-            TextInput::make('dv_number')
-                ->label('DV Number')
+                Textarea::make('particular')
+                ->columnSpan(4)
+                ->label('Particular')
+                ->disabled()
                 ->required(),
-            FileUpload::make('attachment'),
-
+            FileUpload::make('attachment')
+                ->columnSpan(4)
+            ])
         ];
     }
 
