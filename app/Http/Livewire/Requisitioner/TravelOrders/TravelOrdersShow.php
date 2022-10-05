@@ -10,10 +10,6 @@ class TravelOrdersShow extends Component
 {
     public TravelOrder $travel_order;
 
-    public $applicant_ids = array();
-    public $applicants;
-    public $signatory_ids = array();
-    public $signatories;
     public function render()
     {
         return view('livewire.requisitioner.travel-orders.travel-orders-show');
