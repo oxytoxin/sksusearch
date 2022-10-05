@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
+use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
 use Filament\Forms\Components\RichEditor;
@@ -17,7 +18,7 @@ use Livewire\Component;
 
 class DisbursementVouchersIndex extends Component implements HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithTable, OfficeDashboardActions;
 
     protected function getTableQuery()
     {
@@ -28,9 +29,9 @@ class DisbursementVouchersIndex extends Component implements HasTable
     {
         return [
             TextColumn::make('tracking_number'),
-            TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),            
+            TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
             TextColumn::make('payee')
-            ->label('Payee'),
+                ->label('Payee'),
             TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),
         ];
     }
@@ -95,31 +96,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     return $record->current_step_id == 2000;
                 })
                 ->requiresConfirmation(),
-            ActionGroup::make([
-                ViewAction::make('progress')
-                    ->label('Progress')
-                    ->icon('ri-loader-4-fill')
-                    ->button()
-                    ->outlined()
-                    ->modalHeading('Disbursement Voucher Progress')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_progress', [
-                        'disbursement_voucher' => $record,
-                        'steps' => DisbursementVoucherStep::where('id', '>', 2000)->get(),
-                    ])),
-                ViewAction::make('logs')
-                    ->label('Activity Timeline')
-                    ->icon('ri-list-check-2')
-                    ->button()
-                    ->outlined()
-                    ->modalHeading('Disbursement Voucher Activity Timeline')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_logs', [
-                        'disbursement_voucher' => $record,
-                    ])),
-                ViewAction::make('view')
-                    ->label('Preview')
-                    ->openUrlInNewTab()
-                    ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record]), true),
-            ])->icon('ri-eye-line'),
+            ...$this->viewActions(),
         ];
     }
 

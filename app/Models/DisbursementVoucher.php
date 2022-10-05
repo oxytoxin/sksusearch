@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Str;
 
 class DisbursementVoucher extends Model
 {
@@ -17,6 +18,11 @@ class DisbursementVoucher extends Model
         'draft' => 'array',
         'related_documents' => 'array',
     ];
+
+    public static function generateTrackingNumber()
+    {
+        return 'dv-' . today()->format('y') . '-' . Str::random(8);
+    }
 
     public function voucher_subtype()
     {

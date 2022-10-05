@@ -31,8 +31,6 @@ class OfficeDashboard extends Component implements HasTable
         return view('livewire.offices.office-dashboard');
     }
 
-
-
     protected function getTableQuery()
     {
         return DisbursementVoucher::whereRelation('current_step', 'office_id', '=', auth()->user()->employee_information->office_id)->latest();
@@ -42,9 +40,9 @@ class OfficeDashboard extends Component implements HasTable
     {
         return [
             TextColumn::make('tracking_number'),
-            TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),            
+            TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
             TextColumn::make('payee')
-            ->label('Payee'),
+                ->label('Payee'),
             TextColumn::make('submitted_at')->dateTime('F d, Y'),
             TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),
         ];

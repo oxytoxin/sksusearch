@@ -1,5 +1,5 @@
 <div>
-    <div x-data="{ tab: 'verified_docs' }">
+    <div x-data="{ tab: 'related_docs' }">
         <div class="flex">
             <button :class="tab == 'related_docs' ? 'bg-primary-400 text-white' : ''" class="p-2 border border-collapse" @click="tab = 'related_docs'" type="button">Related Documents</button>
             <button :class="tab == 'verified_docs' ? 'bg-primary-400 text-white' : ''" class="p-2 border border-collapse" @click="tab = 'verified_docs'" type="button">Documents Verified by ICU</button>

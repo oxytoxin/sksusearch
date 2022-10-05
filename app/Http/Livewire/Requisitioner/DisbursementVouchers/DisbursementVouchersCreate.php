@@ -23,6 +23,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Str;
 
 class DisbursementVouchersCreate extends Component implements HasForms
 {
@@ -204,7 +205,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public function mount()
     {
-        $this->tracking_number = 'DV_' . now()->format('Y') . '-' . now()->format('m') . '-' . rand(1, 999);
+        $this->tracking_number = DisbursementVoucher::generateTrackingNumber();
         $this->form->fill();
     }
 

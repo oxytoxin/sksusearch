@@ -19,7 +19,7 @@ class TravelOrder extends Model
 
     public static function generateTrackingCode(): string
     {
-        return Str::uuid()->toString();
+        return 'to-' . today()->format('y') . '-' . Str::random(8);
     }
 
     protected function registrationAmount(): Attribute

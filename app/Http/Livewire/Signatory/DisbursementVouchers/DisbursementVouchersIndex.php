@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Signatory\DisbursementVouchers;
 
+use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
 use Filament\Forms\Components\RichEditor;
@@ -18,7 +19,7 @@ use Livewire\Component;
 
 class DisbursementVouchersIndex extends Component implements HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithTable, OfficeDashboardActions;
 
     protected function getTableQuery()
     {
@@ -28,10 +29,10 @@ class DisbursementVouchersIndex extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            TextColumn::make('tracking_number'),
-            TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),            
+            TextColumn::make('tracking_number')->tooltip(fn ($record) => $record->tracking_number)->limit(5),
+            TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
             TextColumn::make('payee')
-            ->label('Payee'),
+                ->label('Payee'),
             TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),
             TextColumn::make('submitted_at')
                 ->label('Date Submitted')
@@ -125,7 +126,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step->process != 'Forwarded to';
+                    return $record->current_step_id == 4000;
                 })
                 ->form(function () {
                     return [
@@ -140,30 +141,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
-            ActionGroup::make([
-                ViewAction::make('progress')
-                    ->label('Progress')
-                    ->icon('ri-loader-4-fill')
-                    ->button()
-                    ->outlined()
-                    ->modalHeading('Disbursement Voucher Progress')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_progress', [
-                        'disbursement_voucher' => $record,
-                        'steps' => DisbursementVoucherStep::where('id', '>', 2000)->get(),
-                    ])),
-                ViewAction::make('logs')
-                    ->label('Activity Timeline')
-                    ->icon('ri-list-check-2')
-                    ->button()
-                    ->outlined()
-                    ->modalHeading('Disbursement Voucher Activity Timeline')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_logs', [
-                        'disbursement_voucher' => $record,
-                    ])),
-                ViewAction::make('view')
-                    ->label('Preview')
-                    ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record]), true),
-            ])->icon('ri-eye-line'),
+            ...$this->viewActions(),
         ];
     }
 
