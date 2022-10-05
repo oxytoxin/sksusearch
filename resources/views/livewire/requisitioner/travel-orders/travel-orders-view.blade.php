@@ -74,7 +74,7 @@
                             <p class="mt-1 text-sm text-primary-500">Approval Status:
                                 {{ $signatory->pivot->is_approved ? 'Approved' : 'Pending' }}</p>
                             <p class="mt-1 text-sm text-primary-500">Date Approved:
-                                {{ $signatory->pivot->is_approved ? $signatory->pivot->updated_at->format('F d, Y h:i:s a') : 'Unavailable' }}
+                                {{ $signatory->pivot->is_approved ? $signatory->pivot->updated_at->format('F d, Y') : 'Unavailable' }}
                             </p>
                             <p class="mt-1 text-sm text-primary-500">Time Approved:
                                 {{ $signatory->pivot->is_approved ? $signatory->pivot->updated_at->format('h:i:s a') : 'Unavailable' }}
