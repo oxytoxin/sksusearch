@@ -130,4 +130,14 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Sidenote::class);
     }
+
+    public function officers_in_charge()
+    {
+        return $this->belongsToMany(User::class, 'oic_users', 'user_id', 'oic_id')->withPivot(['valid_from', 'valid_to'])->withTimestamps();
+    }
+
+    public function oic_for_users()
+    {
+        return $this->belongsToMany(User::class, 'oic_users', 'oic_id', 'user_id')->withPivot(['valid_from', 'valid_to'])->withTimestamps();
+    }
 }

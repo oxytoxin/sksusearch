@@ -1,10 +1,14 @@
 <?php
 
-namespace App\Http\Livewire\Offices;
+namespace App\Http\Livewire\Oic;
 
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
+use App\Models\EmployeeInformation;
+use App\Models\User;
+use DB;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
@@ -12,34 +16,41 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Illuminate\Support\Facades\DB;
+use Filament\Tables\Filters\Layout;
+use Filament\Tables\Filters\SelectFilter;
 use Livewire\Component;
 
-class OfficeDashboard extends Component implements HasTable
+class OicDashboard extends Component implements HasTable
 {
     use InteractsWithTable, OfficeDashboardActions;
 
-    public function mount()
+    public function __construct()
     {
-        if (!in_array(auth()->user()->employee_information?->office_id, [2, 3, 5, 25, 51, 52])) {
-            abort(403);
-        }
-    }
-
-    public function render()
-    {
-        return view('livewire.offices.office-dashboard');
+        $this->oic = true;
     }
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereRelation('current_step', 'office_id', '=', auth()->user()->employee_information->office_id)->latest();
+        return DisbursementVoucher::query();
     }
 
-    protected function getTableColumns()
+    public function getTableColumns()
     {
         return [
             ...$this->officeTableColumns()
+        ];
+    }
+
+    protected function getTableFilters(): array
+    {
+        return [
+            SelectFilter::make('as')
+                ->searchable()
+                ->placeholder('Select User')
+                ->options(EmployeeInformation::whereIn('user_id', auth()->user()->oic_for_users()->pluck('user_id'))->pluck('full_name', 'office_id'))
+                ->query(function ($query, $state) {
+                    $query->whereRelation('current_step', 'office_id', '=', $state);
+                }),
         ];
     }
 
@@ -56,8 +67,12 @@ class OfficeDashboard extends Component implements HasTable
                 $record->update([
                     'certified_by_accountant' => true,
                 ]);
+                $description = 'Disbursement voucher certified.';
+                if ($this->oic) {
+                    $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
+                }
                 $record->activity_logs()->create([
-                    'description' => 'Disbursement voucher certified.',
+                    'description' => $description,
                 ]);
                 DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
@@ -76,8 +91,12 @@ class OfficeDashboard extends Component implements HasTable
                     'previous_step_id' => $previous_step_id,
                 ]);
                 $record->refresh();
+                $description = 'Disbursement Voucher returned to ' . $record->current_step->recipient . '.';
+                if ($this->oic) {
+                    $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
+                }
                 $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient,
+                    'description' => $description,
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
@@ -99,7 +118,23 @@ class OfficeDashboard extends Component implements HasTable
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
             ...$this->viewActions(),
-
         ];
+    }
+
+    protected function getTableFiltersFormColumns(): int
+    {
+        return 1;
+    }
+
+
+
+    protected function getTableFiltersLayout(): ?string
+    {
+        return Layout::AboveContent;
+    }
+
+    public function render()
+    {
+        return view('livewire.oic.oic-dashboard');
     }
 }

@@ -6,26 +6,34 @@ use App\Forms\Components\Flatpickr;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
 use App\Models\FundCluster;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\View;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
 
 trait OfficeDashboardActions
 {
+    public $oic = false;
+
+    private function officeTableColumns()
+    {
+        return [
+            TextColumn::make('tracking_number'),
+            TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
+            TextColumn::make('payee')
+                ->label('Payee'),
+            TextColumn::make('submitted_at')->dateTime('F d, Y'),
+            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),
+        ];
+    }
+
     private function canBeForwarded($record)
     {
         if (!$record) {
@@ -91,8 +99,12 @@ trait OfficeDashboardActions
                             'verified_documents' => $data['verified_documents'],
                             'remarks' => $data['remarks'] ?? '',
                         ]]);
+                        $description = 'Related documents have been verified.';
+                        if ($this->oic) {
+                            $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
+                        }
                         $record->activity_logs()->create([
-                            'description' => 'Related documents have been verified.',
+                            'description' => $description,
                         ]);
                         DB::commit();
                         Notification::make()->title('Related documents have been verified.')->success()->send();
@@ -125,8 +137,12 @@ trait OfficeDashboardActions
                     'cheque_number' => $data['cheque_number'],
                     'current_step_id' => $record->current_step_id + 1000,
                 ]);
+                $description = 'Cheque/ADA made for requisitioner.';
+                if ($this->oic) {
+                    $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
+                }
                 $record->activity_logs()->create([
-                    'description' => 'Cheque/ADA made for requisitioner.',
+                    'description' => $description,
                 ]);
                 DB::commit();
                 Notification::make()->title('Cheque/ADA made for requisitioner.')->success()->send();
@@ -159,8 +175,12 @@ trait OfficeDashboardActions
                     'journal_date' => $data['journal_date'],
                 ]);
                 $record->refresh();
+                $description = 'Disbursement Voucher verified.';
+                if ($this->oic) {
+                    $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
+                }
                 $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher verified.',
+                    'description' => $description,
                 ]);
                 DB::commit();
                 Notification::make()->title('Disbursement Voucher verified.')->success()->send();
@@ -195,8 +215,12 @@ trait OfficeDashboardActions
                     'ors_burs' => $data['ors_burs'],
                     'fund_cluster_id' => $data['fund_cluster_id'],
                 ]);
+                $description = 'ORS/BURS and Fund Cluster assigned to Disbursement Voucher.';
+                if ($this->oic) {
+                    $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
+                }
                 $record->activity_logs()->create([
-                    'description' => 'ORS/BURS and Fund Cluster assigned to Disbursement Voucher',
+                    'description' => $description,
                 ]);
                 DB::commit();
                 Notification::make()->title('ORS/BURS and Fund Cluster updated.')->success()->send();
@@ -235,8 +259,14 @@ trait OfficeDashboardActions
                         'current_step_id' => $record->current_step_id + 1000,
                     ]);
                     $record->refresh();
+                    $description = $record->current_step->process . ' ' . $record->current_step->recipient . ' by ';
+                    if ($this->oic) {
+                        $description .= "OIC: " . auth()->user()->employee_information->full_name . '.';
+                    } else {
+                        $description .= auth()->user()->employee_information->full_name;
+                    }
                     $record->activity_logs()->create([
-                        'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
+                        'description' => $description,
                     ]);
                     if ($record->current_step_id == 8000 || $record->current_step_id == 11000) {
                         $record->update([
@@ -272,10 +302,24 @@ trait OfficeDashboardActions
                         ]);
                     }
                     $record->refresh();
-                    $record->activity_logs()->create([
-                        'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
-                        'remarks' => $data['remarks'] ?? null,
-                    ]);
+                    if ($record->current_step_id == 13000) {
+                        $record->activity_logs()->create([
+                            'description' => $record->current_step->process . ' ' . $record->current_step->recipient,
+                            'remarks' => $data['remarks'] ?? null,
+                        ]);
+                    } else {
+                        $description = $record->current_step->process . ' ' . $record->current_step->recipient . ' by ';
+                        if ($this->oic) {
+                            $description .= "OIC: " . auth()->user()->employee_information->full_name . '.';
+                        } else {
+                            $description .= auth()->user()->employee_information->full_name;
+                        }
+                        $record->activity_logs()->create([
+                            'description' => $description,
+                            'remarks' => $data['remarks'] ?? null,
+                        ]);
+                    }
+
                     DB::commit();
                     Notification::make()->title('Document Forwarded')->success()->send();
                 } else {

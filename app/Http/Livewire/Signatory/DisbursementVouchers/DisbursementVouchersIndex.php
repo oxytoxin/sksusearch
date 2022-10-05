@@ -29,14 +29,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            TextColumn::make('tracking_number')->tooltip(fn ($record) => $record->tracking_number)->limit(5),
-            TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
-            TextColumn::make('payee')
-                ->label('Payee'),
-            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),
-            TextColumn::make('submitted_at')
-                ->label('Date Submitted')
-                ->dateTime('F j, Y'),
+            ...$this->officeTableColumns(),
             TextColumn::make('status')->formatStateUsing(fn ($record) => ($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign'),
         ];
     }
