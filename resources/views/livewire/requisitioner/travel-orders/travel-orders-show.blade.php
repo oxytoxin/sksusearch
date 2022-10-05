@@ -54,7 +54,7 @@
                                 <span
                                     class="col-span-1 text-sm font-semibold tracking-wide text-black uppercase">Memorandum
                                     to:</span>
-                                <div class="col-span-1 text-sm font-semibold tracking-wide text-black uppercase">
+                                <div class="col-span-3 text-sm font-semibold tracking-wide text-black uppercase">
                                     @if (isset($travel_order->applicants))
                                         @foreach ($travel_order->applicants as $applicant)
                                             <span
