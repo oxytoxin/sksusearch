@@ -16,18 +16,6 @@ class TravelOrdersShow extends Component
     public $signatories;
     public function render()
     {
-
-        foreach ($this->travel_order->applicants as $applicant) {
-            $this->applicant_ids[] = $applicant->id;
-        }
-        foreach ($this->travel_order->signatories as $signatory) {
-            $this->signatory_ids[] = $signatory->id;
-        }
-
-        $this->applicants = EmployeeInformation::whereIn('id',  $this->applicant_ids)->get();
-        $signatories = EmployeeInformation::whereIn('id',  $this->signatory_ids)->get();
-        $this->signatories = $signatories->reverse();
-
         return view('livewire.requisitioner.travel-orders.travel-orders-show');
     }
 }
