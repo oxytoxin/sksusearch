@@ -39,15 +39,20 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
+        ],
+
+        'snapshots' => [
+            'driver' => 'local',
+            'root' => database_path('snapshots'),
         ],
 
         'remarks' => [
             'driver' => 'local',
             'root' => storage_path('app/public/remarks'),
-            'url' => env('APP_URL').'/storage/remarks',
+            'url' => env('APP_URL') . '/storage/remarks',
             'visibility' => 'public',
             'throw' => false,
         ],
