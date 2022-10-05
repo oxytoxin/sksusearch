@@ -23,7 +23,7 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
             Tables\Columns\TextColumn::make('date_from')->label('From')->date()->searchable(),
             Tables\Columns\TextColumn::make('date_to')->label('To')->date()->searchable(),
             Tables\Columns\TextColumn::make('approved')->label('Status')
-                ->formatStateUsing(fn ($record) => ! $record->signatories->contains('pivot.is_approved', false) ? 'Approved' : 'Pending'),
+                ->formatStateUsing(fn ($record) => !$record->signatories->contains('pivot.is_approved', false) ? 'Approved' : 'Pending'),
             Tables\Columns\TextColumn::make('signed')->label('Signed')
                 ->formatStateUsing(fn ($record) => $record->signatories()->wherePivot('user_id', auth()->id())->value('is_approved') ? 'Signed' : 'Pending'),
 
@@ -37,9 +37,6 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
                 ->url(fn (TravelOrder $record): string => route('signatory.travel-orders.view', $record))
                 ->icon('heroicon-o-eye'),
             Action::make('print')
-                ->visible(function ($record) {
-                    return ! $record->signatories->contains('pivot.is_approved', false);
-                })
                 ->url(fn (TravelOrder $record): string => route('requisitioner.travel-orders.show', $record))
                 ->icon('heroicon-o-printer'),
         ];
