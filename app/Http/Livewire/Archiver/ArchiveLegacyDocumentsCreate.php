@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Archiver;
 
 use App\Forms\Components\Flatpickr;
+use App\Models\FundCluster;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -18,6 +19,16 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
 {
     use InteractsWithForms;
 
+    public $fund_cluster;
+
+    public $document_code;
+
+    public $journal_date;
+
+    public $particular;
+
+    public $attachment;
+
     protected function getFormSchema(): array
     {
         return[
@@ -29,6 +40,14 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
 
                     Select::make("fund_cluster")
                     ->required()
+                    ->preload()
+                    ->options(FundCluster::all()->pluck('name', 'id'))
+                    ->reactive()
+                    ->afterStateUpdated(function ($set, $state) {
+                        $code = FundCluster::find($state);
+                        $set('document_code', $code->name.'-00-00-0000');
+    
+                    })
                     ->columnSpan(1),
 
                     TextInput::make("document_code")
@@ -59,7 +78,6 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     Textarea::make('particular')
                     ->columnSpan(4)
                     ->label('Particular')
-                    ->disabled()
                     ->required(),
 
                     TextInput::make("dv_number")
@@ -69,6 +87,8 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->columnSpan(1),
 
                     FileUpload::make('attachment')
+                    ->multiple()
+                    ->acceptedFileTypes(['application/pdf'])
                     ->columnSpan(3)
                     
                    ])

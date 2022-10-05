@@ -38,6 +38,10 @@ class ArchiveDocumentsCreate extends Component implements HasForms
                 ->afterStateUpdated(function ($set, $state) {
                     $dv = DisbursementVoucher::find($state);
                     $set('payee', $dv->payee);
+                    $set('dv_number', $dv->dv_number);
+                    $set('cheque_number', $dv->cheque_number);
+                    $set('journal_date', $dv->journal_date);
+
                 })
                 ->required(),
             TextInput::make('document_code')
@@ -54,6 +58,7 @@ class ArchiveDocumentsCreate extends Component implements HasForms
             TextInput::make('dv_number')
                 ->columnSpan(2)
                 ->label('DV Number')
+                ->disabled()
                 ->required(),
             TextInput::make('cheque_number')
                 ->label('ADA/Cheque Number')
@@ -62,6 +67,7 @@ class ArchiveDocumentsCreate extends Component implements HasForms
             Flatpickr::make('journal_date')
                 ->label('Journal Date')
                 ->disableTime()
+                ->disabled()
                 ->required(),
                 Textarea::make('particular')
                 ->columnSpan(4)
@@ -69,6 +75,10 @@ class ArchiveDocumentsCreate extends Component implements HasForms
                 ->disabled()
                 ->required(),
             FileUpload::make('attachment')
+                ->multiple()
+                ->acceptedFileTypes(['application/pdf'])
+                ->enableOpen()
+                ->enableReordering()
                 ->columnSpan(4)
             ])
         ];
