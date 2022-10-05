@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Hash;
 class CreateEmployeeInformation extends CreateRecord
 {
     // use Actions;
-    public $employee;
     protected static string $resource = EmployeeInformationResource::class;
 
     protected function getRedirectUrl(): string
@@ -23,21 +22,16 @@ class CreateEmployeeInformation extends CreateRecord
         return $this->getResource()::getUrl('index');
     }
 
-    protected function handleRecordCreation(array $data) : Model
+    protected function handleRecordCreation(array $data): Model
     {
-        $user = User::create([
+        $user = User::firstOrCreate([
             'email' => $data['email'],
+        ], [
             'password' => Hash::make(strtolower(str_replace(" ", "", $data['last_name'] . "123"))),
         ]);
-        if(EmployeeInformation::where('full_name',strtoupper($data['full_name']))->exists()){
-            
-            // Notification::make()
-            //     ->title('User Already Exist.')
-            //     ->success()  
-            //     ->send();
-            return EmployeeInformation::where('full_name',strtoupper($data['full_name']))->getModel();
-        }else{
-            $employee = EmployeeInformation::create([
+
+        if ($user->employee_information()->exists()) {
+            $user->employee_information->update([
                 'first_name' => strtoupper($data['first_name']),
                 'last_name' => strtoupper($data['last_name']),
                 'full_name' => strtoupper($data['full_name']),
@@ -48,8 +42,20 @@ class CreateEmployeeInformation extends CreateRecord
                 'position_id' => $data['position_id'],
                 'office_id' => $data['office_id'],
             ]);
-            return $this->employee;
+        } else {
+            $user->employee_information()->create([
+                'first_name' => strtoupper($data['first_name']),
+                'last_name' => strtoupper($data['last_name']),
+                'full_name' => strtoupper($data['full_name']),
+                'address' =>  $data['address'],
+                'birthday' => $data['birthday'],
+                'user_id' => $user['id'],
+                'role_id' => $data['role_id'],
+                'position_id' => $data['position_id'],
+                'office_id' => $data['office_id'],
+            ]);
         }
-        
+        $user->refresh();
+        return $user->employee_information;
     }
 }
