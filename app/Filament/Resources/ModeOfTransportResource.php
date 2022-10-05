@@ -8,7 +8,7 @@ use App\Models\ModeOfTransport;
 use App\Models\Mot;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Form; 
+use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
@@ -24,7 +24,7 @@ class ModeOfTransportResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-truck';
 
-    protected static ?int $navigationSort = 13;
+    protected static ?int $navigationSort = 16;
 
     protected static ?string $navigationLabel = 'Mode Of Transport';
 

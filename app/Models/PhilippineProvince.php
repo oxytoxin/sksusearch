@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class PhilippineProvince extends Model
 {
     use HasFactory;
+
+    public function region()
+    {
+        return $this->belongsTo(PhilippineRegion::class, 'region_code', 'region_code');
+    }
 }

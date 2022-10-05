@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\FundClusterResource\Pages;
-use App\Filament\Resources\FundClusterResource\RelationManagers;
-use App\Models\FundCluster;
+use App\Filament\Resources\RegionResource\Pages;
+use App\Filament\Resources\RegionResource\RelationManagers;
+use App\Models\PhilippineRegion;
+use App\Models\Region;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -15,26 +17,25 @@ use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class FundClusterResource extends Resource
+class RegionResource extends Resource
 {
-    protected static ?string $model = FundCluster::class;
+    protected static ?string $model = PhilippineRegion::class;
 
-    protected static ?string $modelLabel = 'Fund Cluster';
+    protected static ?string $modelLabel = 'Region';
 
-    protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
+    protected static ?string $navigationIcon = 'heroicon-o-hashtag';
 
-    protected static ?int $navigationSort = 17;
+    protected static ?int $navigationSort = 11;
 
-    protected static ?string $navigationLabel = 'Fund Clusters';
+    protected static ?string $navigationLabel = 'Regions';
 
-    protected static ?string $navigationGroup = 'Others';
+    protected static ?string $navigationGroup = 'Places';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('name')->required(),
-
+                TextInput::make('region_description')->required(),
             ]);
     }
 
@@ -52,7 +53,9 @@ class FundClusterResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('region_description')
+                    ->label('Name')
+                    ->searchable(),
             ])
             ->filters([
                 //
@@ -62,7 +65,7 @@ class FundClusterResource extends Resource
                     ->color('success'),
             ])
             ->bulkActions([
-                // Tables\Actions\DeleteBulkAction::make(),
+                //Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
@@ -76,9 +79,9 @@ class FundClusterResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFundClusters::route('/'),
-            'create' => Pages\CreateFundCluster::route('/create'),
-            'edit' => Pages\EditFundCluster::route('/{record}/edit'),
+            'index' => Pages\ListRegions::route('/'),
+            'create' => Pages\CreateRegion::route('/create'),
+            'edit' => Pages\EditRegion::route('/{record}/edit'),
         ];
     }
 }

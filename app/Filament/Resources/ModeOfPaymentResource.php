@@ -25,7 +25,7 @@ class ModeOfPaymentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 15;
 
     protected static ?string $navigationLabel = 'Mode Of Payment';
 
@@ -46,7 +46,7 @@ class ModeOfPaymentResource extends Resource
 
     protected static function getNavigationBadgeColor(): ?string
     {
-        return 'success'; 
+        return 'success';
     }
 
     public static function table(Table $table): Table
@@ -60,20 +60,20 @@ class ModeOfPaymentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->color('success'),
+                    ->color('success'),
             ])
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -81,5 +81,5 @@ class ModeOfPaymentResource extends Resource
             'create' => Pages\CreateModeOfPayment::route('/create'),
             'edit' => Pages\EditModeOfPayment::route('/{record}/edit'),
         ];
-    }    
+    }
 }
