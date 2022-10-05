@@ -22,7 +22,8 @@
                                     {{ $travel_order->philippine_region->region_description }}</p>
                             @endif
                         @endif
-                        <p class="mt-1 text-sm text-primary-500">Purpose: {{ $travel_order->purpose }}</p>
+                        <p class="mt-1 text-sm text-primary-500">Purpose:</p>
+                        <p class="mt-1 text-sm whitespace-pre-line text-primary-500">{{ $travel_order->purpose }}</p>
 
                         @if ($travel_order->signatories()->firstWhere('is_approved', false) == null)
                             @if ($travel_order->itineraries()->firstWhere('user_id', auth()->id()))
