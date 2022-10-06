@@ -13,6 +13,8 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
 {
     use InteractsWithTable, OfficeDashboardActions;
 
+    protected $listeners = ['refresh' => '$refresh'];
+
     protected function getTableQuery()
     {
         $office_final_step_id = auth()->user()->employee_information->office->disbursement_voucher_final_step->id;

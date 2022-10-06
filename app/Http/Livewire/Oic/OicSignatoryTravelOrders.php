@@ -11,6 +11,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Layout;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
+use App\Models\OicUser;
 use App\Models\TravelOrder;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
@@ -47,7 +48,7 @@ class OicSignatoryTravelOrders extends Component implements HasTable
             SelectFilter::make('as')
                 ->searchable()
                 ->placeholder('Select User')
-                ->options(EmployeeInformation::whereIn('user_id', auth()->user()->oic_for_users()->pluck('user_id'))->pluck('full_name', 'user_id'))
+                ->options(EmployeeInformation::whereIn('user_id', OicUser::valid()->distinct('user_id')->pluck('user_id'))->pluck('full_name', 'user_id'))
                 ->query(function ($query, $state) {
                     $query->whereRelation('signatories', 'user_id', $state);
                 }),

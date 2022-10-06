@@ -324,6 +324,7 @@ trait OfficeDashboardActions
                     }
 
                     DB::commit();
+                    $this->emit('refresh');
                     Notification::make()->title('Document Forwarded')->success()->send();
                 } else {
                     Notification::make()->title('Document cannot be forwarded.')->body('Document may have been updated. Please refresh this page.')->success()->send();

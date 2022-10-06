@@ -11,6 +11,8 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Layout;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
+use App\Models\OicUser;
+use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -44,9 +46,9 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
             SelectFilter::make('as')
                 ->searchable()
                 ->placeholder('Select User')
-                ->options(EmployeeInformation::whereIn('user_id', auth()->user()->oic_for_users()->pluck('user_id'))->pluck('full_name', 'office_id'))
+                ->options(EmployeeInformation::whereIn('user_id', OicUser::valid()->distinct('user_id')->pluck('user_id'))->pluck('full_name', 'user_id'))
                 ->query(function ($query, $state) {
-                    $query->whereRelation('current_step', 'office_id', '=', $state);
+                    $query->whereRelation('current_step', 'office_id', '=', User::find($state)->first()?->employee_information->office_id);
                 }),
         ];
     }
@@ -65,7 +67,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                     'certified_by_accountant' => true,
                 ]);
                 $description = 'Disbursement voucher certified.';
-                if ($this->oic) {
+                if ($this->isOic()) {
                     $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
                 }
                 $record->activity_logs()->create([
@@ -74,7 +76,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 13000 && !$record->certified_by_accountant)
+                ->visible(fn ($record, $livewire) => $record->current_step_id == 13000 && !$record->certified_by_accountant && User::find($livewire->tableFilters['as']['value'])?->employee_information->position_id == 12)
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
@@ -89,7 +91,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                 ]);
                 $record->refresh();
                 $description = 'Disbursement Voucher returned to ' . $record->current_step->recipient . '.';
-                if ($this->oic) {
+                if ($this->isOic()) {
                     $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
                 }
                 $record->activity_logs()->create([
