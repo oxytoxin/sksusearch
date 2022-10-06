@@ -43,4 +43,9 @@ class Office extends Model
     {
         return $this->hasOne(DisbursementVoucherStep::class)->ofMany('id', 'MIN');
     }
+
+    public function disbursement_voucher_final_step()
+    {
+        return $this->hasOne(DisbursementVoucherStep::class)->ofMany('id', 'MAX');
+    }
 }

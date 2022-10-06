@@ -44,6 +44,7 @@ class VoucherTypeResource extends Resource
             ]);
     }
 
+
     protected static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
@@ -53,6 +54,7 @@ class VoucherTypeResource extends Resource
     {
         return 'success';
     }
+
 
     public static function table(Table $table): Table
     {
@@ -71,7 +73,14 @@ class VoucherTypeResource extends Resource
             ])
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->reorderable('order_column');
+    }
+
+
+    protected function isTablePaginationEnabledWhileReordering(): bool
+    {
+        return true;
     }
 
     public static function getRelations(): array
