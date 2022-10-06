@@ -93,10 +93,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->multiple()
                     ->preserveFilenames()
                     ->acceptedFileTypes(['application/pdf'])
-                    ->columnSpan(3)
-                    
-                    
-                    
+                    ->columnSpan(3)                    
                    ])
                 ])
 
