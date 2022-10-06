@@ -62,16 +62,20 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->preload()
                                 ->visible(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
                                 ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
-                                ->options(TravelOrder::approved()
-                                    ->whereHas('itineraries', function ($query) {
-                                        $query->whereUserId(auth()->id());
-                                    })
-                                    ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS)
+                                ->options(TravelOrder::where(function ($q) {
+                                    $q->approved()
+                                        ->whereHas('itineraries', function ($query) {
+                                            $query->whereUserId(auth()->id());
+                                        })
+                                        ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS);
+                                })->orWhere(function ($q) {
+                                    $q->approved()->where('travel_order_type_id', TravelOrderType::OFFICIAL_TIME);
+                                })
                                     ->pluck('tracking_code', 'id'))
                                 ->reactive()
                                 ->afterStateUpdated(function ($set, $state) {
                                     $to = TravelOrder::find($state);
-                                    if ($to) {
+                                    if ($to && $to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                         $itinerary = $to->itineraries()->whereUserId(auth()->id())->first();
                                         $amount = $to->registration_amount;
                                         foreach ($itinerary['coverage'] as $entry) {
@@ -86,7 +90,14 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             ],
                                         ]);
                                     } else {
-                                        $set('disbursement_voucher_particulars', []);
+                                        $set('disbursement_voucher_particulars', [
+                                            [
+                                                'purpose' => '',
+                                                'responsibility_center' => '',
+                                                'mfo_pap' => '',
+                                                'amount' => 0,
+                                            ],
+                                        ]);
                                     }
                                 }),
                             Radio::make('payee_mode')
