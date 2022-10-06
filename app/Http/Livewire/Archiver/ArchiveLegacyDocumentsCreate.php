@@ -82,7 +82,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
 
                     TextInput::make("dv_number")
                     ->label("DV Number")
-                    ->placeholder("Document Name")
+                    ->placeholder("")
                     ->required()
                     ->columnSpan(1),
 

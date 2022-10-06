@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LegacyDocument extends Model
+class ScannedDocument extends Model
 {
     use HasFactory;
 
-    public function scanned_documents()
+    public function documentable()
     {
-        return $this->morphMany(ScannedDocument::class, 'documentable');
+        return $this->morphTo();
     }
 }
