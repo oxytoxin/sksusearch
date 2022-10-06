@@ -18,4 +18,9 @@ class DisbursementVoucherStep extends Model
     {
         return $this->hasMany(DisbursementVoucher::class, 'previous_step_id');
     }
+
+    public function office()
+    {
+        return $this->belongsTo(Office::class);
+    }
 }
