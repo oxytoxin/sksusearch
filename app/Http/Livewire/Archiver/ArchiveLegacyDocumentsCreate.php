@@ -4,6 +4,8 @@ namespace App\Http\Livewire\Archiver;
 
 use App\Forms\Components\Flatpickr;
 use App\Models\FundCluster;
+use App\Models\LegacyDocument;
+use DB;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -87,9 +89,13 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->columnSpan(1),
 
                     FileUpload::make('attachment')
+                    ->enableOpen()
                     ->multiple()
+                    ->preserveFilenames()
                     ->acceptedFileTypes(['application/pdf'])
                     ->columnSpan(3)
+                    
+                    
                     
                    ])
                 ])
@@ -97,6 +103,28 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
         ];
     }
 
+    public function save()
+    {
+        $this->validate();
+        DB::beginTransction();
+
+        $ldc = LegacyDocument::create([
+            'dv_number' => $this->dv_number,
+            'document_code' => $this->document_code,
+            'payee_name' => $this->payee,
+            'particulars' => $this->particular,
+            'journal_date' => $this->journal_date,
+            'upload_date' => now()->format('Y-m-d'),
+            'fund_cluster_id' => $this->fund_cluster,
+        ]);
+
+        //save Files from fileupload
+
+        DB::commit();
+
+    
+    
+    }
 
     public function render()
     {
