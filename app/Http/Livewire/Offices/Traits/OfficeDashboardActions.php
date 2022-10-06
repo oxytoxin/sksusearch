@@ -20,7 +20,10 @@ use Filament\Tables\Columns\TextColumn;
 
 trait OfficeDashboardActions
 {
-    public $oic = false;
+    public function isOic()
+    {
+        return false;
+    }
 
     private function officeTableColumns()
     {
@@ -100,7 +103,7 @@ trait OfficeDashboardActions
                             'remarks' => $data['remarks'] ?? '',
                         ]]);
                         $description = 'Related documents have been verified.';
-                        if ($this->oic) {
+                        if ($this->isOic()) {
                             $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
                         }
                         $record->activity_logs()->create([
@@ -138,7 +141,7 @@ trait OfficeDashboardActions
                     'current_step_id' => $record->current_step_id + 1000,
                 ]);
                 $description = 'Cheque/ADA made for requisitioner.';
-                if ($this->oic) {
+                if ($this->isOic()) {
                     $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
                 }
                 $record->activity_logs()->create([
@@ -176,7 +179,7 @@ trait OfficeDashboardActions
                 ]);
                 $record->refresh();
                 $description = 'Disbursement Voucher verified.';
-                if ($this->oic) {
+                if ($this->isOic()) {
                     $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
                 }
                 $record->activity_logs()->create([
@@ -216,7 +219,7 @@ trait OfficeDashboardActions
                     'fund_cluster_id' => $data['fund_cluster_id'],
                 ]);
                 $description = 'ORS/BURS and Fund Cluster assigned to Disbursement Voucher.';
-                if ($this->oic) {
+                if ($this->isOic()) {
                     $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
                 }
                 $record->activity_logs()->create([
@@ -260,7 +263,7 @@ trait OfficeDashboardActions
                     ]);
                     $record->refresh();
                     $description = $record->current_step->process . ' ' . $record->current_step->recipient . ' by ';
-                    if ($this->oic) {
+                    if ($this->isOic()) {
                         $description .= "OIC: " . auth()->user()->employee_information->full_name . '.';
                     } else {
                         $description .= auth()->user()->employee_information->full_name;
@@ -309,7 +312,7 @@ trait OfficeDashboardActions
                         ]);
                     } else {
                         $description = $record->current_step->process . ' ' . $record->current_step->recipient . ' by ';
-                        if ($this->oic) {
+                        if ($this->isOic()) {
                             $description .= "OIC: " . auth()->user()->employee_information->full_name . '.';
                         } else {
                             $description .= auth()->user()->employee_information->full_name;

@@ -15,8 +15,8 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        $office_starting_step_id = auth()->user()->employee_information->office->disbursement_voucher_starting_step->id;
-        return DisbursementVoucher::where('current_step_id', '>=', $office_starting_step_id)->latest();
+        $office_final_step_id = auth()->user()->employee_information->office->disbursement_voucher_final_step->id;
+        return DisbursementVoucher::where('current_step_id', '>', $office_final_step_id)->latest();
     }
 
     protected function getTableColumns()
@@ -25,7 +25,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             TextColumn::make('tracking_number'),
             TextColumn::make('user.employee_information.full_name')
                 ->label('Requisitioner'),
-                TextColumn::make('payee')
+            TextColumn::make('payee')
                 ->label('Payee'),
             TextColumn::make('submitted_at')->label('Created by Requisitioner at')->dateTime('F d, Y'),
             TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),

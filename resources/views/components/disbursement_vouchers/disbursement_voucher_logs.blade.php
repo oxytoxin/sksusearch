@@ -12,7 +12,7 @@
                     </div>
                     <div class="flex-1">
                         <div class="flex">
-                            <h4 class="px-3 py-1 text-white rounded md:rounded-full bg-primary-700">{{ $log->description }}</h4>
+                            <h4 class="px-3 py-1 text-sm text-white whitespace-pre-line rounded md:rounded-full bg-primary-700">{{ $log->description }}</h4>
                         </div>
                         @if ($log->remarks)
                             <div class="p-2 mt-2 bg-white rounded shadow">

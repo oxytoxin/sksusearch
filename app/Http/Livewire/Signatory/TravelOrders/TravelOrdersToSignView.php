@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Signatory\TravelOrders;
 
 use App\Models\TravelOrder;
+use App\Models\User;
 use Livewire\Component;
 use WireUi\Traits\Actions;
 
@@ -17,6 +18,18 @@ class TravelOrdersToSignView extends Component
     public $limit = 2;
 
     public $note = '';
+
+    public $from_oic = false;
+    public $oic = false;
+    public $oic_signatory;
+
+    public function mount()
+    {
+        if (request('from_oic')) {
+            $this->from_oic = (bool) request('from_oic');
+            $this->oic_signatory =  (int) request('oic_signatory');
+        }
+    }
 
     public function render()
     {
@@ -35,8 +48,12 @@ class TravelOrdersToSignView extends Component
     public function addNote()
     {
         $this->validate(['note' => 'required|min:10']);
-
-        $notes = $this->travel_order->sidenotes()->create(['content' => $this->note, 'user_id' => auth()->id()]);
+        $content = '';
+        if ($this->from_oic) {
+            $content .= "OIC's Note: ";
+        }
+        $content .= $this->note;
+        $this->travel_order->sidenotes()->create(['content' => $content, 'user_id' => auth()->id()]);
         $this->modal = false;
         $this->note = '';
         $this->travel_order->refresh();
@@ -49,7 +66,12 @@ class TravelOrdersToSignView extends Component
 
     public function approve()
     {
-        $temp = $this->travel_order->signatories()->wherePivot('user_id', auth()->id())->update(['is_approved' => true]);
+        if ($this->from_oic) {
+            $this->travel_order->signatories()->wherePivot('user_id', $this->oic_signatory)->update(['is_approved' => true]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order approved as OIC for: ' . User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
+        } else {
+            $this->travel_order->signatories()->wherePivot('user_id', auth()->id())->update(['is_approved' => true]);
+        }
         $this->travel_order->refresh();
         $this->dialog()->success(
             $title = 'Approved',
