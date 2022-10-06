@@ -9,8 +9,8 @@
     <div class="space-y-1" x-data="{ open: false }">
         <!-- Current: "bg-primary-100 text-primary-900", Default: "bg-white text-primary-600 hover:bg-primary-50 hover:text-primary-900" -->
         <button x-on:click="open=!open" type="button"
-            class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2" aria-controls="sub-menu-1"
-            aria-expanded="false">
+            class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
+            aria-controls="sub-menu-1" aria-expanded="false">
             <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
             <svg :class="open ?
                 'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
@@ -21,24 +21,127 @@
             Disbursement Vouchers
         </button>
         <!-- Expandable link section, show/hide based on state. -->
-        <div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
-            x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
-            <a href="{{ route('requisitioner.disbursement-vouchers.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                Pending Disbursement Vouchers</a>
-            <a href="#" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                Unliquidated Disbursement Vouchers</a>
-            <a href="#" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                Closed Disbursement Vouchers</a>
-            <a href="{{ route('signatory.disbursement-vouchers.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                Signatory Disbursement Vouchers
+        <div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300'
+            x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
+            x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100'
+            x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
+            {{-- drafts --}}
+            <a href="#"
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Drafts
+                {{-- <span
+                    class="inline-flex justify-center items-center p-3 mx-auto w-2 h-2 text-xs font-medium text-primary-600 bg-primary-100 rounded-full">3</span> --}}
+            </a>
+
+            {{-- pending dv's --}}
+            <a href="{{ route('requisitioner.disbursement-vouchers.index') }}"
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Submitted
+                {{-- <span
+                    class="inline-flex justify-center items-center p-3 mx-auto w-2 h-2 text-xs font-medium text-primary-600 bg-primary-100 rounded-full">3</span> --}}
+            </a>
+
+
+
+            {{-- signatory dv's --}}
+            <a href="{{ route('signatory.disbursement-vouchers.index') }}"
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                For Signature
+                {{-- <span
+                    class="inline-flex justify-center items-center p-3 mx-auto w-2 h-2 text-xs font-medium text-primary-600 bg-primary-100 rounded-full">3</span> --}}
+            </a>
+
+            {{-- closed dv's --}}
+            <a href="#"
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Signed
+                {{-- <span
+                    class="inline-flex justify-center items-center p-3 mx-auto w-2 h-2 text-xs font-medium text-primary-600 bg-primary-100 rounded-full">3</span> --}}
             </a>
         </div>
     </div>
 
+    {{-- unliquidated dv's --}}
     <div class="space-y-1" x-data="{ open: false }">
         <button x-on:click="open=!open" type="button"
-            class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2" aria-controls="sub-menu-1"
-            aria-expanded="false">
+            class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
+            aria-controls="sub-menu-1" aria-expanded="false">
+            <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
+            <svg :class="open ?
+                'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
+                'flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400'"
+                class="" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
+            </svg>
+            Unliquidated DVs
+        </button>
+
+        {{-- for unliquidated --}}
+
+        {{-- <div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300'
+            x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
+            x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100'
+            x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
+            <a href="{{ route('requisitioner.travel-orders.index') }}"
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                My Travel Orders
+            </a>
+            <a href="{{ route('signatory.travel-orders.index') }}"
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Signatory Travel orders
+            </a>
+        </div> --}}
+    </div>
+
+    {{-- liquidation reports --}}
+    <div class="space-y-1" x-data="{ open: false }">
+        <button x-on:click="open=!open" type="button"
+            class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
+            aria-controls="sub-menu-1" aria-expanded="false">
+            <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
+            <svg :class="open ?
+                'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
+                'flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400'"
+                class="" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
+            </svg>
+            Liquidation Reports
+        </button>
+
+        {{-- for liquidation reports --}}
+
+        <div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300'
+            x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
+            x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100'
+            x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
+
+            <a href=""
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Drafts
+            </a>
+
+            <a href=""
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Submitted
+            </a>
+
+            <a href=""
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                For Signature
+            </a>
+
+            <a href=""
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Signed
+            </a>
+        </div>
+    </div>
+
+
+    <div class="space-y-1" x-data="{ open: false }">
+        <button x-on:click="open=!open" type="button"
+            class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
+            aria-controls="sub-menu-1" aria-expanded="false">
             <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
             <svg :class="open ?
                 'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
@@ -49,21 +152,41 @@
             Travel Orders
         </button>
         <!-- Expandable link section, show/hide based on state. -->
-        <div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
-            x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
-            <a href="{{ route('requisitioner.travel-orders.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                My Travel Orders
+        <div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300'
+            x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
+            x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100'
+            x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
+
+            {{-- drafts --}}
+            <a href="#"
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Drafts
             </a>
-            <a href="{{ route('signatory.travel-orders.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                Signatory Travel orders
+
+            {{-- pending travel orders --}}
+            <a href="{{ route('requisitioner.travel-orders.index') }}"
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Submitted
+            </a>
+
+            {{-- for signature travel orders --}}
+            <a href="{{ route('signatory.travel-orders.index') }}"
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                For Signature
+            </a>
+
+            {{-- signed travel orders --}}
+            <a href=""
+                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                Signed
             </a>
         </div>
     </div>
     @if (in_array(auth()->user()->employee_information->position_id, [24, 12]))
         <div class="space-y-1" x-data="{ open: false }">
             <button x-on:click="open=!open" type="button"
-                class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2" aria-controls="sub-menu-1"
-                aria-expanded="false">
+                class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
+                aria-controls="sub-menu-1" aria-expanded="false">
                 <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
                 <svg :class="open ?
                     'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
@@ -74,19 +197,26 @@
                 Archives
             </button>
             <!-- Expandable link section, show/hide based on state. -->
-            <div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
-                x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
-                <a href="{{ route('archiver.view-archives') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+            <div class="space-y-1" id="sub-menu-1" x-show='open'
+                x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95'
+                x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-300'
+                x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'
+                class="origin-top-left">
+                <a href="{{ route('archiver.view-archives') }}"
+                    class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                     Archived Documents
                 </a>
                 @if (in_array(auth()->user()->employee_information->position_id, [24]))
-                    <a href="{{ route('archiver.archive-doc.create') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                    <a href="{{ route('archiver.archive-doc.create') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                         Upload Documents
                     </a>
-                    <a href="{{ route('archiver.archive-leg-doc.create') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                    <a href="{{ route('archiver.archive-leg-doc.create') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                         Upload Legacy Documents
                     </a>
-                    <a href="{{ route('requisitioner.travel-orders.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                    <a href="{{ route('requisitioner.travel-orders.index') }}"
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                         Assign Documents
                     </a>
                 @endif
