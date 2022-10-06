@@ -5,4 +5,7 @@
     <div>
         {{ $this->table }}
     </div>
+    <div>
+        @livewire('archiver.view-legacy-documents')
+    </div>
 </div>

@@ -18,4 +18,8 @@ class LegacyDocument extends Model
     {
         return $this->morphMany(ScannedDocument::class, 'documentable');
     }
+    public function fund_cluster()
+    {
+        return $this->belongsTo(FundCluster::class);
+    }
 }
