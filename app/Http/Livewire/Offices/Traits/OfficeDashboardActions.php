@@ -28,7 +28,7 @@ trait OfficeDashboardActions
     private function officeTableColumns()
     {
         return [
-            TextColumn::make('tracking_number'),
+            TextColumn::make('tracking_number')->searchable(),
             TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
             TextColumn::make('payee')
                 ->label('Payee'),

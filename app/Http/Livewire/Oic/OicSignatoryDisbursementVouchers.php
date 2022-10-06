@@ -17,6 +17,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
+use App\Models\OicUser;
 
 class OicSignatoryDisbursementVouchers extends Component implements HasTable
 {
@@ -41,7 +42,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
             SelectFilter::make('as')
                 ->searchable()
                 ->placeholder('Select User')
-                ->options(EmployeeInformation::whereIn('user_id', auth()->user()->oic_for_users()->pluck('user_id'))->pluck('full_name', 'user_id'))
+                ->options(EmployeeInformation::whereIn('user_id', OicUser::valid()->distinct('user_id')->pluck('user_id'))->pluck('full_name', 'user_id'))
                 ->query(function ($query, $state) {
                     $query->where('signatory_id', $state);
                 }),

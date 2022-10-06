@@ -18,4 +18,15 @@ class OicUser extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    protected function scopeValid($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('oic_id', auth()->id())->where('valid_from', '<=', today())
+                ->where('valid_to', '>=', today());
+        })->orWhere(function ($q) {
+            $q->where('oic_id', auth()->id())->where('valid_from', '<=', today())
+                ->whereNull('valid_to');
+        });
+    }
 }

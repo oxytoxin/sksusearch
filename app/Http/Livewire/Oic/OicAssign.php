@@ -18,6 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class OicAssign extends Component implements HasTable
@@ -38,6 +39,7 @@ class OicAssign extends Component implements HasTable
                 ->options(EmployeeInformation::pluck('full_name', 'user_id'))
                 ->searchable()
                 ->validationAttribute('OIC User')
+                ->notIn([auth()->id()])
                 ->required(),
             Grid::make(2)->schema([
                 Flatpickr::make('valid_from')
