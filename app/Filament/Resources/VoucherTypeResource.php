@@ -74,7 +74,8 @@ class VoucherTypeResource extends Resource
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
             ])
-            ->reorderable('order_column');
+            ->reorderable('order_column')
+            ->defaultSort('order_column');
     }
 
 
