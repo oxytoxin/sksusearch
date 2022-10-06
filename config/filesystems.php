@@ -56,6 +56,11 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
+        'scanned_documents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/scanned_documents'),
+            'throw' => false,
+        ],
 
         's3' => [
             'driver' => 's3',

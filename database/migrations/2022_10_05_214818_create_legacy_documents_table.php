@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('dv_number')->unique();
             $table->string('document_code');
             $table->string('payee_name');
-            $table->json('particulars')->nullable();
-            $table->json('other_details');
+            $table->json('particulars');
+            $table->json('other_details')->nullable();
             $table->date('journal_date');
             $table->date('upload_date');
             $table->foreignId('building_id')->nullable()->index();

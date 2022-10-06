@@ -5,15 +5,17 @@ namespace App\Http\Livewire\Archiver;
 use App\Forms\Components\Flatpickr;
 use App\Models\FundCluster;
 use App\Models\LegacyDocument;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Livewire\Component;
 
@@ -27,14 +29,19 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
 
     public $journal_date;
 
-    public $particular;
+    public $particulars =[];
 
     public $attachment;
+
+    public $dv_number;
+    
+    public $payee;
+    
+    public $cheque_no;
 
     protected function getFormSchema(): array
     {
         return[
-            
                 Section::make("Document Details")
                 ->schema([
                    Grid::make(4)
@@ -72,16 +79,18 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->columnSpan(2),
 
                     Flatpickr::make('journal_date')
-                    ->label('Journal Date')
+                    ->label('Journal Date') 
                     ->disableTime()
                     ->required()
                     ->columnSpan(2),
 
-                    Textarea::make('particular')
-                    ->columnSpan(4)
-                    ->label('Particular')
-                    ->required(),
-
+                    Repeater::make('particulars')
+                    ->schema([
+                                Textarea::make('purpose')->required(),
+                             ])
+                    ->minItems(1)
+                    ->columnSpan(4),
+                    
                     TextInput::make("dv_number")
                     ->label("DV Number")
                     ->placeholder("")
@@ -93,33 +102,60 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->multiple()
                     ->preserveFilenames()
                     ->acceptedFileTypes(['application/pdf'])
+                    ->reactive()
+                    ->disk('scanned_documents')
                     ->columnSpan(3)                    
                    ])
                 ])
 
         ];
     }
-
+    public function mount()
+    {
+    
+        $this->form->fill();
+    
+    }
     public function save()
     {
+        
         $this->validate();
-        DB::beginTransction();
+        DB::beginTransaction();
+        $dv_particulars=[];
+
+        foreach ($this->particulars as $particular) {
+            $dv_particulars[] =[
+                "purpose"=>$particular['purpose']
+            ];
+        }
 
         $ldc = LegacyDocument::create([
             'dv_number' => $this->dv_number,
             'document_code' => $this->document_code,
             'payee_name' => $this->payee,
-            'particulars' => $this->particular,
+            'particulars' => $dv_particulars,
+            'other_details'=>json_encode(''),
             'journal_date' => $this->journal_date,
             'upload_date' => now()->format('Y-m-d'),
             'fund_cluster_id' => $this->fund_cluster,
         ]);
 
         //save Files from fileupload
+        foreach($this->attachment as $document){            
+            $ldc->scanned_documents()->create(
+                [
+                    "path"=>$document->storeAs('scanned_documents',now()->format("HismdY-").$document->getClientOriginalName()),
+                    "document_name"=>$document->getClientOriginalName(),
+
+                ]
+            );
+            Notification::make()->title('Upload Success')->body('Upload of '.$document->getClientOriginalName().' successful')->success()->send();
+        }
 
         DB::commit();
+        Notification::make()->title('Operation Success')->body('Legacy document has been archived successfully')->success()->send();
 
-    
+        return redirect()->route('archiver.archive-leg-doc.create');
     
     }
 
