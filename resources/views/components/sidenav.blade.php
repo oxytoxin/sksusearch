@@ -44,11 +44,21 @@
 
 
             {{-- signatory dv's --}}
+            @php
+                $to_sign = App\Models\DisbursementVoucher::whereSignatoryId(auth()->id())
+                    ->where('current_step_id', '<=', 4000)
+                    ->get();
+            @endphp
             <a href="{{ route('signatory.disbursement-vouchers.index') }}"
                 class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                 For Signature
-                {{-- <span
-                    class="inline-flex justify-center items-center p-3 mx-auto w-2 h-2 text-xs font-medium text-primary-600 bg-primary-100 rounded-full">3</span> --}}
+                @if ($to_sign->count() > 0)
+                    <span
+                        class="inline-flex justify-center items-center p-3 mx-auto w-2 h-2 text-xs font-medium text-primary-600 bg-primary-100 rounded-full">
+                        {{ $to_sign->count() }}
+                    </span>
+                @endif
+
             </a>
 
             {{-- closed dv's --}}
@@ -170,6 +180,9 @@
             </a>
 
             {{-- for signature travel orders --}}
+            @php
+                // $to_sign_travel_order = App\Models\TravelOrder::whereRelation('signatories', 'user_id', auth()->id())->first();
+            @endphp
             <a href="{{ route('signatory.travel-orders.index') }}"
                 class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                 For Signature
