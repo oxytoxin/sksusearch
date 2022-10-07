@@ -67,10 +67,10 @@ class TravelOrdersToSignView extends Component
     public function approve()
     {
         if ($this->from_oic) {
-            $this->travel_order->signatories()->wherePivot('user_id', $this->oic_signatory)->update(['is_approved' => true]);
+            $this->travel_order->signatories()->updateExistingPivot($this->oic_signatory, ['is_approved' => true]);
             $this->travel_order->sidenotes()->create(['content' => 'Travel order approved as OIC for: ' . User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
         } else {
-            $this->travel_order->signatories()->wherePivot('user_id', auth()->id())->update(['is_approved' => true]);
+            $this->travel_order->signatories()->updateExistingPivot(auth()->id(), ['is_approved' => true]);
         }
         $this->travel_order->refresh();
         $this->dialog()->success(

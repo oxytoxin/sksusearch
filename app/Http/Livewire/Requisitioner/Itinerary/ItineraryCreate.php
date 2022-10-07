@@ -54,7 +54,7 @@ class ItineraryCreate extends Component implements HasForms
                     if (isset($to)) {
                         $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
                         foreach ($days as  $day) {
-                            if ($to->travel_order_type_id == 1) {
+                            if ($to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                 if ($day != $to->date_to) {
                                     $per_diem = $to->philippine_region->dte->amount;
                                 } else {
