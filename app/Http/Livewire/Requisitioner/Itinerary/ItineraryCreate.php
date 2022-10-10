@@ -69,6 +69,7 @@ class ItineraryCreate extends Component implements HasForms
                                 'data' => [
                                     'date' => $day->toDateString(),
                                     'per_diem' => $per_diem,
+                                    'has_per_diem' => true,
                                     'original_per_diem' => $per_diem,
                                     'total_expenses' => 0,
                                     'breakfast' => false,
@@ -93,7 +94,12 @@ class ItineraryCreate extends Component implements HasForms
                     Flatpickr::make('date')
                         ->disableTime()
                         ->required(),
-                    TextInput::make('per_diem')->disabled(),
+                    Fieldset::make('Per Diem')->schema([
+                        Toggle::make('has_per_diem')
+                            ->label('Has Per Diem')
+                            ->reactive(),
+                        TextInput::make('per_diem')->disabled(),
+                    ]),
                     Fieldset::make('Coverage')->schema([
                         Toggle::make('breakfast')->inline(false)->reactive(),
                         Toggle::make('lunch')->inline(false)->reactive(),
@@ -121,7 +127,7 @@ class ItineraryCreate extends Component implements HasForms
                             TextInput::make('other_expenses')->default(0)->numeric()->reactive(),
                         ]),
                     ]),
-                    TextInput::make('total_expenses')->disabled()->default(0)->lte('per_diem'),
+                    TextInput::make('total_expenses')->disabled()->default(0),
                 ]),
             ])->disableItemCreation()->disableItemDeletion()->visible(fn ($get) => $get('travel_order_id')),
         ];
@@ -179,18 +185,23 @@ class ItineraryCreate extends Component implements HasForms
         foreach ($this->itinerary_entries as  $key => $entry) {
             $original_per_diem = $entry['data']['original_per_diem'];
             $per_diem = $original_per_diem;
-            if ($entry['data']['breakfast']) {
-                $per_diem -= $original_per_diem * 0.1;
+            if (!$entry['data']['has_per_diem']) {
+                $per_diem = 0;
+            } else {
+                if ($entry['data']['breakfast']) {
+                    $per_diem -= $original_per_diem * 0.1;
+                }
+                if ($entry['data']['lunch']) {
+                    $per_diem -= $original_per_diem * 0.1;
+                }
+                if ($entry['data']['dinner']) {
+                    $per_diem -= $original_per_diem * 0.1;
+                }
+                if ($entry['data']['lodging']) {
+                    $per_diem -= $original_per_diem * 0.5;
+                }
             }
-            if ($entry['data']['lunch']) {
-                $per_diem -= $original_per_diem * 0.1;
-            }
-            if ($entry['data']['dinner']) {
-                $per_diem -= $original_per_diem * 0.1;
-            }
-            if ($entry['data']['lodging']) {
-                $per_diem -= $original_per_diem * 0.5;
-            }
+
             $transportation_expenses = 0;
             $other_expenses = 0;
             foreach ($entry['data']['itinerary_entries'] as $expense) {
@@ -198,7 +209,7 @@ class ItineraryCreate extends Component implements HasForms
                 $other_expenses += $expense['other_expenses'] == '' ? 0 : $expense['other_expenses'];
             }
             $this->itinerary_entries[$key]['data']['per_diem'] = $per_diem;
-            $this->itinerary_entries[$key]['data']['total_expenses'] = $transportation_expenses + $other_expenses;
+            $this->itinerary_entries[$key]['data']['total_expenses'] = $transportation_expenses + $other_expenses + $per_diem;
         }
 
         return view('livewire.requisitioner.itinerary.itinerary-create');

@@ -4,7 +4,6 @@
         foreach ($coverage as $value) {
             $total_amount += $value['total_expenses'];
         }
-        $itinerary_total_amount = 0;
     @endphp
     <div class="flex-col space-y-5 text-md">
         <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-lg">
@@ -76,7 +75,7 @@
                                         <p class="mt-1 font-semibold text-primary-500">Services covered by registration:
                                             <span class="font-normal capitalize">
                                                 @if ($covered['breakfast'])
-                                                    breakfast ,
+                                                    breakfast,
                                                 @endif
                                                 @if ($covered['lunch'])
                                                     lunch,
@@ -87,7 +86,6 @@
                                                 @if ($covered['lodging'])
                                                     lodging
                                                 @endif
-
                                                 @if (($covered['breakfast'] || $covered['lodging'] || $covered['dinner'] || $covered['lunch']) == false)
                                                     N/A
                                                 @endif
@@ -104,9 +102,6 @@
                                                         <div class="flex justify-between w-full font-semibold text-primary-900">Transporation Expenses: <span class="font-normal text-right">{{ $entry->transportation_expenses }}</span></div>
                                                         <div class="flex justify-between w-full font-semibold text-primary-900">Other Expenses: <span class="font-normal text-right">{{ $entry->other_expenses }}</span></div>
                                                     </div>
-                                                    @php
-                                                        $itinerary_total_amount += $entry->transportation_expenses + $entry->other_expenses;
-                                                    @endphp
                                                 @endif
                                             @endforeach
                                         </div>
@@ -119,7 +114,7 @@
                         </div>
                     @endforeach
                     <div class="flex justify-between w-full px-4 font-bold text-primary-500">
-                        Grand Total: <span class="text-right">{{ $itinerary_total_amount }}</span></div>
+                        Grand Total: <span class="text-right">{{ $total_amount }}</span></div>
                 </div>
             </div>
         </div>
