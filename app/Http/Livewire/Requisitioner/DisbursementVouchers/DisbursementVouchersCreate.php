@@ -79,14 +79,10 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         $itinerary = $to->itineraries()->whereUserId(auth()->id())->first();
 
                                         $itinerary_entries = $itinerary->itinerary_entries()->where('itinerary_id', $itinerary['id'])->get();
-                                        
+
                                         $amount = $to->registration_amount;
                                         foreach ($itinerary['coverage'] as $entry) {
-                                            $amount += $entry['per_diem'];
-                                        }
-
-                                        foreach ($itinerary_entries as $entry) {
-                                            $amount += ($entry->transportation_expenses + $entry->other_expenses);
+                                            $amount += $entry['total_expenses'];
                                         }
 
                                         $set('disbursement_voucher_particulars', [
