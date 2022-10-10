@@ -130,12 +130,12 @@
                                                         <div
                                                             class="flex justify-between w-full font-semibold text-primary-900">
                                                             Transporation Expenses: <span
-                                                                class="font-normal text-right">{{ number_format($entry->transportation_expenses) }}</span>
+                                                                class="font-normal text-right">{{ $entry->transportation_expenses }}</span>
                                                         </div>
                                                         <div
                                                             class="flex justify-between w-full font-semibold text-primary-900">
                                                             Other Expenses: <span
-                                                                class="font-normal text-right">{{ number_format($entry->other_expenses) }}</span>
+                                                                class="font-normal text-right">{{ $entry->other_expenses }}</span>
                                                         </div>
                                                     </div>
                                                 @endif
