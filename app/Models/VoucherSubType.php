@@ -9,6 +9,8 @@ class VoucherSubType extends Model
 {
     use HasFactory;
 
+    const TRAVELS = [1, 2, 6, 7];
+
     public function voucher_type()
     {
         return $this->belongsTo(VoucherType::class);

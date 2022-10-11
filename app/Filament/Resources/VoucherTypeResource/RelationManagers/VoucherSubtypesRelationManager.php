@@ -68,7 +68,7 @@ class VoucherSubtypesRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->mutateRecordDataUsing(function (array $data, $record) {
-                        $data['documents'] = $record->related_documents_list->documents;
+                        $data['documents'] = $record->related_documents_list?->documents ?? [];
                         return $data;
                     })
                     ->action(function ($data, $record) {
@@ -78,7 +78,9 @@ class VoucherSubtypesRelationManager extends RelationManager
                             unset($data['documents']);
                         }
                         $record->update($data);
-                        $record->related_documents_list->update([
+                        $record->related_documents_list()->updateOrCreate([
+                            'voucher_sub_type_id' => $record->id
+                        ], [
                             'documents' => $documents
                         ]);
                         Notification::make()->title('Saved.')->success()->send();

@@ -10,6 +10,7 @@ use App\Models\TravelOrderType;
 use Carbon\CarbonPeriod;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
@@ -76,43 +77,56 @@ class ItineraryCreate extends Component implements HasForms
                                     'lunch' => false,
                                     'dinner' => false,
                                     'lodging' => false,
-                                    'itinerary_entries' => [],
+                                    'itinerary_entries' => [
+                                        [
+                                            'mot_id' => null,
+                                            'place' => '',
+                                            'departure_time' => null,
+                                            'arrival_time' => null,
+                                            'transportation_expenses' => 0,
+                                            'other_expenses' => 0,
+                                        ],
+                                    ],
                                 ],
                             ];
                         }
                     }
-
                     $this->itinerary_entries = $entries;
                 })
                 ->reactive(),
-            Placeholder::make('travel_order_details')
-                ->visible(fn ($get) => $get('travel_order_id'))
-                ->view('components.travel_orders.travel-order-details'),
-
+            Card::make([
+                Placeholder::make('travel_order_details')
+                    ->view('components.travel_orders.travel-order-details'),
+            ])->visible(fn ($get) => $get('travel_order_id')),
             Builder::make('itinerary_entries')->blocks([
                 Block::make('new_entry')->schema([
-                    Flatpickr::make('date')
-                        ->disableTime()
-                        ->required(),
-                    Fieldset::make('Per Diem')->schema([
-                        Toggle::make('has_per_diem')
-                            ->label('Has Per Diem')
-                            ->reactive(),
-                        TextInput::make('per_diem')->disabled(),
+                    Grid::make(2)->schema([
+                        Fieldset::make('Coverage')->schema([
+                            Flatpickr::make('date')
+                                ->disableTime()
+                                ->required()->columnSpan(1),
+                            Grid::make(4)->schema([
+                                Toggle::make('breakfast')->inline(false)->reactive(),
+                                Toggle::make('lunch')->inline(false)->reactive(),
+                                Toggle::make('dinner')->inline(false)->reactive(),
+                                Toggle::make('lodging')->inline(false)->reactive(),
+                            ]),
+                        ])->columns(1)->columnSpan(1),
+                        Fieldset::make('Total Amount')->schema([
+                            Toggle::make('has_per_diem')
+                                ->label('Has Per Diem')
+                                ->reactive(),
+                            TextInput::make('per_diem')->disabled(),
+                            TextInput::make('total_expenses')->disabled()->default(0),
+                        ])->columns(1)->columnSpan(1),
                     ]),
-                    Fieldset::make('Coverage')->schema([
-                        Toggle::make('breakfast')->inline(false)->reactive(),
-                        Toggle::make('lunch')->inline(false)->reactive(),
-                        Toggle::make('dinner')->inline(false)->reactive(),
-                        Toggle::make('lodging')->inline(false)->reactive(),
-                    ])->columns(4),
                     Repeater::make('itinerary_entries')->schema([
-                        Select::make('mot_id')
-                            ->options(Mot::pluck('name', 'id'))
-                            ->label('Mode of Transportation')
-                            ->required(),
-                        TextInput::make('place')->required(),
-                        Grid::make(2)->schema([
+                        Grid::make(6)->schema([
+                            Select::make('mot_id')
+                                ->options(Mot::pluck('name', 'id'))
+                                ->label('Mode of Transportation')
+                                ->required(),
+                            TextInput::make('place')->required(),
                             Flatpickr::make('departure_time')
                                 ->disableDate()
                                 ->required(),
@@ -120,14 +134,10 @@ class ItineraryCreate extends Component implements HasForms
                                 ->disableDate()
                                 ->afterOrEqual('departure_time')
                                 ->required(),
-
-                        ]),
-                        Grid::make(2)->schema([
-                            TextInput::make('transportation_expenses')->default(0)->required()->numeric()->reactive(),
-                            TextInput::make('other_expenses')->default(0)->numeric()->reactive(),
-                        ]),
+                            TextInput::make('transportation_expenses')->label('Transportation')->default(0)->required()->numeric()->reactive(),
+                            TextInput::make('other_expenses')->label('Others')->default(0)->numeric()->reactive(),
+                        ])
                     ]),
-                    TextInput::make('total_expenses')->disabled()->default(0),
                 ]),
             ])->disableItemCreation()->disableItemDeletion()->visible(fn ($get) => $get('travel_order_id')),
         ];

@@ -60,8 +60,8 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->label('Travel Order')
                                 ->searchable()
                                 ->preload()
-                                ->visible(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
-                                ->required(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
+                                ->visible(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
+                                ->required(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
                                 ->options(TravelOrder::where(function ($q) {
                                     $q->approved()
                                         ->whereHas('itineraries', function ($query) {
@@ -77,8 +77,6 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     $to = TravelOrder::find($state);
                                     if ($to && $to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                         $itinerary = $to->itineraries()->whereUserId(auth()->id())->first();
-
-                                        $itinerary_entries = $itinerary->itinerary_entries()->where('itinerary_id', $itinerary['id'])->get();
 
                                         $amount = $to->registration_amount;
                                         foreach ($itinerary['coverage'] as $entry) {
@@ -144,9 +142,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ]),
                                 ])
                                 ->minItems(1)
-                                ->visible(fn ($get) => $get('travel_order_id') || !in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
-                                ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7]))
-                                ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, [1, 2, 6, 7])),
+                                ->visible(fn ($get) => $get('travel_order_id') || !in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
+                                ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
+                                ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS)),
                         ]),
                     ]),
                 Step::make('Review Related Documents')
