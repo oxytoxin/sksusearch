@@ -59,8 +59,17 @@ class DisbursementVoucher extends Model
         return $this->hasMany(DisbursementVoucherParticular::class);
     }
 
+    public function fund_cluster()
+    {
+        return $this->belongsTo(FundCluster::class);
+    }
+
     public function activity_logs()
     {
         return $this->morphMany(ActivityLog::class, 'loggable');
+    }
+    public function scanned_documents()
+    {
+        return $this->morphMany(ScannedDocument::class, 'documentable');
     }
 }

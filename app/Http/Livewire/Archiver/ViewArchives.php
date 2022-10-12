@@ -4,8 +4,10 @@ namespace App\Http\Livewire\Archiver;
 
 use App\Models\DisbursementVoucher;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
 class ViewArchives extends Component implements HasTable
@@ -14,17 +16,33 @@ class ViewArchives extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereUserId(auth()->id());
+        return DisbursementVoucher::where('current_step_id','>=','23000');
     }
 
     protected function getTableColumns()
     {
         return [
-            TextColumn::make('tracking_number'),
-            TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),            
+            TextColumn::make('tracking_number')
+            ->searchable(),
+            TextColumn::make('user.employee_information.full_name')
+            ->searchable()
+            ->label('Requisitioner'),            
             TextColumn::make('payee')
+            ->searchable()
             ->label('Payee'),
-            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),
+            TextColumn::make('fund_cluster.name')
+            ->searchable()
+            ->label('Fund Cluster'),
+            TextColumn::make('cheque_number')
+            ->searchable()
+            ->label('Cheque / ADA'),
+            ViewColumn::make('disbursment_voucher_particulars.purpose')
+            ->view('components.archiver.tables.columns.particulars-viewer-nlgc')
+            ->label('Particular(s)'),
+            TextColumn::make('disbursement_voucher_particulars_sum_amount')
+            ->sum('disbursement_voucher_particulars', 'amount')
+            ->label('Amount')
+            ->money('php'),
         ];
     }
 
