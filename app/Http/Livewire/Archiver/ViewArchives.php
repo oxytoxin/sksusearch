@@ -3,10 +3,12 @@
 namespace App\Http\Livewire\Archiver;
 
 use App\Models\DisbursementVoucher;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
@@ -44,6 +46,16 @@ class ViewArchives extends Component implements HasTable
             ->label('Amount')
             ->money('php'),
         ];
+    }
+    protected function getTableActions(): array
+    {
+        return [
+                Action::make('view_scanned_documents')
+                ->url(fn (DisbursementVoucher $record): string => route('archiver.view-scanned-docs', [$record]))
+                ->openUrlInNewTab()
+                ->icon('heroicon-o-eye')
+                ->label('')
+            ];
     }
 
     public function render()
