@@ -56,9 +56,12 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
+
         'scanned_documents' => [
             'driver' => 'local',
             'root' => storage_path('app/scanned_documents'),
+            'url' => env('APP_URL') . '/storage/remarks',
+            'visibility' => 'public',
             'throw' => false,
         ],
 
@@ -89,6 +92,8 @@ return [
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
+        public_path('storage/remarks') => storage_path('app/public/remarks'),
+        public_path('storage/scanned_documents') => storage_path('app/scanned_documents'),
     ],
 
 ];
