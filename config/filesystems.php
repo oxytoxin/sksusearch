@@ -60,7 +60,7 @@ return [
         'scanned_documents' => [
             'driver' => 'local',
             'root' => storage_path('app/scanned_documents'),
-            'url' => env('APP_URL') . '/storage/remarks',
+            'url' => env('APP_URL') . '/storage/scanned_documents',
             'visibility' => 'public',
             'throw' => false,
         ],
