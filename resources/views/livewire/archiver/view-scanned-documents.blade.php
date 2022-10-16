@@ -6,7 +6,7 @@
               {{ $scanned_document->document_name }}
             </div>
             <div class="flex" x-cloak x-show="open">
-                <iframe src="{{ asset($scanned_document->path) }}" frameborder="0" class="flex"></iframe>
+                <iframe src="{{ asset('storage/'.$scanned_document->path) }}" frameborder="0" class="rounded-lg w-screen-80"></iframe>
             </div>
           </li> 
         @endforeach
