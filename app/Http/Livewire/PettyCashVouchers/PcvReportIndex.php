@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Livewire\PettyCashVouchers;
+
+use App\Forms\Components\Flatpickr;
+use App\Models\FundCluster;
+use App\Models\PettyCashFund;
+use App\Models\PettyCashVoucher;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Livewire\Component;
+
+class PcvReportIndex extends Component implements HasForms
+{
+    use InteractsWithForms;
+
+    public $data;
+    public $petty_cash_fund;
+
+    protected function getFormStatePath(): string
+    {
+        return 'data';
+    }
+
+    protected function getFormSchema()
+    {
+        return [
+            Grid::make(2)->schema([
+                DatePicker::make('date_from')
+                    ->default(today()->subYear())
+                    ->reactive()
+                    ->lte('date_to'),
+                DatePicker::make('date_to')
+                    ->default(today())
+                    ->reactive()
+                    ->gte('date_from'),
+                TextInput::make('entity_name')
+                    ->reactive(),
+                TextInput::make('report_no')
+                    ->reactive(),
+                Select::make('fund_cluster_id')
+                    ->placeholder('All')
+                    ->reactive()
+                    ->label('Fund Cluster')
+                    ->options(FundCluster::pluck('name', 'id')),
+                TextInput::make('sheet_no')
+                    ->reactive(),
+            ])
+        ];
+    }
+
+    public function mount()
+    {
+        $campus = auth()->user()->employee_information->office?->campus_id;
+        if (!$campus) {
+            abort(403, 'Employee has no office assigned.');
+        }
+        $this->petty_cash_fund = PettyCashFund::whereCampusId($campus)->first();
+        if (!$this->petty_cash_fund) {
+            abort(403, 'No petty cash fund found for your campus.');
+        }
+        $this->form->fill();
+    }
+
+    public function render()
+    {
+        return view('livewire.petty-cash-vouchers.pcv-report-index', [
+            'fund_clusters' => FundCluster::all(),
+            'petty_cash_vouchers' => PettyCashVoucher::query()
+                ->whereRelation('petty_cash_fund', 'campus_id', $this->petty_cash_fund->campus_id)
+                ->when($this->data['fund_cluster_id'], fn ($query) => $query->where('fund_cluster_id', $this->data['fund_cluster_id']))
+                ->where('pcv_date', '>=', $this->data['date_from'])
+                ->where('pcv_date', '<=', $this->data['date_to'])
+                ->orderBy('pcv_date')
+                ->get(),
+        ]);
+    }
+}

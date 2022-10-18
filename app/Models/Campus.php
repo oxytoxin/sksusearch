@@ -18,4 +18,9 @@ class Campus extends Model
     {
         return $this->hasMany(Office::class);
     }
+
+    public function petty_cash_fund()
+    {
+        return $this->hasOne(PettyCashFund::class);
+    }
 }
