@@ -4,7 +4,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 9.32.0.
+ * Generated for Laravel 9.35.1.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -2849,9 +2849,9 @@
             /**
      * 
      *
-     * @method static \Illuminate\Broadcasting\Broadcasters\Broadcaster channel(string $channel, callable|string  $callback, array $options = [])
+     * @method static \Illuminate\Broadcasting\Broadcasters\Broadcaster channel(string $channel, callable|string $callback, array $options = [])
      * @method static mixed auth(\Illuminate\Http\Request $request)
-     * @method static void resolveAuthenticatedUserUsing(Closure $callback)
+     * @method static void resolveAuthenticatedUserUsing(\Closure $callback)
      * @see \Illuminate\Contracts\Broadcasting\Factory
      */ 
         class Broadcast {
@@ -8448,7 +8448,6 @@
      * @method static void alwaysReplyTo(string $address, string|null $name = null)
      * @method static void alwaysReturnPath(string $address)
      * @method static void alwaysTo(string $address, string|null $name = null)
-     * @method static \Illuminate\Mail\PendingMail cc($users)
      * @method static \Illuminate\Mail\SentMessage|null plain(string $view, array $data, $callback)
      * @method static \Illuminate\Mail\SentMessage|null html(string $html, $callback)
      * @method static mixed laterOn(string $queue, \DateTimeInterface|\DateInterval|int $delay, \Illuminate\Contracts\Mail\Mailable|string|array $view)
@@ -8735,6 +8734,18 @@
         {
                         /** @var \Illuminate\Support\Testing\Fakes\MailFake $instance */
                         return $instance->to($users);
+        }
+                    /**
+         * Begin the process of mailing a mailable class instance.
+         *
+         * @param mixed $users
+         * @return \Illuminate\Mail\PendingMail 
+         * @static 
+         */ 
+        public static function cc($users)
+        {
+                        /** @var \Illuminate\Support\Testing\Fakes\MailFake $instance */
+                        return $instance->cc($users);
         }
                     /**
          * Begin the process of mailing a mailable class instance.
@@ -11655,6 +11666,40 @@
                         return $instance->isFromTrustedProxy();
         }
                     /**
+         * Filter the given array of rules into an array of rules that are included in precognitive headers.
+         *
+         * @param array $rules
+         * @return array 
+         * @static 
+         */ 
+        public static function filterPrecognitiveRules($rules)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->filterPrecognitiveRules($rules);
+        }
+                    /**
+         * Determine if the request is attempting to be precognitive.
+         *
+         * @return bool 
+         * @static 
+         */ 
+        public static function isAttemptingPrecognition()
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->isAttemptingPrecognition();
+        }
+                    /**
+         * Determine if the request is precognitive.
+         *
+         * @return bool 
+         * @static 
+         */ 
+        public static function isPrecognitive()
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->isPrecognitive();
+        }
+                    /**
          * Determine if the request is sending JSON.
          *
          * @return bool 
@@ -12109,9 +12154,10 @@
                     /**
          * Retrieve input from the request as an enum.
          *
+         * @template TEnum
          * @param string $key
-         * @param string $enumClass
-         * @return mixed|null 
+         * @param \Illuminate\Http\class-string<TEnum> $enumClass
+         * @return \Illuminate\Http\TEnum|null 
          * @static 
          */ 
         public static function enum($key, $enumClass)
@@ -12369,265 +12415,6 @@
         public static function hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
         {
                         return \Illuminate\Http\Request::hasValidSignatureWhileIgnoring($ignoreQuery, $absolute);
-        }
-         
-    }
-            /**
-     * 
-     *
-     * @see \Illuminate\Contracts\Routing\ResponseFactory
-     */ 
-        class Response {
-                    /**
-         * Create a new response instance.
-         *
-         * @param mixed $content
-         * @param int $status
-         * @param array $headers
-         * @return \Illuminate\Http\Response 
-         * @static 
-         */ 
-        public static function make($content = '', $status = 200, $headers = [])
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->make($content, $status, $headers);
-        }
-                    /**
-         * Create a new "no content" response.
-         *
-         * @param int $status
-         * @param array $headers
-         * @return \Illuminate\Http\Response 
-         * @static 
-         */ 
-        public static function noContent($status = 204, $headers = [])
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->noContent($status, $headers);
-        }
-                    /**
-         * Create a new response for a given view.
-         *
-         * @param string|array $view
-         * @param array $data
-         * @param int $status
-         * @param array $headers
-         * @return \Illuminate\Http\Response 
-         * @static 
-         */ 
-        public static function view($view, $data = [], $status = 200, $headers = [])
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->view($view, $data, $status, $headers);
-        }
-                    /**
-         * Create a new JSON response instance.
-         *
-         * @param mixed $data
-         * @param int $status
-         * @param array $headers
-         * @param int $options
-         * @return \Illuminate\Http\JsonResponse 
-         * @static 
-         */ 
-        public static function json($data = [], $status = 200, $headers = [], $options = 0)
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->json($data, $status, $headers, $options);
-        }
-                    /**
-         * Create a new JSONP response instance.
-         *
-         * @param string $callback
-         * @param mixed $data
-         * @param int $status
-         * @param array $headers
-         * @param int $options
-         * @return \Illuminate\Http\JsonResponse 
-         * @static 
-         */ 
-        public static function jsonp($callback, $data = [], $status = 200, $headers = [], $options = 0)
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->jsonp($callback, $data, $status, $headers, $options);
-        }
-                    /**
-         * Create a new streamed response instance.
-         *
-         * @param \Closure $callback
-         * @param int $status
-         * @param array $headers
-         * @return \Symfony\Component\HttpFoundation\StreamedResponse 
-         * @static 
-         */ 
-        public static function stream($callback, $status = 200, $headers = [])
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->stream($callback, $status, $headers);
-        }
-                    /**
-         * Create a new streamed response instance as a file download.
-         *
-         * @param \Closure $callback
-         * @param string|null $name
-         * @param array $headers
-         * @param string|null $disposition
-         * @return \Symfony\Component\HttpFoundation\StreamedResponse 
-         * @static 
-         */ 
-        public static function streamDownload($callback, $name = null, $headers = [], $disposition = 'attachment')
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->streamDownload($callback, $name, $headers, $disposition);
-        }
-                    /**
-         * Create a new file download response.
-         *
-         * @param \SplFileInfo|string $file
-         * @param string|null $name
-         * @param array $headers
-         * @param string|null $disposition
-         * @return \Symfony\Component\HttpFoundation\BinaryFileResponse 
-         * @static 
-         */ 
-        public static function download($file, $name = null, $headers = [], $disposition = 'attachment')
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->download($file, $name, $headers, $disposition);
-        }
-                    /**
-         * Return the raw contents of a binary file.
-         *
-         * @param \SplFileInfo|string $file
-         * @param array $headers
-         * @return \Symfony\Component\HttpFoundation\BinaryFileResponse 
-         * @static 
-         */ 
-        public static function file($file, $headers = [])
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->file($file, $headers);
-        }
-                    /**
-         * Create a new redirect response to the given path.
-         *
-         * @param string $path
-         * @param int $status
-         * @param array $headers
-         * @param bool|null $secure
-         * @return \Illuminate\Http\RedirectResponse 
-         * @static 
-         */ 
-        public static function redirectTo($path, $status = 302, $headers = [], $secure = null)
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->redirectTo($path, $status, $headers, $secure);
-        }
-                    /**
-         * Create a new redirect response to a named route.
-         *
-         * @param string $route
-         * @param mixed $parameters
-         * @param int $status
-         * @param array $headers
-         * @return \Illuminate\Http\RedirectResponse 
-         * @static 
-         */ 
-        public static function redirectToRoute($route, $parameters = [], $status = 302, $headers = [])
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->redirectToRoute($route, $parameters, $status, $headers);
-        }
-                    /**
-         * Create a new redirect response to a controller action.
-         *
-         * @param string $action
-         * @param mixed $parameters
-         * @param int $status
-         * @param array $headers
-         * @return \Illuminate\Http\RedirectResponse 
-         * @static 
-         */ 
-        public static function redirectToAction($action, $parameters = [], $status = 302, $headers = [])
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->redirectToAction($action, $parameters, $status, $headers);
-        }
-                    /**
-         * Create a new redirect response, while putting the current URL in the session.
-         *
-         * @param string $path
-         * @param int $status
-         * @param array $headers
-         * @param bool|null $secure
-         * @return \Illuminate\Http\RedirectResponse 
-         * @static 
-         */ 
-        public static function redirectGuest($path, $status = 302, $headers = [], $secure = null)
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->redirectGuest($path, $status, $headers, $secure);
-        }
-                    /**
-         * Create a new redirect response to the previously intended location.
-         *
-         * @param string $default
-         * @param int $status
-         * @param array $headers
-         * @param bool|null $secure
-         * @return \Illuminate\Http\RedirectResponse 
-         * @static 
-         */ 
-        public static function redirectToIntended($default = '/', $status = 302, $headers = [], $secure = null)
-        {
-                        /** @var \Illuminate\Routing\ResponseFactory $instance */
-                        return $instance->redirectToIntended($default, $status, $headers, $secure);
-        }
-                    /**
-         * Register a custom macro.
-         *
-         * @param string $name
-         * @param object|callable $macro
-         * @return void 
-         * @static 
-         */ 
-        public static function macro($name, $macro)
-        {
-                        \Illuminate\Routing\ResponseFactory::macro($name, $macro);
-        }
-                    /**
-         * Mix another object into the class.
-         *
-         * @param object $mixin
-         * @param bool $replace
-         * @return void 
-         * @throws \ReflectionException
-         * @static 
-         */ 
-        public static function mixin($mixin, $replace = true)
-        {
-                        \Illuminate\Routing\ResponseFactory::mixin($mixin, $replace);
-        }
-                    /**
-         * Checks if macro is registered.
-         *
-         * @param string $name
-         * @return bool 
-         * @static 
-         */ 
-        public static function hasMacro($name)
-        {
-                        return \Illuminate\Routing\ResponseFactory::hasMacro($name);
-        }
-                    /**
-         * Flush the existing macros.
-         *
-         * @return void 
-         * @static 
-         */ 
-        public static function flushMacros()
-        {
-                        \Illuminate\Routing\ResponseFactory::flushMacros();
         }
          
     }
@@ -13664,6 +13451,16 @@
         public static function morphUsingUuids()
         {            //Method inherited from \Illuminate\Database\Schema\Builder         
                         \Illuminate\Database\Schema\MySqlBuilder::morphUsingUuids();
+        }
+                    /**
+         * Set the default morph key type for migrations to ULIDs.
+         *
+         * @return void 
+         * @static 
+         */ 
+        public static function morphUsingUlids()
+        {            //Method inherited from \Illuminate\Database\Schema\Builder         
+                        \Illuminate\Database\Schema\MySqlBuilder::morphUsingUlids();
         }
                     /**
          * Determine if the given table has a given column.
@@ -19035,7 +18832,19 @@
                     /**
          * 
          *
-         * @see \Filament\Testing\TestsPageActions::assertPageActionHeld()
+         * @see \Filament\Testing\TestsPageActions::assertPageActionHalted()
+         * @param string $name
+         * @return static 
+         * @static 
+         */ 
+        public static function assertPageActionHalted($name)
+        {
+                        return \Livewire\Testing\TestableLivewire::assertPageActionHalted($name);
+        }
+                    /**
+         * 
+         *
+         * @see \Filament\Testing\TestsPageActions::assertPageActionHalted()
          * @param string $name
          * @return static 
          * @static 
@@ -19486,7 +19295,19 @@
                     /**
          * 
          *
-         * @see \Filament\Tables\Testing\TestsActions::assertTableActionHeld()
+         * @see \Filament\Tables\Testing\TestsActions::assertTableActionHalted()
+         * @param string $name
+         * @return static 
+         * @static 
+         */ 
+        public static function assertTableActionHalted($name)
+        {
+                        return \Livewire\Testing\TestableLivewire::assertTableActionHalted($name);
+        }
+                    /**
+         * 
+         *
+         * @see \Filament\Tables\Testing\TestsActions::assertTableActionHalted()
          * @param string $name
          * @return static 
          * @static 
@@ -19742,7 +19563,19 @@
                     /**
          * 
          *
-         * @see \Filament\Tables\Testing\TestsBulkActions::assertTableBulkActionHeld()
+         * @see \Filament\Tables\Testing\TestsBulkActions::assertTableBulkActionHalted()
+         * @param string $name
+         * @return static 
+         * @static 
+         */ 
+        public static function assertTableBulkActionHalted($name)
+        {
+                        return \Livewire\Testing\TestableLivewire::assertTableBulkActionHalted($name);
+        }
+                    /**
+         * 
+         *
+         * @see \Filament\Tables\Testing\TestsBulkActions::assertTableBulkActionHalted()
          * @param string $name
          * @return static 
          * @static 
