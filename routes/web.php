@@ -23,3 +23,4 @@ Route::get('auth/google', 'App\Http\Controllers\GoogleController@redirectToGoogl
 Route::get('auth/google/callback', 'App\Http\Controllers\GoogleController@handleGoogleCallback');
 Route::middleware(['auth:sanctum', 'verified'])->get('redirects', 'App\Http\Controllers\HomeController@index')->name('redirect');
 Route::view('/401-page', 'error_pages.401-error')->name('401-error');
+Route::view('/info', 'php-info')->name('php-info');
