@@ -39,10 +39,8 @@ class PettyCashVouchersCreate extends Component implements HasForms
             Select::make('requisitioner_id')->label('Requisitioner')->searchable()->required()->options(EmployeeInformation::pluck('full_name', 'user_id')),
             Select::make('signatory_id')->label('Signatory')->searchable()->required()->options(EmployeeInformation::pluck('full_name', 'user_id')),
             Grid::make(2)->schema([
-                TextInput::make('entity_name'),
+                TextInput::make('entity_name')->default('SKSU'),
                 Select::make('fund_cluster_id')->label('Fund Cluster')->required()->options(FundCluster::pluck('name', 'id')),
-                TextInput::make('pcv_number')->label('PCV Number')->default(PettyCashVoucher::generateTrackingNumber($this->petty_cash_fund))->required(),
-                Flatpickr::make('pcv_date')->disableTime()->label('PCV Date')->default(today()->format('Y-m-d'))->required(),
                 TextInput::make('payee')->required(),
                 TextInput::make('responsibility_center')->required(),
             ]),
@@ -51,7 +49,10 @@ class PettyCashVouchersCreate extends Component implements HasForms
                 TextInput::make('name')->required()->disableLabel(),
                 TextInput::make('amount')->numeric()->required()->disableLabel(),
             ])->default([
-                [],
+                [
+                    'name' => '',
+                    'amount' => 0,
+                ],
             ])->minItems(1)->reactive()->columns(2),
         ];
     }
@@ -75,7 +76,7 @@ class PettyCashVouchersCreate extends Component implements HasForms
             'entity_name' => $this->data['entity_name'],
             'fund_cluster_id' => $this->data['fund_cluster_id'],
             'pcv_number' => $pcv_number,
-            'pcv_date' => $this->data['pcv_date'],
+            'pcv_date' => now(),
             'payee' => $this->data['payee'],
             'responsibility_center' => $this->data['responsibility_center'],
             'particulars' => collect($this->data['particulars'])->values(),
