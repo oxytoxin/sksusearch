@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Str;
@@ -18,6 +19,18 @@ class DisbursementVoucher extends Model
         'draft' => 'array',
         'related_documents' => 'array',
     ];
+
+    protected function totalAmount(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->disbursement_voucher_particulars->sum('amount'),
+        );
+    }
+
+    public function petty_cash_fund_records()
+    {
+        return $this->morphMany(PettyCashFundRecord::class, 'recordable');
+    }
 
     public static function generateTrackingNumber()
     {

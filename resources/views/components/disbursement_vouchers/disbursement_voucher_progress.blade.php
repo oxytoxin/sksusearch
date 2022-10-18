@@ -24,7 +24,6 @@
                 @endif
             @else
                 <li class="flex gap-2 text-gray-600">
-
                     <span class="capitalize">{{ implode(' ', [$step->process, $step->recipient, $step->sender]) }}.</span>
                 </li>
             @endif

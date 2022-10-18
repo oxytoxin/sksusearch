@@ -18,7 +18,7 @@
                 'border-danger-600 ring-danger-600' => $errors->has($getStatePath()),
             ]) }}
             x-data="{
-                value: @entangle($getStatePath()).defer,
+                value: @entangle($getStatePath()),
                 instance: undefined,
                 init() {
                     $watch('value', value => this.instance.setDate(value, false));
