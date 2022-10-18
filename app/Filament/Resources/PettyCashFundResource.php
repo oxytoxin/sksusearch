@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PettyCashFundResource\Pages;
 use App\Filament\Resources\PettyCashFundResource\RelationManagers;
+use App\Models\EmployeeInformation;
 use App\Models\PettyCashFund;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
@@ -40,6 +41,12 @@ class PettyCashFundResource extends Resource
     {
         return $form
             ->schema([
+                Select::make('custodian_id')
+                    ->required()
+                    ->searchable()
+                    ->preload()
+                    ->options(EmployeeInformation::pluck('full_name', 'user_id'))
+                    ->label('Custodian'),
                 Select::make('campus_id')
                     ->required()
                     ->relationship('campus', 'name')
@@ -57,11 +64,9 @@ class PettyCashFundResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('campus.name'),
-                Tables\Columns\TextColumn::make('voucher_limit'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime('h:i A F j, Y'),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime('h:i A F j, Y'),
+                Tables\Columns\TextColumn::make('custodian.employee_information.full_name'),
+                Tables\Columns\TextColumn::make('voucher_limit')->formatStateUsing(fn ($state) => number_format($state, 2))->prefix('P'),
+                Tables\Columns\TextColumn::make('balance')->formatStateUsing(fn ($state) => number_format($state, 2))->prefix('P'),
             ])
             ->filters([
                 //

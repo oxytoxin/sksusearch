@@ -140,4 +140,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsToMany(User::class, 'oic_users', 'oic_id', 'user_id')->withPivot(['id', 'valid_from', 'valid_to'])->withTimestamps();
     }
+
+    public function petty_cash_fund()
+    {
+        return $this->hasOne(PettyCashFund::class, 'custodian_id');
+    }
 }

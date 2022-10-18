@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('petty_cash_funds', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('custodian_id')->index();
             $table->foreignId('campus_id')->index();
             $table->integer('voucher_limit')->default(300000);
             $table->timestamps();

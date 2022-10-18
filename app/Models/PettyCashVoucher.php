@@ -38,9 +38,9 @@ class PettyCashVoucher extends Model
         return $this->morphMany(PettyCashFundRecord::class, 'recordable');
     }
 
-    public static function generateTrackingNumber()
+    public static function generateTrackingNumber($pcf)
     {
-        return 'pcv-' . today()->format('y') . '-' . Str::random(8);
+        return $pcf->campus->campus_code . '-' . today()->format('Y') . '-' . (PettyCashVoucher::wherePettyCashFundId($pcf->id)->whereBetween('created_at', [now()->startOfYear(), now()->endOfYear()])->count() + 1);
     }
 
     public function petty_cash_fund()

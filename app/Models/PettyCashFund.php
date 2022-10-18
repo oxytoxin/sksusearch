@@ -40,4 +40,9 @@ class PettyCashFund extends Model
     {
         return $this->hasOne(PettyCashFundRecord::class)->latestOfMany();
     }
+
+    public function custodian()
+    {
+        return $this->belongsTo(User::class, 'custodian_id');
+    }
 }
