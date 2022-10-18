@@ -20,7 +20,7 @@ class PettyCashVoucherFactory extends Factory
      */
     public function definition()
     {
-        $created = $this->faker->dateTimeBetween('-3 months', 'now');
+        $created = $this->faker->dateTimeBetween('-5 years', 'now');
         $particulars = collect();
         for ($i = 0; $i < $this->faker->numberBetween(1, 5); $i++) {
             $particulars->push([
@@ -30,12 +30,13 @@ class PettyCashVoucherFactory extends Factory
         }
         $total = $particulars->sum('amount');
         $paid = $this->faker->numberBetween($total - 300, $total + 300);
-        $tn = PettyCashVoucher::generateTrackingNumber();
+        $pcf = $this->faker->randomElement(PettyCashFund::get());
+        $tn = PettyCashVoucher::generateTrackingNumber($pcf);
         return [
             'tracking_number' => $tn,
             'entity_name' => $this->faker->name,
             'fund_cluster_id' => $this->faker->randomElement(FundCluster::pluck('id')->toArray()),
-            'petty_cash_fund_id' => $this->faker->randomElement(PettyCashFund::pluck('id')->toArray()),
+            'petty_cash_fund_id' => $pcf,
             'pcv_number' => $tn,
             'pcv_date' => $created,
             'payee' => "dawdwa",

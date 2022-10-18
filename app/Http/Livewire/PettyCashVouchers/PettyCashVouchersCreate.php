@@ -41,7 +41,7 @@ class PettyCashVouchersCreate extends Component implements HasForms
             Grid::make(2)->schema([
                 TextInput::make('entity_name'),
                 Select::make('fund_cluster_id')->label('Fund Cluster')->required()->options(FundCluster::pluck('name', 'id')),
-                TextInput::make('pcv_number')->label('PCV Number')->required(),
+                TextInput::make('pcv_number')->label('PCV Number')->default(PettyCashVoucher::generateTrackingNumber($this->petty_cash_fund))->required(),
                 Flatpickr::make('pcv_date')->disableTime()->label('PCV Date')->default(today()->format('Y-m-d'))->required(),
                 TextInput::make('payee')->required(),
                 TextInput::make('responsibility_center')->required(),
@@ -65,15 +65,16 @@ class PettyCashVouchersCreate extends Component implements HasForms
             return;
         }
         DB::beginTransaction();
+        $pcv_number = PettyCashVoucher::generateTrackingNumber($this->petty_cash_fund);
         $pcv = PettyCashVoucher::create([
             'custodian_id' => auth()->id(),
             'signatory_id' => $this->data['signatory_id'],
             'requisitioner_id' => $this->data['requisitioner_id'],
             'petty_cash_fund_id' => $this->petty_cash_fund->id,
-            'tracking_number' => PettyCashVoucher::generateTrackingNumber(),
+            'tracking_number' => $pcv_number,
             'entity_name' => $this->data['entity_name'],
             'fund_cluster_id' => $this->data['fund_cluster_id'],
-            'pcv_number' => $this->data['pcv_number'],
+            'pcv_number' => $pcv_number,
             'pcv_date' => $this->data['pcv_date'],
             'payee' => $this->data['payee'],
             'responsibility_center' => $this->data['responsibility_center'],
@@ -93,11 +94,8 @@ class PettyCashVouchersCreate extends Component implements HasForms
 
     public function mount()
     {
-        $campus = auth()->user()->employee_information->office?->campus_id;
-        if (!$campus) {
-            abort(403, 'Employee has no office assigned.');
-        }
-        $this->petty_cash_fund = PettyCashFund::whereCampusId($campus)->first();
+
+        $this->petty_cash_fund = auth()->user()->petty_cash_fund;
         if (!$this->petty_cash_fund) {
             abort(403, 'No petty cash fund found for your campus.');
         }
