@@ -98,6 +98,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->columnSpan(1),
 
                     FileUpload::make('attachment')
+                    ->maxSize(50000)
                     ->enableOpen()
                     ->multiple()
                     ->preserveFilenames()
