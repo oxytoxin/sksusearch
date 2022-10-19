@@ -36,7 +36,9 @@ class ViewLegacyDocuments extends Component implements HasTable
                 ->view('components.archiver.tables.columns.particulars-viewer')
                 ->label('Particular(s)')
                 ->searchable(),
-            TextColumn::make('journal_date')->label('Journal Date')
+            TextColumn::make('journal_date')
+                ->label('Journal Date')
+                ->date()
                 ->searchable(),
 
         ];
@@ -55,7 +57,10 @@ class ViewLegacyDocuments extends Component implements HasTable
                 ViewAction::make('legacy_document_generate_qr')
                     ->label('Generate QR')
                     ->modalHeading('QR CODE')
-                    ->modalContent()
+                    ->modalContent(fn ($record) => view('components.archiver.tables.columns.legacy-document-qr', [
+                        'legacy_document' => $record,
+                    ]))
+                    ->modalWidth('xs')
                     ->icon('ri-qr-code-line'),
             ])->icon('ri-eye-line'),
             EditAction::make('legacy_document_edit')
