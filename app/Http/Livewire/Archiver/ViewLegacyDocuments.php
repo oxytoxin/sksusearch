@@ -4,6 +4,9 @@ namespace App\Http\Livewire\Archiver;
 
 use App\Models\DisbursementVoucher;
 use App\Models\LegacyDocument;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -24,17 +27,39 @@ class ViewLegacyDocuments extends Component implements HasTable
         return [
             TextColumn::make('payee_name')->label('Payee')->searchable(),
             TextColumn::make('document_code')->label('Document Code')
-            ->searchable(),
+                ->searchable(),
             TextColumn::make('dv_number')->label('DV Number')
-            ->searchable(),
+                ->searchable(),
             TextColumn::make('fund_cluster.name')->label('Fund Cluster')
-            ->searchable(),
+                ->searchable(),
             ViewColumn::make('particulars')
-            ->view('components.archiver.tables.columns.particulars-viewer')
-            ->label('Particular(s)')
-            ->searchable(),
+                ->view('components.archiver.tables.columns.particulars-viewer')
+                ->label('Particular(s)')
+                ->searchable(),
             TextColumn::make('journal_date')->label('Journal Date')
-            ->searchable(),
+                ->searchable(),
+
+        ];
+    }
+
+    private function getTableActions()
+    {
+        return [
+            ActionGroup::make([
+                ViewAction::make('legacy_document_details')
+                    ->label('View Details')
+                    ->icon('ri-list-check-2'),
+                ViewAction::make('legacy_document_preview')
+                    ->label('Preview')
+                    ->icon('ri-file-copy-2-line'),
+                ViewAction::make('legacy_document_generate_qr')
+                    ->label('Generate QR')
+                    ->modalHeading('QR CODE')
+                    ->modalContent()
+                    ->icon('ri-qr-code-line'),
+            ])->icon('ri-eye-line'),
+            EditAction::make('legacy_document_edit')
+                ->label('Edit'),
         ];
     }
     public function render()
