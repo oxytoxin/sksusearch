@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->morphs('recordable');
             $table->tinyInteger('type')->default(1);
+            $table->text('nature_of_payment');
+            $table->integer('amount');
             $table->integer('running_balance');
             $table->foreignId('petty_cash_fund_id')->index();
             $table->timestamps();

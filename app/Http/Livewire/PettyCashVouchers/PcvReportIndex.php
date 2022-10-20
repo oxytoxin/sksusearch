@@ -6,6 +6,7 @@ use App\Forms\Components\Flatpickr;
 use App\Models\FundCluster;
 use App\Models\PettyCashFund;
 use App\Models\PettyCashVoucher;
+use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
@@ -31,7 +32,7 @@ class PcvReportIndex extends Component implements HasForms
         return [
             Grid::make(2)->schema([
                 DatePicker::make('date_from')
-                    ->default(today()->subYear())
+                    ->default(today()->subMonth())
                     ->reactive()
                     ->lte('date_to'),
                 DatePicker::make('date_to')
@@ -39,6 +40,7 @@ class PcvReportIndex extends Component implements HasForms
                     ->reactive()
                     ->gte('date_from'),
                 TextInput::make('entity_name')
+                    ->default('SKSU')
                     ->reactive(),
                 TextInput::make('report_no')
                     ->reactive(),
@@ -69,8 +71,7 @@ class PcvReportIndex extends Component implements HasForms
             'petty_cash_vouchers' => PettyCashVoucher::query()
                 ->whereRelation('petty_cash_fund', 'campus_id', $this->petty_cash_fund->campus_id)
                 ->when($this->data['fund_cluster_id'], fn ($query) => $query->where('fund_cluster_id', $this->data['fund_cluster_id']))
-                ->where('pcv_date', '>=', $this->data['date_from'])
-                ->where('pcv_date', '<=', $this->data['date_to'])
+                ->whereBetween('pcv_date', [$this->data['date_from'], Carbon::make($this->data['date_to'])->addDay()])
                 ->orderBy('pcv_date')
                 ->get(),
         ]);

@@ -11,26 +11,14 @@ use Livewire\Component;
 class TestComponent extends Component implements HasForms
 {
     use InteractsWithForms;
-    public $items = [];
 
     protected function getFormSchema(): array
     {
-        return [
-            SlimRepeater::make('items')->schema([
-                TextInput::make('particulars')->required()->disableLabel(),
-                TextInput::make('amount')->numeric()->required()->disableLabel(),
-            ])->disableLabel()->default([])->columns(2),
-        ];
+        return [];
     }
 
     public function test()
     {
-        dd(1);
-    }
-
-    public function mount()
-    {
-        $this->form->fill();
     }
 
     public function render()

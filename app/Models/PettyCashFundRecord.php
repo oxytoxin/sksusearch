@@ -25,6 +25,13 @@ class PettyCashFundRecord extends Model
         return $this->belongsTo(PettyCashFund::class);
     }
 
+    protected function amount(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value / 100,
+            set: fn ($value) => $value * 100,
+        );
+    }
 
     protected function runningBalance(): Attribute
     {
