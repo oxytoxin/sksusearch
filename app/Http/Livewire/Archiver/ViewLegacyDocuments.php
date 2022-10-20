@@ -52,7 +52,7 @@ class ViewLegacyDocuments extends Component implements HasTable
                     ->label('View Details')
                     ->icon('ri-list-check-2'),
                 ViewAction::make('legacy_document_preview')
-                    ->label('Preview')
+                    ->label('Preview Documents')
                     ->icon('ri-file-copy-2-line'),
                 ViewAction::make('legacy_document_generate_qr')
                     ->label('Generate QR')
