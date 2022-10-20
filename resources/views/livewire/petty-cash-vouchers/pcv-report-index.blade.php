@@ -35,7 +35,7 @@
                                 <td class="px-2">{{ date_format(date_create($voucher->pcv_date), 'm/d/y') }}</td>
                                 <td class="px-2">{{ $voucher->pcv_number }}</td>
                                 <td class="px-2 text-center">{{ $particular['name'] }}</td>
-                                <td class="px-2 text-center">P{{ number_format($particular['amount'], 2) }}</td>
+                                <td class="px-2 text-right">P{{ number_format($particular['amount'], 2) }}</td>
                             </tr>
                         @endforeach
                     @empty
@@ -50,11 +50,11 @@
                 <p>I hereby certify to the correctness of the above information.</p>
                 <div class="flex justify-center mt-16 space-x-12">
                     <div class="flex flex-col items-center">
-                        <h4>{{ auth()->user()->employee_information->full_name }}</h4>
+                        <h4 class="px-4 border-b border-black">{{ auth()->user()->employee_information->full_name }}</h4>
                         <h5 class="text-xs">Petty Cash Custodian</h5>
                     </div>
                     <div class="flex flex-col items-center">
-                        <h4>{{ today()->format('F j, Y') }}</h4>
+                        <h4 class="px-4 border-b border-black">{{ today()->format('F j, Y') }}</h4>
                         <h5 class="text-xs">Date</h5>
                     </div>
                 </div>

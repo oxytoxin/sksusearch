@@ -85,12 +85,15 @@ class PettyCashVouchersCreate extends Component implements HasForms
         foreach ($pcv->particulars as $key => $particular) {
             $pcv->petty_cash_fund_records()->create([
                 'type' => PettyCashFundRecord::DISBURSEMENT,
+                'nature_of_payment' => $particular['name'],
+                'amount' => $particular['amount'],
                 'petty_cash_fund_id' => $this->petty_cash_fund->id,
                 'running_balance' => (PettyCashFundRecord::wherePettyCashFundId($this->petty_cash_fund->id)->latest()->first()?->running_balance ?? 0) - $particular['amount'],
             ]);
         }
         DB::commit();
-        Notification::make()->title('Petty Cash Voucher request created.')->send();
+        Notification::make()->title('Petty Cash Voucher request created.')->success()->send();
+        redirect()->route('pcv.index');
     }
 
     public function mount()
