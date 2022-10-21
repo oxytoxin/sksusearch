@@ -1,11 +1,5 @@
 <nav x-data x-cloak class="flex flex-col px-2 space-y-1 md:mt-5">
 
-    {{-- <x-sidenav-link href="{{ route('requisitioner.dashboard') }}" :active="request()->routeIs('requisitioner.dashboard')">
-        My Dashboard
-    </x-sidenav-link>
-    <x-sidenav-link href="{{ route('office.dashboard') }}" :active="request()->routeIs('office.dashboard')">
-        Office Dashboard
-    </x-sidenav-link> --}}
     <div class="space-y-1" x-data="{ open: false }">
         <!-- Current: "bg-primary-100 text-primary-900", Default: "bg-white text-primary-600 hover:bg-primary-50 hover:text-primary-900" -->
         <button x-on:click="open=!open" type="button"
@@ -39,15 +33,16 @@
 
             {{-- signatory dv's --}}
             @php
-                $to_sign = App\Models\DisbursementVoucher::whereSignatoryId(auth()->id())
+                $to_sign_count = App\Models\DisbursementVoucher::whereSignatoryId(auth()->id())
                     ->where('current_step_id', '<=', 4000)
-                    ->get();
+                    ->where('previous_step_id', '<=', 4000)
+                    ->count();
             @endphp
             <a href="{{ route('signatory.disbursement-vouchers.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                 For Signature
-                @if ($to_sign->count() > 0)
+                @if ($to_sign_count > 0)
                     <span class="inline-flex items-center justify-center w-2 h-2 p-3 mx-auto text-xs font-medium rounded-full text-primary-600 bg-primary-100">
-                        {{ $to_sign->count() }}
+                        {{ $to_sign_count }}
                     </span>
                 @endif
 
@@ -159,10 +154,6 @@
                 Submitted
             </a>
 
-            {{-- for signature travel orders --}}
-            @php
-                // $to_sign_travel_order = App\Models\TravelOrder::whereRelation('signatories', 'user_id', auth()->id())->first();
-            @endphp
             <a href="{{ route('signatory.travel-orders.index') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                 For Signature
             </a>

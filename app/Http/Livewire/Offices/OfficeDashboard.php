@@ -21,7 +21,7 @@ class OfficeDashboard extends Component implements HasTable
 
     public function mount()
     {
-        if (!in_array(auth()->user()->employee_information?->office_id, [2, 3, 5, 25, 51, 52])) {
+        if (!in_array(auth()->user()->employee_information?->office_id, [2, 3, 5, 51, 52])) {
             abort(403);
         }
     }
@@ -62,7 +62,7 @@ class OfficeDashboard extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 13000 && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == 12)
+                ->visible(fn ($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == 12)
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
@@ -84,7 +84,7 @@ class OfficeDashboard extends Component implements HasTable
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
-                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to')
+                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false)
                 ->form(function () {
                     return [
                         Select::make('return_step_id')

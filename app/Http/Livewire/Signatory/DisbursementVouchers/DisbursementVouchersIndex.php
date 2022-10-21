@@ -2,20 +2,22 @@
 
 namespace App\Http\Livewire\Signatory\DisbursementVouchers;
 
-use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
+use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 use App\Models\DisbursementVoucher;
-use App\Models\DisbursementVoucherStep;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Filters\Layout;
+use Filament\Forms\Components\Select;
+use App\Models\DisbursementVoucherStep;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Illuminate\Support\Facades\DB;
-use Livewire\Component;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Forms\Components\RichEditor;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Concerns\InteractsWithTable;
+use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 
 class DisbursementVouchersIndex extends Component implements HasTable
 {
@@ -23,7 +25,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereForCancellation(false)->whereSignatoryId(auth()->id());
+        return DisbursementVoucher::whereSignatoryId(auth()->id())->latest();
     }
 
     protected function getTableColumns()
@@ -32,6 +34,26 @@ class DisbursementVouchersIndex extends Component implements HasTable
             ...$this->officeTableColumns(),
             TextColumn::make('status')->formatStateUsing(fn ($record) => ($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign'),
         ];
+    }
+
+    protected function getTableFilters(): array
+    {
+        return [
+            SelectFilter::make('for_cancellation')->options([
+                true => 'For Cancellation',
+                false => 'For Approval',
+            ])->default(0)->label('Status'),
+        ];
+    }
+
+    protected function getTableFiltersFormColumns(): int
+    {
+        return 1;
+    }
+
+    protected function getTableFiltersLayout(): ?string
+    {
+        return Layout::AboveContent;
     }
 
     public function getTableActions()
@@ -56,7 +78,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 3000;
+                    return $record->current_step_id == 3000 && $record->for_cancellation == false;
                 })
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
@@ -91,7 +113,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000;
+                    return $record->current_step_id == 4000 && $record->for_cancellation == false;
                 })
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
@@ -119,7 +141,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000;
+                    return $record->current_step_id == 4000 && $record->for_cancellation == false;
                 })
                 ->form(function () {
                     return [

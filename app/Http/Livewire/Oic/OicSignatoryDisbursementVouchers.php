@@ -25,7 +25,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereForCancellation(false);
+        return DisbursementVoucher::query();
     }
 
     protected function getTableColumns()
@@ -46,6 +46,10 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 ->query(function ($query, $state) {
                     $query->where('signatory_id', $state);
                 }),
+            SelectFilter::make('for_cancellation')->options([
+                true => 'For Cancellation',
+                false => 'For Approval',
+            ])->default(0)->label('Status'),
         ];
     }
 
@@ -71,7 +75,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 3000;
+                    return $record->current_step_id == 3000 && $record->for_cancellation == false;
                 })
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
@@ -106,7 +110,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000;
+                    return $record->current_step_id == 4000 && $record->for_cancellation == false;
                 })
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
@@ -134,7 +138,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000;
+                    return $record->current_step_id == 4000 && $record->for_cancellation == false;
                 })
                 ->form(function () {
                     return [
@@ -155,7 +159,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
 
     protected function getTableFiltersFormColumns(): int
     {
-        return 1;
+        return 2;
     }
 
     protected function getTableFiltersLayout(): ?string

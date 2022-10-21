@@ -125,7 +125,7 @@ trait OfficeDashboardActions
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 6000 && $record->voucher_subtype->related_documents_list && blank($record->related_documents);
+                    return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype->related_documents_list && blank($record->related_documents);
                 })
 
         ];
@@ -155,7 +155,7 @@ trait OfficeDashboardActions
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 17000 && blank($record->cheque_number);
+                    return $record->current_step_id == 17000 && blank($record->cheque_number) && $record->for_cancellation == false;
                 })
                 ->form(function () {
                     return [
@@ -193,7 +193,7 @@ trait OfficeDashboardActions
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 12000 && blank($record->journal_date) && blank($record->dv_number);
+                    return $record->current_step_id == 12000 && blank($record->journal_date) && blank($record->dv_number) && $record->for_cancellation == false;
                 })
                 ->form(function () {
                     return [
@@ -233,7 +233,7 @@ trait OfficeDashboardActions
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 9000 && (blank($record->ors_burs) || blank($record->fund_cluster_id));
+                    return $record->current_step_id == 9000 && (blank($record->ors_burs) || blank($record->fund_cluster_id)) && $record->for_cancellation == false;
                 })
                 ->form(function ($record) {
                     return [
@@ -289,7 +289,7 @@ trait OfficeDashboardActions
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step->process == 'Forwarded to';
+                    return $record->current_step->process == 'Forwarded to' && $record->for_cancellation == false;
                 })
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
@@ -338,7 +338,7 @@ trait OfficeDashboardActions
                     ];
                 })
                 ->modalWidth('4xl')
-                ->visible(fn ($record) => $this->canBeForwarded($record))
+                ->visible(fn ($record) => $this->canBeForwarded($record) && $record->for_cancellation == false)
                 ->requiresConfirmation(),
         ];
     }

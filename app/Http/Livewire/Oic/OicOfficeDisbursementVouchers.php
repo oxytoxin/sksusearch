@@ -30,7 +30,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereForCancellation(false);
+        return DisbursementVoucher::where('current_step_id', '>=', 4000);
     }
 
     public function getTableColumns()
@@ -50,6 +50,10 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                 ->query(function ($query, $state) {
                     $query->whereRelation('current_step', 'office_id', '=', User::find($state)->first()?->employee_information->office_id);
                 }),
+            SelectFilter::make('for_cancellation')->options([
+                true => 'For Cancellation',
+                false => 'For Approval',
+            ])->default(0)->label('Status'),
         ];
     }
 
@@ -76,7 +80,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
-                ->visible(fn ($record, $livewire) => $record->current_step_id == 13000 && !$record->certified_by_accountant && User::find($livewire->tableFilters['as']['value'])?->employee_information->position_id == 12)
+                ->visible(fn ($record, $livewire) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && User::find($livewire->tableFilters['as']['value'])?->employee_information->position_id == 12)
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
@@ -102,7 +106,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
-                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to')
+                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false)
                 ->form(function () {
                     return [
                         Select::make('return_step_id')
@@ -122,7 +126,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
 
     protected function getTableFiltersFormColumns(): int
     {
-        return 1;
+        return 2;
     }
 
     protected function getTableFiltersLayout(): ?string
