@@ -35,6 +35,13 @@ class PettyCashVouchersCreate extends Component implements HasForms
 
     protected function getFormSchema(): array
     {
+        $balance = PettyCashFundRecord::wherePettyCashFundId($this->petty_cash_fund->id)->latest()->first()?->running_balance;
+        if ($balance > $this->petty_cash_fund->voucher_limit) {
+            $limit = $this->petty_cash_fund->voucher_limit;
+        } else {
+            $limit = $balance;
+        }
+
         return [
             Select::make('requisitioner_id')->label('Requisitioner')->searchable()->required()->options(EmployeeInformation::pluck('full_name', 'user_id')),
             Select::make('signatory_id')->label('Signatory')->searchable()->required()->options(EmployeeInformation::pluck('full_name', 'user_id')),
@@ -42,9 +49,10 @@ class PettyCashVouchersCreate extends Component implements HasForms
                 TextInput::make('entity_name')->default('SKSU'),
                 Select::make('fund_cluster_id')->label('Fund Cluster')->required()->options(FundCluster::pluck('name', 'id')),
                 TextInput::make('payee')->required(),
+                TextInput::make('address')->maxLength(191),
                 TextInput::make('responsibility_center')->required(),
             ]),
-            TextInput::make('grand_total')->maxValue($this->petty_cash_fund->voucher_limit)->disabled()->default(0)->extraInputAttributes(['class' => 'text-right'])->numeric(),
+            TextInput::make('grand_total')->maxValue($balance)->disabled()->default(0)->extraInputAttributes(['class' => 'text-right'])->numeric(),
             SlimRepeater::make('particulars')->schema([
                 TextInput::make('name')->required()->disableLabel(),
                 TextInput::make('amount')->numeric()->required()->disableLabel(),
@@ -78,6 +86,7 @@ class PettyCashVouchersCreate extends Component implements HasForms
             'pcv_number' => $pcv_number,
             'pcv_date' => now(),
             'payee' => $this->data['payee'],
+            'address' => $this->data['address'],
             'responsibility_center' => $this->data['responsibility_center'],
             'particulars' => collect($this->data['particulars'])->values(),
             'amount_granted' => collect($this->data['particulars'])->sum('amount'),

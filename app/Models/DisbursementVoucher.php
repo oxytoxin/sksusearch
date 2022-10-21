@@ -16,6 +16,9 @@ class DisbursementVoucher extends Model
         'submitted_at' => 'immutable_date',
         'due_date' => 'immutable_date',
         'journal_date' => 'immutable_date',
+        'certified_by_accountant' => 'boolean',
+        'for_cancellation' => 'boolean',
+        'cancelled_at' => 'immutable_datetime',
         'draft' => 'array',
         'related_documents' => 'array',
     ];

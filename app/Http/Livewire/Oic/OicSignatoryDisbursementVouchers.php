@@ -25,7 +25,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::query();
+        return DisbursementVoucher::whereForCancellation(false);
     }
 
     protected function getTableColumns()

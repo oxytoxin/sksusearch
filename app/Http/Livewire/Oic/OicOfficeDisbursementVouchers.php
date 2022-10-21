@@ -30,7 +30,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::query();
+        return DisbursementVoucher::whereForCancellation(false);
     }
 
     public function getTableColumns()

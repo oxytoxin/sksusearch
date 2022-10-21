@@ -22,7 +22,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereUserId(auth()->id());
+        return DisbursementVoucher::whereForCancellation(false)->whereUserId(auth()->id());
     }
 
     protected function getTableColumns()
@@ -93,6 +93,40 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     return $record->current_step_id == 2000;
                 })
                 ->requiresConfirmation(),
+            Action::make('Cancel')->action(function ($record) {
+                DB::beginTransaction();
+                $record->update([
+                    'for_cancellation' => true,
+                ]);
+                $record->refresh();
+                $record->activity_logs()->create([
+                    'description' => 'Cancellation requested by ' . auth()->user()->employee_information->full_name,
+                ]);
+                if ($record->current_step_id < 5000 && $record->previous_step_id < 5000) {
+                    $record->update([
+                        'cancelled_at' => now(),
+                    ]);
+                    $record->activity_logs()->create([
+                        'description' => 'Cancellation approved.',
+                    ]);
+                    DB::commit();
+                    Notification::make()->title('Disbursement voucher cancelled.')->success()->send();
+                    return;
+                }
+                DB::commit();
+                Notification::make()->title('Disbursement voucher requested for cancellation.')->success()->send();
+            })
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->current_step_id == 3000;
+                })
+                ->visible(fn ($record) => !$record->cheque_number)
+                ->requiresConfirmation()
+                ->button()
+                ->color('danger'),
             ...$this->viewActions(),
         ];
     }

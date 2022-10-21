@@ -33,7 +33,7 @@ class OfficeDashboard extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereRelation('current_step', 'office_id', '=', auth()->user()->employee_information->office_id)->latest();
+        return DisbursementVoucher::whereForCancellation(false)->whereRelation('current_step', 'office_id', '=', auth()->user()->employee_information->office_id)->latest();
     }
 
     protected function getTableColumns()

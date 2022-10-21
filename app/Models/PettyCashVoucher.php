@@ -33,6 +33,13 @@ class PettyCashVoucher extends Model
         );
     }
 
+    protected function netAmount(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->amount_granted - $this->amount_paid,
+        );
+    }
+
     public function petty_cash_fund_records()
     {
         return $this->morphMany(PettyCashFundRecord::class, 'recordable');
@@ -46,6 +53,11 @@ class PettyCashVoucher extends Model
     public function petty_cash_fund()
     {
         return $this->belongsTo(PettyCashFund::class);
+    }
+
+    public function fund_cluster()
+    {
+        return $this->belongsTo(FundCluster::class);
     }
 
     public function requisitioner()

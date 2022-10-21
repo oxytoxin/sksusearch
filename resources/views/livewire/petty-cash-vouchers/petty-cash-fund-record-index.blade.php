@@ -1,5 +1,8 @@
 <div x-data>
-    <div>
+    <div class="flex">
+        <h2 class="font-light capitalize text-primary-600">Petty Cash Vouchers / Petty Cash Fund Record</h2>
+    </div>
+    <div class="p-4 mt-4 bg-white rounded shadow">
         {{ $this->form }}
         <div class="flex justify-end mt-4">
             <x-filament::button @click="printOut($refs.printContainer.outerHTML);">Print</x-filament::button>
