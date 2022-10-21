@@ -8,7 +8,7 @@
                         <div class="flex mt-1 ml-1">
                             <div class="flow-root my-auto">
                                 <div class="inline-block mr-2">
-                                    <img src="http://sksu.edu.ph/wp-content/uploads/2020/09/512x512-1.png" alt="sksu logo" class="object-scale-down h-full mx-auto w-14">
+                                    <img src="{{ asset('images/sksulogo.png') }}" alt="sksu logo" class="object-scale-down h-full mx-auto w-14">
                                     <span class="text-xs text-center text-black print:text-8">SKSU Works for Success!</span>
                                     {{-- <span class="text-xs font-bold text-center text-black"> ISO 9001:2015</span> --}}
                                 </div>
@@ -125,32 +125,32 @@
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-10">
                     <div class="w-1/2 pl-2 text-left border-r-2 border-black h-44">
-                        <div class="flex flex-col">                                                            
-                        @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                            <span>{{ $particular->purpose }}</span>
-                        @endforeach
+                        <div class="flex flex-col">
+                            @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
+                                <span>{{ $particular->purpose }}</span>
+                            @endforeach
                         </div>
                     </div>
                     <div class="w-64 text-center border-r-2 border-black h-44">
-                        <div class="flex flex-col">                                                        
-                        @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                            <span>{{ $particular->responsibility_center }}</span>
-                        @endforeach
-                            </div>
+                        <div class="flex flex-col">
+                            @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
+                                <span>{{ $particular->responsibility_center }}</span>
+                            @endforeach
+                        </div>
                     </div>
                     <div class="text-center border-r-2 border-black h-44 w-36">
-                        <div class="flex flex-col">                            
-                        @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                            <span>{{ $particular->mfo_pap }}</span>
-                        @endforeach
-                            </div>
+                        <div class="flex flex-col">
+                            @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
+                                <span>{{ $particular->mfo_pap }}</span>
+                            @endforeach
+                        </div>
                     </div>
                     <div class="text-right h-44 w-36">
-                        <div class="flex flex-col">                            
-                        @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                            <span>{{ $particular->amount }}</span>
-                        @endforeach
-                            </div>
+                        <div class="flex flex-col">
+                            @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
+                                <span>{{ $particular->amount }}</span>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-black print:text-12">
