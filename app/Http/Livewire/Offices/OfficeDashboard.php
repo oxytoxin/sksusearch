@@ -21,8 +21,8 @@ class OfficeDashboard extends Component implements HasTable
 
     public function mount()
     {
-        if (!in_array(auth()->user()->employee_information?->office_id, [2, 3, 5, 51, 52])) {
-            abort(403);
+        if (!in_array(auth()->user()->employee_information?->office->office_group_id, [1, 2, 3, 4, 5])) {
+            abort(403, 'You are not allowed to access this page.');
         }
     }
 
@@ -33,7 +33,7 @@ class OfficeDashboard extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereForCancellation(false)->whereRelation('current_step', 'office_id', '=', auth()->user()->employee_information->office_id)->latest();
+        return DisbursementVoucher::whereForCancellation(false)->whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest();
     }
 
     protected function getTableColumns()

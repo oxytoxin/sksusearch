@@ -17,7 +17,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        $office_final_step_id = auth()->user()->employee_information->office->disbursement_voucher_final_step->id;
+        $office_final_step_id = auth()->user()->employee_information->office->office_group->disbursement_voucher_final_step->id;
         return DisbursementVoucher::whereForCancellation(false)->where('current_step_id', '>', $office_final_step_id)->latest();
     }
 
