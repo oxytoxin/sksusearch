@@ -18,4 +18,9 @@ class OfficeGroup extends Model
     {
         return $this->hasOne(DisbursementVoucherStep::class)->ofMany('id', 'MAX');
     }
+
+    public function disbursement_voucher_steps()
+    {
+        return $this->hasMany(DisbursementVoucherStep::class);
+    }
 }

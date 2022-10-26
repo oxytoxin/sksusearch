@@ -2,18 +2,20 @@
 
 namespace App\Http\Livewire\Offices;
 
-use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
-use App\Models\DisbursementVoucher;
-use App\Models\DisbursementVoucherStep;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Notifications\Notification;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
+use App\Models\DisbursementVoucher;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Layout;
+use Filament\Forms\Components\Select;
+use App\Models\DisbursementVoucherStep;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Notifications\Notification;
+use Filament\Forms\Components\RichEditor;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Concerns\InteractsWithTable;
+use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 
 class OfficeDashboard extends Component implements HasTable
 {
@@ -33,7 +35,28 @@ class OfficeDashboard extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereForCancellation(false)->whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest();
+        return DisbursementVoucher::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest();
+    }
+
+    protected function getTableFilters(): array
+    {
+        return [
+            SelectFilter::make('for_cancellation')->options([
+                true => 'For Cancellation',
+                false => 'For Approval',
+            ])->default(0)->label('Status'),
+        ];
+    }
+
+
+    protected function getTableFiltersFormColumns(): int
+    {
+        return 2;
+    }
+
+    protected function getTableFiltersLayout(): ?string
+    {
+        return Layout::AboveContent;
     }
 
     protected function getTableColumns()
@@ -98,6 +121,30 @@ class OfficeDashboard extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
+            Action::make('Cancel')->action(function ($record) {
+                DB::beginTransaction();
+                $process_ids = DisbursementVoucherStep::where('process', 'Received by')->orWhere('process', 'Received in')->pluck('id');
+                $next_step = $process_ids->last(fn ($value) => $value < auth()->user()->employee_information->office->office_group->disbursement_voucher_starting_step->id);
+                $record->update([
+                    'current_step_id' => $next_step,
+                ]);
+                $record->activity_logs()->create([
+                    'description' => 'Cancellation approved by ' . auth()->user()->employee_information->full_name,
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement voucher approved for cancellation.')->success()->send();
+                return;
+            })
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->for_cancellation && !$record->cancelled_at;
+                })
+                ->requiresConfirmation()
+                ->button()
+                ->color('danger'),
             ...$this->viewActions(),
 
         ];

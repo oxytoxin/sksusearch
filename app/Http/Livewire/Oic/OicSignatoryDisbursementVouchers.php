@@ -32,7 +32,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
     {
         return [
             ...$this->officeTableColumns(),
-            TextColumn::make('status')->formatStateUsing(fn ($record) => ($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign'),
+            TextColumn::make('status')->formatStateUsing(fn ($record) => $record->cancelled_at ? 'Cancelled' : (($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign')),
         ];
     }
 
@@ -49,7 +49,8 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
             SelectFilter::make('for_cancellation')->options([
                 true => 'For Cancellation',
                 false => 'For Approval',
-            ])->default(0)->label('Status'),
+            ])
+                ->default(0)->label('Status'),
         ];
     }
 
@@ -153,6 +154,27 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
+            Action::make('Cancel')->action(function ($record) {
+                DB::beginTransaction();
+                $record->update([
+                    'cancelled_at' => now(),
+                ]);
+                $record->activity_logs()->create([
+                    'description' => 'Cancellation approved by OIC:' . auth()->user()->employee_information->full_name,
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement voucher cancelled.')->success()->send();
+            })
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->current_step_id == 4000 && $record->for_cancellation && !$record->cancelled_at;
+                })
+                ->requiresConfirmation()
+                ->button()
+                ->color('danger'),
             ...$this->viewActions(),
         ];
     }

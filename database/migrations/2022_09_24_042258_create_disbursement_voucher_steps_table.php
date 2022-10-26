@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('process');
             $table->string('recipient');
             $table->string('sender')->nullable();
-            $table->foreignId('office_id')->nullable()->index();
             $table->integer('return_step_id');
             $table->timestamps();
         });
