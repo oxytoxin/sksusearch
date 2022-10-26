@@ -13,4 +13,9 @@ use Illuminate\Database\Eloquent\Model;
 class CreatePettyCashFund extends CreateRecord
 {
     protected static string $resource = PettyCashFundResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
