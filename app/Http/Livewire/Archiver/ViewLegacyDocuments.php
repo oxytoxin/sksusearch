@@ -40,6 +40,15 @@ class ViewLegacyDocuments extends Component implements HasTable
                 ->label('Journal Date')
                 ->date()
                 ->searchable(),
+            TextColumn::make('document_category')
+                ->label('Journal Date')
+                ->enum([
+                    '1' => 'Disbursement Voucher',
+                    '2' => 'Liquidation Report',
+                    '3' => 'Cancelled Cheque',
+                    '4' => 'Staled Cheque',
+                ])
+                ->searchable(),
 
         ];
     }
@@ -52,7 +61,8 @@ class ViewLegacyDocuments extends Component implements HasTable
                     ->label('View Details')
                     ->icon('ri-list-check-2'),
                 ViewAction::make('legacy_document_preview')
-                    ->label('Preview Documents')
+                    ->label('View Scanned Documents')
+                    ->url(fn (LegacyDocument $record): string => route('archiver.view-scanned-docs-lgc', [$record]))
                     ->icon('ri-file-copy-2-line'),
                 ViewAction::make('legacy_document_generate_qr')
                     ->label('Generate QR')
@@ -62,9 +72,11 @@ class ViewLegacyDocuments extends Component implements HasTable
                     ]))
                     ->modalWidth('xs')
                     ->icon('ri-qr-code-line'),
-            ])->icon('ri-eye-line'),
-            EditAction::make('legacy_document_edit')
-                ->label('Edit'),
+                EditAction::make('legacy_document_edit')
+                    ->label('Edit')
+                    ->icon('ri-edit-2-line'),
+            ])->icon('ri-flashlight-fill'),
+            
         ];
     }
     public function render()

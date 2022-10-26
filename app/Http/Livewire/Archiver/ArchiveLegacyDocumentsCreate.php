@@ -44,24 +44,20 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
         return[
                 Section::make("Document Details")
                 ->schema([
-                   Grid::make(5)
+                   Grid::make(4)
                    ->schema([
                     Select::make("document_category")
                     ->required()
                     ->preload()
                     ->options(
-                    ['dv' => 'Disbursement Voucher',
-                    'liq' => 'Liquidation Report',
-                    'cancelled_cheque' => 'Cancelled Cheque',
-                    'staled_cheque' => 'Staled Cheque',
+                    ['1' => 'Disbursement Voucher',
+                    '2' => 'Liquidation Report',
+                    '3' => 'Cancelled Cheque',
+                    '4' => 'Staled Cheque',
                     ])
                     ->reactive()
-                    ->afterStateUpdated(function ($set, $state) {
-                        $code = FundCluster::find($state);
-                        $set('document_code', $code->name.'-00-00-0000');
-    
-                    })
                     ->columnSpan(1),
+
                     Select::make("fund_cluster")
                     ->required()
                     ->preload()
@@ -76,7 +72,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
 
                     TextInput::make("document_code")
                     ->label("Document Code")
-                    ->columnSpan(3)
+                    ->columnSpan(2)
                     ->required()
                     ->mask(fn (TextInput\Mask $mask) => $mask->pattern('000-00-00-0000'))
                     ->placeholder('000-00-00-0000'),
@@ -154,6 +150,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
             'journal_date' => $this->journal_date,
             'upload_date' => now()->format('Y-m-d'),
             'fund_cluster_id' => $this->fund_cluster,
+            'document_category' => $this->document_category,
         ]);
 
         //save Files from fileupload

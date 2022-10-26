@@ -14,7 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('legacy_documents', function (Blueprint $table) {
-            $table->string('document_category')->nullable()->after('fund_cluster_id');
+            $table->foreignId('document_category')
+            ->after('fund_cluster_id')
+            ->default(1);
         });
     }
 
