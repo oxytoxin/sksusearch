@@ -8,6 +8,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\MultiSelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
@@ -16,6 +17,15 @@ class ViewArchives extends Component implements HasTable
 {
     use InteractsWithTable;
 
+    protected function getTableFilters(): array
+    {
+        return [
+            MultiSelectFilter::make('fund_cluster.name')
+            ->label('Fund Cluster')
+            ->relationship('fund_cluster', 'name')
+            
+        ];
+    }
     protected function getTableQuery()
     {
         return DisbursementVoucher::where('current_step_id','>=','23000');

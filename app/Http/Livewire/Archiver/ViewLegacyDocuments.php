@@ -11,6 +11,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\Layout;
+use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Tables\Filters\SelectFilter;
 use Livewire\Component;
 
 class ViewLegacyDocuments extends Component implements HasTable
@@ -22,6 +26,23 @@ class ViewLegacyDocuments extends Component implements HasTable
         return LegacyDocument::query();
     }
 
+    protected function getTableFilters(): array
+    {
+        return [
+            SelectFilter::make('document_category')
+            ->options([
+                '1' => 'Disbursement Voucher',
+                '2' => 'Liquidation Report',
+                '3' => 'Cancelled Cheque',
+                '4' => 'Staled Cheque',
+            ]),
+            MultiSelectFilter::make('fund_cluster.name')
+            ->label('Fund Cluster')
+            ->relationship('fund_cluster', 'name')
+            
+        ];
+    }
+    
     protected function getTableColumns()
     {
         return [
