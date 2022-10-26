@@ -29,7 +29,7 @@ class ViewLegacyDocuments extends Component implements HasTable
     protected function getTableFilters(): array
     {
         return [
-            SelectFilter::make('document_category')
+            MultiSelectFilter::make('document_category')
             ->options([
                 '1' => 'Disbursement Voucher',
                 '2' => 'Liquidation Report',
