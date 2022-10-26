@@ -44,9 +44,24 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
         return[
                 Section::make("Document Details")
                 ->schema([
-                   Grid::make(4)
+                   Grid::make(5)
                    ->schema([
-
+                    Select::make("document_category")
+                    ->required()
+                    ->preload()
+                    ->options(
+                    ['dv' => 'Disbursement Voucher',
+                    'liq' => 'Liquidation Report',
+                    'cancelled_cheque' => 'Cancelled Cheque',
+                    'staled_cheque' => 'Staled Cheque',
+                    ])
+                    ->reactive()
+                    ->afterStateUpdated(function ($set, $state) {
+                        $code = FundCluster::find($state);
+                        $set('document_code', $code->name.'-00-00-0000');
+    
+                    })
+                    ->columnSpan(1),
                     Select::make("fund_cluster")
                     ->required()
                     ->preload()

@@ -117,7 +117,7 @@ class ArchiveDocumentsCreate extends Component implements HasForms
         DB::commit();
         Notification::make()->title('Operation Success')->body('Documents have been archived successfully')->success()->send();
 
-        return redirect()->route('archiver.archive-leg-doc.create');
+        return redirect()->route('archiver.archive-doc.create');
     
     }
 
