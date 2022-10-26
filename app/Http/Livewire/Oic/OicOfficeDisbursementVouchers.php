@@ -30,7 +30,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::where('current_step_id', '>=', 4000);
+        return DisbursementVoucher::where('current_step_id', '>', 4000);
     }
 
     public function getTableColumns()
@@ -120,6 +120,30 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
+            Action::make('Cancel')->action(function ($record) {
+                DB::beginTransaction();
+                $process_ids = DisbursementVoucherStep::where('process', 'Received by')->orWhere('process', 'Received in')->pluck('id');
+                $next_step = $process_ids->last(fn ($value) => $value < EmployeeInformation::firstWhere('user_id', $this->tableFilters['as']['value'])->office->office_group->disbursement_voucher_starting_step->id);
+                $record->update([
+                    'current_step_id' => $next_step,
+                ]);
+                $record->activity_logs()->create([
+                    'description' => 'Cancellation approved by OIC:' . auth()->user()->employee_information->full_name,
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement voucher approved for cancellation.')->success()->send();
+                return;
+            })
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->for_cancellation && !$record->cancelled_at;
+                })
+                ->requiresConfirmation()
+                ->button()
+                ->color('danger'),
             ...$this->viewActions(),
         ];
     }

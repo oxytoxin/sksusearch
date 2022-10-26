@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCancelled;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCreate;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersIndex;
 use App\Http\Livewire\Requisitioner\Itinerary\ItineraryCreate;
@@ -28,5 +29,6 @@ Route::middleware([
     Route::get('/itinerary/{itinerary}', ItineraryShow::class)->name('itinerary.show');
     Route::get('/itinerary/print/{itinerary}', ItineraryPrint::class)->name('itinerary.print');
     Route::get('/disbursement-vouchers', DisbursementVouchersIndex::class)->name('disbursement-vouchers.index');
+    Route::get('/cancelled-disbursement-vouchers', DisbursementVouchersCancelled::class)->name('disbursement-vouchers.cancelled');
     Route::get('/disbursement-vouchers/{voucher_subtype}/create', DisbursementVouchersCreate::class)->name('disbursement-vouchers.create');
 });

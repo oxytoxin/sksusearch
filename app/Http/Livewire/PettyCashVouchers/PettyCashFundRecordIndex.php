@@ -35,19 +35,17 @@ class PettyCashFundRecordIndex extends Component implements HasForms
                 DatePicker::make('date_to')
                     ->default(today())
                     ->reactive()
+                    ->label('Date Until')
                     ->gte('date_from'),
                 TextInput::make('entity_name')
                     ->default('SKSU')
-                    ->reactive(),
-                TextInput::make('report_no')
                     ->reactive(),
                 Select::make('fund_cluster_id')
                     ->placeholder('All')
                     ->reactive()
                     ->label('Fund Cluster')
                     ->options(FundCluster::pluck('name', 'id')),
-                TextInput::make('sheet_no')
-                    ->reactive(),
+
             ])
         ];
     }
