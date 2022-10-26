@@ -1,5 +1,9 @@
 <div>
     <ul role="list" class="divide-y divide-gray-200">
+        <div class="flex-col">
+          <h1 class="font-sans text-xl font-bold tracking-widest capitalize text-primary-700">Scanned Documents</h1>
+          <h2 class="font-sans text-xs font-medium tracking-widest text-gray-600 capitalize">Click document names to open.</h2>
+        </div>
         @foreach ($dv->scanned_documents as $scanned_document)
             <li class="px-4 py-4 sm:px-0">
             <a class="flex w-fit hover:text-primary-600 hover:text-lg hover:font-extrabold" href="{{ asset('storage/'.$scanned_document->path) }}" target="_blank"  x-data="{}" x-tooltip.raw="Click to view file!">
@@ -13,5 +17,5 @@
         @endforeach        
       </ul>
       
-</div>
- 
+  </div>
+  

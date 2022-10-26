@@ -9,9 +9,9 @@ class ViewLgcScannedDocuments extends Component
 {
     public $dv;
     public $scanned_documents;
-    public function mount(LegacyDocument $disbursement_voucher)
+    public function mount(LegacyDocument $legacy_document)
     {
-        $this->dv = $disbursement_voucher;
+        $this->dv = $legacy_document;
     }
     public function render()
     {
