@@ -84,9 +84,8 @@
                         <p class="italic">Requested by:</p>
                     </div>
                     <div class="w-3/4 mx-auto mt-4 text-center">
-                        <div class="border-b border-black">&nbsp;</div>
+                        <div class="border-b border-black">&nbsp;{{ $pcv->requisitioner->employee_information->full_name }}</div>
                         <p>Signature over Printed Name</p>
-                        <p>{{ $pcv->requisitioner->employee_information->full_name }}</p>
                     </div>
                 </div>
                 <div class="flex-1"></div>
@@ -96,9 +95,9 @@
                         <p class="italic">Approved by:</p>
                     </div>
                     <div class="w-3/4 mx-auto mt-4 mb-4 text-center">
-                        <div class="border-b border-black">&nbsp;</div>
+                        <div class="border-b border-black">&nbsp;{{ $pcv->signatory->employee_information->full_name }}</div>
                         <p>Signature over Printed Name</p>
-                        <p>{{ $pcv->signatory->employee_information->full_name }}</p>
+                        <p>&nbsp;</p>
                     </div>
                 </div>
             </div>
@@ -124,7 +123,7 @@
                 </div>
                 <div class="flex-1"></div>
                 <div class="w-3/4 mx-auto mt-8 mb-4 text-center">
-                    <div class="border-b border-black">&nbsp;</div>
+                    <div class="border-b border-black">&nbsp;{{ $pcv->custodian->employee_information->full_name }}</div>
                     <p>Signature over Printed Name</p>
                     <p>Petty Cash Custodian</p>
                 </div>
@@ -136,7 +135,7 @@
                         <p class="italic">Paid by:</p>
                     </div>
                     <div class="w-3/4 mx-auto mt-4 mb-4 text-center">
-                        <div class="border-b border-black">&nbsp;</div>
+                        <div class="border-b border-black">&nbsp;{{ $pcv->custodian->employee_information->full_name }}</div>
                         <p>Signature over Printed Name</p>
                         <p>Petty Cash Custodian</p>
                     </div>
@@ -147,7 +146,7 @@
                         <p class="italic">Cash Received by:</p>
                     </div>
                     <div class="w-3/4 mx-auto mt-4 mb-4 text-center">
-                        <div class="border-b border-black">&nbsp;</div>
+                        <div class="border-b border-black">&nbsp;{{ $pcv->payee }}</div>
                         <p>Signature over Printed Name</p>
                         <p>Payee</p>
                         <p class="flex justify-center">
@@ -161,8 +160,8 @@
                 <div class="grid w-6 h-6 border-b border-r border-black place-items-center">D</div>
                 <div class="flex gap-2 pl-8 mt-2">
                     <div class="relative">
-                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated && $pcv->net_amount >= 0) bg-primary-400 @endif">&nbsp;</div>
-                        @if ($pcv->is_liquidated && $pcv->net_amount >= 0)
+                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated) bg-primary-400 @endif">&nbsp;</div>
+                        @if ($pcv->is_liquidated)
                             <x-ri-check-line class="absolute top-0 left-1" />
                         @endif
                     </div>
@@ -179,7 +178,7 @@
                 </div>
                 <div class="flex-1"></div>
                 <div class="w-3/4 mx-auto mt-4 mb-4 text-center">
-                    <div class="border-b border-black">&nbsp;</div>
+                    <div class="border-b border-black">&nbsp;{{ $pcv->payee }}</div>
                     <p>Signature over Printed Name</p>
                     <p>Payee</p>
                     <p class="flex justify-center">

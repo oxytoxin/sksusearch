@@ -69,4 +69,9 @@ class PettyCashVoucher extends Model
     {
         return $this->belongsTo(User::class, 'signatory_id');
     }
+
+    public function custodian()
+    {
+        return $this->belongsTo(User::class, 'custodian_id');
+    }
 }

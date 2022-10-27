@@ -43,14 +43,20 @@ class PettyCashVouchersCreate extends Component implements HasForms
         }
 
         return [
-            Select::make('requisitioner_id')->label('Requisitioner')->searchable()->required()->options(EmployeeInformation::pluck('full_name', 'user_id')),
+            Select::make('requisitioner_id')
+                ->label('Requisitioner')
+                ->searchable()
+                ->required()
+                ->options(EmployeeInformation::pluck('full_name', 'user_id'))
+                ->reactive()
+                ->afterStateUpdated(fn ($set, $state) => $set('payee', EmployeeInformation::firstWhere('user_id', $state)?->full_name)),
             Select::make('signatory_id')->label('Signatory')->searchable()->required()->options(EmployeeInformation::pluck('full_name', 'user_id')),
             Grid::make(2)->schema([
                 TextInput::make('entity_name')->default('SKSU'),
                 Select::make('fund_cluster_id')->label('Fund Cluster')->required()->options(FundCluster::pluck('name', 'id')),
                 TextInput::make('payee')->required(),
                 TextInput::make('address')->maxLength(191),
-                TextInput::make('responsibility_center')->required(),
+                TextInput::make('responsibility_center'),
             ]),
             TextInput::make('grand_total')->maxValue($balance)->disabled()->default(0)->extraInputAttributes(['class' => 'text-right'])->numeric(),
             SlimRepeater::make('particulars')->schema([
@@ -71,6 +77,11 @@ class PettyCashVouchersCreate extends Component implements HasForms
         $this->petty_cash_fund->refresh();
         if ($this->petty_cash_fund->latest_petty_cash_fund_record?->running_balance < $this->data['grand_total']) {
             Notification::make()->title('Insufficient petty cash fund balance.')->danger()->send();
+            return;
+        }
+
+        if (collect($this->data['particulars'])->sum('amount') > $this->petty_cash_fund->voucher_limit) {
+            Notification::make()->title('Petty cash voucher is above voucher limit.')->danger()->send();
             return;
         }
         DB::beginTransaction();

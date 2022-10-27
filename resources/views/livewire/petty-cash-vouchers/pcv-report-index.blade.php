@@ -33,14 +33,16 @@
                 </thead>
                 <tbody class="">
                     @forelse ($petty_cash_vouchers as $voucher)
-                        @foreach ($voucher->particulars as $particular)
-                            <tr class="border border-collapse border-black divide-x divide-black">
-                                <td class="px-2">{{ date_format(date_create($voucher->pcv_date), 'm/d/y') }}</td>
-                                <td class="px-2">{{ $voucher->pcv_number }}</td>
-                                <td class="px-2 text-center">{{ $particular['name'] }}</td>
-                                <td class="px-2 text-right">P{{ number_format($particular['amount'], 2) }}</td>
-                            </tr>
-                        @endforeach
+                        <tr class="border border-collapse border-black divide-x divide-black">
+                            <td class="px-2">{{ date_format(date_create($voucher->pcv_date), 'm/d/y') }}</td>
+                            <td class="px-2">{{ $voucher->pcv_number }}</td>
+                            <td class="px-2 text-center">
+                                @foreach ($voucher->particulars as $particular)
+                                    {{ $particular['name'] }}<br>
+                                @endforeach
+                            </td>
+                            <td class="px-2 text-right">P{{ number_format($voucher->amount_paid, 2) }}</td>
+                        </tr>
                     @empty
                         <tr class="border border-collapse border-black divide-x divide-black">
                             <td colspan="4" class="px-2 max-w-[4rem] text-center">No records found.</td>

@@ -51,10 +51,14 @@ class PettyCashVouchersIndex extends Component implements HasTable
                 ->button()
                 ->outlined()
                 ->action(function ($record, $data) {
-                    if (PettyCashFundRecord::wherePettyCashFundId($record->petty_cash_fund_id)->latest()->first()?->running_balance - $data['amount_paid'] < 0) {
-                        Notification::make()->title('Insufficient petty cash fund balance for reimbursement.')->warning()->send();
-                        return;
+                    if ($data['amount_paid'] > $record->amount_granted) {
+                        $balance = PettyCashFundRecord::wherePettyCashFundId($record->petty_cash_fund_id)->latest()->first()?->running_balance;
+                        if ($balance - ($data['amount_paid'] - $record->amount_granted) < 0) {
+                            Notification::make()->title('Insufficient petty cash fund balance for reimbursement.')->warning()->send();
+                            return;
+                        }
                     }
+
                     DB::beginTransaction();
                     $record->update([
                         'amount_paid' => $data['amount_paid'],
