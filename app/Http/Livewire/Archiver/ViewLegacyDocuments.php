@@ -61,6 +61,10 @@ class ViewLegacyDocuments extends Component implements HasTable
                 ->label('Journal Date')
                 ->date()
                 ->searchable(),
+            TextColumn::make('cheque_no')
+                ->label('Cheque Number')
+                ->date()
+                ->searchable(),
             TextColumn::make('document_category')
                 ->label('Journal Date')
                 ->enum([
