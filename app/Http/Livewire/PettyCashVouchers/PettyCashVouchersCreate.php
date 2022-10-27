@@ -79,6 +79,11 @@ class PettyCashVouchersCreate extends Component implements HasForms
             Notification::make()->title('Insufficient petty cash fund balance.')->danger()->send();
             return;
         }
+
+        if (collect($this->data['particulars'])->sum('amount') > $this->petty_cash_fund->voucher_limit) {
+            Notification::make()->title('Petty cash voucher is above voucher limit.')->danger()->send();
+            return;
+        }
         DB::beginTransaction();
         $pcv_number = PettyCashVoucher::generateTrackingNumber($this->petty_cash_fund);
         $pcv = PettyCashVoucher::create([

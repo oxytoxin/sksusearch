@@ -69,7 +69,8 @@ class PcvReportIndex extends Component implements HasForms
         return view('livewire.petty-cash-vouchers.pcv-report-index', [
             'fund_clusters' => FundCluster::all(),
             'petty_cash_vouchers' => PettyCashVoucher::query()
-                ->whereRelation('petty_cash_fund', 'campus_id', $this->petty_cash_fund->campus_id)
+                ->where('petty_cash_fund_id', $this->petty_cash_fund->id)
+                ->whereIsLiquidated(true)
                 ->when($this->data['fund_cluster_id'], fn ($query) => $query->where('fund_cluster_id', $this->data['fund_cluster_id']))
                 ->whereBetween('pcv_date', [$this->data['date_from'], Carbon::make($this->data['date_to'])->addDay()])
                 ->orderBy('pcv_date')
