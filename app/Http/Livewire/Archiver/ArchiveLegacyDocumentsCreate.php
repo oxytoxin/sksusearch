@@ -27,6 +27,14 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
 
     public $document_code;
 
+    public $document_category;
+    
+    public $cheque_no;
+
+    public $cheque_amt;
+
+    public $cheque_date;
+
     public $journal_date;
 
     public $particulars =[];
@@ -36,8 +44,8 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
     public $dv_number;
     
     public $payee;
-    
-    public $cheque_no;
+
+    public $cheque_state;
 
     protected function getFormSchema(): array
     {
@@ -49,11 +57,10 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     Select::make("document_category")
                     ->required()
                     ->preload()
+                    ->default(1)
                     ->options(
                     ['1' => 'Disbursement Voucher',
                     '2' => 'Liquidation Report',
-                    '3' => 'Cancelled Cheque',
-                    '4' => 'Staled Cheque',
                     ])
                     ->reactive()
                     ->columnSpan(1),
@@ -63,6 +70,8 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->preload()
                     ->options(FundCluster::all()->pluck('name', 'id'))
                     ->reactive()
+                    ->required(fn () => in_array($this->document_category,['1','2']))
+                    ->visible(fn () => in_array($this->document_category,['1','2']))
                     ->afterStateUpdated(function ($set, $state) {
                         $code = FundCluster::find($state);
                         $set('document_code', $code->name.'-00-00-0000');
@@ -73,8 +82,10 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     TextInput::make("document_code")
                     ->label("Document Code")
                     ->columnSpan(2)
-                    ->required()
                     ->mask(fn (TextInput\Mask $mask) => $mask->pattern('000-00-00-0000'))
+                    ->unique('App\Models\LegacyDocument')
+                    ->required(fn () => in_array($this->document_category,['1','2']))
+                    ->visible(fn () => in_array($this->document_category,['1','2']))
                     ->placeholder('000-00-00-0000'),
 
                     TextInput::make("payee")
@@ -87,26 +98,63 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->label("ADA / CHEQUE NO")
                     ->placeholder("0000000")
                     ->required()
-                    ->columnSpan(2),
+                    ->columnSpan(1),
+
+                    TextInput::make("cheque_amt")
+                    ->label("Cheque Amount")
+                    ->placeholder("00000.00")
+                    ->numeric()
+                    ->required()
+                    ->visible()
+                    ->columnSpan(1),
+
+                    Flatpickr::make('cheque_date')
+                    ->label('Cheque Date') 
+                    ->disableTime()
+                    ->required()
+                    ->visible()
+                    ->columnSpan(1),
+                    Select::make("cheque_state")
+                    ->label('Cheque State') 
+                    ->required()
+                    ->preload()
+                    ->options([
+                    '1' => 'Encashed',
+                    '2' => 'Cancelled',
+                    '3' => 'Stale',
+                    ])
+                    ->reactive()
+                    ->default(1)
+                    ->columnSpan(1),
+
 
                     Flatpickr::make('journal_date')
                     ->label('Journal Date') 
                     ->disableTime()
+                    ->required(fn () => in_array($this->document_category,['1','2']))
+                    ->visible(fn () => in_array($this->document_category,['1','2']))
+                    ->columnSpan(1),
+
+                    
+                    TextInput::make("dv_number")
+                    ->label("Disbursement Voucher Number")
+                    ->placeholder("")
                     ->required()
-                    ->columnSpan(2),
+                    ->unique('App\Models\LegacyDocument')
+                    ->required(fn () => in_array($this->document_category,['1','2']))
+                    ->visible(fn () => in_array($this->document_category,['1','2']))
+                    ->columnSpan(3),
 
                     Repeater::make('particulars')
                     ->schema([
                                 Textarea::make('purpose')->required(),
                              ])
                     ->minItems(1)
+                    ->required(fn () => in_array($this->document_category,['1','2']))
+                    ->visible(fn () => in_array($this->document_category,['1','2']))
                     ->columnSpan(4),
                     
-                    TextInput::make("dv_number")
-                    ->label("DV Number")
-                    ->placeholder("")
-                    ->required()
-                    ->columnSpan(1),
+                    
 
                     FileUpload::make('attachment')
                     ->maxSize(50000)
@@ -116,7 +164,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->acceptedFileTypes(['application/pdf'])
                     ->reactive()
                     ->disk('scanned_documents')
-                    ->columnSpan(3)                    
+                    ->columnSpan(4)                    
                    ])
                 ])
 
@@ -124,7 +172,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
     }
     public function mount()
     {
-    
+      
         $this->form->fill();
     
     }
@@ -148,8 +196,12 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
             'particulars' => $dv_particulars,
             'other_details'=>json_encode(''),
             'journal_date' => $this->journal_date,
-            'upload_date' => now()->format('Y-m-d'),
+            'upload_date' => now(),
             'fund_cluster_id' => $this->fund_cluster,
+            'cheque_number' => $this->cheque_no,
+            'cheque_amount' => $this->cheque_amt,
+            'cheque_date' => $this->cheque_date,
+            'cheque_state' => $this->cheque_state,
             'document_category' => $this->document_category,
         ]);
 

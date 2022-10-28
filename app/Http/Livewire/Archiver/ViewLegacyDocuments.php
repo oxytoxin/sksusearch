@@ -33,47 +33,81 @@ class ViewLegacyDocuments extends Component implements HasTable
             ->options([
                 '1' => 'Disbursement Voucher',
                 '2' => 'Liquidation Report',
-                '3' => 'Cancelled Cheque',
-                '4' => 'Staled Cheque',
             ]),
             MultiSelectFilter::make('fund_cluster.name')
             ->label('Fund Cluster')
-            ->relationship('fund_cluster', 'name')
-            
+            ->relationship('fund_cluster', 'name'),
+            MultiSelectFilter::make('cheque_state')
+            ->options([
+                '1' => 'Encashed',
+                '2' => 'Cancelled',
+                '3' => 'Stale',
+            ]),
         ];
     }
     
     protected function getTableColumns()
     {
         return [
-            TextColumn::make('payee_name')->label('Payee')->searchable(),
-            TextColumn::make('document_code')->label('Document Code')
-                ->searchable(),
-            TextColumn::make('dv_number')->label('DV Number')
-                ->searchable(),
-            TextColumn::make('fund_cluster.name')->label('Fund Cluster')
-                ->searchable(),
+            TextColumn::make('document_code')
+                ->label('Document Code')
+                ->searchable()
+                ->sortable(),
+
+            TextColumn::make('dv_number')
+                ->label('DV Number')
+                ->searchable()
+                ->sortable(),
+
+            TextColumn::make('payee_name')
+                ->label('Payee')
+                ->searchable()
+                ->sortable(),
+
             ViewColumn::make('particulars')
                 ->view('components.archiver.tables.columns.particulars-viewer')
                 ->label('Particular(s)')
-                ->searchable(),
+                ->searchable()
+                ->sortable(),
+
             TextColumn::make('journal_date')
                 ->label('Journal Date')
                 ->date()
-                ->searchable(),
-            TextColumn::make('cheque_no')
+                ->searchable()
+                ->sortable(),
+
+            TextColumn::make('cheque_number')
                 ->label('Cheque Number')
-                ->date()
                 ->searchable(),
+
+            TextColumn::make('cheque_amount')
+                ->label('Cheque Amount')
+                ->sortable()
+                ->searchable(),
+
+            TextColumn::make('cheque_date')
+                ->label('Cheque Date')
+                ->date()
+                ->sortable()
+                ->searchable(),
+           
+            TextColumn::make('cheque_state')
+                ->label('Cheque State')
+                ->enum([
+                    '1' => 'Encashed',
+                    '2' => 'Cancelled',
+                    '3' => 'Stale',
+                ]),
+            TextColumn::make('fund_cluster.name')->label('Fund Cluster')
+                ->searchable()->sortable(),
+
             TextColumn::make('document_category')
-                ->label('Journal Date')
+                ->label('Document Category')
                 ->enum([
                     '1' => 'Disbursement Voucher',
                     '2' => 'Liquidation Report',
-                    '3' => 'Cancelled Cheque',
-                    '4' => 'Staled Cheque',
                 ])
-                ->searchable(),
+                ->searchable()->sortable(),
 
         ];
     }
