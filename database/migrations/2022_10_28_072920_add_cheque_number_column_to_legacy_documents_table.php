@@ -32,7 +32,7 @@ return new class extends Migration
             $table->dropColumn('cheque_number');
             $table->dropColumn('cheque_amount');
             $table->dropColumn('cheque_date');
-
+            $table->dropColumn('cheque_state');
         });
     }
 };
