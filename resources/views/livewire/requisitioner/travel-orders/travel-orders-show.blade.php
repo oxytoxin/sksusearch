@@ -3,17 +3,21 @@
     <div id="print_to" class="col-span-2">
         <div class="flex justify-between w-full p-6 border-b-4 border-black print:flex">
             <div id="header" class="flex w-full ml-3 text-left">
-                <div class="inline my-auto"><img src="{{ asset('images/sksulogo.png') }}" alt="sksu logo" class="object-scale-down w-20 h-full">
+                <div class="inline my-auto"><img src="{{ asset('images/sksulogo.png') }}" alt="sksu logo"
+                        class="object-scale-down w-20 h-full">
                 </div>
                 <div class="my-auto ml-3">
                     <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-left text-black">Republic of the Philippines</span>
+                        <span class="text-sm font-semibold tracking-wide text-left text-black">Republic of the
+                            Philippines</span>
                     </div>
                     <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-left uppercase text-primary-600">sultan kudarat state university</span>
+                        <span class="text-sm font-semibold tracking-wide text-left uppercase text-primary-600">sultan
+                            kudarat state university</span>
                     </div>
                     <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-black">ACCESS, EJC Montilla, 9800 City of Tacurong</span>
+                        <span class="text-sm font-semibold tracking-wide text-black">ACCESS, EJC Montilla, 9800 City of
+                            Tacurong</span>
                     </div>
                     <div class="block">
                         <span class="text-sm font-semibold tracking-wide text-black">Province of Sultan Kudarat</span>
@@ -22,7 +26,8 @@
             </div>
             <div class="relative right-0">
                 <div class="m-auto">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $travel_order->tracking_code }}&amp;size=100x100" alt="" title="" />
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $travel_order->tracking_code }}&amp;size=100x100"
+                        alt="" title="" />
                 </div>
             </div>
         </div>
@@ -31,14 +36,19 @@
             <div class="m-6 divide-y divide-black divide-solid print:divide-y-2">
                 <div class="flex items-start w-full h-auto p-6 print:block">
                     <div id="header" class="items-start block w-full space-y-4 text-left">
-                        <div class="block">
-                            <span class="text-sm font-semibold tracking-wide text-left text-black">{{ $travel_order->created_at == '' ? 'Date Not Set' : $travel_order->created_at->format('F d, Y') }}</span>
-                        </div>
+
                         <div class="flex">
-                            <span class="mx-auto text-5xl font-extrabold tracking-wide text-black uppercase print:text-xl">travel order</span>
+                            <span
+                                class="mx-auto text-5xl font-extrabold tracking-wide text-black uppercase print:text-xl">travel
+                                order</span>
+                        </div>
+                        <div class="block">
+                            <span
+                                class="text-sm font-semibold tracking-wide text-left text-black">{{ $travel_order->created_at == '' ? 'Date Not Set' : $travel_order->created_at->format('F d, Y') }}</span>
                         </div>
                         <div class="grid grid-cols-4">
-                            <span class="col-span-1 text-sm font-semibold tracking-wide text-black uppercase">Memorandum to:</span>
+                            <span class="col-span-1 text-sm font-semibold tracking-wide text-black uppercase">Memorandum
+                                to:</span>
                             <div class="col-span-3 text-sm font-semibold tracking-wide text-black uppercase">
                                 @foreach ($travel_order->applicants as $applicant)
                                     <h4 class="whitespace-nowrap">{{ $applicant->employee_information->full_name }}</h4>
@@ -52,8 +62,11 @@
                         <div class="flex-wrap block -space-y-1">
                             @if ($travel_order->travel_order_type->name == 'Official Time')
                                 <span class="font-semibold tracking-wide text-left text-black text-md">
-                                    You are scheduled to travel from <strong class="underline">{{ $travel_order->date_from->format('jS') . ' of ' . $travel_order->date_from->format('F Y') }}</strong> to
-                                    <strong class="underline">{{ $travel_order->date_to->format('jS') . ' of ' . $travel_order->date_to->format('F Y') }}</strong>
+                                    You are scheduled to travel from <strong
+                                        class="underline">{{ $travel_order->date_from->format('jS') . ' of ' . $travel_order->date_from->format('F Y') }}</strong>
+                                    to
+                                    <strong
+                                        class="underline">{{ $travel_order->date_to->format('jS') . ' of ' . $travel_order->date_to->format('F Y') }}</strong>
                                     to do the following:
                                 </span>
                             @else
@@ -68,23 +81,33 @@
                                         {{ $travel_order->philippine_region_id == null ? 'City Not Set' : $travel_order->philippine_region->region_description }}
                                     </strong>
                                     on the
-                                    <strong class="underline">{{ $travel_order->date_from->format('jS') . ' of ' . $travel_order->date_from->format('F Y') }}</strong>
+                                    <strong
+                                        class="underline">{{ $travel_order->date_from->format('jS') . ' of ' . $travel_order->date_from->format('F Y') }}</strong>
                                     to
-                                    <strong class="underline">{{ $travel_order->date_to->format('jS') . ' of ' . $travel_order->date_to->format('F Y') }}</strong>
+                                    <strong
+                                        class="underline">{{ $travel_order->date_to->format('jS') . ' of ' . $travel_order->date_to->format('F Y') }}</strong>
                                     to do the following:
                                 </span>
                             @endif
 
-                            <span class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
+                            <span
+                                class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
                                 {{ $travel_order->purpose == '' ? 'Purpose not Found' : $travel_order->purpose }}
                             </span>
 
                             @foreach ($travel_order->signatories as $signatory)
-                                <span class="block pt-16 font-semibold tracking-wide text-center text-black underline text-md">
+                                <span
+                                    class="block pt-16 font-semibold tracking-wide text-center text-black underline text-md">
                                     {{ $signatory->employee_information->full_name }}
                                 </span>
                                 <span class="block pt-3 font-semibold tracking-wide text-center text-black text-md">
-                                    {{ $signatory->employee_information->position->description }} of {{ $signatory->employee_information->office->name }}
+                                    @if ($signatory->employee_information->position->description == 'University President')
+                                        {{ $signatory->employee_information->position->description }}
+                                    @else
+                                        {{ $signatory->employee_information->position->description }} of
+                                        {{ $signatory->employee_information->office->name }}
+                                    @endif
+
                                 </span>
                             @endforeach
 
