@@ -125,6 +125,17 @@
             <div class="col-span-10">&nbsp</div>
             <div class="col-span-10">&nbsp</div>
             <div class="col-span-10">&nbsp</div>
+
+            <div class="col-span-3 col-start-2 text-center ">
+                <div class="flex flex-col w-full pt-5 border-t-2 border-black">
+                    <span class="font-extrabold capitalize print:text-sm">{{ auth()->user()->name }}</span>
+                    <span
+                        class="text-xs font-extrabold capitalize print:text-10">{{ auth()->user()->employee_information->position->description }}
+                        <span class="lowercase">of</span>
+                        {{ auth()->user()->employee_information->office->name }}</span>
+                </div>
+            </div>
+
             <div class="col-span-3 col-start-7 text-center ">
                 <div class="flex flex-col w-full pt-5 border-t-2 border-black">
                     <span
