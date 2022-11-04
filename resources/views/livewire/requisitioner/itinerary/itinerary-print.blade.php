@@ -40,7 +40,8 @@
                     class="font-extrabold">{{ auth()->user()->employee_information->position->description }}</span>
             </div>
             <div class="col-span-5 row-span-2 px-2 py-1 border-r border-black">Purpose of Travel: <span
-                    class="font-extrabold whitespace-pre-line">{{ $travel_order->purpose }}</span></div>
+                    class="font-extrabold whitespace-pre-line">{{ $itinerary->purpose != null ? $itinerary->purpose : $travel_order->purpose }}</span>
+            </div>
             <div class="col-span-5 px-2 py-1 border-black border-x">Official Station: <span
                     class="font-extrabold">{{ auth()->user()->employee_information->office->name }}</span></div>
 

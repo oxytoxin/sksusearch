@@ -54,14 +54,15 @@
                 </div>
             </div>
         </div>
-
         <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-lg">
-            <div class="flex-wrap items-center justify-between w-full -mt-4 -ml-4 sm:flex-nowrap">
+            <form wire:submit.prevent='save' class="flex flex-col gap-4">
 
-                <p class="mt-1 text-primary-500 mb-2">Purpose:
-                </p>
-                <textarea
-                    class="
+                <div class="flex-wrap items-center justify-between w-full -mt-4 -ml-4 sm:flex-nowrap">
+
+                    <p class="mt-1 text-primary-500 mb-2">Purpose:
+                    </p>
+                    <textarea
+                        class="
         form-control
         block
         w-full
@@ -78,17 +79,20 @@
         m-0
         focus:text-gray-700 focus:bg-white focus:outline-none
       "
-                    rows="3" placeholder="{{ $travel_order->purpose }}"></textarea>
-            </div>
-            <div class="flex justify-between w-full">
-                <div>
+                        rows="3" placeholder="{{ $travel_order->purpose }}" wire:model="purpose"></textarea>
                 </div>
-                <a href="" id="save"
-                    class="max-w-sm px-4 py-2 my-2 mr-4 mt-2 text-sm font-semibold tracking-wider text-white rounded-lg w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">
+                <div class="flex justify-between w-full">
+                    <div>
+                    </div>
+                    <x-filament-support::button type="submit" wire:target='save' class="mr-4">Save
+                    </x-filament-support::button>
+                    {{-- <button type="button" id="save"
+                    class="max-w-sm px-4 py-2 my-2 mr-4 mt-2 text-sm font-semibold tracking-wider text-white rounded-lg w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white"
+                    >
                     Save
-                </a>
-            </div>
-
+                </button> --}}
+                </div>
+            </form>
         </div>
 
         <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-lg">
