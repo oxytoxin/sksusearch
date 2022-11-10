@@ -131,8 +131,9 @@ class ViewLegacyDocuments extends Component implements HasTable
                     ]))
                     ->modalWidth('xs')
                     ->icon('ri-qr-code-line'),
-                EditAction::make('legacy_document_edit')
+                ViewAction::make('legacy_document_edit')
                     ->label('Edit')
+                    ->url(fn (LegacyDocument $record): string => route('archiver.archive-leg-doc.update', [$record]))
                     ->icon('ri-edit-2-line'),
             ])->icon('ri-flashlight-fill'),
             

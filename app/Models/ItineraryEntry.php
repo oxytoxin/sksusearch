@@ -11,7 +11,8 @@ class ItineraryEntry extends Model
     use HasFactory;
 
     protected $casts = [
-        'date' => 'immutable_date',
+        'date' => 'date:Y-m-d',
+        'date' =>'immutable_date',
         'departure_time' => 'immutable_datetime',
         'arrival_time' => 'immutable_datetime',
     ];
