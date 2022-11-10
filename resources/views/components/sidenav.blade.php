@@ -283,6 +283,47 @@
                     Replenish Petty Cash Fund
                 </a>
             @endif
+
         </div>
+        @php
+            $motorpool_head = App\Models\Office::where('id', 68)->first();
+        @endphp
+
+        <div class="space-y-1" x-data="{ open: false }">
+            <button x-on:click="open=!open" type="button"
+                class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
+                aria-controls="sub-menu-1" aria-expanded="false">
+                <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
+                <svg :class="open ?
+                    'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
+                    'flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400'"
+                    class="" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
+                </svg>
+                Motorpool
+            </button>
+            <!-- Expandable link section, show/hide based on state. -->
+            <div class="space-y-1" id="sub-menu-1" x-show='open'
+                x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95'
+                x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-300'
+                x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'
+                class="origin-top-left">
+                @if ($motorpool_head->head_id == auth()->user()->id)
+                    <a href=""
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                        Vehicles
+                    </a>
+                    <a href=""
+                        class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                        Drivers
+                    </a>
+                @endif
+                <a href=""
+                    class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
+                    Schedules
+                </a>
+            </div>
+        </div>
+
     </div>
 </nav>

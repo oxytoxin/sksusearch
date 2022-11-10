@@ -28,6 +28,7 @@
                 <div class="m-auto">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $travel_order->tracking_code }}&amp;size=100x100"
                         alt="" title="" />
+                    <span class="flex justify-center  text-[11px] font-xs">{{ $travel_order->tracking_code }}</span>
                 </div>
             </div>
         </div>
