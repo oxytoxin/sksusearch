@@ -104,11 +104,14 @@
                                 <span class="block pt-3 font-semibold tracking-wide text-center text-black text-md">
                                     @if ($signatory->employee_information->position->description == 'University President')
                                         {{ $signatory->employee_information->position->description }}
+                                    @elseif ($signatory->employee_information->position->description == 'Faculty')
+                                        {{ $signatory->employee_information->position->description }}
+                                    @elseif($signatory->employee_information->office == null)
+                                        {{ $signatory->employee_information->position->description }}
                                     @else
                                         {{ $signatory->employee_information->position->description }} of
                                         {{ $signatory->employee_information->office->name }}
                                     @endif
-
                                 </span>
                             @endforeach
 
