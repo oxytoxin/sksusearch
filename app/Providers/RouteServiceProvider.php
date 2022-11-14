@@ -53,6 +53,8 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/custom/archiver.php'));
             Route::middleware('web')
                 ->group(base_path('routes/custom/oic.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/custom/motorpool.php'));
         });
     }
 
