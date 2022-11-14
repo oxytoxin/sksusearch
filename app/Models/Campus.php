@@ -23,4 +23,9 @@ class Campus extends Model
     {
         return $this->hasOne(PettyCashFund::class);
     }
+
+    public function vehicle()
+    {
+        return $this->hasMany(Vehicle::class);
+    }
 }
