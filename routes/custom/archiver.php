@@ -24,6 +24,6 @@ Route::middleware([
     Route::get('/archive-document/new', ArchiveDocumentsCreate::class)->name('archive-doc.create');
     Route::get('/archive-document/legacy/update/{legacy_document}', ArchiveLegacyDocumentsEdit::class)->name('archive-leg-doc.update');
     Route::get('/archive-document/legacy/new', ArchiveLegacyDocumentsCreate::class)->name('archive-leg-doc.create');
-    Route::get('/view-scanned-documents/legacy/{legacy_document}', ViewLgcScannedDocuments::class)->name('view-scanned-docs-lgc');
+    Route::get('/view-scanned-documents/legacy/{legacy_document}/{edit}', ViewLgcScannedDocuments::class)->name('view-scanned-docs-lgc');
     Route::get('/view-scanned-documents/{disbursement_voucher}', ViewScannedDocuments::class)->name('view-scanned-docs');
 });

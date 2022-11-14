@@ -187,8 +187,7 @@ class ArchiveLegacyDocumentsEdit extends Component implements HasForms
                     ->acceptedFileTypes(['application/pdf'])
                     ->reactive()
                     ->disk('scanned_documents')
-                    ->columnSpan(4)
-                    ->hidden()                    
+                    ->columnSpan(4)                  
                    ])
                 ])
 
@@ -211,6 +210,7 @@ class ArchiveLegacyDocumentsEdit extends Component implements HasForms
             'cheque_state'=>$legacy_document->cheque_state
 
         ]);
+        
     }
 
     public function save()
@@ -241,6 +241,16 @@ class ArchiveLegacyDocumentsEdit extends Component implements HasForms
             $this->ldc->document_category = $this->document_category;
 
             $this->ldc->save();
+            foreach($this->attachment as $document){            
+                $this->ldc->scanned_documents()->create(
+                    [
+                        "path"=>$document->storeAs('scanned_documents',now()->format("HismdY-").$document->getClientOriginalName()),
+                        "document_name"=>$document->getClientOriginalName(),
+    
+                    ]
+                );
+                Notification::make()->title('Upload Success')->body('Upload of '.$document->getClientOriginalName().' successful')->success()->send();
+            }
 
         DB::commit();
         Notification::make()->title('Update Success')->body('Legacy document has been updated successfully')->success()->send();
@@ -251,14 +261,17 @@ class ArchiveLegacyDocumentsEdit extends Component implements HasForms
     public function sendCode()
     {
         $hash_pool = "6448128edd17012e33c92c887beb336886b41fd7e50e143d96819c6cc96ef1b8576e4347ee02d4933e6be8d6bbb01287f463dc9acaaefe9409bf2934c197b3ab";
+       if($this->codeSent == false){
         for ($i=0; $i < 8 ; $i++) {
 
             $this->code .=  substr($hash_pool,rand(0,strlen($hash_pool)-1),1) ;
 
         }
+       }
         $this->codeSent=true;
         Notification::make()
         ->title('Code Sent')
+        ->body($this->code)
         ->success()
         ->send();
     

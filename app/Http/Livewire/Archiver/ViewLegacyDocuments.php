@@ -121,7 +121,7 @@ class ViewLegacyDocuments extends Component implements HasTable
                     ->icon('ri-list-check-2'),
                 ViewAction::make('legacy_document_preview')
                     ->label('View Scanned Documents')
-                    ->url(fn (LegacyDocument $record): string => route('archiver.view-scanned-docs-lgc', [$record]))
+                    ->url(fn (LegacyDocument $record): string => route('archiver.view-scanned-docs-lgc', [$record,0]))
                     ->icon('ri-file-copy-2-line'),
                 ViewAction::make('legacy_document_generate_qr')
                     ->label('Generate QR')
