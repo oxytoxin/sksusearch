@@ -21,7 +21,9 @@ class VehicleIndex extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            Tables\Columns\TextColumn::make('name')
+            Tables\Columns\TextColumn::make('model')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('plate_number')
                 ->searchable(),
             Tables\Columns\TextColumn::make('campus.name')
                 ->label('Campus')
