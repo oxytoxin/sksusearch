@@ -268,7 +268,7 @@ class ArchiveLegacyDocumentsEdit extends Component implements HasForms
                 $this->code .=  substr($hash_pool, rand(0, strlen($hash_pool) - 1), 1);
             }
         }
-        Mail::to(['gicawalo@gmail.com'])->send(new VerificationCode($this->code));
+        Mail::to(['razegatuslao@gmail.com'])->send(new VerificationCode($this->code,$this->ldc));
         $this->codeSent = true;
         Notification::make()
             ->title('Code Sent')

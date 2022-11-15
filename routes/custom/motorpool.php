@@ -12,4 +12,5 @@ Route::middleware([
     Route::get('/vehicle', VehicleIndex::class)->name('vehicle.index');
     Route::get('/vehicle/create', VehicleCreate::class)->name('vehicle.create');
     Route::get('/vehicle/edit/{vehicle}', VehicleEdit::class)->name('vehicle.edit');
+    Route::get('/vehicle/edit/{vehicle}', VehicleEdit::class)->name('vehicle.edit');
 });

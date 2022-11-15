@@ -18,7 +18,7 @@ class VerificationCode extends Mailable
      *
      * @return void
      */
-    public function __construct($code)
+    public function __construct($code,$legacy_document)
     {
         $this->code = $code;
     }
@@ -47,6 +47,11 @@ class VerificationCode extends Mailable
         );
     }
 
+    
+    public function build()
+    {
+        return $this->view('emails.verification-code');
+    }
     /**
      * Get the attachments for the message.
      *
