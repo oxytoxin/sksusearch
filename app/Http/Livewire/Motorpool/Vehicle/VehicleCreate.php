@@ -16,13 +16,15 @@ class VehicleCreate extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public $name;
+    public $model;
+    public $plate_number;
     public $campus_id;
 
     protected function getFormSchema()
     {
         return [
-            TextInput::make('name')->required(),
+            TextInput::make('model')->required(),
+            TextInput::make('plate_number')->required(),
             Select::make('campus_id')
                 ->label('Campus')
                 ->options(Campus::pluck('name', 'id'))
@@ -35,7 +37,8 @@ class VehicleCreate extends Component implements HasForms
         $this->validate();
         DB::beginTransaction();
         $vehicle = Vehicle::create([
-            'name' => $this->name,
+            'model' => $this->model,
+            'plate_number' => $this->plate_number,
             'campus_id' => $this->campus_id,
         ]);
         DB::commit();
