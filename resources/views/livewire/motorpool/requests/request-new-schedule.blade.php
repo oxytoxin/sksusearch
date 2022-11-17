@@ -1,5 +1,5 @@
 <div x-data x-cloak>
-    <h2 class="font-light capitalize text-primary-600 mb-4">New Schedule</h2>
+    <h2 class="mb-4 font-light capitalize text-primary-600">New Schedule</h2>
     <form wire:submit.prevent='save' class="flex flex-col gap-4">
         <div>
             {{ $this->form }}
