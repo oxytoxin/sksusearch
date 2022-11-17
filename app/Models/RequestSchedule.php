@@ -7,5 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class RequestSchedule extends Model
 {
-    use HasFactory;
+    use HasFactory; 
+
+    public function applicants()
+    {
+        return $this->belongsToMany(User::class, 'request_applicants', 'request_schedule_id', 'user_id')->withTimestamps();
+    }
 }

@@ -145,4 +145,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasOne(PettyCashFund::class, 'custodian_id');
     }
+
+    public function request_applicants()
+    {
+        return $this->belongsToMany(RequestSchedule::class, 'request_applicants', 'user_id', 'request_schedule_id')->withTimestamps();
+    }
 }

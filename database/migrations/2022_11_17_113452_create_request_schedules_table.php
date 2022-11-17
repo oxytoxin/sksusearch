@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignId('travel_order_id')->index()->nullable();
             $table->foreignId('driver_id')->index();
             $table->foreignId('vehicle_id')->index();
-            $table->json('applicant_ids');
             $table->text('purpose');
             $table->foreignId('philippine_region_id')->index()->nullable();
             $table->foreignId('philippine_province_id')->index()->nullable();
