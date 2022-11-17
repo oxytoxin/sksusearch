@@ -286,7 +286,7 @@
 
         </div>
         @php
-            $motorpool_head = App\Models\Office::where('id', 68)->first();
+            $motorpool_head = App\Models\Office::where('name', 'Motorpool')->first();
         @endphp
 
         <div class="space-y-1" x-data="{ open: false }">
@@ -313,12 +313,12 @@
                         class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                         Vehicles
                     </a>
-                    <a href=""
+                    <a href="{{ route('motorpool.request.index') }}"
                         class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                         Requests
                     </a>
                 @endif
-                <a href="{{ route('motorpool.vehicle.weekly-schedule') }}"
+                <a href="{{ route('motorpool.weekly-schedule') }}"
                     class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                     Schedules
                 </a>

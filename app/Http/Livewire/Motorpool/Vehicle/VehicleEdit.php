@@ -53,7 +53,7 @@ class VehicleEdit extends Component implements HasForms
     {
         $this->vehicle = $vehicle;
         $this->form->fill([
-            'name' => $vehicle->name,
+            'model' => $vehicle->model,
             'plate_number' => $vehicle->plate_number,
             'campus_id' => $vehicle->campus_id,
         ]);
