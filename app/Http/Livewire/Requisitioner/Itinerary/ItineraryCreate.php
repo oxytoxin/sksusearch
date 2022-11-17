@@ -104,14 +104,19 @@ class ItineraryCreate extends Component implements HasForms
                         Fieldset::make('Coverage')->schema([
                             Flatpickr::make('date')
                                 ->disableTime()
-                                ->required()->columnSpan(1),
-                            Grid::make(4)->schema([
-                                Toggle::make('breakfast')->inline(false)->reactive(),
-                                Toggle::make('lunch')->inline(false)->reactive(),
-                                Toggle::make('dinner')->inline(false)->reactive(),
-                                Toggle::make('lodging')->inline(false)->reactive(),
-                            ]),
-                        ])->columns(1)->columnSpan(1),
+                                ->required()
+                                ->disabled()
+                                ->columnSpan(1),
+                            Grid::make([
+                                'sm' => 4,
+                                'md' => 4,])
+                                ->schema([
+                                Toggle::make('breakfast')->inline(false)->reactive()->columnSpan(1),
+                                Toggle::make('lunch')->inline(false)->reactive()->columnSpan(1),
+                                Toggle::make('dinner')->inline(false)->reactive()->columnSpan(1),
+                                Toggle::make('lodging')->inline(false)->reactive()->columnSpan(1),
+                            ])->columnSpan(1),
+                        ])->columnSpan(1),
                         Fieldset::make('Total Amount')->schema([
                             Toggle::make('has_per_diem')
                                 ->label('Has Per Diem')
@@ -121,7 +126,11 @@ class ItineraryCreate extends Component implements HasForms
                         ])->columns(1)->columnSpan(1),
                     ]),
                     Repeater::make('itinerary_entries')->schema([
-                        Grid::make(6)->schema([
+                        Grid::make([
+                            'sm' => 1,
+                            'md' => 2,
+                            'lg' => 6,])
+                            ->schema([
                             Select::make('mot_id')
                                 ->options(Mot::pluck('name', 'id'))
                                 ->label('Mode of Transportation')

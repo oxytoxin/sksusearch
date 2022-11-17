@@ -2,7 +2,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3">
         <div class="flex-row col-span-1 lg:col-span-2">
             <div
-                class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-none md:rounded-tl-lg">
+                class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 lg:rounded-none lg:rounded-tl-lg">
                 <div class="flex flex-wrap items-center justify-between -mt-4 -ml-4 sm:flex-nowrap">
                     <div class="w-full mt-4 ml-4">
                         <h3 class="text-lg font-medium leading-6 text-primary-900">Travel Order Details</h3>
@@ -64,7 +64,7 @@
             </div>
 
             <div
-                class="px-4 py-5 mt-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-none md:rounded-bl-lg">
+                class="px-4 py-5 mt-5 bg-white border-b rounded-md border-primary-200 sm:px-6 lg:rounded-none lg:rounded-bl-lg">
                 <div class="flex flex-wrap items-center justify-between -mt-4 -ml-4 sm:flex-nowrap">
                     <div class="mt-4 ml-4">
                         <h3 class="text-lg font-medium leading-6 text-primary-900">Status</h3>
@@ -87,7 +87,7 @@
         </div>
 
         <div
-            class="col-span-1 px-4 py-5 ml-4 bg-white border-b rounded-md border-primary-300 md:rounded-l-none md:rounded-r-3xl">
+            class="w-full col-span-1 px-4 py-5 mt-3 bg-white border-b rounded-md lg:mt-0 lg:ml-4 border-primary-300 lg:rounded-l-none lg:rounded-r-3xl">
             <div class="flow-root mt-6">
                 <ul role="list" class="-my-5 divide-y divide-primary-200">
                     <h3 class="font-semibold text-primary-600 text-md">Notes</h3>

@@ -20,7 +20,7 @@
 				</div>
 				<!-- Enabled: "bg-indigo-600", Not Enabled: "bg-gray-200" -->
 				<button type="button" x-on:click="showMeSelect = !showMeSelect"
-					class="relative inline-flex flex-shrink-0 h-6 mr-4 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer bg-primary-600 focus:ring-primary-500 w-11 focus:outline-none focus:ring-2 focus:ring-offset-2"
+					class="relative flex-shrink-0 hidden h-6 mr-4 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer bg-primary-600 focus:ring-primary-500 w-11 focus:outline-none focus:ring-2 focus:ring-offset-2 md:inline-flex"
 					role="switch" aria-checked="false">
 					<span class="sr-only">Use setting</span>
 					<!-- Enabled: "", Not Enabled: "translate-x-0" -->
@@ -102,12 +102,12 @@
 
 					<div class="w-px h-6 ml-6 bg-gray-300"></div>
 					<button type="button"
-						class="px-4 py-2 ml-6 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add
+						class="hidden px-4 py-2 ml-6 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 md:flex">Add
 						event</button>
 				</div>
 
-				<div class="relative ml-6 md:hidden">
-					<button type="button"
+				<div class="relative ml-6 md:hidden" x-data="{ open: false }">
+					<button type="button" x-on:click="open = !open"
 						class="flex items-center p-2 -mx-2 text-gray-400 border border-transparent rounded-full hover:text-gray-500"
 						id="menu-0-button" aria-expanded="false" aria-haspopup="true">
 						<span class="sr-only">Open menu</span>
@@ -119,17 +119,10 @@
 						</svg>
 					</button>
 
-					<!--
-																Dropdown menu, show/hide based on menu state.
-						
-																Entering: "transition ease-out duration-100"
-																		From: "transform opacity-0 scale-95"
-																		To: "transform opacity-100 scale-100"
-																Leaving: "transition ease-in duration-75"
-																		From: "transform opacity-100 scale-100"
-																		To: "transform opacity-0 scale-95"
-														-->
-					<div
+					<div @click.outside="open = false" x-show='open' x-transition:enter='transition ease-out duration-100'
+						x-transition:enter-start='transform opacity-0 scale-95' x-transition:enter-end='transform opacity-100 scale-100'
+						x-transition:leave='transition ease-in duration-75' x-transition:leave-start='transform opacity-100 scale-100'
+						x-transition:leave-end='transform opacity-0 scale-0'
 						class="absolute right-0 z-10 mt-3 overflow-hidden origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg w-36 ring-1 ring-black ring-opacity-5 focus:outline-none"
 						role="menu" aria-orientation="vertical" aria-labelledby="menu-0-button" tabindex="-1">
 						<div class="py-1" role="none">
@@ -138,18 +131,18 @@
 								id="menu-0-item-0">Create event</a>
 						</div>
 						<div class="py-1" role="none">
-							<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-								id="menu-0-item-1">Go to today</a>
+							<button type="button" wire:click="currentweek" class="block px-4 py-2 text-sm text-gray-700" role="menuitem"
+								tabindex="-1" id="menu-0-item-1">Go to this week</button>
 						</div>
 						<div class="py-1" role="none">
 							<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-								id="menu-0-item-2">Day view</a>
+								id="menu-0-item-2">Vehicle A</a>
 							<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-								id="menu-0-item-3">Week view</a>
+								id="menu-0-item-3">Vehicle B</a>
 							<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-								id="menu-0-item-4">Month view</a>
+								id="menu-0-item-4">Vehicle C</a>
 							<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-								id="menu-0-item-5">Year view</a>
+								id="menu-0-item-5">Vehicle D</a>
 						</div>
 					</div>
 				</div>
@@ -160,19 +153,21 @@
 				<div class="sticky top-0 z-30 flex-none bg-white shadow ring-1 ring-black ring-opacity-5 sm:pr-8">
 					<div class="grid grid-cols-7 text-sm leading-6 text-gray-500 sm:hidden">
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">M <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">10</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[0] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">T <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">11</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[1] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">W <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-white bg-indigo-600 rounded-full">12</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[2] }}</span></button>
+						{{-- <button type="button" class="flex flex-col items-center pt-2 pb-3">W <span
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-white bg-indigo-600 rounded-full">12</span></button> --}}
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">T <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">13</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[3] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">F <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">14</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[4] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">S <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">15</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[5] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">S <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">16</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[6] }}</span></button>
 					</div>
 
 					<div
@@ -180,10 +175,12 @@
 						<div class="col-end-1 w-14"></div>
 						<div class="flex items-center justify-center py-3">
 							@if ($dates[0] == $today->format('d'))
-								<span class="flex items-baseline">Mon
+								{{-- <span class="flex items-baseline">Mon
 									<span
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[0] }}</span>
-								</span>
+								</span> --}}
+								<span>Mon <span
+									class="items-center justify-center font-semibold text-gray-900">{{ $dates[0] }}</span></span>
 							@else
 								<span>Mon <span
 										class="items-center justify-center font-semibold text-gray-900">{{ $dates[0] }}</span></span>
@@ -192,10 +189,12 @@
 						<div class="flex items-center justify-center py-3">
 
 							@if ($dates[1] == $today->format('d'))
-								<span class="flex items-baseline">Tue
+								{{-- <span class="flex items-baseline">Tue
 									<span
 										class="font-semibolds ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white">{{ $dates[1] }}</span>
-								</span>
+								</span> --}}
+								<span>Tue <span
+									class="items-center justify-center font-semibold text-gray-900">{{ $dates[1] }}</span></span>
 							@else
 								<span>Tue <span
 										class="items-center justify-center font-semibold text-gray-900">{{ $dates[1] }}</span></span>
@@ -204,10 +203,12 @@
 						<div class="flex items-center justify-center py-3">
 
 							@if ($dates[2] == $today->format('d'))
-								<span class="flex items-baseline">Wed
+								{{-- <span class="flex items-baseline">Wed
 									<span
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[2] }}</span>
-								</span>
+								</span> --}}
+								<span>Wed <span
+									class="items-center justify-center font-semibold text-gray-900">{{ $dates[2] }}</span></span>
 							@else
 								<span>Wed <span
 										class="items-center justify-center font-semibold text-gray-900">{{ $dates[2] }}</span></span>
@@ -217,10 +218,12 @@
 						<div class="flex items-center justify-center py-3">
 
 							@if ($dates[3] == $today->format('d'))
-								<span class="flex items-baseline">Thu
+								{{-- <span class="flex items-baseline">Thu
 									<span
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[3] }}</span>
-								</span>
+								</span> --}}
+								<span>Thu <span
+									class="items-center justify-center font-semibold text-gray-900">{{ $dates[3] }}</span></span>
 							@else
 								<span>Thu <span
 										class="items-center justify-center font-semibold text-gray-900">{{ $dates[3] }}</span></span>
@@ -229,10 +232,12 @@
 						<div class="flex items-center justify-center py-3">
 
 							@if ($dates[4] == $today->format('d'))
-								<span class="flex items-baseline">Fri
+								{{-- <span class="flex items-baseline">Fri
 									<span
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[4] }}</span>
-								</span>
+								</span> --}}
+								<span>Fri <span
+									class="items-center justify-center font-semibold text-gray-900">{{ $dates[4] }}</span></span>
 							@else
 								<span>Fri <span
 										class="items-center justify-center font-semibold text-gray-900">{{ $dates[4] }}</span></span>
@@ -241,10 +246,12 @@
 						<div class="flex items-center justify-center py-3">
 
 							@if ($dates[5] == $today->format('d'))
-								<span class="flex items-baseline">Sat
+								{{-- <span class="flex items-baseline">Sat
 									<span
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[5] }}</span>
-								</span>
+								</span> --}}
+								<span>Sat <span
+									class="items-center justify-center font-semibold text-gray-900">{{ $dates[5] }}</span></span>
 							@else
 								<span>Sat <span
 										class="items-center justify-center font-semibold text-gray-900">{{ $dates[5] }}</span></span>
@@ -252,10 +259,12 @@
 						</div>
 						<div class="flex items-center justify-center py-3">
 							@if ($dates[6] == $today->format('d'))
-								<span class="flex items-baseline">Sun
+								{{-- <span class="flex items-baseline">Sun
 									<span
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[6] }}</span>
-								</span>
+								</span> --}}
+								<span>Sun <span
+									class="items-center justify-center font-semibold text-gray-900">{{ $dates[6] }}</span></span>
 							@else
 								<span>Sun <span
 										class="items-center justify-center font-semibold text-gray-900">{{ $dates[6] }}</span></span>
@@ -267,7 +276,7 @@
 					<div class="sticky left-0 z-10 flex-none bg-white rounded-b-lg w-14 ring-1 ring-gray-100"></div>
 					<div class="grid flex-auto grid-cols-1 grid-rows-1">
 						<!-- Horizontal lines -->
-						<div class="grid col-start-1 col-end-2 row-start-1 divide-y divide-gray-100"
+						<div class="grid col-start-1 col-end-2 row-start-1 divide-y divide-gray-300"
 							style="grid-template-rows: repeat(48, minmax(3.5rem, 1fr))">
 							<div class="row-end-1 h-7"></div>
 							<div>
@@ -370,7 +379,7 @@
 
 						<!-- Vertical lines -->
 						<div
-							class="hidden grid-cols-7 col-start-1 col-end-2 grid-rows-1 row-start-1 divide-x divide-gray-100 sm:grid sm:grid-cols-7">
+							class="hidden grid-cols-7 col-start-1 col-end-2 grid-rows-1 row-start-1 divide-x divide-gray-200 sm:grid sm:grid-cols-7">
 							<div class="col-start-1 row-span-full"></div>
 							<div class="col-start-2 row-span-full"></div>
 							<div class="col-start-3 row-span-full"></div>
@@ -384,13 +393,35 @@
 						<!-- Events -->
 						<ol class="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8"
 							style="grid-template-rows: 1.75rem repeat(288, minmax(0, 1fr)) auto">
-							<li class="relative flex mt-px sm:col-start-3" style="grid-row: 74 / span 12">
+							<li class="relative flex mt-px sm:col-start-1" style="grid-row: {{ (0*12)+2 }} / span {{ 1.5*12 }}">
 								<a href="#"
-									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg group inset-1 bg-blue-50 hover:bg-blue-100">
+									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-blue-200 rounded-lg group inset-1 hover:bg-blue-100">
+									<p class="order-1 font-semibold text-blue-700">Travel From SKSU Tacurong to Sultan Kudarat Provincial Capitol</p>
+									<p class="text-blue-500 group-hover:text-blue-700"><time datetime="2022-01-12T06:00">12:00 AM - 1:30 AM</time></p>
+								</a>
+							</li>
+							<li class="relative flex mt-px sm:col-start-2" style="grid-row: {{ (4.5*12)+2 }} / span {{ 1.5*12 }}">
+								<a href="#"
+									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-red-100 rounded-lg group inset-1 hover:bg-blue-100">
+									<p class="order-1 font-semibold text-red-700">Breakfast</p>
+									<p class="text-red-500 group-hover:text-red-700"><time datetime="2022-01-12T06:00">4:30 AM - 6:00 AM</time></p>
+								</a>
+							</li>
+							<li class="relative flex mt-px sm:col-start-4" style="grid-row: {{ (3*12)+2 }} / span {{ 15*12 }}">
+								<a href="#"
+									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-red-200 rounded-lg group inset-1 hover:bg-red-100">
+									<p class="order-1 font-semibold text-red-700">Excursion to Lake Sebu</p>
+									<p class="text-red-500 group-hover:text-red-700"><time datetime="2022-01-12T06:00">3:00 AM - 6:00 PM</time></p>
+								</a>
+							</li>
+							<li class="relative flex mt-px sm:col-start-3" style="grid-row: 2 / span 18">
+								<a href="#"
+									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-blue-200 rounded-lg group inset-1 hover:bg-blue-100">
 									<p class="order-1 font-semibold text-blue-700">Breakfast</p>
 									<p class="text-blue-500 group-hover:text-blue-700"><time datetime="2022-01-12T06:00">6:00 AM</time></p>
 								</a>
 							</li>
+							
 							<li class="relative flex mt-px sm:col-start-3" style="grid-row: 92 / span 30">
 								<a href="#"
 									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg group inset-1 bg-pink-50 hover:bg-pink-100">
