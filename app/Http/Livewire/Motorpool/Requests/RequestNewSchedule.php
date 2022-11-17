@@ -85,9 +85,9 @@ class RequestNewSchedule extends Component implements HasForms
                 ->afterStateUpdated(function ($set) {
                     $to = TravelOrder::find($this->travel_order_id);
                     $set('purpose', $to->purpose);
-                    $set('region_code', $to->philippine_region_id);
-                    $set('province_code', $to->philippine_province_id);
-                    $set('city_code', $to->philippine_city_id);
+                    $set('region_code', $to->philippine_region->region_code);
+                    $set('province_code', $to->philippine_province->province_code);
+                    $set('city_code', $to->philippine_city->city_municipality_code);
                     $set('other_details', $to->other_details);
                     $set('date_of_travel', $to->date_from);
                     // $set('applicants', $to->applicants());
