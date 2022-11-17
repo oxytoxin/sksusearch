@@ -7,6 +7,7 @@ use App\Models\EmployeeInformation;
 use App\Models\PhilippineCity;
 use App\Models\PhilippineProvince;
 use App\Models\PhilippineRegion;
+use App\Models\Position;
 use App\Models\RequestSchedule;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
@@ -102,7 +103,7 @@ class RequestNewSchedule extends Component implements HasForms
                 ->reactive(),
             Select::make('driver_id')
                 ->label('Driver')
-                ->options(EmployeeInformation::where('position_id', '28')
+                ->options(EmployeeInformation::where('position_id', Position::where('description','Driver')->pluck('id'))
                     ->whereHas('office', function ($query) {
                         return $query->where('campus_id', '=', auth()->user()->employee_information->office->campus_id);
                     })->pluck('full_name', 'id'))

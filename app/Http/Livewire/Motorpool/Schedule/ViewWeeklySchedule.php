@@ -2,6 +2,9 @@
 
 namespace App\Http\Livewire\Motorpool\Schedule;
 
+use App\Models\RequestSchedule;
+use App\Models\Vehicle;
+use Carbon\Carbon;
 use DateTime;
 use Livewire\Component;
 
@@ -13,7 +16,9 @@ class ViewWeeklySchedule extends Component
     public $currentMonth;
     public $dates;
     public $numberOfWeeksThisYear;
-        
+    public $currentVehicle;
+    public $vehicles;
+    public $schedules;
     public function nextWeek()
     {
         $this->currentWeekNumber +=1;
@@ -49,8 +54,7 @@ class ViewWeeklySchedule extends Component
         }
         $this->setDates();
     }
-
-    
+   
     public function currentweek()
     {
         $this->currentWeekNumber = $this->today->format('W');
@@ -62,9 +66,48 @@ class ViewWeeklySchedule extends Component
         }
         $this->setDates();
     }
-
-    public function selectVehicle($id)
+    
+    public function setDates()
     {
+        for ($i=0; $i < count($this->dates); $i++) { 
+            // $tempDate = date('d',strtotime($this->currentYearNumber.'W'. $this->currentWeekNumber));
+            $tempDate = date('d',strtotime($this->currentYearNumber.'W'. $this->currentWeekNumber));
+            $untilDate =date('t',strtotime($this->currentYearNumber.'W'. $this->currentWeekNumber));
+            $tempmonth = date('m',strtotime($this->currentYearNumber.'W'. $this->currentWeekNumber));
+                // dd($tempmonth);
+            if ($this->currentWeekNumber <= 9) {
+                $tempDate = date('d',strtotime($this->currentYearNumber.'W0'. $this->currentWeekNumber));
+                $untilDate =date('t',strtotime($this->currentYearNumber.'W0'. $this->currentWeekNumber));
+                $tempmonth = date('m',strtotime($this->currentYearNumber.'W0'. $this->currentWeekNumber));
+            }            
+           
+            if($tempDate+$i > $untilDate){
+               $this->dates[$i] = ['full_date' => $this->currentYearNumber.'-'.$tempmonth.'-'.$tempDate+$i - $untilDate,'day_date'=>$tempDate+$i - $untilDate];
+            }else{
+                $this->dates[$i] = ['full_date' => $this->currentYearNumber.'-'.$tempmonth.'-'.$tempDate+$i,'day_date'=>$tempDate+$i];
+            }
+        }
+        $this->getSchedule();
+    }
+
+    
+    public function setVehicle($id)
+    {
+        
+        $this->currentVehicle=Vehicle::where('id',$id)->first();
+        $this->getSchedule();
+    }
+    
+    public function getSchedule()
+    {
+        $this->schedules=RequestSchedule::where('vehicle_id',$this->currentVehicle->id)
+                ->whereBetween('date_of_travel',
+                    [
+                    strval((new Carbon($this->dates[0]['full_date']))->format('Y-m-d')),
+                    strval((new Carbon($this->dates[6]['full_date']))->format('Y-m-d'))
+                    ]
+                    )
+                ->get();        
         
     }
     
@@ -77,32 +120,14 @@ class ViewWeeklySchedule extends Component
         $this->numberOfWeeksThisYear =$this->numberOfWeeksThisYear->format('W');
         $this->currentMonth =  date('F',strtotime($this->currentYearNumber.'W'. $this->currentWeekNumber));
         $this->dates = array_fill(0, 7, "0");
-        $this->setDates();
+        $this->vehicles=Vehicle::all();
+        $this->currentVehicle=Vehicle::first();
+        $this->schedules=RequestSchedule::all();
+        $this->setDates();       
+        $this->getSchedule();
     }
 
     
-    public function setDates()
-    {
-        for ($i=0; $i < count($this->dates); $i++) { 
-            // $tempDate = date('d',strtotime($this->currentYearNumber.'W'. $this->currentWeekNumber));
-            $tempDate = date('d',strtotime($this->currentYearNumber.'W'. $this->currentWeekNumber));
-            $untilDate =date('t',strtotime($this->currentYearNumber.'W'. $this->currentWeekNumber));
-            if ($this->currentWeekNumber <= 9) {
-                $tempDate = date('d',strtotime($this->currentYearNumber.'W0'. $this->currentWeekNumber));
-                $untilDate =date('t',strtotime($this->currentYearNumber.'W0'. $this->currentWeekNumber));
-            }            
-           
-            if($tempDate+$i > $untilDate){
-               $this->dates[$i] = $tempDate+$i - $untilDate;
-            }else{
-                $this->dates[$i] = $tempDate+$i;
-            }
-        }
-    }
-
-
-
-
     
     public function render()
     {

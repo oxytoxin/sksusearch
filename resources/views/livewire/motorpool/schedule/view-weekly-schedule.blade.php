@@ -1,9 +1,15 @@
 <div>
 	<div class="flex flex-col h-full bg-white rounded-lg">
 		<header class="flex items-center justify-between flex-none px-6 py-4 border-b border-gray-200">
-			<h1 class="text-lg font-semibold text-gray-900 capitalize">
-				<time>{{ $currentMonth }} {{ $currentYearNumber }}</time>
-			</h1>
+			<div class="flex-col text-lg font-semibold text-gray-900 capitalize">
+				<div class="flex">
+					<time>{{ $currentMonth }} {{ $currentYearNumber }}</time>
+				</div>
+				<div class="flex lg:hidden">
+					<span class="text-sm text-gray-600"><span class="text-extrabold">Vehicle: </span>{{ $currentVehicle->model . ' (' . $currentVehicle->plate_number.')' }}</span>
+				</div>
+			</div>
+			
 			<div class="flex items-center" x-data="{ showMeSelect: true }" x-cloak>
 				<div class="hidden md:mr-4 md:flex md:items-center">
 					<div class="relative flex flex-row items-center">
@@ -40,7 +46,7 @@
 								x-tooltip.raw="Select vehicle from dropdown to show schedule of vehicle"
 								class="flex items-center py-2 pl-3 pr-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
 								id="menu-button" aria-expanded="false" aria-haspopup="true">
-								Select Vehicle
+								{{ $currentVehicle->model . ' (' . $currentVehicle->plate_number.')' }}
 								<!-- Heroicon name: mini/chevron-down -->
 								<svg class="w-5 h-5 ml-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
 									fill="currentColor" aria-hidden="true">
@@ -53,17 +59,21 @@
 								x-transition:enter-start='transform opacity-0 scale-95' x-transition:enter-end='transform opacity-100 scale-100'
 								x-transition:leave='transition ease-in duration-75' x-transition:leave-start='transform opacity-100 scale-100'
 								x-transition:leave-end='transform opacity-0 scale-95'
-								class="absolute right-0 z-10 mt-1 overflow-hidden origin-top-right bg-white rounded-md shadow-lg w-36 ring-1 ring-black ring-opacity-5 focus:outline-none"
+								class="absolute right-0 z-10 mt-2 overflow-hidden origin-top-right bg-white rounded-md shadow-lg shadow-slate-700 ring-1 ring-black ring-opacity-5 focus:outline-none"
 								role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-								<div class="py-1" role="none">
-									<button type="button" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-										id="menu-item-0">Vehicle A</button>
-									<button type="button" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-										id="menu-item-1">Vehicle B</button>
-									<button type="button" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-										id="menu-item-2">Vehicle C</button>
-									<button type="button" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-										id="menu-item-3">Vehicle D</button>
+								<div class="flex flex-col w-full py-1" role="none">
+									@foreach ($vehicles as $vehicle)
+									@if ($vehicle->model . ' : ' . $vehicle->plate_number == $currentVehicle->model . ' : ' . $currentVehicle->plate_number)
+									<button type="button" x-on:click="open=false" wire:click="setVehicle({{ $vehicle->id }})"
+										class="flex w-full px-4 py-2 text-sm text-primary-700 bg-primary-200" role="menuitem" tabindex="-1"
+										id="menu-item-0">{{ $vehicle->model . ' (' . $vehicle->plate_number.')' }}</button>
+									@else
+									<button type="button" x-on:click="open=false" wire:click="setVehicle({{ $vehicle->id }})"
+										class="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-primary-100" role="menuitem" tabindex="-1"
+										id="menu-item-0">{{ $vehicle->model . ' (' . $vehicle->plate_number.')' }}</button>
+									@endif
+									
+									@endforeach
 								</div>
 							</div>
 						</div>
@@ -123,7 +133,7 @@
 						x-transition:enter-start='transform opacity-0 scale-95' x-transition:enter-end='transform opacity-100 scale-100'
 						x-transition:leave='transition ease-in duration-75' x-transition:leave-start='transform opacity-100 scale-100'
 						x-transition:leave-end='transform opacity-0 scale-0'
-						class="absolute right-0 z-10 mt-3 overflow-hidden origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg w-36 ring-1 ring-black ring-opacity-5 focus:outline-none"
+						class="absolute right-0 z-10 mt-3 overflow-hidden text-left origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg shadow-slate-700 w-36 ring-1 ring-black ring-opacity-5 focus:outline-none"
 						role="menu" aria-orientation="vertical" aria-labelledby="menu-0-button" tabindex="-1">
 						<div class="py-1" role="none">
 							<!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
@@ -131,18 +141,24 @@
 								id="menu-0-item-0">Create event</a>
 						</div>
 						<div class="py-1" role="none">
-							<button type="button" wire:click="currentweek" class="block px-4 py-2 text-sm text-gray-700" role="menuitem"
+							<button type="button" wire:click="currentweek" class="flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-primary-100" role="menuitem"
 								tabindex="-1" id="menu-0-item-1">Go to this week</button>
 						</div>
-						<div class="py-1" role="none">
-							<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-								id="menu-0-item-2">Vehicle A</a>
-							<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-								id="menu-0-item-3">Vehicle B</a>
-							<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-								id="menu-0-item-4">Vehicle C</a>
-							<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-								id="menu-0-item-5">Vehicle D</a>
+						<div class="py-1 " role="none">
+							@foreach ($vehicles as $vehicle)
+								@if ($vehicle->model . ' : ' . $vehicle->plate_number == $currentVehicle->model . ' : ' . $currentVehicle->plate_number)
+								<button type="button"x-on:click="open=false" wire:click="setVehicle({{ $vehicle->id }})"
+									class="flex w-full px-4 py-2 text-sm text-left text-primary-700 bg-primary-200" role="menuitem" tabindex="-1"
+									id="menu-0-item-{{ $loop->index }}">{{ $vehicle->model . ' (' . $vehicle->plate_number.')' }}
+								</button>
+								@else
+								<button type="button"x-on:click="open=false" wire:click="setVehicle({{ $vehicle->id }})"
+									class="flex w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-primary-100" role="menuitem" tabindex="-1"
+									id="menu-0-item-{{ $loop->index }}">{{ $vehicle->model . ' (' . $vehicle->plate_number.')' }}
+								</button>
+								@endif
+								
+							@endforeach
 						</div>
 					</div>
 				</div>
@@ -153,21 +169,21 @@
 				<div class="sticky top-0 z-30 flex-none bg-white shadow ring-1 ring-black ring-opacity-5 sm:pr-8">
 					<div class="grid grid-cols-7 text-sm leading-6 text-gray-500 sm:hidden">
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">M <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[0] }}</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[0]['day_date'] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">T <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[1] }}</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[1]['day_date'] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">W <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[2] }}</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[2]['day_date'] }}</span></button>
 						{{-- <button type="button" class="flex flex-col items-center pt-2 pb-3">W <span
 								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-white bg-indigo-600 rounded-full">12</span></button> --}}
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">T <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[3] }}</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[3]['day_date'] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">F <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[4] }}</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[4]['day_date'] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">S <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[5] }}</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[5]['day_date'] }}</span></button>
 						<button type="button" class="flex flex-col items-center pt-2 pb-3">S <span
-								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[6] }}</span></button>
+								class="flex items-center justify-center w-8 h-8 mt-1 font-semibold text-gray-900">{{ $dates[6]['day_date'] }}</span></button>
 					</div>
 
 					<div
@@ -180,10 +196,10 @@
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[0] }}</span>
 								</span> --}}
 								<span>Mon <span
-									class="items-center justify-center font-semibold text-gray-900">{{ $dates[0] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[0]['day_date'] }}</span></span>
 							@else
 								<span>Mon <span
-										class="items-center justify-center font-semibold text-gray-900">{{ $dates[0] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[0]['day_date'] }}</span></span>
 							@endif
 						</div>
 						<div class="flex items-center justify-center py-3">
@@ -194,10 +210,10 @@
 										class="font-semibolds ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white">{{ $dates[1] }}</span>
 								</span> --}}
 								<span>Tue <span
-									class="items-center justify-center font-semibold text-gray-900">{{ $dates[1] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[1]['day_date'] }}</span></span>
 							@else
 								<span>Tue <span
-										class="items-center justify-center font-semibold text-gray-900">{{ $dates[1] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[1]['day_date'] }}</span></span>
 							@endif
 						</div>
 						<div class="flex items-center justify-center py-3">
@@ -208,10 +224,10 @@
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[2] }}</span>
 								</span> --}}
 								<span>Wed <span
-									class="items-center justify-center font-semibold text-gray-900">{{ $dates[2] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[2]['day_date'] }}</span></span>
 							@else
 								<span>Wed <span
-										class="items-center justify-center font-semibold text-gray-900">{{ $dates[2] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[2]['day_date'] }}</span></span>
 							@endif
 
 						</div>
@@ -223,10 +239,10 @@
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[3] }}</span>
 								</span> --}}
 								<span>Thu <span
-									class="items-center justify-center font-semibold text-gray-900">{{ $dates[3] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[3]['day_date'] }}</span></span>
 							@else
 								<span>Thu <span
-										class="items-center justify-center font-semibold text-gray-900">{{ $dates[3] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[3]['day_date'] }}</span></span>
 							@endif
 						</div>
 						<div class="flex items-center justify-center py-3">
@@ -237,10 +253,10 @@
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[4] }}</span>
 								</span> --}}
 								<span>Fri <span
-									class="items-center justify-center font-semibold text-gray-900">{{ $dates[4] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[4]['day_date'] }}</span></span>
 							@else
 								<span>Fri <span
-										class="items-center justify-center font-semibold text-gray-900">{{ $dates[4] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[4]['day_date'] }}</span></span>
 							@endif
 						</div>
 						<div class="flex items-center justify-center py-3">
@@ -251,10 +267,10 @@
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[5] }}</span>
 								</span> --}}
 								<span>Sat <span
-									class="items-center justify-center font-semibold text-gray-900">{{ $dates[5] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[5]['day_date'] }}</span></span>
 							@else
 								<span>Sat <span
-										class="items-center justify-center font-semibold text-gray-900">{{ $dates[5] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[5]['day_date'] }}</span></span>
 							@endif
 						</div>
 						<div class="flex items-center justify-center py-3">
@@ -264,10 +280,10 @@
 										class="ml-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white">{{ $dates[6] }}</span>
 								</span> --}}
 								<span>Sun <span
-									class="items-center justify-center font-semibold text-gray-900">{{ $dates[6] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[6]['day_date'] }}</span></span>
 							@else
 								<span>Sun <span
-										class="items-center justify-center font-semibold text-gray-900">{{ $dates[6] }}</span></span>
+										class="items-center justify-center font-semibold text-gray-900">{{ $dates[6]['day_date'] }}</span></span>
 							@endif
 						</div>
 					</div>
@@ -393,49 +409,132 @@
 						<!-- Events -->
 						<ol class="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8"
 							style="grid-template-rows: 1.75rem repeat(288, minmax(0, 1fr)) auto">
-							<li class="relative flex mt-px sm:col-start-1" style="grid-row: {{ (0*12)+2 }} / span {{ 1.5*12 }}">
-								<a href="#"
-									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-blue-200 rounded-lg group inset-1 hover:bg-blue-100">
-									<p class="order-1 font-semibold text-blue-700">Travel From SKSU Tacurong to Sultan Kudarat Provincial Capitol</p>
-									<p class="text-blue-500 group-hover:text-blue-700"><time datetime="2022-01-12T06:00">12:00 AM - 1:30 AM</time></p>
-								</a>
-							</li>
-							<li class="relative flex mt-px sm:col-start-2" style="grid-row: {{ (4.5*12)+2 }} / span {{ 1.5*12 }}">
-								<a href="#"
-									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-red-100 rounded-lg group inset-1 hover:bg-blue-100">
-									<p class="order-1 font-semibold text-red-700">Breakfast</p>
-									<p class="text-red-500 group-hover:text-red-700"><time datetime="2022-01-12T06:00">4:30 AM - 6:00 AM</time></p>
-								</a>
-							</li>
-							<li class="relative flex mt-px sm:col-start-4" style="grid-row: {{ (3*12)+2 }} / span {{ 15*12 }}">
-								<a href="#"
-									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-red-200 rounded-lg group inset-1 hover:bg-red-100">
-									<p class="order-1 font-semibold text-red-700">Excursion to Lake Sebu</p>
-									<p class="text-red-500 group-hover:text-red-700"><time datetime="2022-01-12T06:00">3:00 AM - 6:00 PM</time></p>
-								</a>
-							</li>
-							<li class="relative flex mt-px sm:col-start-3" style="grid-row: 2 / span 18">
-								<a href="#"
-									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-blue-200 rounded-lg group inset-1 hover:bg-blue-100">
-									<p class="order-1 font-semibold text-blue-700">Breakfast</p>
-									<p class="text-blue-500 group-hover:text-blue-700"><time datetime="2022-01-12T06:00">6:00 AM</time></p>
-								</a>
-							</li>
+
+							@foreach ($schedules as $schedule)
+								@switch($schedule->date_of_travel)
+									@case($dates[0]['full_date'])
+									@php
+										$date1=new DateTime($schedule->time_start);
+										$date2=$date1->diff(new DateTime($schedule->time_end));
+										$difference = ($date2->i/60)+$date2->h;
+									@endphp
+									<li class="relative flex mt-px sm:col-start-1"
+										style="grid-row: {{  date_format(date_create($schedule->time_start),'G')  * 12 + 2 }} / span {{ $difference * 12 }}">
+										<a href="#"
+											class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg bg-cyan-200 group inset-1 hover:bg-cyan-100">
+											<p class="order-1 font-semibold text-cyan-700">{{ $schedule->purpose }}
+											</p>
+											<p class="text-cyan-500 group-hover:text-cyan-700"><time datetime="2022-01-12T06:00">{{ date_format(date_create($schedule->time_start),'h:i a') }} - {{ date_format(date_create($schedule->time_end),'h:i a') }} </time></p>
+										</a>
+									</li>
+									@break
+
+									@case($dates[1]['full_date'])
+									@php
+										$date1=new DateTime($schedule->time_start);
+										$date2=$date1->diff(new DateTime($schedule->time_end));
+										$difference = ($date2->i/60)+$date2->h;
+									@endphp
+									<li class="relative flex mt-px sm:col-start-2"
+										style="grid-row: {{  date_format(date_create($schedule->time_start),'G')  * 12 + 2 }} / span {{ $difference * 12 }}">
+										<a href="#"
+											class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-blue-200 rounded-lg group inset-1 hover:bg-blue-100">
+											<p class="order-1 font-semibold text-blue-700">{{ $schedule->purpose }}
+											</p>
+											<p class="text-blue-500 group-hover:text-blue-700"><time datetime="2022-01-12T06:00">{{ date_format(date_create($schedule->time_start),'h:i a') }} - {{ date_format(date_create($schedule->time_end),'h:i a') }} </time></p>
+										</a>
+									</li>
+									@break
+
+									@case($dates[2]['full_date'])
+									@php
+										$date1=new DateTime($schedule->time_start);
+										$date2=$date1->diff(new DateTime($schedule->time_end));
+										$difference = ($date2->i/60)+$date2->h;
+									@endphp
+									<li class="relative flex mt-px sm:col-start-3"
+										style="grid-row: {{  date_format(date_create($schedule->time_start),'G')  * 12 + 2 }} / span {{ $difference * 12 }}">
+										<a href="#"
+											class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-pink-200 rounded-lg group inset-1 hover:bg-pink-100">
+											<p class="order-1 font-semibold text-pink-700">{{ $schedule->purpose }}
+											</p>
+											<p class="text-pink-500 group-hover:text-pink-700"><time datetime="2022-01-12T06:00">{{ date_format(date_create($schedule->time_start),'h:i a') }} - {{ date_format(date_create($schedule->time_end),'h:i a') }} </time></p>
+										</a>
+									</li>
+									@break
+
+									@case($dates[3]['full_date'])
+									@php
+										$date1=new DateTime($schedule->time_start);
+										$date2=$date1->diff(new DateTime($schedule->time_end));
+										$difference = ($date2->i/60)+$date2->h;
+									@endphp
+									<li class="relative flex mt-px sm:col-start-4"
+										style="grid-row: {{  date_format(date_create($schedule->time_start),'G')  * 12 + 2 }} / span {{ $difference * 12 }}">
+										<a href="#"
+											class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg bg-amber-200 group inset-1 hover:bg-amber-100">
+											<p class="order-1 font-semibold text-amber-700">{{ $schedule->purpose }}
+											</p>
+											<p class="text-amber-600 group-hover:text-amber-700"><time datetime="2022-01-12T06:00">{{ date_format(date_create($schedule->time_start),'h:i a') }} - {{ date_format(date_create($schedule->time_end),'h:i a') }} </time></p>
+										</a>
+									</li>
+									@break
+
+									@case($dates[4]['full_date'])
+									@php
+										$date1=new DateTime($schedule->time_start);
+										$date2=$date1->diff(new DateTime($schedule->time_end));
+										$difference = ($date2->i/60)+$date2->h;
+									@endphp
+									<li class="relative flex mt-px sm:col-start-5"
+										style="grid-row: {{  date_format(date_create($schedule->time_start),'G')  * 12 + 2 }} / span {{ $difference * 12 }}">
+										<a href="#"
+											class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg bg-primary-200 group inset-1 hover:bg-primary-100">
+											<p class="order-1 font-semibold text-primary-700">{{ $schedule->purpose }}
+											</p>
+											<p class="text-primary-500 group-hover:text-primary-700"><time datetime="2022-01-12T06:00">{{ date_format(date_create($schedule->time_start),'h:i a') }} - {{ date_format(date_create($schedule->time_end),'h:i a') }} </time></p>
+										</a>
+									</li>
+									@break
+
+									@case($dates[5]['full_date'])
+									@php
+										$date1=new DateTime($schedule->time_start);
+										$date2=$date1->diff(new DateTime($schedule->time_end));
+										$difference = ($date2->i/60)+$date2->h;
+									@endphp
+									<li class="relative flex mt-px sm:col-start-6"
+										style="grid-row: {{  date_format(date_create($schedule->time_start),'G')  * 12 + 2 }} / span {{ $difference * 12 }}">
+										<a href="#"
+											class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-purple-200 rounded-lg group inset-1 hover:bg-purple-100">
+											<p class="order-1 font-semibold text-purple-700">{{ $schedule->purpose }}
+											</p>
+											<p class="text-purple-500 group-hover:text-purple-700"><time datetime="2022-01-12T06:00">{{ date_format(date_create($schedule->time_start),'h:i a') }} - {{ date_format(date_create($schedule->time_end),'h:i a') }} </time></p>
+										</a>
+									</li>
+									@break
+
+									@case($dates[6]['full_date'])
+									@php
+										$date1=new DateTime($schedule->time_start);
+										$date2=$date1->diff(new DateTime($schedule->time_end));
+										$difference = ($date2->i/60)+$date2->h;
+									@endphp
+									<li class="relative flex mt-px sm:col-start-7"
+										style="grid-row: {{  date_format(date_create($schedule->time_start),'G')  * 12 + 2 }} / span {{ $difference * 12 }}">
+										<a href="#"
+											class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg bg-rose-200 group inset-1 hover:bg-rose-100">
+											<p class="order-1 font-semibold text-rose-700">{{ $schedule->purpose }}
+											</p>
+											<p class="text-rose-500 group-hover:text-rose-700"><time datetime="2022-01-12T06:00">{{ date_format(date_create($schedule->time_start),'h:i a') }} - {{ date_format(date_create($schedule->time_end),'h:i a') }} </time></p>
+										</a>
+									</li>
+									@break
+								@endswitch
+							@endforeach
+
 							
-							<li class="relative flex mt-px sm:col-start-3" style="grid-row: 92 / span 30">
-								<a href="#"
-									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg group inset-1 bg-pink-50 hover:bg-pink-100">
-									<p class="order-1 font-semibold text-pink-700">Flight to Paris</p>
-									<p class="text-pink-500 group-hover:text-pink-700"><time datetime="2022-01-12T07:30">7:30 AM</time></p>
-								</a>
-							</li>
-							<li class="relative hidden mt-px sm:col-start-6 sm:flex" style="grid-row: 122 / span 24">
-								<a href="#"
-									class="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-gray-100 rounded-lg group inset-1 hover:bg-gray-200">
-									<p class="order-1 font-semibold text-gray-700">Meeting with design team at Disney</p>
-									<p class="text-gray-500 group-hover:text-gray-700"><time datetime="2022-01-15T10:00">10:00 AM</time></p>
-								</a>
-							</li>
+
 						</ol>
 					</div>
 				</div>
