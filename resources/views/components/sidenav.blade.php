@@ -286,7 +286,7 @@
 
         </div>
         @php
-            $motorpool_head = App\Models\Office::where('name', 'Motorpool')->first();
+            $motorpool_head = App\Models\Office::where('name','like', '%Motorpool%')->first();
         @endphp
 
         <div class="space-y-1" x-data="{ open: false }">
