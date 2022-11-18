@@ -6,6 +6,7 @@ use App\Models\RequestSchedule;
 use App\Models\Vehicle;
 use Carbon\Carbon;
 use DateTime;
+use Filament\Notifications\Notification;
 use Livewire\Component;
 
 class ViewWeeklySchedule extends Component
@@ -100,15 +101,19 @@ class ViewWeeklySchedule extends Component
     
     public function getSchedule()
     {
-        $this->schedules=RequestSchedule::where('vehicle_id',$this->currentVehicle->id)
-                ->whereBetween('date_of_travel',
-                    [
-                    strval((new Carbon($this->dates[0]['full_date']))->format('Y-m-d')),
-                    strval((new Carbon($this->dates[6]['full_date']))->format('Y-m-d'))
-                    ]
-                    )
-                ->get();        
+       if($this->currentVehicle == null){
         
+       }else{
+        $this->schedules=RequestSchedule::where('vehicle_id',$this->currentVehicle->id)
+        ->whereBetween('date_of_travel',
+            [
+            strval((new Carbon($this->dates[0]['full_date']))->format('Y-m-d')),
+            strval((new Carbon($this->dates[6]['full_date']))->format('Y-m-d'))
+            ]
+            )
+        ->get();        
+
+       }
     }
     
     public function mount()
@@ -125,6 +130,13 @@ class ViewWeeklySchedule extends Component
         $this->schedules=RequestSchedule::all();
         $this->setDates();       
         $this->getSchedule();
+    }
+
+    
+    public function redirectToCreateVehicle()
+    {
+        
+        redirect()->route('motorpool.vehicle.create',['1']);
     }
 
     

@@ -47,8 +47,11 @@ class VehicleCreate extends Component implements HasForms
         return redirect()->route('motorpool.vehicle.index', $vehicle);
     }
 
-    public function mount()
+    public function mount($from_schedules)
     {
+        if ($from_schedules == 1) {
+            Notification::make()->title('Redirected')->body('No vehicles were found! You have been redirected to the add vehicle page...')->duration(4*1000)->warning()->send();
+        }
         $this->form->fill();
     }
 

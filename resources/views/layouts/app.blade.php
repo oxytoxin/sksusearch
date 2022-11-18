@@ -110,9 +110,9 @@
 		</div>
 	</div>
 	<x-dialog z-index="z-50" blur="md" align="center" />
+	{{-- <x-notifications position="top-right" z-index="z-50" /> --}}
 	@stack('modals')
 	
-	@livewire('notifications')
 </body>
-
+@livewire('notifications')
 </html>

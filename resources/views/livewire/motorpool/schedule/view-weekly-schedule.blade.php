@@ -1,4 +1,7 @@
 <div>
+	@if ($currentVehicle ==null)
+		{{ $this->redirectToCreateVehicle() }}
+	@else
 	<div class="flex flex-col h-full bg-white rounded-lg">
 		<header class="flex items-center justify-between flex-none px-6 py-4 border-b border-gray-200">
 			<div class="flex-col text-lg font-semibold text-gray-900 capitalize">
@@ -541,5 +544,6 @@
 			</div>
 		</div>
 	</div>
+	@endif
 
 </div>

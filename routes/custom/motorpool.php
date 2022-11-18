@@ -13,7 +13,7 @@ Route::middleware([
     config('jetstream.auth_session'),
 ])->prefix('motorpool')->name('motorpool.')->group(function () {
     Route::get('/vehicle', VehicleIndex::class)->name('vehicle.index');
-    Route::get('/vehicle/create', VehicleCreate::class)->name('vehicle.create');
+    Route::get('/vehicle/create/{from_schedules}', VehicleCreate::class)->name('vehicle.create');
     Route::get('/vehicle/edit/{vehicle}', VehicleEdit::class)->name('vehicle.edit');
     Route::get('/schedule/weekly', ViewWeeklySchedule::class)->name('weekly-schedule');
     Route::get('/requests', RequestIndex::class)->name('request.index');

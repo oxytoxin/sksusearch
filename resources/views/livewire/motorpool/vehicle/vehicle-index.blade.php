@@ -1,7 +1,7 @@
 <div class="space-y-2">
     <div class="flex justify-between items-center">
         <h2 class="font-light capitalize text-primary-600">Vehicles</h2>
-        <a href="{{ route('motorpool.vehicle.create') }}"
+        <a href="{{ route('motorpool.vehicle.create',['0']) }}"
             class="hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">Add
             Vehicle</a>
     </div>
