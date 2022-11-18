@@ -287,7 +287,7 @@
         </div>
         @php
             $motorpool_head = App\Models\Office::where('name','like', '%Motorpool%')->first();
-            dd($motorpool_head);
+            
         @endphp
 
         <div class="space-y-1" x-data="{ open: false }">
@@ -309,7 +309,7 @@
                 x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-300'
                 x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'
                 class="origin-top-left">
-                @if ($motorpool_head?->head_id == auth()->user()->id)
+                @if ($motorpool_head?->head_id == auth()->user()->id || $motorpool_head?->admin_user_id == auth()->user()->id)
                     <a href="{{ route('motorpool.vehicle.index') }}"
                         class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                         Vehicles
