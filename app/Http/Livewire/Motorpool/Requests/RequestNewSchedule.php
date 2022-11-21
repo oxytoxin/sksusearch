@@ -63,8 +63,6 @@ class RequestNewSchedule extends Component implements HasForms
                     '1' => 'Slip',
                     '2' => 'Travel Order',
                 ])
-                ->default('1')
-                ->disablePlaceholderSelection()
                 ->afterStateUpdated(function ($set, $state) {
                     if ($state == '1') {
                         $set('travel_order_id', '');
@@ -103,7 +101,7 @@ class RequestNewSchedule extends Component implements HasForms
                 ->reactive(),
             Select::make('driver_id')
                 ->label('Driver')
-                ->options(EmployeeInformation::where('position_id', Position::where('description','Driver')->pluck('id'))
+                ->options(EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))
                     ->whereHas('office', function ($query) {
                         return $query->where('campus_id', '=', auth()->user()->employee_information->office->campus_id);
                     })->pluck('full_name', 'id'))
@@ -163,7 +161,7 @@ class RequestNewSchedule extends Component implements HasForms
         DB::beginTransaction();
         $rq = RequestSchedule::create([
             'request_type' => $this->request_type,
-            'travel_order_id' => $this->travel_order_id,
+            'travel_order_id' => $this->travel_order_id == '' ? null : $this->travel_order_id,
             'driver_id' => $this->driver_id,
             'vehicle_id' => $this->vehicle_id,
             'purpose' => $this->purpose,

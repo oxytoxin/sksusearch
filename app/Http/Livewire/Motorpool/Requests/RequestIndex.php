@@ -7,6 +7,8 @@ use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\ViewAction;
 use Livewire\Component;
 
 class RequestIndex extends Component implements HasTable
@@ -34,9 +36,15 @@ class RequestIndex extends Component implements HasTable
     protected function getTableActions(): array
     {
         return [
-            Action::make('edit')
-                ->icon('heroicon-s-pencil')
-            // ->url(fn (Vehicle $record): string => route('motorpool.vehicle.edit', $record))
+            ActionGroup::make([
+                Action::make('edit')
+                    ->icon('ri-edit-line'),
+                ViewAction::make('print')
+                    ->label('Print')
+                    ->icon('ri-printer-fill')
+                    ->openUrlInNewTab()
+                    ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record]), true),
+            ])
         ];
     }
 
