@@ -272,7 +272,7 @@ class ArchiveLegacyDocumentsEdit extends Component implements HasForms
         $this->codeSent = true;
         Notification::make()
             ->title('Code Sent')
-            ->body($this->code)
+            ->body('Please Contact the authorized personnel.')
             ->success()
             ->send();
     }
