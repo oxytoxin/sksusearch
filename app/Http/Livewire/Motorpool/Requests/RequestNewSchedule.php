@@ -174,11 +174,10 @@ class RequestNewSchedule extends Component implements HasForms
             'time_end' => $this->time_end,
         ]);
         $rq->applicants()->sync($this->passengers);
-        // $to->signatories()->sync($this->signatories);
         DB::commit();
-        Notification::make()->title('Operation Success')->body('Request has been created.')->success()->send();
 
-        return redirect()->route('motorpool.request.index', $rq);
+        Notification::make()->title('Operation Success')->body('Request has been created.')->success()->send();
+        return redirect()->route('motorpool.request.show', $rq);
     }
 
     public function render()
