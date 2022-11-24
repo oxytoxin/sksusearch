@@ -19,5 +19,5 @@ Route::middleware([
     Route::get('/schedule/weekly', ViewWeeklySchedule::class)->name('weekly-schedule');
     Route::get('/requests', RequestIndex::class)->name('request.index');
     Route::get('/requests/new', RequestNewSchedule::class)->name('request.new');
-    Route::get('/requests/show', RequestShow::class)->name('request.show');
+    Route::get('/requests/show/{request}', RequestShow::class)->name('request.show');
 });

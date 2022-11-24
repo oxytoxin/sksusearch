@@ -43,7 +43,7 @@ class RequestIndex extends Component implements HasTable
                     ->label('Print')
                     ->icon('ri-printer-fill')
                     ->openUrlInNewTab()
-                    ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record]), true),
+                ->url(fn ($record) => route('motorpool.request.show', ['request' => $record]), true),
             ])
         ];
     }
