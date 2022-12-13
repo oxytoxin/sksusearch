@@ -14,7 +14,7 @@
 			</div>
 			
 			<div class="flex items-center" x-data="{ showMeSelect: true }" x-cloak>
-				<div class="hidden md:mr-4 md:flex md:items-center">
+				{{-- <div class="hidden md:mr-4 md:flex md:items-center">
 					<div class="relative flex flex-row items-center">
 						<label for="search" class="text-sm md:mr-2">Search Vehicle </label>
 						<div class="relative" class="origin-center-left" x-show='showMeSelect == false'
@@ -36,7 +36,7 @@
 					<span aria-hidden="true"
 						:class="showMeSelect == false ? 'translate-x-0 bg-primary-alt-100' : 'translate-x-5 bg-primary-300 border border-white'"
 						class="inline-block w-5 h-5 transition duration-200 ease-in-out transform rounded-full shadow pointer-events-none ring-0"></span>
-				</button>
+				</button> --}}
 
 				<div class="hidden md:mr-4 md:flex md:items-center">
 					<div class="flex flex-row items-center">
