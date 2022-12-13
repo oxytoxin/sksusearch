@@ -6,6 +6,7 @@ use App\Models\DisbursementVoucher;
 use App\Models\LegacyDocument;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\Position;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -118,7 +119,10 @@ class ViewLegacyDocuments extends Component implements HasTable
             ActionGroup::make([
                 ViewAction::make('legacy_document_details')
                     ->label('View Details')
-                    ->icon('ri-list-check-2'),
+                    ->icon('ri-list-check-2')
+                    ->modalContent(fn ($record) => view('components.archiver.tables.columns.legacy-document-details', [
+                        'legacy_document' => $record,
+                    ])),
                 ViewAction::make('legacy_document_preview')
                     ->label('View Scanned Documents')
                     ->url(fn (LegacyDocument $record): string => route('archiver.view-scanned-docs-lgc', [$record,0]))
@@ -138,6 +142,10 @@ class ViewLegacyDocuments extends Component implements HasTable
             ])->icon('ri-flashlight-fill'),
             
         ];
+    }
+    protected function getTableActionsPosition(): ?string
+    {
+        return Position::AfterCells;
     }
     public function render()
     {

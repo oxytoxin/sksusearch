@@ -2,7 +2,7 @@
     <div class="flex">
         <h2 class="font-light capitalize text-primary-600">Archives</h2>
     </div>
-    <div x-data="{ tab: 'nl_docs' }" x-cloak>
+    <div x-data="{ tab: 'leg_docs' }" x-cloak>
         <div class="inline-flex flex-col mt-2 md:flex-row">
             <button @click="tab = 'nl_docs'" :class="tab == 'nl_docs' && 'bg-white -mt-2 text-primary-600'" class="px-4 py-2 mt-2 text-lg font-semibold rounded-t-lg hover:bg-primary-300">Non-legacy documents</button>
             <button @click="tab = 'leg_docs'" :class="tab == 'leg_docs' && 'bg-white -mt-2 text-primary-600'" class="px-4 py-2 mt-2 text-lg font-semibold rounded-t-lg hover:bg-primary-300">Legacy Documents</button>
