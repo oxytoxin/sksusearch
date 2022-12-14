@@ -22,6 +22,16 @@ class ViewLegacyDocuments extends Component implements HasTable
 {
     use InteractsWithTable;
 
+    
+    public function mount($document_code)
+    {
+     if($document_code !=""){
+        $this->form->fill(["tableSearchQuery"=>$document_code]);
+     }
+    }
+
+    
+
     protected function getTableQuery()
     {
         return LegacyDocument::query();

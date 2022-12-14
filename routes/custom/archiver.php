@@ -7,6 +7,7 @@ use App\Http\Livewire\Archiver\ArchiveLegacyDocumentsCreate;
 use App\Http\Livewire\Archiver\ArchiveLegacyDocumentsEdit;
 use App\Http\Livewire\Archiver\ArchiverDashboard;
 use App\Http\Livewire\Archiver\ViewArchives;
+use App\Http\Livewire\Archiver\ViewLegacyDocuments;
 use App\Http\Livewire\Archiver\ViewLgcScannedDocuments;
 use App\Http\Livewire\Archiver\ViewScannedDocuments;
 use App\Http\Livewire\Cashier\CashierDashboard;
@@ -26,4 +27,5 @@ Route::middleware([
     Route::get('/archive-document/legacy/new', ArchiveLegacyDocumentsCreate::class)->name('archive-leg-doc.create');
     Route::get('/view-scanned-documents/legacy/{legacy_document}/{edit}', ViewLgcScannedDocuments::class)->name('view-scanned-docs-lgc');
     Route::get('/view-scanned-documents/{disbursement_voucher}', ViewScannedDocuments::class)->name('view-scanned-docs');
+    Route::get('/view-legacy-documents/email/{document_code}', ViewLegacyDocuments::class)->name('view-legacy-docs-from-email');
 });

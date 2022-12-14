@@ -26,7 +26,7 @@
             x-transition:enter = 'transition fade-in duration-700'
             x-transition:enter-start =  'opacity-0'
             x-transition:enter-end =  'opacity-100'>
-            @livewire('archiver.view-legacy-documents')
+            @livewire('archiver.view-legacy-documents',[''])
             </div>
         </div>
     </div>

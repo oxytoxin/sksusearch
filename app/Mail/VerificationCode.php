@@ -13,6 +13,7 @@ class VerificationCode extends Mailable
 {
     use Queueable, SerializesModels;
     public $code;
+    public $ldc;
     /**
      * Create a new message instance.
      *
@@ -21,6 +22,7 @@ class VerificationCode extends Mailable
     public function __construct($code,$legacy_document)
     {
         $this->code = $code;
+        $this->ldc = $legacy_document;
     }
 
     /**
