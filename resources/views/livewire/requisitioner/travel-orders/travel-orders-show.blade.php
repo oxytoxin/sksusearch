@@ -63,11 +63,8 @@
                         <div class="flex-wrap block -space-y-1">
                             @if ($travel_order->travel_order_type->name == 'Official Time')
                                 <span class="font-semibold tracking-wide text-left text-black text-md">
-                                    You are scheduled to travel from <strong
-                                        class="underline">{{ $travel_order->date_from->format('jS') . ' of ' . $travel_order->date_from->format('F Y') }}</strong>
-                                    to
-                                    <strong
-                                        class="underline">{{ $travel_order->date_to->format('jS') . ' of ' . $travel_order->date_to->format('F Y') }}</strong>
+                                    You are scheduled to travel on <strong
+                                        class="underline">{{ $travel_order->date_from->format('F j') . '-' . $travel_order->date_to->format('j, Y') }}</strong>
                                     to do the following:
                                 </span>
                             @else
@@ -81,12 +78,9 @@
                                         {{ $travel_order->philippine_province_id == null ? 'Province Not Set' : $travel_order->philippine_province->province_description }},
                                         {{ $travel_order->philippine_region_id == null ? 'City Not Set' : $travel_order->philippine_region->region_description }}
                                     </strong>
-                                    on the
+                                    on
                                     <strong
-                                        class="underline">{{ $travel_order->date_from->format('jS') . ' of ' . $travel_order->date_from->format('F Y') }}</strong>
-                                    to
-                                    <strong
-                                        class="underline">{{ $travel_order->date_to->format('jS') . ' of ' . $travel_order->date_to->format('F Y') }}</strong>
+                                        class="underline">{{ $travel_order->date_from->format('F j') . '-' . $travel_order->date_to->format('j, Y') }}</strong>
                                     to do the following:
                                 </span>
                             @endif
@@ -96,24 +90,31 @@
                                 {{ $travel_order->purpose == '' ? 'Purpose not Found' : $travel_order->purpose }}
                             </span>
 
-                            @foreach ($travel_order->signatories as $signatory)
-                                <span
-                                    class="block pt-16 font-semibold tracking-wide text-center text-black underline text-md">
-                                    {{ $signatory->employee_information->full_name }}
-                                </span>
-                                <span class="block pt-3 font-semibold tracking-wide text-center text-black text-md">
-                                    @if ($signatory->employee_information->position->description == 'University President')
-                                        {{ $signatory->employee_information->position->description }}
-                                    @elseif ($signatory->employee_information->position->description == 'Faculty')
-                                        {{ $signatory->employee_information->position->description }}
-                                    @elseif($signatory->employee_information->office == null)
-                                        {{ $signatory->employee_information->position->description }}
-                                    @else
-                                        {{ $signatory->employee_information->position->description }} of
-                                        {{ $signatory->employee_information->office->name }}
-                                    @endif
-                                </span>
-                            @endforeach
+                            <span
+                                class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
+                                Your travel is an <span
+                                    class="underline">{{ $travel_order->travel_order_type->name }}</span>. A report of activities should be made immediately upon termination of this travel order.
+                                    </span>
+
+                                    @foreach ($travel_order->signatories as $signatory)
+                                        <span
+                                            class="block pt-16 font-semibold tracking-wide text-center text-black underline text-md">
+                                            {{ $signatory->employee_information->full_name }}
+                                        </span>
+                                        <span
+                                            class="block pt-3 font-semibold tracking-wide text-center text-black text-md">
+                                            @if ($signatory->employee_information->position->description == 'University President')
+                                                {{ $signatory->employee_information->position->description }}
+                                            @elseif ($signatory->employee_information->position->description == 'Faculty')
+                                                {{ $signatory->employee_information->position->description }}
+                                            @elseif($signatory->employee_information->office == null)
+                                                {{ $signatory->employee_information->position->description }}
+                                            @else
+                                                {{ $signatory->employee_information->position->description }} of
+                                                {{ $signatory->employee_information->office->name }}
+                                            @endif
+                                        </span>
+                                    @endforeach
 
                         </div>
                     </div>
