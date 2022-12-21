@@ -79,7 +79,7 @@ class TravelOrdersCreate extends Component implements HasForms
                     ->required(),
                 Flatpickr::make('date_to')
                     ->disableTime()
-                    ->afterOrEqual(fn ($get) => $get('date_from'))
+                    ->afterOrEqual(fn ($get) => $get('date_to'))
                     ->required(),
             ]),
             Fieldset::make('Destination')->schema([
@@ -109,26 +109,31 @@ class TravelOrdersCreate extends Component implements HasForms
     public function save()
     {
         $this->validate();
-        DB::beginTransaction();
-        $to = TravelOrder::create([
-            'tracking_code' => TravelOrder::generateTrackingCode(),
-            'travel_order_type_id' => $this->travel_order_type_id,
-            'date_from' => $this->date_from,
-            'date_to' => $this->date_to,
-            'purpose' => $this->purpose,
-            'has_registration' => $this->has_registration,
-            'registration_amount' => $this->registration_amount,
-            'philippine_region_id' => PhilippineRegion::firstWhere('region_code', $this->region_code)?->id,
-            'philippine_province_id' => PhilippineProvince::firstWhere('province_code', $this->province_code)?->id,
-            'philippine_city_id' => PhilippineCity::firstWhere('city_municipality_code', $this->city_code)?->id,
-            'other_details' => $this->other_details,
-        ]);
-        $to->applicants()->sync($this->applicants);
-        $to->signatories()->sync($this->signatories);
-        DB::commit();
-        Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
 
-        return redirect()->route('requisitioner.travel-orders.show', $to);
+        if ($this->date_from > $this->date_to) {
+            Notification::make()->title('Operation Failed')->body('Invalid Dates. Please Check again')->danger()->send();
+        } else {
+            DB::beginTransaction();
+            $to = TravelOrder::create([
+                'tracking_code' => TravelOrder::generateTrackingCode(),
+                'travel_order_type_id' => $this->travel_order_type_id,
+                'date_from' => $this->date_from,
+                'date_to' => $this->date_to,
+                'purpose' => $this->purpose,
+                'has_registration' => $this->has_registration,
+                'registration_amount' => $this->registration_amount,
+                'philippine_region_id' => PhilippineRegion::firstWhere('region_code', $this->region_code)?->id,
+                'philippine_province_id' => PhilippineProvince::firstWhere('province_code', $this->province_code)?->id,
+                'philippine_city_id' => PhilippineCity::firstWhere('city_municipality_code', $this->city_code)?->id,
+                'other_details' => $this->other_details,
+            ]);
+            $to->applicants()->sync($this->applicants);
+            $to->signatories()->sync($this->signatories);
+            DB::commit();
+            Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
+
+            return redirect()->route('requisitioner.travel-orders.show', $to);
+        }
     }
 
     public function mount()
