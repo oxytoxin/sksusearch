@@ -11,9 +11,12 @@ class TravelOrdersToSignView extends Component
 {
     use Actions;
 
+    public $rejectionNote;
+
     public TravelOrder $travel_order;
 
     public $modal = false;
+    public $modalRejection= false;
 
     public $limit = 2;
 
@@ -30,6 +33,7 @@ class TravelOrdersToSignView extends Component
             $this->oic_signatory =  (int) request('oic_signatory');
         }
     }
+
 
     public function render()
     {
@@ -79,4 +83,37 @@ class TravelOrdersToSignView extends Component
             $icon = 'success',
         );
     }
+    public function reject()
+    {
+        $this->validate(['rejectionNote' => 'required|min:10']);
+        $this->modalRejection = false;
+        $this->dialog()->id('custom')->confirm([
+           "icon"=>'question',
+           "iconColor"=>'text-primary-500',
+           'accept'  => [
+            'label'  => 'Proceed',
+            'method' => 'rejectFinal',
+            ],           
+        ]);
+    }
+    
+    public function rejectFinal()
+    {
+        if ($this->from_oic) {
+            $this->travel_order->signatories()->updateExistingPivot($this->oic_signatory, ['is_approved' => 2]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected as OIC for: ' . User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : '.$this->rejectionNote, 'user_id' => auth()->id()]);
+        } else {
+            $this->travel_order->signatories()->updateExistingPivot(auth()->id(), ['is_approved' => 2]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : '.$this->rejectionNote, 'user_id' => auth()->id()]);
+        }
+        $this->travel_order->refresh();
+        $this->dialog()->success(
+            $title = 'Operation Completed',
+            $description = 'Travel order rejected!',
+            $icon = 'success',
+        );
+    }
+
+
 }
