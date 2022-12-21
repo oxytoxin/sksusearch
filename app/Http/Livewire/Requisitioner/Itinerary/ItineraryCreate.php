@@ -48,7 +48,12 @@ class ItineraryCreate extends Component implements HasForms
                         $query->whereUserId(auth()->id());
                     })
                     ->whereIn('travel_order_type_id', [TravelOrderType::OFFICIAL_BUSINESS, TravelOrderType::OFFICIAL_TIME])
-                    ->pluck('tracking_code', 'id'))
+                    ->select(
+                        DB::raw("CONCAT(purpose,' ( ',tracking_code,' )') AS tcAndP"),'id')
+                    ->pluck('tcAndP', 'id'))
+
+
+
                 ->afterStateUpdated(function () {
                     $to = TravelOrder::with('philippine_region.dte')->find($this->travel_order_id);
                     $entries = [];

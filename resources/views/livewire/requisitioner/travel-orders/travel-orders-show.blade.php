@@ -171,7 +171,10 @@
 
 				window.print();
 
+                window.location.href = "/requisitioner/travel-orders";
+                
 				document.body.innerHTML = originalContents;
+                
 
 			}
 		</script>

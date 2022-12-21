@@ -83,7 +83,7 @@
 		</div>
 
 		<div
-			class="col-span-1 px-4 py-5 ml-4 overflow-y-auto bg-white border-b rounded-md border-primary-300 max-h-screen-70 soft-scrollbar">
+			class="col-span-1 px-4 py-5 mt-4 overflow-y-auto bg-white border-b rounded-md lg:mt-0 lg:ml-4 border-primary-300 max-h-screen-70 soft-scrollbar">
 			<div class="flow-root mt-6">
 				<ul role="list" class="-my-5 divide-y divide-primary-200">
 					<div class="flex justify-between w-full">

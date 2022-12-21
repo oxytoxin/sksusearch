@@ -21,7 +21,7 @@ class TravelOrder extends Model
     {
         return 'to-' . today()->format('y') . '-' . Str::random(8);
     }
-
+    
     protected function registrationAmount(): Attribute
     {
         return Attribute::make(
