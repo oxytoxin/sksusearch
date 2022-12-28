@@ -16,7 +16,8 @@ return new class extends Migration
         Schema::create('archived_cheques', function (Blueprint $table) {
             $table->id();
             $table->text('cheque_number');
-            $table->integer('cheque_amount');
+            $table->text('payee')->nullable();
+            $table->bigInteger('cheque_amount');
             $table->date('cheque_date')->nullable();
             $table->tinyInteger('cheque_state')->nullable();
             $table->foreignId('building_id')->nullable()->index();

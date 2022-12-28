@@ -19,7 +19,7 @@
                 {{ $this->table }}
             </div>
         </div>
-        <div x-show="tab == 'leg_docs'"  :class="tab == 'leg_docs' && 'rounded-b-lg rounded-r-lg'" class="p-4 origin-[10%_0] bg-white"
+        <div x-show="tab == 'leg_docs'"  :class="tab == 'leg_docs' && 'rounded-b-lg rounded-r-lg rounded-l-lg'" class="p-4 origin-[10%_0] bg-white"
         x-transition:enter = 'transform ease-out duration-200'
         x-transition:enter-start =  'scale-0'
         x-transition:enter-end =  'scale-100'>
@@ -30,7 +30,7 @@
             @livewire('archiver.view-legacy-documents',[''])
             </div>
         </div>
-        <div x-show="tab == 'chq'"  :class="tab == 'chq' && 'rounded-b-lg rounded-r-lg'" class="p-4 origin-[30%_0] bg-white"
+        <div x-show="tab == 'chq'"  :class="tab == 'chq' && 'rounded-b-lg rounded-r-lg rounded-l-lg'" class="p-4 origin-[30%_0] bg-white"
         x-transition:enter = 'transform ease-out duration-200'
         x-transition:enter-start =  'scale-0'
         x-transition:enter-end =  'scale-100'>
@@ -38,7 +38,7 @@
             x-transition:enter = 'transition fade-in duration-700'
             x-transition:enter-start =  'opacity-0'
             x-transition:enter-end =  'opacity-100'>
-            @livewire('archiver.view-legacy-documents',[''])
+            @livewire('archiver.view-stale-cheques')
             </div>
         </div>
     </div>

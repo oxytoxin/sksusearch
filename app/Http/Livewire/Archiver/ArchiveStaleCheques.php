@@ -23,6 +23,7 @@ class ArchiveStaleCheques extends Component implements  HasForms
     public $cheque_amount;
     public $cheque_date;
     public $cheque_state;
+    public $payee;
 
     protected function getFormSchema(): array
     {
@@ -40,6 +41,12 @@ class ArchiveStaleCheques extends Component implements  HasForms
                             TextInput::make("cheque_no")
                             ->label("ADA / CHEQUE NO")
                             ->placeholder("0000000")
+                            ->required()
+                            ->columnSpan(1),
+
+                            TextInput::make("payee")
+                            ->label("Payee name")
+                            ->placeholder("Full name of payee")
                             ->required()
                             ->columnSpan(1),
 
@@ -65,10 +72,19 @@ class ArchiveStaleCheques extends Component implements  HasForms
                             ->options([
                             '1' => 'Cancelled',
                             '2' => 'Stale',
-                            ]),
-
+                            ])
+                            ->columnSpan(
+                                [
+                                'default' => 1,
+                                'sm' => 2,
+                                'md' => 2,
+                                'lg' => 2,
+                                ]
+                            ),
+                            
                             FileUpload::make('attachment')
                             ->enableOpen()
+                            ->required()
                             ->preserveFilenames()
                             ->acceptedFileTypes(['application/pdf'])
                             ->reactive()
@@ -77,7 +93,7 @@ class ArchiveStaleCheques extends Component implements  HasForms
                                 'default' => 1,
                                 'sm' => 2,
                                 'md' => 2,
-                                'lg' => 4,])  
+                                'lg' => 2,])  
                         ]
                     )
                 ]
@@ -101,6 +117,7 @@ class ArchiveStaleCheques extends Component implements  HasForms
             'cheque_amount' => $this->cheque_amt,
             'cheque_date' => $this->cheque_date,
             'cheque_state' => $this->cheque_state,
+            'payee' => $this->payee,
             'other_details'=>json_encode(''),
         ]);
 
