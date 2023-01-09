@@ -18,6 +18,7 @@ class PettyCashFundRecordIndex extends Component implements HasForms
     use InteractsWithForms;
 
     public $data;
+    public $petty_cash_fund;
 
     protected function getFormStatePath(): string
     {

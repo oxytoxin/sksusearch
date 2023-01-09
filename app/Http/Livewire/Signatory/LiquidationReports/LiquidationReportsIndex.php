@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Livewire\Signatory\DisbursementVouchers;
+namespace App\Http\Livewire\Signatory\LiquidationReports;
 
 use Livewire\Component;
+use App\Models\LiquidationReport;
 use Illuminate\Support\Facades\DB;
-use App\Models\DisbursementVoucher;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Filters\Layout;
+use App\Models\LiquidationReportStep;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
 use Filament\Tables\Actions\ViewAction;
@@ -15,55 +15,36 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Concerns\InteractsWithTable;
-use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 
-class DisbursementVouchersIndex extends Component implements HasTable
+class LiquidationReportsIndex extends Component implements HasTable
 {
-    use InteractsWithTable, OfficeDashboardActions;
+
+    use InteractsWithTable;
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereSignatoryId(auth()->id())->latest();
+        return LiquidationReport::whereSignatoryId(auth()->id())->latest();
     }
 
     protected function getTableColumns()
     {
         return [
-            ...$this->officeTableColumns(),
+            TextColumn::make('tracking_number'),
+            TextColumn::make('disbursement_voucher.tracking_number'),
+            TextColumn::make('report_date')->date()->label('Date'),
             TextColumn::make('status')->formatStateUsing(fn ($record) => $record->for_cancellation ? ($record->cancelled_at ? 'Cancelled' : 'For Cancellation') : (($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign')),
         ];
     }
 
-    protected function getTableFilters(): array
+    protected function getTableActions()
     {
         return [
-            SelectFilter::make('for_cancellation')->options([
-                true => 'For Cancellation',
-                false => 'For Approval',
-            ])->default(0)->label('Status'),
-        ];
-    }
-
-    protected function getTableFiltersFormColumns(): int
-    {
-        return 1;
-    }
-
-    protected function getTableFiltersLayout(): ?string
-    {
-        return Layout::AboveContent;
-    }
-
-    public function getTableActions()
-    {
-        return [
-            Action::make('Receive')->button()->action(function (DisbursementVoucher $record) {
+            Action::make('Receive')->button()->action(function ($record) {
                 if ($record->current_step->process == 'Forwarded to') {
                     DB::beginTransaction();
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                     $record->refresh();
                     $record->activity_logs()->create([
@@ -75,17 +56,17 @@ class DisbursementVouchersIndex extends Component implements HasTable
             })
                 ->visible(function ($record) {
                     if (!$record) {
-                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        Notification::make()->title('Selected document not found.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 3000 && $record->for_cancellation == false;
+                    return $record->current_step_id == 3000;
                 })
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
                 if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                 } else {
                     $record->update([
@@ -147,7 +128,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     return [
                         Select::make('return_step_id')
                             ->label('Return to')
-                            ->options(fn ($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
+                            ->options(fn ($record) => LiquidationReportStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
                             ->required(),
                         RichEditor::make('remarks')
                             ->label('Remarks (Optional)')
@@ -165,7 +146,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     'description' => 'Cancellation approved.',
                 ]);
                 DB::commit();
-                Notification::make()->title('Disbursement voucher approved for cancellation.')->success()->send();
+                Notification::make()->title('Liquidation Report approved for cancellation.')->success()->send();
                 return;
             })
                 ->visible(function ($record) {
@@ -178,12 +159,32 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 ->requiresConfirmation()
                 ->button()
                 ->color('danger'),
-            ...$this->viewActions(),
+            ActionGroup::make([
+                ViewAction::make('progress')
+                    ->label('Progress')
+                    ->icon('ri-loader-4-fill')
+                    ->modalHeading('Liquidation Report Progress')
+                    ->modalContent(fn ($record) => view('components.timeline_views.progress_logs', [
+                        'record' => $record,
+                        'steps' => LiquidationReportStep::where('id', '>', 2000)->get(),
+                    ])),
+                ViewAction::make('logs')
+                    ->label('Activity Timeline')
+                    ->icon('ri-list-check-2')
+                    ->modalHeading('Liquidation Report Activity Timeline')
+                    ->modalContent(fn ($record) => view('components.timeline_views.activity_logs', [
+                        'record' => $record,
+                    ])),
+                ViewAction::make('view')
+                    ->label('Preview')
+                    ->openUrlInNewTab()
+                    ->url(fn ($record) => route('signatory.liquidation-reports.show', ['liquidation_report' => $record]), true),
+            ])->icon('ri-eye-line'),
         ];
     }
 
     public function render()
     {
-        return view('livewire.signatory.disbursement-vouchers.disbursement-vouchers-index');
+        return view('livewire.signatory.liquidation-reports.liquidation-reports-index');
     }
 }

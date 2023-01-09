@@ -26,6 +26,13 @@ class DisbursementVoucherParticular extends Model
         );
     }
 
+    protected function finalAmount(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value / 100,
+        );
+    }
+
     public function disbursement_voucher()
     {
         return $this->belongsTo(DisbursementVoucher::class);

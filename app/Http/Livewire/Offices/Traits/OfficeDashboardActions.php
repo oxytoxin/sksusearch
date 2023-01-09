@@ -59,16 +59,16 @@ trait OfficeDashboardActions
                     ->label('Progress')
                     ->icon('ri-loader-4-fill')
                     ->modalHeading('Disbursement Voucher Progress')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_progress', [
-                        'disbursement_voucher' => $record,
+                    ->modalContent(fn ($record) => view('components.timeline_views.progress_logs', [
+                        'record' => $record,
                         'steps' => DisbursementVoucherStep::where('id', '>', 2000)->get(),
                     ])),
                 ViewAction::make('logs')
                     ->label('Activity Timeline')
                     ->icon('ri-list-check-2')
                     ->modalHeading('Disbursement Voucher Activity Timeline')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_logs', [
-                        'disbursement_voucher' => $record,
+                    ->modalContent(fn ($record) => view('components.timeline_views.activity_logs', [
+                        'record' => $record,
                     ])),
                 ViewAction::make('related_documents')
                     ->label('Related Documents')

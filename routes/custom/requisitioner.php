@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Livewire\LiquidationReports\LiquidationReportsShow;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCancelled;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCreate;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersIndex;
 use App\Http\Livewire\Requisitioner\Itinerary\ItineraryCreate;
 use App\Http\Livewire\Requisitioner\Itinerary\ItineraryPrint;
 use App\Http\Livewire\Requisitioner\Itinerary\ItineraryShow;
+use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCancelled;
+use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCreate;
+use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsIndex;
 use App\Http\Livewire\Requisitioner\TransactionsIndex;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersCreate;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersIndex;
@@ -31,4 +35,8 @@ Route::middleware([
     Route::get('/disbursement-vouchers', DisbursementVouchersIndex::class)->name('disbursement-vouchers.index');
     Route::get('/cancelled-disbursement-vouchers', DisbursementVouchersCancelled::class)->name('disbursement-vouchers.cancelled');
     Route::get('/disbursement-vouchers/{voucher_subtype}/create', DisbursementVouchersCreate::class)->name('disbursement-vouchers.create');
+    Route::get('/liquidation-reports/create', LiquidationReportsCreate::class)->name('liquidation-reports.create');
+    Route::get('/cancelled-liquidation-reports', LiquidationReportsCancelled::class)->name('liquidation-reports.cancelled');
+    Route::get('/liquidation-reports', LiquidationReportsIndex::class)->name('liquidation-reports.index');
+    Route::get('/liquidation-reports/{liquidation_report}', LiquidationReportsShow::class)->name('liquidation-reports.show');
 });

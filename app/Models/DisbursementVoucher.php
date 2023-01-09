@@ -88,4 +88,9 @@ class DisbursementVoucher extends Model
     {
         return $this->morphMany(ScannedDocument::class, 'documentable');
     }
+
+    public function liquidation_report()
+    {
+        return $this->hasOne(LiquidationReport::class);
+    }
 }

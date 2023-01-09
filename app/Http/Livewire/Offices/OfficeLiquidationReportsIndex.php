@@ -1,39 +1,33 @@
 <?php
 
-namespace App\Http\Livewire\Signatory\DisbursementVouchers;
+namespace App\Http\Livewire\Offices;
 
 use Livewire\Component;
+use App\Models\LiquidationReport;
 use Illuminate\Support\Facades\DB;
-use App\Models\DisbursementVoucher;
+use App\Forms\Components\Flatpickr;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Layout;
+use App\Models\LiquidationReportStep;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Concerns\InteractsWithTable;
-use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 
-class DisbursementVouchersIndex extends Component implements HasTable
+class OfficeLiquidationReportsIndex extends Component implements HasTable
 {
-    use InteractsWithTable, OfficeDashboardActions;
+    use InteractsWithTable;
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereSignatoryId(auth()->id())->latest();
-    }
-
-    protected function getTableColumns()
-    {
-        return [
-            ...$this->officeTableColumns(),
-            TextColumn::make('status')->formatStateUsing(fn ($record) => $record->for_cancellation ? ($record->cancelled_at ? 'Cancelled' : 'For Cancellation') : (($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign')),
-        ];
+        return LiquidationReport::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest();
     }
 
     protected function getTableFilters(): array
@@ -46,46 +40,62 @@ class DisbursementVouchersIndex extends Component implements HasTable
         ];
     }
 
-    protected function getTableFiltersFormColumns(): int
-    {
-        return 1;
-    }
-
     protected function getTableFiltersLayout(): ?string
     {
         return Layout::AboveContent;
     }
 
-    public function getTableActions()
+
+    protected function getTableColumns()
     {
         return [
-            Action::make('Receive')->button()->action(function (DisbursementVoucher $record) {
+            TextColumn::make('tracking_number'),
+            TextColumn::make('disbursement_voucher.tracking_number'),
+            TextColumn::make('report_date')->date()->label('Date'),
+        ];
+    }
+
+    protected function getTableActions()
+    {
+        return [
+            Action::make('Receive')->button()->action(function ($record) {
                 if ($record->current_step->process == 'Forwarded to') {
                     DB::beginTransaction();
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                     $record->refresh();
                     $record->activity_logs()->create([
                         'description' => $record->current_step->process . ' ' . auth()->user()->employee_information->full_name,
                     ]);
+
+                    if ($record->current_step_id == 6000) {
+                        $record->update([
+                            'current_step_id' => $record->current_step->next_step->id,
+                        ]);
+                        $record->refresh();
+                        $record->activity_logs()->create([
+                            'description' => $record->current_step->process,
+                        ]);
+                    }
+
                     DB::commit();
                     Notification::make()->title('Document Received')->success()->send();
                 }
             })
                 ->visible(function ($record) {
                     if (!$record) {
-                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        Notification::make()->title('Selected document not found.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 3000 && $record->for_cancellation == false;
+                    return $record->current_step->process == 'Forwarded to' && $record->for_cancellation == false;
                 })
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
                 if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                 } else {
                     $record->update([
@@ -113,7 +123,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000 && !$record->for_cancellation;
+                    return $record->certified_by_accountant && !$record->for_cancellation;
                 })
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
@@ -147,7 +157,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     return [
                         Select::make('return_step_id')
                             ->label('Return to')
-                            ->options(fn ($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
+                            ->options(fn ($record) => LiquidationReportStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
                             ->required(),
                         RichEditor::make('remarks')
                             ->label('Remarks (Optional)')
@@ -165,7 +175,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     'description' => 'Cancellation approved.',
                 ]);
                 DB::commit();
-                Notification::make()->title('Disbursement voucher approved for cancellation.')->success()->send();
+                Notification::make()->title('Liquidation Report approved for cancellation.')->success()->send();
                 return;
             })
                 ->visible(function ($record) {
@@ -178,12 +188,86 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 ->requiresConfirmation()
                 ->button()
                 ->color('danger'),
-            ...$this->viewActions(),
+            Action::make('verify')->button()->action(function ($record, $data) {
+                DB::beginTransaction();
+                $record->update([
+                    'lr_number' => $data['lr_number'],
+                    'journal_date' => $data['journal_date'],
+                    'current_step_id' => $record->current_step->next_step->id,
+                ]);
+                $record->refresh();
+                $description = 'Liquidation Report verified.';
+
+                $record->activity_logs()->create([
+                    'description' => $description,
+                ]);
+                DB::commit();
+                Notification::make()->title('Liquidation Report verified.')->success()->send();
+            })
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->current_step_id == 7000 && blank($record->journal_date) && blank($record->lr_number) && !$record->for_cancellation;
+                })
+                ->form(function () {
+                    return [
+                        TextInput::make('lr_number')
+                            ->label('LR Number')
+                            ->required(),
+                        Flatpickr::make('journal_date')
+                            ->disableTime()
+                            ->required(),
+                    ];
+                })
+                ->requiresConfirmation(),
+            Action::make('certify')->button()->action(function ($record) {
+                DB::beginTransaction();
+                $record->update([
+                    'certified_by_accountant' => true,
+                ]);
+                $record->activity_logs()->create([
+                    'description' => 'Liquidation Report certified.',
+                ]);
+                DB::commit();
+                Notification::make()->title('Liquidation Report certified.')->success()->send();
+            })
+                ->visible(fn ($record) => $record->current_step_id == 8000 && !$record->for_cancellation && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == 12)
+                ->requiresConfirmation(),
+            ActionGroup::make([
+                ViewAction::make('progress')
+                    ->label('Progress')
+                    ->icon('ri-loader-4-fill')
+                    ->modalHeading('Liquidation Report Progress')
+                    ->modalContent(fn ($record) => view('components.timeline_views.progress_logs', [
+                        'record' => $record,
+                        'steps' => LiquidationReportStep::where('id', '>', 2000)->get(),
+                    ])),
+                ViewAction::make('logs')
+                    ->label('Activity Timeline')
+                    ->icon('ri-list-check-2')
+                    ->modalHeading('Liquidation Report Activity Timeline')
+                    ->modalContent(fn ($record) => view('components.timeline_views.activity_logs', [
+                        'record' => $record,
+                    ])),
+                ViewAction::make('view')
+                    ->label('Preview')
+                    ->openUrlInNewTab()
+                    ->url(fn ($record) => route('signatory.liquidation-reports.show', ['liquidation_report' => $record]), true),
+            ])->icon('ri-eye-line'),
         ];
+    }
+
+    public function mount()
+    {
+        if (!in_array(auth()->user()->employee_information?->office->office_group_id, [2])) {
+            abort(403, 'You are not allowed to access this page.');
+        }
     }
 
     public function render()
     {
-        return view('livewire.signatory.disbursement-vouchers.disbursement-vouchers-index');
+        return view('livewire.offices.office-liquidation-reports-index');
     }
 }
