@@ -10,6 +10,10 @@ class LiquidationReportStep extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'enabled' => 'boolean'
+    ];
+
     public function current_liquidation_reports()
     {
         return $this->hasMany(LiquidationReport::class, 'current_step_id');
@@ -22,17 +26,17 @@ class LiquidationReportStep extends Model
 
     public function nextStep(): Attribute
     {
-        return new Attribute(get: fn () => LiquidationReportStep::where('id', '>', $this->id)->first());
+        return new Attribute(get: fn () => LiquidationReportStep::whereEnabled(true)->where('id', '>', $this->id)->first());
     }
 
     public function previousStep(): Attribute
     {
-        return new Attribute(get: fn () => LiquidationReportStep::where('id', '<', $this->id)->latest('id')->first());
+        return new Attribute(get: fn () => LiquidationReportStep::whereEnabled(true)->where('id', '<', $this->id)->latest('id')->first());
     }
 
     public function firstStepInGroup(): Attribute
     {
-        return new Attribute(get: fn () => LiquidationReportStep::where('id', '<', $this->id)->latest('id')->first());
+        return new Attribute(get: fn () => LiquidationReportStep::whereEnabled(true)->where('id', '<', $this->id)->where('process', 'Forwarded to')->latest('id')->first());
     }
 
     public function office_group()

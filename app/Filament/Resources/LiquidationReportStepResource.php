@@ -2,10 +2,11 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DisbursementVoucherStepResource\Pages;
-use App\Filament\Resources\DisbursementVoucherStepResource\RelationManagers;
-use App\Models\DisbursementVoucherStep;
+use App\Filament\Resources\LiquidationReportStepResource\Pages;
+use App\Filament\Resources\LiquidationReportStepResource\RelationManagers;
+use App\Models\LiquidationReportStep;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -13,9 +14,9 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class DisbursementVoucherStepResource extends Resource
+class LiquidationReportStepResource extends Resource
 {
-    protected static ?string $model = DisbursementVoucherStep::class;
+    protected static ?string $model = LiquidationReportStep::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
@@ -26,16 +27,15 @@ class DisbursementVoucherStepResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('id')
-                    ->unique('disbursement_voucher_steps', 'id', fn ($record) => $record)
-                    ->required(),
+                Forms\Components\TextInput::make('id'),
                 Forms\Components\Toggle::make('enabled')
                     ->required(),
+                Select::make('office_group_id')
+                    ->relationship('office_group', 'name'),
                 Forms\Components\TextInput::make('process')
                     ->required()
                     ->maxLength(191),
                 Forms\Components\TextInput::make('recipient')
-                    ->required()
                     ->maxLength(191),
                 Forms\Components\TextInput::make('sender')
                     ->maxLength(191),
@@ -60,7 +60,9 @@ class DisbursementVoucherStepResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([]);
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]);
     }
 
     public static function getRelations(): array
@@ -73,9 +75,9 @@ class DisbursementVoucherStepResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDisbursementVoucherSteps::route('/'),
-            'create' => Pages\CreateDisbursementVoucherStep::route('/create'),
-            'edit' => Pages\EditDisbursementVoucherStep::route('/{record}/edit'),
+            'index' => Pages\ListLiquidationReportSteps::route('/'),
+            'create' => Pages\CreateLiquidationReportStep::route('/create'),
+            'edit' => Pages\EditLiquidationReportStep::route('/{record}/edit'),
         ];
     }
 }

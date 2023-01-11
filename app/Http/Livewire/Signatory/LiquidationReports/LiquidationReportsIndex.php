@@ -66,10 +66,12 @@ class LiquidationReportsIndex extends Component implements HasTable
                 DB::beginTransaction();
                 if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
                     $record->update([
+                        'signatory_date' => now(),
                         'current_step_id' => $record->current_step->next_step->id,
                     ]);
                 } else {
                     $record->update([
+                        'signatory_date' => now(),
                         'current_step_id' => $record->previous_step_id,
                     ]);
                 }
@@ -166,7 +168,7 @@ class LiquidationReportsIndex extends Component implements HasTable
                     ->modalHeading('Liquidation Report Progress')
                     ->modalContent(fn ($record) => view('components.timeline_views.progress_logs', [
                         'record' => $record,
-                        'steps' => LiquidationReportStep::where('id', '>', 2000)->get(),
+                        'steps' => LiquidationReportStep::whereEnabled(true)->where('id', '>', 2000)->get(),
                     ])),
                 ViewAction::make('logs')
                     ->label('Activity Timeline')

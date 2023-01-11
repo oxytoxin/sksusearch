@@ -44,7 +44,7 @@ class OfficeLiquidationReportsForwarded extends Component implements HasTable
                     ->modalHeading('Liquidation Report Progress')
                     ->modalContent(fn ($record) => view('components.timeline_views.progress_logs', [
                         'record' => $record,
-                        'steps' => LiquidationReportStep::where('id', '>', 2000)->get(),
+                        'steps' => LiquidationReportStep::whereEnabled(true)->where('id', '>', 2000)->get(),
                     ])),
                 ViewAction::make('logs')
                     ->label('Activity Timeline')

@@ -93,26 +93,29 @@
                 {{ Akaunting\Money\Money::PHP($this->disbursement_voucher->total_amount, true) }}
             </h4>
         </div>
-        @foreach ($this->data['refund_particulars'] as $refund_particular)
+        @if (count($this->data['refund_particulars']))
+            @foreach ($this->data['refund_particulars'] as $refund_particular)
+                <div class="flex text-sm divide-x-2 divide-black">
+                    <h4 class="flex-1 p-1">AMOUNT REFUNDED PER OR NO.
+                        <span class="border-b border-black">{{ $refund_particular['or_number'] }}</span>
+                        DTD.<span
+                            class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
+                    </h4>
+                    <h4 class="w-1/3 p-1 pl-12 text-left">
+                        {{ Akaunting\Money\Money::PHP($refund_particular['amount'] ? $refund_particular['amount'] : 0, true) }}
+                    </h4>
+                </div>
+            @endforeach
             <div class="flex text-sm divide-x-2 divide-black">
-                <h4 class="flex-1 p-1">AMOUNT REFUNDED PER OR NO.
-                    <span class="border-b border-black">{{ $refund_particular['or_number'] }}</span>
-                    DTD.<span
-                        class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
+                <h4 class="flex-1 p-1">
+                    TOTAL AMOUNT REFUNDED
                 </h4>
                 <h4 class="w-1/3 p-1 pl-12 text-left">
-                    {{ Akaunting\Money\Money::PHP($refund_particular['amount'] ? $refund_particular['amount'] : 0, true) }}
+                    {{ Akaunting\Money\Money::PHP(collect($this->data['refund_particulars'])->sum('amount') ?? 0, true) }}
                 </h4>
             </div>
-        @endforeach
-        <div class="flex text-sm divide-x-2 divide-black">
-            <h4 class="flex-1 p-1">
-                TOTAL AMOUNT REFUNDED
-            </h4>
-            <h4 class="w-1/3 p-1 pl-12 text-left">
-                {{ Akaunting\Money\Money::PHP(collect($this->data['refund_particulars'])->sum('amount') ?? 0, true) }}
-            </h4>
-        </div>
+        @endif
+
         <div class="flex text-sm divide-x-2 divide-black">
             <h4 class="flex-1 p-1">
                 AMOUNT TO BE REIMBURSED

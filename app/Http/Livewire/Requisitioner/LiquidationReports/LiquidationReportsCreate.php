@@ -153,6 +153,7 @@ class LiquidationReportsCreate extends Component implements HasForms
     public function mount()
     {
         $this->form->fill();
+        $this->data['refund_particulars'] = [];
     }
 
     public function render()
