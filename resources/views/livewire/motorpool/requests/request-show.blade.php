@@ -241,7 +241,7 @@
                         <div class="flex columns-3">
                             <div class="inline whitespace-nowrap ">20. Remarks</div>
                             <div class="border-b border-black block w-full"></div>
-                            <div class="inline whitespace-nowrap pl-1">Liter/s</div>
+                            <!-- <div class="inline whitespace-nowrap pl-1">Liter/s</div> -->
                         </div>
                         <div class="block pt-5">
                             <p class="indent-5">
@@ -272,7 +272,7 @@
     <div class="flex justify-center">
         <button type="button" value="click" onclick="printDiv('print_to')" id="printto"
             class="w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 max-w-sm rounded-full px-4 py-2 font-semibold tracking-wider text-white active:text-white">
-            Print Travel Order
+            Print Driver's Trip Ticket
         </button>
     </div>
     @push('scripts')
