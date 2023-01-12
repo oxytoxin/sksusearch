@@ -3,7 +3,7 @@
         {{ auth()->user()->employee_information?->office->name ?? 'Unknown Office' }}</h4>
 
     <div x-data="{ tab: 'office_dv' }" x-cloak>
-        <div class="inline-flex flex-col mt-2 md:flex-row">
+        <div class="inline-flex flex-row mt-2">
             <button @click="tab = 'office_dv'" :class="tab == 'office_dv' && 'bg-white -mt-2 text-primary-600'"
                 class="px-4 py-2 mt-2 text-lg font-semibold rounded-t-lg hover:bg-primary-300">
                 Disbursement Vouchers To Sign

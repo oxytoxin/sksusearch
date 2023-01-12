@@ -20,6 +20,47 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
 {
     use InteractsWithTable, OfficeDashboardActions;
 
+    public $tracking_num_from_scan;
+
+    
+    public function updated($name, $value)
+    {
+        if ($name == 'tracking_num_from_scan'){
+            $dv = DisbursementVoucher::where("tracking_number",'=',$value)->whereRelation('current_step', 'process', '=', "Forwarded to")->whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->first();
+            if ($dv != null){
+            DB::beginTransaction();
+            
+            $dv->update([
+                'current_step_id' => $dv->current_step->next_step->id,
+            ]);
+            $dv->refresh();
+                    $description = $dv->current_step->process . ' ' . $dv->current_step->recipient . ' by ';
+                    if ($this->isOic()) {
+                        $description .= "OIC: " . auth()->user()->employee_information->full_name . '.';
+                    } else {
+                        $description .= auth()->user()->employee_information->full_name;
+                    }
+            $dv->activity_logs()->create([
+                        'description' => $description,
+                    ]);
+            if ($dv->current_step_id == 8000 || $dv->current_step_id == 11000) {
+                    $dv->update([
+                            'current_step_id' => $dv->current_step_id + 1000,
+                        ]);
+                        $dv->refresh();
+                        $dv->activity_logs()->create([
+                            'description' => $dv->current_step->process,
+                        ]);
+               }
+            DB::commit();
+            Notification::make()->title('Document Received')->success()->send();
+            }
+            else {
+            Notification::make()->title('Document Not Found or Already Received')->warning()->send();
+            }
+        }
+    }
+
     public function mount()
     {
         if (!in_array(auth()->user()->employee_information?->office->office_group_id, [1, 2, 3, 4, 5])) {
