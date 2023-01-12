@@ -102,7 +102,7 @@
 			</div>
 			<main class="flex-1">
 				<div class="py-6">
-					<div class="max-w-full px-4 mx-auto sm:px-6 md:px-8">
+					<div class="max-w-full px-4 mx-auto sm:px-6 md:px-8" id="slot">
 						{{ $slot }}
 					</div>
 				</div>

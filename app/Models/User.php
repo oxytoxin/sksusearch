@@ -150,4 +150,16 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsToMany(RequestSchedule::class, 'request_applicants', 'user_id', 'request_schedule_id')->withTimestamps();
     }
+
+    
+    public function chat_messages()
+    {   
+        return $this->belongsToMany(ChatMessages::class, 'chat_messages', 'user_id', 'chat_message_id');
+    }
+    
+    public function group_user()
+    {
+        return $this->belongsToMany(GroupUser::class, 'group_user', 'user_id', 'group_user_id');
+
+    }
 }
