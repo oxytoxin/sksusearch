@@ -11,7 +11,7 @@
 		</div>
 		<div class="flex">
             <div class="ml-1">
-                <p class="text-blue-600"><strong class="italic">Note:</strong>  Ifit's not working, try clicking the text box above before scanning the qr. </p>
+                <p class="text-blue-600"><strong class="italic">Note:</strong>  If it's not working, try clicking the text box above before scanning the qr. </p>
             </div>
 		</div>
 	</div>
