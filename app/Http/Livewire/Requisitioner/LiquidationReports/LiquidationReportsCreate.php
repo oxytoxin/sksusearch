@@ -64,8 +64,12 @@ class LiquidationReportsCreate extends Component implements HasForms
                                         $set('signatory_id', $this->disbursement_voucher->signatory_id);
                                         $particulars = collect();
                                         foreach ($this->disbursement_voucher->disbursement_voucher_particulars as $key => $particular) {
+                                            $purpose = str($particular->purpose);
+                                            if ($key == 0) {
+                                                $purpose = $purpose->prepend("To liquidate the cash advance granted for the following purpose(s):\n");
+                                            }
                                             $particulars->push([
-                                                'purpose' => $particular->purpose,
+                                                'purpose' => $purpose->toString(),
                                                 'amount' => $particular->final_amount
                                             ]);
                                         }
@@ -106,8 +110,8 @@ class LiquidationReportsCreate extends Component implements HasForms
                             ->schema([
                                 SlimRepeater::make('refund_particulars')->schema([
                                     TextInput::make('or_number')->required()->validationAttribute('OR Number')->label('OR Number')->disableLabel(),
-                                    TextInput::make('amount')->required()->validationAttribute('Amount')->numeric()->label('Amount')->disableLabel(),
                                     DatePicker::make('date')->required()->validationAttribute('Date')->withoutTime()->label('OR Date')->disableLabel(),
+                                    TextInput::make('amount')->required()->validationAttribute('Amount')->numeric()->label('Amount')->disableLabel(),
                                 ])->columns(3)
                             ])
                             ->columns(1)

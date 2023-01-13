@@ -67,7 +67,7 @@
         <div>
             @foreach ($this->data['particulars'] as $particular)
                 <div class="flex text-sm divide-x-2 divide-black">
-                    <h4 class="flex-1 p-2">{{ $particular['purpose'] }}</h4>
+                    <h4 class="flex-1 p-2 whitespace-pre-line">{{ $particular['purpose'] }}</h4>
                     <h4 class="flex items-end justify-end w-1/3 p-2 px-4">
                         {{ Akaunting\Money\Money::PHP($particular['amount'] ? $particular['amount'] : 0, true) }}
                     </h4>
