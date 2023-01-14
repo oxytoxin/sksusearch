@@ -29,6 +29,8 @@ class DisbursementVoucherStepResource extends Resource
                 Forms\Components\TextInput::make('id')
                     ->unique('disbursement_voucher_steps', 'id', fn ($record) => $record)
                     ->required(),
+                Forms\Components\Toggle::make('enabled')
+                    ->required(),
                 Forms\Components\TextInput::make('process')
                     ->required()
                     ->maxLength(191),
@@ -37,9 +39,6 @@ class DisbursementVoucherStepResource extends Resource
                     ->maxLength(191),
                 Forms\Components\TextInput::make('sender')
                     ->maxLength(191),
-                Forms\Components\Select::make('office_id')
-                    ->options(\App\Models\Office::pluck('name', 'id'))
-                    ->searchable(),
                 Forms\Components\TextInput::make('return_step_id')
                     ->required(),
             ]);
@@ -50,10 +49,10 @@ class DisbursementVoucherStepResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id'),
+                Tables\Columns\IconColumn::make('enabled')->boolean(),
                 Tables\Columns\TextColumn::make('process'),
                 Tables\Columns\TextColumn::make('recipient'),
                 Tables\Columns\TextColumn::make('sender'),
-                Tables\Columns\TextColumn::make('office.name'),
             ])
             ->filters([
                 //

@@ -59,16 +59,16 @@ trait OfficeDashboardActions
                     ->label('Progress')
                     ->icon('ri-loader-4-fill')
                     ->modalHeading('Disbursement Voucher Progress')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_progress', [
-                        'disbursement_voucher' => $record,
-                        'steps' => DisbursementVoucherStep::where('id', '>', 2000)->get(),
+                    ->modalContent(fn ($record) => view('components.timeline_views.progress_logs', [
+                        'record' => $record,
+                        'steps' => DisbursementVoucherStep::whereEnabled(true)->where('id', '>', 2000)->get(),
                     ])),
                 ViewAction::make('logs')
                     ->label('Activity Timeline')
                     ->icon('ri-list-check-2')
                     ->modalHeading('Disbursement Voucher Activity Timeline')
-                    ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_logs', [
-                        'disbursement_voucher' => $record,
+                    ->modalContent(fn ($record) => view('components.timeline_views.activity_logs', [
+                        'record' => $record,
                     ])),
                 ViewAction::make('related_documents')
                     ->label('Related Documents')
@@ -259,7 +259,7 @@ trait OfficeDashboardActions
                 if ($record->current_step->process == 'Forwarded to') {
                     DB::beginTransaction();
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                     $record->refresh();
                     $description = $record->current_step->process . ' ' . $record->current_step->recipient . ' by ';
@@ -297,7 +297,7 @@ trait OfficeDashboardActions
                     DB::beginTransaction();
                     if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
                         $record->update([
-                            'current_step_id' => $record->current_step_id + 1000,
+                            'current_step_id' => $record->current_step->next_step->id,
                         ]);
                     } else {
                         $record->update([

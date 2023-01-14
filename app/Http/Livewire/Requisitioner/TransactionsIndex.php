@@ -10,7 +10,7 @@ class TransactionsIndex extends Component
     public function render()
     {
         return view('livewire.requisitioner.transactions-index', [
-            'categories' => VoucherCategory::with(['voucher_types.voucher_subtypes'])->get(),
+            'voucher_types' => VoucherCategory::find(1)->voucher_types()->with(['voucher_subtypes'])->get(),
         ]);
     }
 }

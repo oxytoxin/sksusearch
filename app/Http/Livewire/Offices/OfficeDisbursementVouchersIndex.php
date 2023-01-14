@@ -3,9 +3,16 @@
 namespace App\Http\Livewire\Offices;
 
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 use App\Models\DisbursementVoucher;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Layout;
+use Filament\Forms\Components\Select;
+use App\Models\DisbursementVoucherStep;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Notifications\Notification;
+use Filament\Forms\Components\RichEditor;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 
@@ -13,34 +20,168 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
 {
     use InteractsWithTable, OfficeDashboardActions;
 
-    protected $listeners = ['refresh' => '$refresh'];
+    public $tracking_num_from_scan;
+
+    
+    public function updated($name, $value)
+    {
+        if ($name == 'tracking_num_from_scan'){
+            $dv = DisbursementVoucher::where("tracking_number",'=',$value)->whereRelation('current_step', 'process', '=', "Forwarded to")->whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->first();
+            if ($dv != null){
+            DB::beginTransaction();
+            
+            $dv->update([
+                'current_step_id' => $dv->current_step->next_step->id,
+            ]);
+            $dv->refresh();
+                    $description = $dv->current_step->process . ' ' . $dv->current_step->recipient . ' by ';
+                    if ($this->isOic()) {
+                        $description .= "OIC: " . auth()->user()->employee_information->full_name . '.';
+                    } else {
+                        $description .= auth()->user()->employee_information->full_name;
+                    }
+            $dv->activity_logs()->create([
+                        'description' => $description,
+                    ]);
+            if ($dv->current_step_id == 8000 || $dv->current_step_id == 11000) {
+                    $dv->update([
+                            'current_step_id' => $dv->current_step_id + 1000,
+                        ]);
+                        $dv->refresh();
+                        $dv->activity_logs()->create([
+                            'description' => $dv->current_step->process,
+                        ]);
+               }
+            DB::commit();
+            Notification::make()->title('Document Received')->success()->send();
+            }
+            else {
+            Notification::make()->title('Document Not Found or Already Received')->warning()->send();
+            }
+        }
+    }
+
+    public function mount()
+    {
+        if (!in_array(auth()->user()->employee_information?->office->office_group_id, [1, 2, 3, 4, 5])) {
+            abort(403, 'You are not allowed to access this page.');
+        }
+    }
 
     protected function getTableQuery()
     {
-        $office_final_step_id = auth()->user()->employee_information->office->office_group->disbursement_voucher_final_step->id;
-        if ($office_final_step_id == 20000) {
-            $office_final_step_id = 6000;
-        }
-        return DisbursementVoucher::whereForCancellation(false)->where('current_step_id', '>', $office_final_step_id)->latest();
+        return DisbursementVoucher::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest();
+    }
+
+    protected function getTableFilters(): array
+    {
+        return [
+            SelectFilter::make('for_cancellation')->options([
+                true => 'For Cancellation',
+                false => 'For Approval',
+            ])->default(0)->label('Status'),
+        ];
+    }
+
+
+    protected function getTableFiltersFormColumns(): int
+    {
+        return 2;
+    }
+
+    protected function getTableFiltersLayout(): ?string
+    {
+        return Layout::AboveContent;
     }
 
     protected function getTableColumns()
     {
         return [
-            TextColumn::make('tracking_number'),
-            TextColumn::make('user.employee_information.full_name')
-                ->label('Requisitioner'),
-            TextColumn::make('payee')
-                ->label('Payee'),
-            TextColumn::make('submitted_at')->label('Created by Requisitioner at')->dateTime('F d, Y'),
-            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),
+            ...$this->officeTableColumns()
         ];
     }
 
     protected function getTableActions()
     {
         return [
+            ...$this->commonActions(),
+            ...$this->budgetOfficeActions(),
+            ...$this->accountingActions(),
+            ...$this->cashierActions(),
+            ...$this->icuActions(),
+            Action::make('certify')->button()->action(function ($record) {
+                DB::beginTransaction();
+                $record->update([
+                    'certified_by_accountant' => true,
+                ]);
+                $record->activity_logs()->create([
+                    'description' => 'Disbursement voucher certified.',
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement voucher certified.')->success()->send();
+            })
+                ->visible(fn ($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == 12)
+                ->requiresConfirmation(),
+            Action::make('return')->button()->action(function ($record, $data) {
+                DB::beginTransaction();
+                if ($record->current_step_id < $record->previous_step_id) {
+                    $previous_step_id = $record->previous_step_id;
+                } else {
+                    $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('id', '<', $record->current_step->id)->latest('id')->first()->id;
+                }
+                $record->update([
+                    'current_step_id' => $data['return_step_id'],
+                    'previous_step_id' => $previous_step_id,
+                ]);
+                $record->refresh();
+                $record->activity_logs()->create([
+                    'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient,
+                    'remarks' => $data['remarks'] ?? null,
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement Voucher returned.')->success()->send();
+            })
+                ->color('danger')
+                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false)
+                ->form(function () {
+                    return [
+                        Select::make('return_step_id')
+                            ->label('Return to')
+                            ->options(fn ($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
+                            ->required(),
+                        RichEditor::make('remarks')
+                            ->label('Remarks (Optional)')
+                            ->fileAttachmentsDisk('remarks'),
+                    ];
+                })
+                ->modalWidth('4xl')
+                ->requiresConfirmation(),
+            Action::make('Cancel')->action(function ($record) {
+                DB::beginTransaction();
+                $process_ids = DisbursementVoucherStep::where('process', 'Received by')->orWhere('process', 'Received in')->pluck('id');
+                $next_step = $process_ids->last(fn ($value) => $value < auth()->user()->employee_information->office->office_group->disbursement_voucher_starting_step->id);
+                $record->update([
+                    'current_step_id' => $next_step,
+                ]);
+                $record->activity_logs()->create([
+                    'description' => 'Cancellation approved by ' . auth()->user()->employee_information->full_name,
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement voucher approved for cancellation.')->success()->send();
+                return;
+            })
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->for_cancellation && !$record->cancelled_at;
+                })
+                ->requiresConfirmation()
+                ->button()
+                ->color('danger'),
             ...$this->viewActions(),
+
         ];
     }
 

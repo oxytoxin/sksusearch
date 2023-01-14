@@ -61,7 +61,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 if ($record->current_step->process == 'Forwarded to') {
                     DB::beginTransaction();
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                     $record->refresh();
                     $record->activity_logs()->create([
@@ -83,7 +83,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 DB::beginTransaction();
                 if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                 } else {
                     $record->update([

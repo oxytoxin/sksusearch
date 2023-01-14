@@ -23,4 +23,19 @@ class OfficeGroup extends Model
     {
         return $this->hasMany(DisbursementVoucherStep::class);
     }
+
+    public function liquidation_report_starting_step()
+    {
+        return $this->hasOne(LiquidationReportStep::class)->ofMany('id', 'MIN');
+    }
+
+    public function liquidation_report_final_step()
+    {
+        return $this->hasOne(LiquidationReportStep::class)->ofMany('id', 'MAX');
+    }
+
+    public function liquidation_report_steps()
+    {
+        return $this->hasMany(LiquidationReportStep::class);
+    }
 }

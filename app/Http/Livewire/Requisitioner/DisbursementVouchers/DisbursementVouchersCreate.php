@@ -14,6 +14,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ViewField;
 use Filament\Forms\Components\Wizard;
@@ -131,7 +132,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                             ]),
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
-                                    TextInput::make('purpose')->required(),
+                                    Textarea::make('purpose')->required(),
                                     Grid::make(3)->schema([
                                         TextInput::make('responsibility_center'),
                                         TextInput::make('mfo_pap')
@@ -177,7 +178,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ViewField::make('voucher_preview')->label('Voucher Preview')->view('components.forms.voucher-preview'),
                             ]),
                     ]),
-            ])->submitAction(view('components.forms.save-voucher')),
+            ])->submitAction(view('components.forms.save-button')),
         ];
     }
 

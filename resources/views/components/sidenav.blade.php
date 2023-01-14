@@ -133,24 +133,24 @@
             x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100'
             x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
 
-            <a href=""
+            <a href="#"
                 class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                 Drafts
             </a>
 
-            <a href=""
+            <a href="{{ route('requisitioner.liquidation-reports.index') }}"
                 class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
                 Submitted
             </a>
 
-            <a href=""
+            <a href="{{ route('requisitioner.liquidation-reports.cancelled') }}"
                 class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                For Signature
+                Cancelled
             </a>
 
-            <a href=""
+            <a href="{{ route('signatory.liquidation-reports.index') }}"
                 class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                Signed
+                Signatory
             </a>
         </div>
     </div>
@@ -290,7 +290,7 @@
 
         </div>
         @php
-            $motorpool_head = App\Models\Office::where('name','like', '%Motorpool%')->first();
+            $motorpool_head = App\Models\Office::where('name', 'like', '%Motorpool%')->first();
             // dd($motorpool_head?->admin_user_id.' ?= '.auth()->user()->id.$motorpool_head);
         @endphp
 

@@ -32,7 +32,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
     {
         return [
             ...$this->officeTableColumns(),
-            TextColumn::make('status')->formatStateUsing(fn ($record) => ($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign'),
+            TextColumn::make('status')->formatStateUsing(fn ($record) => $record->for_cancellation ? ($record->cancelled_at ? 'Cancelled' : 'For Cancellation') : (($record->current_step_id > 4000 || $record->previous_step_id > 4000) ? 'Signed' : 'To Sign')),
         ];
     }
 
@@ -63,7 +63,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 if ($record->current_step->process == 'Forwarded to') {
                     DB::beginTransaction();
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                     $record->refresh();
                     $record->activity_logs()->create([
@@ -85,7 +85,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 DB::beginTransaction();
                 if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                 } else {
                     $record->update([
@@ -113,7 +113,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000 && $record->for_cancellation == false;
+                    return $record->current_step_id == 4000 && !$record->for_cancellation;
                 })
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
@@ -121,7 +121,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 if ($record->current_step_id < $record->previous_step_id) {
                     $previous_step_id = $record->previous_step_id;
                 } else {
-                    $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', $record->current_step->recipient)->first()->id;
+                    $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('id', '<', $record->current_step->id)->latest('id')->first()->id;
                 }
                 $record->update([
                     'current_step_id' => $data['return_step_id'],
@@ -156,6 +156,28 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
+            Action::make('Cancel')->action(function ($record) {
+                DB::beginTransaction();
+                $record->update([
+                    'cancelled_at' => now(),
+                ]);
+                $record->activity_logs()->create([
+                    'description' => 'Cancellation approved.',
+                ]);
+                DB::commit();
+                Notification::make()->title('Disbursement voucher approved for cancellation.')->success()->send();
+                return;
+            })
+                ->visible(function ($record) {
+                    if (!$record) {
+                        Notification::make()->title('Selected document not found in office.')->warning()->send();
+                        return false;
+                    }
+                    return $record->current_step_id == 4000 && $record->for_cancellation && !$record->cancelled_at;
+                })
+                ->requiresConfirmation()
+                ->button()
+                ->color('danger'),
             ...$this->viewActions(),
         ];
     }

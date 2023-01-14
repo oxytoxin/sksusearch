@@ -40,7 +40,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 if ($record->current_step->process == 'Forwarded to') {
                     DB::beginTransaction();
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                     $record->refresh();
                     $record->activity_logs()->create([
@@ -62,7 +62,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 DB::beginTransaction();
                 if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
                     $record->update([
-                        'current_step_id' => $record->current_step_id + 1000,
+                        'current_step_id' => $record->current_step->next_step->id,
                     ]);
                 } else {
                     $record->update([
@@ -116,14 +116,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement voucher requested for cancellation.')->success()->send();
             })
-                ->visible(function ($record) {
-                    if (!$record) {
-                        Notification::make()->title('Selected document not found in office.')->warning()->send();
-                        return false;
-                    }
-                    return $record->current_step_id == 3000;
-                })
-                ->visible(fn ($record) => !$record->cheque_number)
+                ->visible(fn ($record) => !$record->cheque_number && !$record->cancelled_at && !$record->for_cancellation)
                 ->requiresConfirmation()
                 ->button()
                 ->color('danger'),
