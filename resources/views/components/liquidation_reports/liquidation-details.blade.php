@@ -4,7 +4,8 @@
     $cheque_amount = $this->disbursement_voucher->total_suggested_amount > 0 ? $this->disbursement_voucher->total_suggested_amount : $this->disbursement_voucher->total_amount;
     $ready = false;
     try {
-        Akaunting\Money\Money::PHP(collect($this->data['particulars'])->sum('amount'));
+        Akaunting\Money\Money::PHP($particulars->sum('amount'));
+        Akaunting\Money\Money::PHP($refund_particulars->sum('amount'));
         if ($this->disbursement_voucher) {
             $ready = true;
         }
