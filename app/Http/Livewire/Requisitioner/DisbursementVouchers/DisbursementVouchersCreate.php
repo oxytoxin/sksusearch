@@ -5,6 +5,9 @@ namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 use App\Models\DisbursementVoucher;
 use App\Models\EmployeeInformation;
 use App\Models\Mop;
+use App\Models\ElectricityMeter;
+use App\Models\WaterMeter;
+use App\Models\Vehicle;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
 use App\Models\VoucherSubType;
@@ -130,14 +133,158 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->label('Mode of Payment')
                                     ->options(Mop::pluck('name', 'id')),
                             ]),
+                            //Electricity, Water, Fuel (start)
+                            Grid::make(3)->schema([
+                                    Select::make('electricity_utility_type')
+                                    ->label('Meter Number')
+                                    ->options(ElectricityMeter::pluck('meter_number', 'id'))
+                                    ->required(),
+                                    TextInput::make('electricity_consumption')
+                                    ->label('Kilowatt-hour Consumpition (kWh)')
+                                    ->numeric()
+                                    ->reactive()
+                                    ->default(0)
+                                    ->afterStateUpdated(function ($set, $get, $state) {
+                                        $total = $get('electricity_cost') * $state;
+                                        $set('disbursement_voucher_particulars', [
+                                            [
+                                                'purpose' => '',
+                                                'responsibility_center' => '',
+                                                'mfo_pap' => '',
+                                                'amount' => $total,
+                                            ],
+                                        ]);
+                                    })
+                                    ->required(),
+                                    TextInput::make('electricity_cost')
+                                    ->label('Cost per kilowatt-hour (kWh)')
+                                    ->numeric()
+                                    ->reactive()
+                                    ->default(0)
+                                    ->afterStateUpdated(function ($set, $get, $state) {
+                                        $total = $get('electricity_consumption') * $state;
+                                        $set('disbursement_voucher_particulars', [
+                                            [
+                                                'purpose' => '',
+                                                'responsibility_center' => '',
+                                                'mfo_pap' => '',
+                                                'amount' => $total,
+                                            ],
+                                        ]);
+                                    })
+                                    ->required(),
+                            ])->visible(fn ($get) => $this->voucher_subtype->id == 27),
+                            Grid::make(3)->schema([
+                                Select::make('water_utility_type')
+                                ->label('Meter Number')
+                                ->options(WaterMeter::pluck('meter_number', 'id'))
+                                ->required(),
+                                TextInput::make('water_consumption')
+                                ->label('Cubic Metre Consumption')
+                                ->numeric()
+                                ->reactive()
+                                ->default(0)
+                                ->afterStateUpdated(function ($set, $get, $state) {
+                                    $total = $get('water_cost') * $state;
+                                    $set('disbursement_voucher_particulars', [
+                                        [
+                                            'purpose' => '',
+                                            'responsibility_center' => '',
+                                            'mfo_pap' => '',
+                                            'amount' => $total,
+                                        ],
+                                    ]);
+                                })
+                                ->required(),
+                                TextInput::make('water_cost')
+                                ->label('Cost per Cubic Metre')
+                                ->numeric()
+                                ->reactive()
+                                ->default(0)
+                                ->afterStateUpdated(function ($set, $get, $state) {
+                                    $total = $get('water_consumption') * $state;
+                                    $set('disbursement_voucher_particulars', [
+                                        [
+                                            'purpose' => '',
+                                            'responsibility_center' => '',
+                                            'mfo_pap' => '',
+                                            'amount' => $total,
+                                        ],
+                                    ]);
+                                })
+                                ->required(),
+                            ])->visible(fn ($get) => $this->voucher_subtype->id == 70),
+                            Grid::make(3)->schema([
+                            Select::make('fuel_utility_type')
+                            ->label('Vehicle')
+                            ->options(Vehicle::pluck('model', 'id'))
+                            ->required(),
+                            TextInput::make('fuel_consumption')
+                            ->label('Fuel Consumption (Liters)')      
+                            ->numeric()
+                            ->reactive()
+                            ->default(0)
+                            ->afterStateUpdated(function ($set, $get, $state) {
+                                $total = $get('fuel_cost') * $state;
+                                $set('disbursement_voucher_particulars', [
+                                    [
+                                        'purpose' => '',
+                                        'responsibility_center' => '',
+                                        'mfo_pap' => '',
+                                        'amount' => $total,
+                                    ],
+                                ]);
+                            })
+                            ->required(),
+                            TextInput::make('fuel_cost')
+                            ->label('Cost per Liter')
+                            ->numeric()
+                            ->reactive()
+                            ->default(0)
+                            ->afterStateUpdated(function ($set, $get, $state) {
+                                $total = $get('fuel_consumption') * $state;
+                                $set('disbursement_voucher_particulars', [
+                                    [
+                                        'purpose' => '',
+                                        'responsibility_center' => '',
+                                        'mfo_pap' => '',
+                                        'amount' => $total,
+                                    ],
+                                ]);
+                            })
+                            ->required(),
+                            ])->visible(fn ($get) => $this->voucher_subtype->id == 71),
+                            
+                            Repeater::make('other_expenses')
+                            ->schema([
+                                TextInput::make('other_expense')
+                                ->reactive()
+                                ->label('Other Expenses')
+                                ->numeric(),
+                            ])->visible(fn ($get) => in_array($this->voucher_subtype->id, [27,70,71])),
+                             //Electricity, Water, Fuel (end)
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
-                                    Textarea::make('purpose')->required(),
+                                    Textarea::make('purpose')
+                                    ->required(function ($get, $set) {
+                                        if($this->voucher_subtype->id == 27)
+                                        {
+                                            $set('purpose', 'Electricity Bill For ');
+                                        }else if($this->voucher_subtype->id == 70)
+                                        {
+                                            $set('purpose', 'Water Bill For ');
+                                        }else
+                                        {
+                                            $set('purpose', '');
+                                        }
+                                    }),
                                     Grid::make(3)->schema([
                                         TextInput::make('responsibility_center'),
                                         TextInput::make('mfo_pap')
                                             ->label('MFO/PAP'),
                                         TextInput::make('amount')
+                                            ->disabled(fn ($get) => in_array($this->voucher_subtype->id, [27,70,71]))
+                                            ->reactive()
                                             ->numeric()
                                             ->required(),
                                     ]),

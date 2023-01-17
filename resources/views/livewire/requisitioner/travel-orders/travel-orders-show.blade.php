@@ -114,7 +114,7 @@
 
                             <span
                                 class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
-                                Your travel is an <span
+                                Your travel is on <span
                                     class="underline">{{ $travel_order->travel_order_type->name }}</span>. A report of
                                 activities should be made immediately upon termination of this travel order.
                             </span>
