@@ -25,6 +25,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
+use Illuminate\Validation\ValidationException;
 
 class LiquidationReportsCreate extends Component implements HasForms
 {
@@ -32,6 +33,10 @@ class LiquidationReportsCreate extends Component implements HasForms
 
     public $data = [];
     public $disbursement_voucher;
+
+    protected $listeners = [
+        'wizard::nextStep' => 'next',
+    ];
 
 
     protected function getFormSchema()
@@ -139,7 +144,20 @@ class LiquidationReportsCreate extends Component implements HasForms
                                 } catch (\Throwable $th) {
                                 }
                             }),
-                    ]),
+                    ])
+                    ->afterValidation(function () {
+                        $particulars = collect($this->data['particulars']);
+                        $refund_particulars = collect($this->data['refund_particulars']);
+                        $cheque_amount = $this->disbursement_voucher->total_suggested_amount > 0 ? $this->disbursement_voucher->total_suggested_amount : $this->disbursement_voucher->total_amount;
+                        if ($cheque_amount > $particulars->sum('amount')) {
+                            if (($refund_particulars->sum('amount') ?? 0) != ($cheque_amount - $particulars->sum('amount') ?? 0)) {
+                                Notification::make()->title('Refund Error')->body('Refunded amount must be equal to the amount to be refunded.')->danger()->send();
+                                throw ValidationException::withMessages([
+                                    'refund_amount' => 'Refunded amount must be equal to the amount to be refunded.'
+                                ]);
+                            }
+                        }
+                    }),
                 Step::make('Preview')
                     ->schema([
                         Placeholder::make('preview')

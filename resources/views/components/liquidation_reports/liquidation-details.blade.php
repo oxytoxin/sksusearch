@@ -1,5 +1,6 @@
 @php
     $particulars = collect($this->data['particulars']);
+    $refund_particulars = collect($this->data['refund_particulars']);
     $cheque_amount = $this->disbursement_voucher->total_suggested_amount > 0 ? $this->disbursement_voucher->total_suggested_amount : $this->disbursement_voucher->total_amount;
     $ready = false;
     try {
@@ -40,6 +41,15 @@
                 </p>
             @endif
         </div>
+        @if ($cheque_amount > $particulars->sum('amount'))
+            <div>
+                <h3>Refunded Amount</h3>
+                <p>
+                    {{ Akaunting\Money\Money::PHP($refund_particulars->sum('amount') ?? 0, true) }}
+                </p>
+            </div>
+        @endif
+
     </div>
 
 @endif
