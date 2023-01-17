@@ -35,13 +35,21 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public $other_expenses = [];
 
+    public $total_expense;
+
+    public $electricity_utility_type;
+
     public $electricity_consumption;
 
     public $electricity_cost;
 
+    public $water_utility_type;
+
     public $water_consumption;
 
     public $water_cost;
+
+    public $fuel_utility_type;
 
     public $fuel_consumption;
 
@@ -159,7 +167,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $total = $get('electricity_cost') * $state;
+                                        $particulars = collect($this->other_expenses);
+                                        $total = ($get('electricity_cost') * $state) + $particulars->sum('other_expense');
+                                        $this->total_expense = $particulars->sum('other_expense');
                                         $set('disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => '',
@@ -176,7 +186,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $total = $get('electricity_consumption') * $state;
+                                        $particulars = collect($this->other_expenses);
+                                        $total = ($get('electricity_consumption') * $state ) + $particulars->sum('other_expense');
+                                        $this->total_expense = $particulars->sum('other_expense');
                                         $set('disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => '',
@@ -199,7 +211,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $total = $get('water_cost') * $state;
+                                        $particulars = collect($this->other_expenses);
+                                        $total = ($get('water_cost') * $state) + $particulars->sum('other_expense');
+                                        $this->total_expense = $particulars->sum('other_expense');
                                         $set('disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => '',
@@ -216,7 +230,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $total = $get('water_consumption') * $state;
+                                        $particulars = collect($this->other_expenses);
+                                        $total = ($get('water_consumption') * $state) + $particulars->sum('other_expense');
+                                        $this->total_expense = $particulars->sum('other_expense');
                                         $set('disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => '',
@@ -239,7 +255,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $total = $get('fuel_cost') * $state;
+                                        $particulars = collect($this->other_expenses);
+                                        $total = ($get('fuel_cost') * $state) + $particulars->sum('other_expense');
+                                        $this->total_expense = $particulars->sum('other_expense');
                                         $set('disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => '',
@@ -256,7 +274,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $total = $get('fuel_consumption') * $state;
+                                        $particulars = collect($this->other_expenses);
+                                        $total = ($get('fuel_consumption') * $state) + $particulars->sum('other_expense');
+                                        $this->total_expense = $particulars->sum('other_expense');
                                         $set('disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => '',
@@ -275,9 +295,21 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         ->reactive()
                                         ->label('Other Expenses')
                                         ->numeric()
+                                        ->default(0)
                                         ->afterStateUpdated(function ($set, $get) {
                                             $particulars = collect($this->other_expenses);
-                                            $total = $get('amount') + $particulars->sum('other_expense');
+                                            $sum = $particulars->sum('other_expense');
+                                            $this->total_expense = $sum;
+                                            if($this->voucher_subtype->id == 27)
+                                            {
+                                                $total = ($get('../../electricity_consumption') * $get('../../electricity_cost')) + $sum;
+                                            }else if($this->voucher_subtype->id == 70)
+                                            {
+                                                $total = ($get('../../water_consumption') * $get('../../water_cost')) + $sum;
+                                            }else if($this->voucher_subtype->id == 71)
+                                            {
+                                                $total = ($get('../../fuel_consumption') * $get('../../fuel_cost')) + $sum;
+                                            }
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => '',
@@ -356,7 +388,34 @@ class DisbursementVouchersCreate extends Component implements HasForms
     {
         $this->validate();
         DB::beginTransaction();
-
+        if ($this->voucher_subtype->id == 27) {
+            $data = array(
+                'type' => 'Electricity',
+                'meter_number' => $this->electricity_utility_type,
+                'consumption' => $this->electricity_consumption,
+                'cost' => $this->electricity_cost,
+                'other_expenses' => $this->total_expense,
+            );
+        } else if($this->voucher_subtype->id == 70) {
+            $data = array(
+                'type' => 'Water',
+                'meter_number' => $this->water_utility_type,
+                'consumption' => $this->water_consumption,
+                'cost' => $this->water_cost,
+                'other_expenses' => $this->total_expense,
+            );
+        } else  if($this->voucher_subtype->id == 71){
+            $data = array(
+                'type' => 'Fuel',
+                'meter_number' => $this->fuel_utility_type,
+                'consumption' => $this->fuel_consumption,
+                'cost' => $this->fuel_cost,
+                'other_expenses' => $this->total_expense,
+            );
+        }else{
+            $data = [];
+        }
+        $utilities_json = json_encode($data);
         $dv = DisbursementVoucher::create([
             'voucher_subtype_id' => $this->voucher_subtype->id,
             'user_id' => auth()->id(),
@@ -366,6 +425,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
             'travel_order_id' => $this->travel_order_id,
             'tracking_number' => $this->tracking_number,
             'submitted_at' => now(),
+            'other_details' => $utilities_json,
             'current_step_id' => 3000,
             'previous_step_id' => 2000,
         ]);
