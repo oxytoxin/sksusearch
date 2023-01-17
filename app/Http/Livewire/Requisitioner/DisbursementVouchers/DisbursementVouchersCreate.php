@@ -391,7 +391,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
         if ($this->voucher_subtype->id == 27) {
             $other_details = [
                 'type' => 'Electricity',
-                'meter_number' => $this->electricity_utility_type,
+                'meter_number_id' => $this->electricity_utility_type,
                 'consumption' => $this->electricity_consumption,
                 'cost' => $this->electricity_cost,
                 'other_expenses' => collect($this->other_expenses)->values()->toArray(),
@@ -399,7 +399,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
         } else if ($this->voucher_subtype->id == 70) {
             $other_details = [
                 'type' => 'Water',
-                'meter_number' => $this->water_utility_type,
+                'meter_number_id' => $this->water_utility_type,
                 'consumption' => $this->water_consumption,
                 'cost' => $this->water_cost,
                 'other_expenses' => collect($this->other_expenses)->values()->toArray(),
@@ -407,7 +407,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
         } else  if ($this->voucher_subtype->id == 71) {
             $other_details = [
                 'type' => 'Fuel',
-                'meter_number' => $this->fuel_utility_type,
+                'meter_number_id' => $this->fuel_utility_type,
                 'consumption' => $this->fuel_consumption,
                 'cost' => $this->fuel_cost,
                 'other_expenses' => collect($this->other_expenses)->values()->toArray(),
