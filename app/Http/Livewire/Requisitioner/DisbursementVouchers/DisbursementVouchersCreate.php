@@ -292,11 +292,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
                             Repeater::make('other_expenses')
                                 ->columns(2)
                                 ->schema([
-                                    TextInput::make('name')
-                                        ->required(),
+                                    TextInput::make('name'),
+                                        // ->required(),
                                     TextInput::make('amount')
                                         ->reactive()
-                                        ->required()
+                                        // ->required()
                                         ->numeric()
                                         ->default(0)
                                         ->afterStateUpdated(function ($set, $get) {
