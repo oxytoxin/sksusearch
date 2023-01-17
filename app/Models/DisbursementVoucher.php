@@ -21,6 +21,7 @@ class DisbursementVoucher extends Model
         'cancelled_at' => 'immutable_datetime',
         'draft' => 'array',
         'related_documents' => 'array',
+        'other_details' => 'array',
     ];
 
     protected function totalAmount(): Attribute
