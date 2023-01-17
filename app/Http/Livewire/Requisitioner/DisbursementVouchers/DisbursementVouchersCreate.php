@@ -33,6 +33,20 @@ class DisbursementVouchersCreate extends Component implements HasForms
 {
     use InteractsWithForms;
 
+    public $other_expenses = [];
+
+    public $electricity_consumption;
+
+    public $electricity_cost;
+
+    public $water_consumption;
+
+    public $water_cost;
+
+    public $fuel_consumption;
+
+    public $fuel_cost;
+    
     public $tracking_number;
 
     public $travel_order_id;
@@ -260,7 +274,19 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 TextInput::make('other_expense')
                                 ->reactive()
                                 ->label('Other Expenses')
-                                ->numeric(),
+                                ->numeric()
+                                ->afterStateUpdated(function ($set, $get, $state) {
+                                    $particulars = collect($this->other_expenses);
+                                    $total = $get('amount') + $particulars->sum('other_expense');
+                                    $set('disbursement_voucher_particulars', [
+                                        [
+                                            'purpose' => '',
+                                            'responsibility_center' => '',
+                                            'mfo_pap' => '',
+                                            'amount' => $total,
+                                        ],
+                                    ]);
+                                }),
                             ])->visible(fn ($get) => in_array($this->voucher_subtype->id, [27,70,71])),
                              //Electricity, Water, Fuel (end)
                             Repeater::make('disbursement_voucher_particulars')
