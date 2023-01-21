@@ -61,7 +61,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             redirect()->route('office.dashboard');
             }
         }
-    }
+    }           
 
     public function mount()
     {
