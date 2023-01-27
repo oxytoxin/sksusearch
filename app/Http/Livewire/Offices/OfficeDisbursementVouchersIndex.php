@@ -54,12 +54,14 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                }
             DB::commit();
             Notification::make()->title('Document Received')->success()->send();
+            redirect()->route('office.dashboard');
             }
             else {
             Notification::make()->title('Document Not Found or Already Received')->warning()->send();
+            redirect()->route('office.dashboard');
             }
         }
-    }
+    }           
 
     public function mount()
     {

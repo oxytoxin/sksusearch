@@ -37,17 +37,25 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public $total_expense;
 
+    public $total_utility;
+
+    public $electricity_utility_particulars = [];
+
     public $electricity_utility_type;
 
     public $electricity_consumption;
 
     public $electricity_cost;
 
+    public $water_utility_particulars = [];
+
     public $water_utility_type;
 
     public $water_consumption;
 
     public $water_cost;
+
+    public $fuel_utility_particulars = [];
 
     public $fuel_utility_type;
 
@@ -156,28 +164,49 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->options(Mop::pluck('name', 'id')),
                             ]),
                             //Electricity, Water, Fuel (start)
-                            Grid::make(3)->schema([
-                                Select::make('electricity_utility_type')
+
+                            Repeater::make('electricity_utility_particulars')
+                                ->columns(4)
+                                ->schema([
+                                    Select::make('electricity_utility_type')
                                     ->label('Meter Number')
                                     ->options(ElectricityMeter::pluck('meter_number', 'id'))
                                     ->required(),
-                                TextInput::make('electricity_consumption')
+                                    TextInput::make('electricity_consumption')
                                     ->label('Kilowatt-hour Consumpition (kWh)')
                                     ->numeric()
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $particulars = collect($this->other_expenses);
-                                        $total = ($get('electricity_cost') * $state) + $particulars->sum('amount');
-                                        $this->total_expense = $particulars->sum('amount');
-                                        $set('disbursement_voucher_particulars', [
-                                            [
-                                                'purpose' => '',
-                                                'responsibility_center' => '',
-                                                'mfo_pap' => '',
-                                                'amount' => $total,
-                                            ],
-                                        ]);
+                                        if($state == '' || $state == null)
+                                        {
+                                            $consumption = 0;
+                                            $cost = $get('electricity_cost');
+                                        }else if($get('electricity_cost') == '' || ($get('electricity_cost') == null)){
+                                            $cost = 0;
+                                            $consumption = $state;
+                                        }else if(($state == '' || $state == null) && ($get('electricity_cost') == '' || $get('electricity_cost') == null))
+                                        {
+                                            $cost = 0;
+                                            $consumption = 0;
+                                        }else{
+                                            $cost = $state;
+                                            $consumption = $get('electricity_cost');
+                                        }
+                                            $set('electricity_total', $consumption * $cost);
+                                            $utility_particulars = collect($this->electricity_utility_particulars);
+                                            $other_expense = collect($this->other_expenses);
+                                            $total = $utility_particulars->sum('electricity_total') + $other_expense->sum('amount');
+                                            $set('../../disbursement_voucher_particulars', [
+                                                [
+                                                    'purpose' => $get('../../purpose'),
+                                                    'responsibility_center' => '',
+                                                    'mfo_pap' => '',
+                                                    'amount' =>  $total,
+                                                ],
+                                            ]);
+                                        
+                                       
                                     })
                                     ->required(),
                                 TextInput::make('electricity_cost')
@@ -186,140 +215,260 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $particulars = collect($this->other_expenses);
-                                        $total = ($get('electricity_consumption') * $state) + $particulars->sum('amount');
-                                        $this->total_expense = $particulars->sum('amount');
-                                        $set('disbursement_voucher_particulars', [
+                                        if($state == '' || $state == null)
+                                        {
+                                            $consumption = $get('electricity_consumption');
+                                            $cost = 0;
+                                        }else if($get('electricity_consumption') == ''  || $get('electricity_consumption') == null){
+                                            $cost = $state;
+                                            $consumption = 0;
+                                        }else if(($state == '' || $state == null) && ($get('electricity_consumption') == '' || $get('electricity_consumption') == null))
+                                        {
+                                            $cost = 0;
+                                            $consumption = 0;
+                                        }else{
+                                            $cost = $state;
+                                            $consumption = $get('electricity_consumption');
+                                        }
+                                        $set('electricity_total', $cost * $consumption);
+                                        $utility_particulars = collect($this->electricity_utility_particulars);
+                                        $other_expense = collect($this->other_expenses);
+                                        $total = $utility_particulars->sum('electricity_total') + $other_expense->sum('amount');
+                                        $set('../../disbursement_voucher_particulars', [
                                             [
-                                                'purpose' => '',
+                                                'purpose' => $get('../../purpose'),
                                                 'responsibility_center' => '',
                                                 'mfo_pap' => '',
                                                 'amount' => $total,
                                             ],
                                         ]);
-                                    })
-                                    ->required(),
-                            ])->visible(fn ($get) => $this->voucher_subtype->id == 27),
-                            Grid::make(3)->schema([
-                                Select::make('water_utility_type')
+                                    })->required(),
+                                    TextInput::make('electricity_total')
+                                    ->label('Total')
+                                    ->numeric()
+                                    ->reactive()
+                                    ->default(0)
+                                    ->disabled(),
+                                ])
+                                ->label('Utility Particulars')
+                                ->createItemButtonLabel('Add New Row')
+                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [27])),
+
+                                Repeater::make('water_utility_particulars')
+                                ->columns(4)
+                                ->schema([
+                                    Select::make('water_utility_type')
                                     ->label('Meter Number')
                                     ->options(WaterMeter::pluck('meter_number', 'id'))
                                     ->required(),
-                                TextInput::make('water_consumption')
+                                    TextInput::make('water_consumption')
                                     ->label('Cubic Metre Consumption')
                                     ->numeric()
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $particulars = collect($this->other_expenses);
-                                        $total = ($get('water_cost') * $state) + $particulars->sum('amount');
-                                        $this->total_expense = $particulars->sum('amount');
-                                        $set('disbursement_voucher_particulars', [
-                                            [
-                                                'purpose' => '',
-                                                'responsibility_center' => '',
-                                                'mfo_pap' => '',
-                                                'amount' => $total,
-                                            ],
-                                        ]);
+                                        if($state == '' || $state == null)
+                                        {
+                                            $consumption = 0;
+                                            $cost = $get('water_cost');
+                                        }else if($get('water_cost') == '' || ($get('water_cost') == null)){
+                                            $cost = 0;
+                                            $consumption = $state;
+                                        }else if(($state == '' || $state == null) && ($get('water_cost') == '' || $get('water_cost') == null))
+                                        {
+                                            $cost = 0;
+                                            $consumption = 0;
+                                        }else{
+                                            $cost = $state;
+                                            $consumption = $get('water_cost');
+                                        }
+                                            $set('water_total', $consumption * $cost);
+                                            $utility_particulars = collect($this->water_utility_particulars);
+                                            $other_expense = collect($this->other_expenses);
+                                            $total = $utility_particulars->sum('water_total') + $other_expense->sum('amount');
+                                            $set('../../disbursement_voucher_particulars', [
+                                                [
+                                                    'purpose' => $get('../../purpose'),
+                                                    'responsibility_center' => '',
+                                                    'mfo_pap' => '',
+                                                    'amount' =>  $total,
+                                                ],
+                                            ]);
+                                        
+                                       
                                     })
                                     ->required(),
-                                TextInput::make('water_cost')
+                                    TextInput::make('water_cost')
                                     ->label('Cost per Cubic Metre')
                                     ->numeric()
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $particulars = collect($this->other_expenses);
-                                        $total = ($get('water_consumption') * $state) + $particulars->sum('amount');
-                                        $this->total_expense = $particulars->sum('amount');
-                                        $set('disbursement_voucher_particulars', [
+                                        if($state == '' || $state == null)
+                                        {
+                                            $consumption = $get('water_consumption');
+                                            $cost = 0;
+                                        }else if($get('water_consumption') == ''  || $get('water_consumption') == null){
+                                            $cost = $state;
+                                            $consumption = 0;
+                                        }else if(($state == '' || $state == null) && ($get('water_consumption') == '' || $get('water_consumption') == null))
+                                        {
+                                            $cost = 0;
+                                            $consumption = 0;
+                                        }else{
+                                            $cost = $state;
+                                            $consumption = $get('water_consumption');
+                                        }
+                                        $set('water_total', $cost * $consumption);
+                                        $utility_particulars = collect($this->water_utility_particulars);
+                                        $other_expense = collect($this->other_expenses);
+                                        $total = $utility_particulars->sum('water_total') + $other_expense->sum('amount');
+                                        $set('../../disbursement_voucher_particulars', [
                                             [
-                                                'purpose' => '',
+                                                'purpose' => $get('../../purpose'),
                                                 'responsibility_center' => '',
                                                 'mfo_pap' => '',
                                                 'amount' => $total,
                                             ],
                                         ]);
-                                    })
-                                    ->required(),
-                            ])->visible(fn ($get) => $this->voucher_subtype->id == 70),
-                            Grid::make(3)->schema([
-                                Select::make('fuel_utility_type')
+                                    })->required(),
+                                    TextInput::make('water_total')
+                                    ->label('Total')
+                                    ->numeric()
+                                    ->reactive()
+                                    ->default(0)
+                                    ->disabled(),
+                                ])
+                                ->label('Utility Particulars')
+                                ->createItemButtonLabel('Add New Row')
+                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [70])),    
+
+                                Repeater::make('fuel_utility_particulars')
+                                ->columns(4)
+                                ->schema([
+                                    Select::make('fuel_utility_type')
                                     ->label('Vehicle')
                                     ->options(Vehicle::pluck('model', 'id'))
                                     ->required(),
-                                TextInput::make('fuel_consumption')
+                                    TextInput::make('fuel_consumption')
                                     ->label('Fuel Consumption (Liters)')
                                     ->numeric()
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $particulars = collect($this->other_expenses);
-                                        $total = ($get('fuel_cost') * $state) + $particulars->sum('amount');
-                                        $this->total_expense = $particulars->sum('amount');
-                                        $set('disbursement_voucher_particulars', [
-                                            [
-                                                'purpose' => '',
-                                                'responsibility_center' => '',
-                                                'mfo_pap' => '',
-                                                'amount' => $total,
-                                            ],
-                                        ]);
+                                        if($state == '' || $state == null)
+                                        {
+                                            $consumption = 0;
+                                            $cost = $get('fuel_cost');
+                                        }else if($get('fuel_cost') == '' || ($get('fuel_cost') == null)){
+                                            $cost = 0;
+                                            $consumption = $state;
+                                        }else if(($state == '' || $state == null) && ($get('fuel_cost') == '' || $get('fuel_cost') == null))
+                                        {
+                                            $cost = 0;
+                                            $consumption = 0;
+                                        }else{
+                                            $cost = $state;
+                                            $consumption = $get('fuel_cost');
+                                        }
+                                            $set('fuel_total', $consumption * $cost);
+                                            $utility_particulars = collect($this->fuel_utility_particulars);
+                                            $other_expense = collect($this->other_expenses);
+                                            $total = $utility_particulars->sum('fuel_total') + $other_expense->sum('amount');
+                                            $set('../../disbursement_voucher_particulars', [
+                                                [
+                                                    'purpose' => $get('../../purpose'),
+                                                    'responsibility_center' => '',
+                                                    'mfo_pap' => '',
+                                                    'amount' =>  $total,
+                                                ],
+                                            ]);
+                                        
+                                       
                                     })
                                     ->required(),
-                                TextInput::make('fuel_cost')
+                                    TextInput::make('fuel_cost')
                                     ->label('Cost per Liter')
                                     ->numeric()
                                     ->reactive()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
-                                        $particulars = collect($this->other_expenses);
-                                        $total = ($get('fuel_consumption') * $state) + $particulars->sum('amount');
-                                        $this->total_expense = $particulars->sum('amount');
-                                        $set('disbursement_voucher_particulars', [
+                                        if($state == '' || $state == null)
+                                        {
+                                            $consumption = $get('fuel_consumption');
+                                            $cost = 0;
+                                        }else if($get('fuel_consumption') == ''  || $get('fuel_consumption') == null){
+                                            $cost = $state;
+                                            $consumption = 0;
+                                        }else if(($state == '' || $state == null) && ($get('fuel_consumption') == '' || $get('fuel_consumption') == null))
+                                        {
+                                            $cost = 0;
+                                            $consumption = 0;
+                                        }else{
+                                            $cost = $state;
+                                            $consumption = $get('fuel_consumption');
+                                        }
+                                        $set('fuel_total', $cost * $consumption);
+                                        $utility_particulars = collect($this->fuel_utility_particulars);
+                                        $other_expense = collect($this->other_expenses);
+                                        $total = $utility_particulars->sum('fuel_total') + $other_expense->sum('amount');
+                                        $set('../../disbursement_voucher_particulars', [
                                             [
-                                                'purpose' => '',
+                                                'purpose' => $get('../../purpose'),
                                                 'responsibility_center' => '',
                                                 'mfo_pap' => '',
                                                 'amount' => $total,
                                             ],
                                         ]);
-                                    })
-                                    ->required(),
-                            ])->visible(fn ($get) => $this->voucher_subtype->id == 71),
+                                    })->required(),
+                                    TextInput::make('fuel_total')
+                                    ->label('Total')
+                                    ->numeric()
+                                    ->reactive()
+                                    ->default(0)
+                                    ->disabled(),
+                                ])
+                                ->label('Utility Particulars')
+                                ->createItemButtonLabel('Add New Row')
+                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [71])),      
 
                             Repeater::make('other_expenses')
                                 ->columns(2)
                                 ->schema([
-                                    TextInput::make('name')
-                                        ->required(),
+                                    TextInput::make('name'),
                                     TextInput::make('amount')
                                         ->reactive()
-                                        ->required()
                                         ->numeric()
                                         ->default(0)
                                         ->afterStateUpdated(function ($set, $get) {
                                             $particulars = collect($this->other_expenses);
                                             $sum = $particulars->sum('amount');
-                                            $this->total_expense = $sum;
-                                            if ($this->voucher_subtype->id == 27) {
-                                                $total = ($get('../../electricity_consumption') * $get('../../electricity_cost')) + $sum;
-                                            } else if ($this->voucher_subtype->id == 70) {
-                                                $total = ($get('../../water_consumption') * $get('../../water_cost')) + $sum;
-                                            } else if ($this->voucher_subtype->id == 71) {
-                                                $total = ($get('../../fuel_consumption') * $get('../../fuel_cost')) + $sum;
+
+                                            if($get('amount') != 0 || $get('amount') != null)
+                                            {
+                                                $this->total_expense = $sum;
+                                                if ($this->voucher_subtype->id == 27) {
+                                                    $utility_particulars = collect($this->electricity_utility_particulars);
+                                                    $total = $utility_particulars->sum('electricity_total') + $sum;
+                                                } else if ($this->voucher_subtype->id == 70) {
+                                                    $utility_particulars = collect($this->water_utility_particulars);
+                                                    $total = $utility_particulars->sum('water_total') + $sum;
+                                                } else if ($this->voucher_subtype->id == 71) {
+                                                    $utility_particulars = collect($this->fuel_utility_particulars);
+                                                    $total = $utility_particulars->sum('fuel_total') + $sum;
+                                                }
+                                                $set('../../disbursement_voucher_particulars', [
+                                                    [
+                                                        'purpose' => $get('../../purpose'),
+                                                        'responsibility_center' => '',
+                                                        'mfo_pap' => '',
+                                                        'amount' => $total,
+                                                    ],
+                                                ]);
                                             }
-                                            $set('../../disbursement_voucher_particulars', [
-                                                [
-                                                    'purpose' => '',
-                                                    'responsibility_center' => '',
-                                                    'mfo_pap' => '',
-                                                    'amount' => $total,
-                                                ],
-                                            ]);
+                                           
                                         }),
-                                ])->visible(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71])),
+                                ])->createItemButtonLabel('Add New Row')->visible(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71])),
                             //Electricity, Water, Fuel (end)
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
@@ -391,25 +540,19 @@ class DisbursementVouchersCreate extends Component implements HasForms
         if ($this->voucher_subtype->id == 27) {
             $other_details = [
                 'type' => 'Electricity',
-                'meter_number_id' => $this->electricity_utility_type,
-                'consumption' => $this->electricity_consumption,
-                'cost' => $this->electricity_cost,
+                'details' => collect($this->electricity_utility_particulars)->values()->toArray(),
                 'other_expenses' => collect($this->other_expenses)->values()->toArray(),
             ];
         } else if ($this->voucher_subtype->id == 70) {
             $other_details = [
                 'type' => 'Water',
-                'meter_number_id' => $this->water_utility_type,
-                'consumption' => $this->water_consumption,
-                'cost' => $this->water_cost,
+                'details' => collect($this->water_utility_particulars)->values()->toArray(),
                 'other_expenses' => collect($this->other_expenses)->values()->toArray(),
             ];
         } else  if ($this->voucher_subtype->id == 71) {
             $other_details = [
                 'type' => 'Fuel',
-                'meter_number_id' => $this->fuel_utility_type,
-                'consumption' => $this->fuel_consumption,
-                'cost' => $this->fuel_cost,
+                'details' => collect($this->fuel_utility_particulars)->values()->toArray(),
                 'other_expenses' => collect($this->other_expenses)->values()->toArray(),
             ];
         } else {

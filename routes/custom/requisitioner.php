@@ -11,6 +11,7 @@ use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCancell
 use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCreate;
 use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsIndex;
 use App\Http\Livewire\Requisitioner\TransactionsIndex;
+use App\Http\Livewire\Requisitioner\PromptContactNumber;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersCreate;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersIndex;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersShow;
@@ -22,8 +23,14 @@ Route::middleware([
     config('jetstream.auth_session'),
 ])->prefix('requisitioner')->name('requisitioner.')->group(function () {
     Route::get('my-dashboard', function () {
-        return view('dashboard');
+        if(auth()->user()->employee_information->contact_number == null)
+        {
+            return redirect()->route('requisitioner.contact-number');
+        }else{
+            return view('dashboard');
+        }
     })->name('dashboard');
+    Route::get('/require-contact-number', PromptContactNumber::class)->name('contact-number');
     Route::get('/transactions', TransactionsIndex::class)->name('transactions.index');
     Route::get('/travel-orders/create', TravelOrdersCreate::class)->name('travel-orders.create');
     Route::get('/travel-orders', TravelOrdersIndex::class)->name('travel-orders.index');
