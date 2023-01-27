@@ -11,6 +11,7 @@ use Filament\Tables\Filters\Layout;
 use App\Models\LiquidationReportStep;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
+use Filament\Forms\Components\Fieldset;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
@@ -19,6 +20,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Tables\Concerns\InteractsWithTable;
 
 class OfficeLiquidationReportsIndex extends Component implements HasTable
@@ -193,6 +195,11 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
                 $record->update([
                     'lr_number' => $data['lr_number'],
                     'journal_date' => $data['journal_date'],
+                    'related_documents' => [
+                        'required_documents' => $record?->disbursement_voucher->voucher_subtype->related_documents_list->documents,
+                        'verified_documents' => $data['verified_documents'],
+                        'remarks' => $data['remarks'] ?? '',
+                    ],
                     'current_step_id' => $record->current_step->next_step->id,
                 ]);
                 $record->refresh();
@@ -219,8 +226,18 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
                         Flatpickr::make('journal_date')
                             ->disableTime()
                             ->required(),
+                        Fieldset::make('Related Documents')
+                            ->columns(1)
+                            ->schema([
+                                CheckboxList::make('verified_documents')
+                                    ->options(function ($record) {
+                                        return collect($record?->disbursement_voucher->voucher_subtype->related_documents_list?->liquidation_report_documents)->flatMap(fn ($d) => [$d => $d]) ?? [];
+                                    }),
+                                RichEditor::make('remarks')
+                            ])
                     ];
                 })
+                ->modalWidth('3xl')
                 ->requiresConfirmation(),
             Action::make('certify')->button()->action(function ($record) {
                 DB::beginTransaction();
@@ -250,6 +267,13 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
                     ->modalHeading('Liquidation Report Activity Timeline')
                     ->modalContent(fn ($record) => view('components.timeline_views.activity_logs', [
                         'record' => $record,
+                    ])),
+                ViewAction::make('related_documents')
+                    ->label('Related Documents')
+                    ->icon('ri-file-copy-2-line')
+                    ->modalHeading('Liquidation Report Related Documents')
+                    ->modalContent(fn ($record) => view('components.liquidation_reports.liquidation-report-verified-documents', [
+                        'liquidation_report' => $record,
                     ])),
                 ViewAction::make('view')
                     ->label('Preview')

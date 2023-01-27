@@ -128,7 +128,8 @@
                     </div>
                     <div class="flex gap-2 px-4">
                         <p>Date:</p>
-                        <p class="flex-1 text-center border-b border-black">{{ today()->format('F d, Y') }}</p>
+                        <p class="flex-1 text-center border-b border-black">
+                        </p>
                     </div>
                 </div>
                 <div class="flex flex-col w-1/3 h-48 pb-1">
@@ -145,7 +146,7 @@
                     <div class="flex gap-2 px-4">
                         <p>Date:</p>
                         <p class="flex-1 text-center border-b border-black">
-                            {{ $liquidation_report->signatory_date?->format('F d, Y') }}</p>
+                        </p>
                     </div>
                 </div>
                 <div class="flex flex-col w-1/3 h-48 pb-1">
@@ -161,7 +162,7 @@
                     <div class="flex gap-2 px-4">
                         <p>Date:</p>
                         <p class="flex-1 text-center border-b border-black">
-                            {{ $liquidation_report->journal_date?->format('F d, Y') }}</p>
+                        </p>
                     </div>
                 </div>
             </div>

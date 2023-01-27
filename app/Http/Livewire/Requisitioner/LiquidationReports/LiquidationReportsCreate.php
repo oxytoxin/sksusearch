@@ -158,9 +158,18 @@ class LiquidationReportsCreate extends Component implements HasForms
                             }
                         }
                     }),
-                Step::make('Preview')
+                Step::make('Related Documents')
                     ->schema([
                         Placeholder::make('preview')
+                            ->disableLabel()
+                            ->content(fn ($record) => view('components.liquidation_reports.related-documents', [
+                                'voucher_subtype' => $this->disbursement_voucher?->voucher_subtype
+                            ]))
+
+                    ]),
+                Step::make('Preview')
+                    ->schema([
+                        Placeholder::make('related_documents')
                             ->view('components.liquidation_reports.liquidation-report-preview')
                     ])
             ])->submitAction(view('components.forms.save-button'))

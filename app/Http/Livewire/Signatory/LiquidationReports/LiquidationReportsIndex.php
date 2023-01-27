@@ -177,6 +177,13 @@ class LiquidationReportsIndex extends Component implements HasTable
                     ->modalContent(fn ($record) => view('components.timeline_views.activity_logs', [
                         'record' => $record,
                     ])),
+                ViewAction::make('related_documents')
+                    ->label('Related Documents')
+                    ->icon('ri-file-copy-2-line')
+                    ->modalHeading('Disbursement Voucher Related Documents')
+                    ->modalContent(fn ($record) => view('components.liquidation_reports.liquidation-report-verified-documents', [
+                        'liquidation_report' => $record,
+                    ])),
                 ViewAction::make('view')
                     ->label('Preview')
                     ->openUrlInNewTab()

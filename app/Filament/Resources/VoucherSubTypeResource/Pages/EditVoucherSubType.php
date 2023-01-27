@@ -21,15 +21,21 @@ class EditVoucherSubType extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $documents = [];
+        $liquidation_report_documents = [];
         if (isset($data['documents'])) {
             $documents = $data['documents'];
             unset($data['documents']);
+        }
+        if (isset($data['liquidation_report_documents'])) {
+            $liquidation_report_documents = $data['liquidation_report_documents'];
+            unset($data['liquidation_report_documents']);
         }
         $record->update($data);
         $record->related_documents_list()->updateOrCreate([
             'voucher_sub_type_id' => $record->id
         ], [
-            'documents' => $documents
+            'documents' => $documents,
+            'liquidation_report_documents' => $liquidation_report_documents,
         ]);
         return $record;
     }
@@ -37,6 +43,7 @@ class EditVoucherSubType extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['documents'] = $this->record->related_documents_list?->documents ?? [];
+        $data['liquidation_report_documents'] = $this->record->related_documents_list?->liquidation_report_documents ?? [];
         return $data;
     }
 }

@@ -11,6 +11,7 @@ class RelatedDocumentsList extends Model
 
     protected $casts = [
         'documents' => 'array',
+        'liquidation_report_documents' => 'array',
     ];
 
     public function voucher_sub_type()

@@ -15,6 +15,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Tables\Filters\SelectFilter;
 
 class VoucherSubTypeResource extends Resource
 {
@@ -42,7 +43,11 @@ class VoucherSubTypeResource extends Resource
                 Grid::make(1)->schema([
                     ArrayField::make('documents')
                         ->placeholder('Add document (Press Enter)')
-                        ->label('Required Documents')
+                        ->label('Required Documents'),
+                    ArrayField::make('liquidation_report_documents')
+                        ->placeholder('Add document (Press Enter)')
+                        ->label('Liquidation Report Required Documents')
+                        ->visible(fn ($record) => $record->voucher_type_id == 1),
                 ])
             ]);
     }
@@ -66,8 +71,9 @@ class VoucherSubTypeResource extends Resource
                 TextColumn::make('name')->searchable()->sortable(),
             ])
             ->filters([
-                MultiSelectFilter::make('voucher_type_id')
+                SelectFilter::make('voucher_type_id')
                     ->label('Type')
+                    ->multiple()
                     ->options(VoucherType::pluck('name', 'id')),
             ])
             ->actions([

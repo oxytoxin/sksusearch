@@ -19,6 +19,7 @@ class LiquidationReport extends Model
         'particulars' => 'array',
         'refund_particulars' => 'array',
         'draft' => 'array',
+        'related_documents' => 'array',
     ];
 
     public static function generateTrackingNumber()
