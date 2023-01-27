@@ -22,7 +22,7 @@ class PromptContactNumber extends Component
         ],[
             'contact_number.required' => 'Phone Number is required',
             'contact_number.numeric' => 'Phone Number must be a number',
-            'contact_number.regex' => 'Phone Number must start with 09 and have 11 digits',
+            'contact_number.regex' => 'Phone Number must start with 09 and must have 11 digits',
         ]);
         DB::beginTransaction();
         EmployeeInformation::where('id', auth()->user()->id)

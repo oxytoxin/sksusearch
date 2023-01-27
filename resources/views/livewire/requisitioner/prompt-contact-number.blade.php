@@ -24,6 +24,7 @@
           From: "opacity-100 translate-y-0 sm:scale-100"
           To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       -->
+      <form wire:submit.prevent='saveNumber'>
       <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-3 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
         <div>
           <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
@@ -39,14 +40,16 @@
             <div class="relative mt-3 rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-indigo-600 focus-within:ring-1 focus-within:ring-indigo-600">
             <input  wire:model.debounce="contact_number" type="number" name="name" id="name" autofocus class="text-center block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm">
             </div>
-            @error('contact_number') <span class="error text-red-500">{{ $message }}</span> @enderror
+            @error('contact_number') <span class="error text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
           </div>
         </div>
         <div class="mt-5 sm:mt-6 space-y-3">
-          <button wire:click="saveNumber" type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm">Proceed</button>
+          <x-filament-support::button type="submit" wire:target='saveNumber' class="w-full justify-center">Proceed</x-filament-support::button>
+          <!-- <button wire:click="saveNumber" type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm">Proceed</button> -->
         </div>
       </div>
+</form>
     </div>
   </div>
 </div>
