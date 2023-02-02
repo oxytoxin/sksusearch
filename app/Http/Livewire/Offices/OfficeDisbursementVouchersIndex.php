@@ -13,6 +13,10 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Grid;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 
@@ -82,6 +86,66 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 true => 'For Cancellation',
                 false => 'For Approval',
             ])->default(0)->label('Status'),
+
+            Filter::make('created_at')
+                ->form([
+                    Grid::make(2)
+                ->schema([
+                    Forms\Components\DatePicker::make('from')->default(\Carbon\Carbon::parse(now())->toFormattedDateString()),
+                    Forms\Components\DatePicker::make('until')->default(\Carbon\Carbon::parse(now())->toFormattedDateString()),
+                ])
+                ])
+                // ...
+                ->indicateUsing(function (array $data): array {
+                    $indicators = [];
+                    if(\Carbon\Carbon::parse($data['from'])->toFormattedDateString() == \Carbon\Carbon::parse(now())->toFormattedDateString() && \Carbon\Carbon::parse($data['until'])->toFormattedDateString() == \Carbon\Carbon::parse(now())->toFormattedDateString())
+                    {
+                        $indicators['from'] = 'Today';
+                    }else{
+                        if ($data['from'] ?? null) {
+                            $indicators['from'] = 'Created from ' . \Carbon\Carbon::parse($data['from'])->toFormattedDateString();
+                        }
+                
+                        if ($data['until'] ?? null) {
+                            $indicators['until'] = 'Created until ' . \Carbon\Carbon::parse($data['until'])->toFormattedDateString();
+                        }
+                    }
+                    
+            
+                    return $indicators;
+                })
+                 ->query(function (Builder $query, array $data): Builder {
+                return $query
+                    ->when(
+                        $data['from'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
+                    )
+                    ->when(
+                        $data['until'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
+                    );
+                    })
+
+            // Filter::make('submitted_at')
+            // ->form([
+            //     Grid::make(2)
+            //     ->schema([
+            //         Forms\Components\DatePicker::make('from')->default(\Carbon\Carbon::now()->format('Y-m-d')),
+            //         Forms\Components\DatePicker::make('to')->default(\Carbon\Carbon::now()->format('Y-m-d')),
+            //     ])
+            // ])
+            // ->query(function (Builder $query, array $data): Builder {
+            //     return $query
+            //         ->when(
+            //             $data['from'],
+            //             fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
+            //         )
+            //         ->when(
+            //             $data['to'],
+            //             fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
+            //         );
+            // })
+            
         ];
     }
 
