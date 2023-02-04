@@ -43,7 +43,6 @@ class EmployeeInformationResource extends Resource
 
         return $form
             ->schema([
-
                 Fieldset::make('Employee Information')
                     ->schema([
                         TextInput::make('first_name')->required(),
@@ -103,6 +102,7 @@ class EmployeeInformationResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('user_id')->label('USER ID'),
                 TextColumn::make('full_name')->searchable(['first_name', 'last_name'])->sortable(),
                 TextColumn::make('position.description')->searchable()->sortable()->limit(20)
                     ->tooltip(fn ($record): string => $record->position?->description ?? 'No Position')
