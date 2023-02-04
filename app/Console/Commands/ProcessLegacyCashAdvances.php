@@ -55,8 +55,6 @@ class ProcessLegacyCashAdvances extends Command
             'name' => 'Legacy Cash Advances',
         ]);
 
-
-
         $rows = SimpleExcelReader::create(storage_path('csv/legacy-ca.csv'))->getRows();
         $rows->each(function ($data) use ($voucher_subtype) {
             $dv = DisbursementVoucher::create([
@@ -72,6 +70,7 @@ class ProcessLegacyCashAdvances extends Command
                     'account' => trim($data['Account']),
                     'ref' => trim($data['Ref.']),
                 ],
+                'cheque_number' => 'LEGACY-' . $data['Ref.'],
                 'submitted_at' => date_create(trim($data['Date'])),
                 'current_step_id' => 23000,
             ]);

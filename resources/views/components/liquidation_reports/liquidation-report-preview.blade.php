@@ -137,7 +137,7 @@
                 </div>
                 <div class="flex flex-col items-center justify-center flex-1 px-4">
                     <p class="w-full text-center border-b border-black">
-                        {{ App\Models\EmployeeInformation::find(auth()->id())?->full_name }}</p>
+                        {{ App\Models\EmployeeInformation::firstWhere('user_id', auth()->id())?->full_name }}</p>
                     </p>
                     <p>Signature over Printed Name</p>
                     <p>Claimant</p>
@@ -155,7 +155,8 @@
                 </div>
                 <div class="flex flex-col items-center justify-center flex-1 px-4">
                     <p class="w-full text-center border-b border-black">
-                        {{ App\Models\EmployeeInformation::find($this->data['signatory_id'])?->full_name }}</p>
+                        {{ App\Models\EmployeeInformation::firstWhere('user_id', $this->data['signatory_id'])?->full_name }}
+                    </p>
                     <p>Signature over Printed Name</p>
                     <p>Immediate Supervisor</p>
                 </div>
