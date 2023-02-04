@@ -7,6 +7,10 @@ use App\Models\DisbursementVoucher;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Forms;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Grid;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 
 class OfficeDisbursementVouchersForwarded extends Component implements HasTable
@@ -22,6 +26,30 @@ class OfficeDisbursementVouchersForwarded extends Component implements HasTable
             $office_final_step_id = 6000;
         }
         return DisbursementVoucher::whereForCancellation(false)->where('current_step_id', '>', $office_final_step_id)->latest();
+    }
+
+    
+    protected function getTableFilters(): array
+    {
+        return [
+                        
+            Filter::make('submitted_at')
+            ->form([
+                    Forms\Components\DatePicker::make('from'),
+                    Forms\Components\DatePicker::make('to'),
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                return $query
+                    ->when(
+                        $data['from'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
+                    )
+                    ->when(
+                        $data['to'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
+                    );
+            })
+        ];
     }
 
     protected function getTableColumns()
