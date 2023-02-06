@@ -176,6 +176,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->label('Kilowatt-hour Consumpition (kWh)')
                                     ->numeric()
                                     ->reactive()
+                                    ->lazy()
                                     ->default(0)
                                     ->afterStateUpdated(function ($set, $get, $state) {
                                         if($state == '' || $state == null)
@@ -194,10 +195,32 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $consumption = $get('electricity_cost');
                                         }
                                             $total_consumption = $consumption * $cost;
-                                            $set('electricity_total', number_format($total_consumption), 2);
+                                            $set('electricity_total', $consumption * $cost);
                                             $utility_particulars = collect($this->electricity_utility_particulars);
+                                            $filtered = $utility_particulars->filter(function ($item) {
+                                                return !is_null($item['electricity_total']) && $item['electricity_total'] !== "";
+                                            });
+
+                                            if ($filtered->isNotEmpty())
+                                            {
+                                                $utility_sum = $filtered->sum('electricity_total');
+                                            }else{
+                                                $utility_sum = 0;
+                                            }
+
                                             $other_expense = collect($this->other_expenses);
-                                            $total = number_format($utility_particulars->sum('electricity_total'), 2) + number_format($other_expense->sum('amount'), 2);
+                                            $filtered_expense = $other_expense->filter(function ($item) {
+                                                return !is_null($item['amount']) && $item['amount'] !== "";
+                                            });
+
+                                            if ($filtered_expense->isNotEmpty())
+                                            {
+                                                $other_expense_sum = $filtered_expense->sum('amount');
+                                            }else{
+                                                $other_expense_sum = 0;
+                                            }
+
+                                            $total = number_format($utility_sum, 2) + number_format( $other_expense_sum, 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
@@ -215,6 +238,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->numeric()
                                     ->reactive()
                                     ->default(0)
+                                    ->lazy()
                                     ->afterStateUpdated(function ($set, $get, $state) {
                                         if($state == '' || $state == null)
                                         {
@@ -232,10 +256,32 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $consumption = $get('electricity_consumption');
                                         }
                                         $total_consumption = $cost * $consumption;
-                                        $set('electricity_total', number_format($total_consumption, 2));
+                                        $set('electricity_total', $cost * $consumption);
                                         $utility_particulars = collect($this->electricity_utility_particulars);
+                                        $filtered = $utility_particulars->filter(function ($item) {
+                                            return !is_null($item['electricity_total']) && $item['electricity_total'] !== "";
+                                        });
+
+                                        if ($filtered->isNotEmpty())
+                                        {
+                                            $utility_sum = $filtered->sum('electricity_total');
+                                        }else{
+                                            $utility_sum = 0;
+                                        }
+
                                         $other_expense = collect($this->other_expenses);
-                                        $total = number_format($utility_particulars->sum('electricity_total'), 2)  + number_format($other_expense->sum('amount'), 2);
+                                        $filtered_expense = $other_expense->filter(function ($item) {
+                                            return !is_null($item['amount']) && $item['amount'] !== "";
+                                        });
+
+                                        if ($filtered_expense->isNotEmpty())
+                                        {
+                                            $other_expense_sum = $filtered_expense->sum('amount');
+                                        }else{
+                                            $other_expense_sum = 0;
+                                        }
+
+                                        $total = number_format($utility_sum, 2)  + number_format($other_expense_sum, 2);
                                         $set('../../disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => $get('../../purpose'),
@@ -448,7 +494,17 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         ->default(0)
                                         ->afterStateUpdated(function ($set, $get) {
                                             $particulars = collect($this->other_expenses);
-                                            $sum = $particulars->sum('amount');
+
+                                            $filtered = $particulars->filter(function ($item) {
+                                                return !is_null($item['amount']) && $item['amount'] !== "";
+                                            });
+
+                                            if ($filtered->isNotEmpty()) {
+                                                
+                                                $sum = $filtered->sum('amount');
+                                            } else {
+                                                $sum = 0;
+                                            }
 
                                             if($get('amount') != 0 || $get('amount') != null)
                                             {
