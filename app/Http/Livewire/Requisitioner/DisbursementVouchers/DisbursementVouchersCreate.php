@@ -221,7 +221,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                     'purpose' => $get('../../purpose'),
                                                     'responsibility_center' => '',
                                                     'mfo_pap' => '',
-                                                    'amount' =>  number_format($total, 2),
+                                                    'amount' =>  round($total, 2),
                                                 ],
                                             ]);
                                         })
@@ -275,7 +275,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                     'purpose' => $get('../../purpose'),
                                                     'responsibility_center' => '',
                                                     'mfo_pap' => '',
-                                                    'amount' => number_format($total, 2),
+                                                    'amount' => round($total, 2),
                                                 ],
                                             ]);
                                         })->required(),
@@ -320,7 +320,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $set('water_total', round($total_consumption, 2));
                                             $utility_particulars = collect($this->water_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = number_format($utility_particulars->sum('water_total'), $other_expense->sum('amount'), 2);
+                                            $total = round($utility_particulars->sum('water_total'), $other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
@@ -354,7 +354,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $set('water_total', round($total_consumption, 2));
                                             $utility_particulars = collect($this->water_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = number_format($utility_particulars->sum('water_total'), 2) + number_format($other_expense->sum('amount'), 2);
+                                            $total = round($utility_particulars->sum('water_total'), 2) + round($other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
@@ -405,7 +405,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $set('fuel_total', round($total_consumption, 2));
                                             $utility_particulars = collect($this->fuel_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = number_format($utility_particulars->sum('fuel_total'), $other_expense->sum('amount'), 2);
+                                            $total = round($utility_particulars->sum('fuel_total'), $other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
@@ -439,7 +439,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $set('fuel_total', round($total_consumption, 2));
                                             $utility_particulars = collect($this->fuel_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = number_format($utility_particulars->sum('fuel_total'), $other_expense->sum('amount'), 2);
+                                            $total = round($utility_particulars->sum('fuel_total'), $other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
@@ -499,7 +499,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                         'purpose' => $get('../../purpose'),
                                                         'responsibility_center' => '',
                                                         'mfo_pap' => '',
-                                                        'amount' => number_format($total, 2),
+                                                        'amount' => round($total, 2),
                                                     ],
                                                 ]);
                                             }
