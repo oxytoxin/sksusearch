@@ -23,11 +23,11 @@ class EditVoucherSubType extends EditRecord
         $documents = [];
         $liquidation_report_documents = [];
         if (isset($data['documents'])) {
-            $documents = $data['documents'];
+            $documents = collect($data['documents'])->flatten()->toArray();
             unset($data['documents']);
         }
         if (isset($data['liquidation_report_documents'])) {
-            $liquidation_report_documents = $data['liquidation_report_documents'];
+            $liquidation_report_documents = collect($data['liquidation_report_documents'])->flatten()->toArray();
             unset($data['liquidation_report_documents']);
         }
         $record->update($data);
@@ -42,8 +42,8 @@ class EditVoucherSubType extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['documents'] = $this->record->related_documents_list?->documents ?? [];
-        $data['liquidation_report_documents'] = $this->record->related_documents_list?->liquidation_report_documents ?? [];
+        $data['documents'] = collect($this->record->related_documents_list?->documents)->map(fn ($d) => ['name' => $d]) ?? [];
+        $data['liquidation_report_documents'] = collect($this->record->related_documents_list?->liquidation_report_documents)->map(fn ($d) => ['name' => $d]) ?? [];
         return $data;
     }
 }
