@@ -4,9 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VoucherSubTypeResource\Pages;
 use App\Forms\Components\ArrayField;
+use App\Forms\Components\SlimRepeater;
 use App\Models\VoucherSubType;
 use App\Models\VoucherType;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
@@ -41,13 +43,21 @@ class VoucherSubTypeResource extends Resource
                 TextInput::make('name')
                     ->required(),
                 Grid::make(1)->schema([
-                    ArrayField::make('documents')
-                        ->placeholder('Add document (Press Enter)')
-                        ->label('Required Documents'),
-                    ArrayField::make('liquidation_report_documents')
-                        ->placeholder('Add document (Press Enter)')
+                    SlimRepeater::make('documents')
+                        ->label('Required Documents')
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('')
+                                ->required(),
+                        ]),
+                    SlimRepeater::make('liquidation_report_documents')
                         ->label('Liquidation Report Required Documents')
-                        ->visible(fn ($record) => $record->voucher_type_id == 1),
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('')
+                                ->required(),
+                        ])
+                        ->visible(fn ($context, $record) => $context == 'create' || $record->voucher_type_id == 1),
                 ])
             ]);
     }
