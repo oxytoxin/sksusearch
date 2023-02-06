@@ -20,7 +20,7 @@ class OfficeLiquidationReportsForwarded extends Component implements HasTable
     protected function getTableQuery()
     {
         $office_final_step_id = auth()->user()->employee_information->office->office_group->liquidation_report_final_step->id;
-        return LiquidationReport::whereForCancellation(false)->where('current_step_id', '>', $office_final_step_id)->latest();
+        return LiquidationReport::whereForCancellation(false)->where('current_step_id', '>', $office_final_step_id)->latest('report_date');
     }
 
     protected function getTableColumns()

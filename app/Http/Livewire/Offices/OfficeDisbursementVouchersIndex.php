@@ -26,46 +26,45 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
 
     public $tracking_num_from_scan;
 
-    
+
     public function updated($name, $value)
     {
-        if ($name == 'tracking_num_from_scan'){
-            $dv = DisbursementVoucher::where("tracking_number",'=',$value)->whereRelation('current_step', 'process', '=', "Forwarded to")->whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->first();
-            if ($dv != null){
-            DB::beginTransaction();
-            
-            $dv->update([
-                'current_step_id' => $dv->current_step->next_step->id,
-            ]);
-            $dv->refresh();
-                    $description = $dv->current_step->process . ' ' . $dv->current_step->recipient . ' by ';
-                    if ($this->isOic()) {
-                        $description .= "OIC: " . auth()->user()->employee_information->full_name . '.';
-                    } else {
-                        $description .= auth()->user()->employee_information->full_name;
-                    }
-            $dv->activity_logs()->create([
-                        'description' => $description,
-                    ]);
-            if ($dv->current_step_id == 8000 || $dv->current_step_id == 11000) {
+        if ($name == 'tracking_num_from_scan') {
+            $dv = DisbursementVoucher::where("tracking_number", '=', $value)->whereRelation('current_step', 'process', '=', "Forwarded to")->whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->first();
+            if ($dv != null) {
+                DB::beginTransaction();
+
+                $dv->update([
+                    'current_step_id' => $dv->current_step->next_step->id,
+                ]);
+                $dv->refresh();
+                $description = $dv->current_step->process . ' ' . $dv->current_step->recipient . ' by ';
+                if ($this->isOic()) {
+                    $description .= "OIC: " . auth()->user()->employee_information->full_name . '.';
+                } else {
+                    $description .= auth()->user()->employee_information->full_name;
+                }
+                $dv->activity_logs()->create([
+                    'description' => $description,
+                ]);
+                if ($dv->current_step_id == 8000 || $dv->current_step_id == 11000) {
                     $dv->update([
-                            'current_step_id' => $dv->current_step_id + 1000,
-                        ]);
-                        $dv->refresh();
-                        $dv->activity_logs()->create([
-                            'description' => $dv->current_step->process,
-                        ]);
-               }
-            DB::commit();
-            Notification::make()->title('Document Received')->success()->send();
-            redirect()->route('office.dashboard');
-            }
-            else {
-            Notification::make()->title('Document Not Found or Already Received')->warning()->send();
-            redirect()->route('office.dashboard');
+                        'current_step_id' => $dv->current_step_id + 1000,
+                    ]);
+                    $dv->refresh();
+                    $dv->activity_logs()->create([
+                        'description' => $dv->current_step->process,
+                    ]);
+                }
+                DB::commit();
+                Notification::make()->title('Document Received')->success()->send();
+                redirect()->route('office.dashboard');
+            } else {
+                Notification::make()->title('Document Not Found or Already Received')->warning()->send();
+                redirect()->route('office.dashboard');
             }
         }
-    }           
+    }
 
     public function mount()
     {
@@ -90,41 +89,40 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             Filter::make('created_at')
                 ->form([
                     Grid::make(2)
-                ->schema([
-                    Forms\Components\DatePicker::make('from')->default(\Carbon\Carbon::parse(now())->toFormattedDateString()),
-                    Forms\Components\DatePicker::make('until')->default(\Carbon\Carbon::parse(now())->toFormattedDateString()),
-                ])
+                        ->schema([
+                            Forms\Components\DatePicker::make('from')->default(\Carbon\Carbon::parse(now())->toFormattedDateString()),
+                            Forms\Components\DatePicker::make('until')->default(\Carbon\Carbon::parse(now())->toFormattedDateString()),
+                        ])
                 ])
                 // ...
                 ->indicateUsing(function (array $data): array {
                     $indicators = [];
-                    if(\Carbon\Carbon::parse($data['from'])->toFormattedDateString() == \Carbon\Carbon::parse(now())->toFormattedDateString() && \Carbon\Carbon::parse($data['until'])->toFormattedDateString() == \Carbon\Carbon::parse(now())->toFormattedDateString())
-                    {
+                    if (\Carbon\Carbon::parse($data['from'])->toFormattedDateString() == \Carbon\Carbon::parse(now())->toFormattedDateString() && \Carbon\Carbon::parse($data['until'])->toFormattedDateString() == \Carbon\Carbon::parse(now())->toFormattedDateString()) {
                         $indicators['from'] = 'Today';
-                    }else{
+                    } else {
                         if ($data['from'] ?? null) {
                             $indicators['from'] = 'Created from ' . \Carbon\Carbon::parse($data['from'])->toFormattedDateString();
                         }
-                
+
                         if ($data['until'] ?? null) {
                             $indicators['until'] = 'Created until ' . \Carbon\Carbon::parse($data['until'])->toFormattedDateString();
                         }
                     }
-                    
-            
+
+
                     return $indicators;
                 })
-                 ->query(function (Builder $query, array $data): Builder {
-                return $query
-                    ->when(
-                        $data['from'],
-                        fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
-                    )
-                    ->when(
-                        $data['until'],
-                        fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
-                    );
-                    })
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['from'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['until'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
+                        );
+                })
 
             // Filter::make('submitted_at')
             // ->form([
@@ -145,7 +143,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             //             fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
             //         );
             // })
-            
+
         ];
     }
 

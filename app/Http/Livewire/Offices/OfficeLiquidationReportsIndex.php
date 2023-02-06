@@ -29,7 +29,7 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return LiquidationReport::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest();
+        return LiquidationReport::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest('report_date');
     }
 
     protected function getTableFilters(): array

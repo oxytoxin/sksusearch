@@ -30,7 +30,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::where('current_step_id', '>', 4000);
+        return DisbursementVoucher::where('current_step_id', '>', 4000)->latest('submitted_at');
     }
 
     public function getTableColumns()

@@ -25,30 +25,30 @@ class OfficeDisbursementVouchersForwarded extends Component implements HasTable
         if ($office_final_step_id == 20000) {
             $office_final_step_id = 6000;
         }
-        return DisbursementVoucher::whereForCancellation(false)->where('current_step_id', '>', $office_final_step_id)->latest();
+        return DisbursementVoucher::whereForCancellation(false)->where('current_step_id', '>', $office_final_step_id)->latest('submitted_at');
     }
 
-    
+
     protected function getTableFilters(): array
     {
         return [
-                        
+
             Filter::make('submitted_at')
-            ->form([
+                ->form([
                     Forms\Components\DatePicker::make('from'),
                     Forms\Components\DatePicker::make('to'),
-            ])
-            ->query(function (Builder $query, array $data): Builder {
-                return $query
-                    ->when(
-                        $data['from'],
-                        fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
-                    )
-                    ->when(
-                        $data['to'],
-                        fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
-                    );
-            })
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['from'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['to'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
+                        );
+                })
         ];
     }
 
