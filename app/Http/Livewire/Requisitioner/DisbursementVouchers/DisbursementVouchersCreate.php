@@ -301,6 +301,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         ->label('Cubic Metre Consumption')
                                         ->numeric()
                                         ->reactive()
+                                        ->lazy()
                                         ->default(0)
                                         ->afterStateUpdated(function ($set, $get, $state) {
                                             if ($state == '' || $state == null) {
@@ -335,6 +336,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         ->label('Cost per Cubic Metre')
                                         ->numeric()
                                         ->reactive()
+                                        ->lazy()
                                         ->default(0)
                                         ->afterStateUpdated(function ($set, $get, $state) {
                                             if ($state == '' || $state == null) {
@@ -386,6 +388,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         ->label('Fuel Consumption (Liters)')
                                         ->numeric()
                                         ->reactive()
+                                        ->lazy()
                                         ->default(0)
                                         ->afterStateUpdated(function ($set, $get, $state) {
                                             if ($state == '' || $state == null) {
@@ -420,6 +423,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         ->label('Cost per Liter')
                                         ->numeric()
                                         ->reactive()
+                                        ->lazy()
                                         ->default(0)
                                         ->afterStateUpdated(function ($set, $get, $state) {
                                             if ($state == '' || $state == null) {
@@ -466,6 +470,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     TextInput::make('name'),
                                     TextInput::make('amount')
                                         ->reactive()
+                                        ->lazy()
                                         ->numeric()
                                         ->default(0)
                                         ->afterStateUpdated(function ($set, $get) {
@@ -523,7 +528,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         TextInput::make('mfo_pap')
                                             ->label('MFO/PAP'),
                                         TextInput::make('amount')
-                                            ->disabled(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71]))
+                                            // ->disabled(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71]))
                                             ->reactive()
                                             ->numeric()
                                             ->required(),
