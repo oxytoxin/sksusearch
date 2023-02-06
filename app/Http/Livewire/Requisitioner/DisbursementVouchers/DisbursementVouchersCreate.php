@@ -193,10 +193,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $cost = $state;
                                             $consumption = $get('electricity_cost');
                                         }
-                                            $set('electricity_total', $consumption * $cost);
+                                            $total_consumption = $consumption * $cost;
+                                            $set('electricity_total', number_format($total_consumption), 2);
                                             $utility_particulars = collect($this->electricity_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = $utility_particulars->sum('electricity_total') + $other_expense->sum('amount');
+                                            $total = number_format($utility_particulars->sum('electricity_total'), 2) + number_format($other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
@@ -230,10 +231,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $cost = $state;
                                             $consumption = $get('electricity_consumption');
                                         }
-                                        $set('electricity_total', $cost * $consumption);
+                                        $total_consumption = $cost * $consumption;
+                                        $set('electricity_total', number_format($total_consumption, 2));
                                         $utility_particulars = collect($this->electricity_utility_particulars);
                                         $other_expense = collect($this->other_expenses);
-                                        $total = $utility_particulars->sum('electricity_total') + $other_expense->sum('amount');
+                                        $total = number_format($utility_particulars->sum('electricity_total'), 2)  + number_format($other_expense->sum('amount'), 2);
                                         $set('../../disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => $get('../../purpose'),
@@ -282,10 +284,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $cost = $state;
                                             $consumption = $get('water_cost');
                                         }
-                                            $set('water_total', $consumption * $cost);
+                                            $total_consumption = $consumption * $cost;
+                                            $set('water_total', number_format($total_consumption, 2));
                                             $utility_particulars = collect($this->water_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = $utility_particulars->sum('water_total') + $other_expense->sum('amount');
+                                            $total = number_format($utility_particulars->sum('water_total'), 2) + number_format($other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
@@ -319,10 +322,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $cost = $state;
                                             $consumption = $get('water_consumption');
                                         }
-                                        $set('water_total', $cost * $consumption);
+                                        $total_consumption = $cost * $consumption;
+                                        $set('water_total', number_format($total_consumption, 2));
                                         $utility_particulars = collect($this->water_utility_particulars);
                                         $other_expense = collect($this->other_expenses);
-                                        $total = $utility_particulars->sum('water_total') + $other_expense->sum('amount');
+                                        $total = number_format($utility_particulars->sum('water_total'), 2) + number_format($other_expense->sum('amount'), 2);
                                         $set('../../disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => $get('../../purpose'),
@@ -371,10 +375,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $cost = $state;
                                             $consumption = $get('fuel_cost');
                                         }
-                                            $set('fuel_total', $consumption * $cost);
+                                            $total_consumption = $consumption * $cost;
+                                            $set('fuel_total', number_format($total_consumption, 2));
                                             $utility_particulars = collect($this->fuel_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = $utility_particulars->sum('fuel_total') + $other_expense->sum('amount');
+                                            $total = number_format($utility_particulars->sum('fuel_total'), 2) + number_format($other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
@@ -408,10 +413,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $cost = $state;
                                             $consumption = $get('fuel_consumption');
                                         }
-                                        $set('fuel_total', $cost * $consumption);
+                                        $total_consumption = $cost * $consumption;
+                                        $set('fuel_total', number_format($total_consumption, 2));
                                         $utility_particulars = collect($this->fuel_utility_particulars);
                                         $other_expense = collect($this->other_expenses);
-                                        $total = $utility_particulars->sum('fuel_total') + $other_expense->sum('amount');
+                                        $total = number_format($utility_particulars->sum('fuel_total'), 2) + number_format($other_expense->sum('amount'), 2);
                                         $set('../../disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => $get('../../purpose'),
@@ -449,20 +455,20 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                 $this->total_expense = $sum;
                                                 if ($this->voucher_subtype->id == 27) {
                                                     $utility_particulars = collect($this->electricity_utility_particulars);
-                                                    $total = $utility_particulars->sum('electricity_total') + $sum;
+                                                    $total = number_format($utility_particulars->sum('electricity_total'), 2) + number_format($sum, 2);
                                                 } else if ($this->voucher_subtype->id == 70) {
                                                     $utility_particulars = collect($this->water_utility_particulars);
-                                                    $total = $utility_particulars->sum('water_total') + $sum;
+                                                    $total = number_format($utility_particulars->sum('water_total'), 2) + number_format($sum, 2);
                                                 } else if ($this->voucher_subtype->id == 71) {
                                                     $utility_particulars = collect($this->fuel_utility_particulars);
-                                                    $total = $utility_particulars->sum('fuel_total') + $sum;
+                                                    $total = number_format($utility_particulars->sum('fuel_total'), 2) + number_format($sum, 2);
                                                 }
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
                                                         'purpose' => $get('../../purpose'),
                                                         'responsibility_center' => '',
                                                         'mfo_pap' => '',
-                                                        'amount' => $total,
+                                                        'amount' => number_format($total, 2),
                                                     ],
                                                 ]);
                                             }
