@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class ElectricityMeter extends Model
 {
     use HasFactory;
+
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class);
+    }
 }

@@ -28,4 +28,15 @@ class Campus extends Model
     {
         return $this->hasMany(Vehicle::class);
     }
+
+    public function electricity_meters()
+    {
+        return $this->hasMany(ElectricityMeter::class);
+    }
+
+    public function water_meters()
+    {
+        return $this->hasMany(WaterMeter::class);
+    }
+
 }

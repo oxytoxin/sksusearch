@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class WaterMeter extends Model
 {
     use HasFactory;
+
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class);
+    }
 }

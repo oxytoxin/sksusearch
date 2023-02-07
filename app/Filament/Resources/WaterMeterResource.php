@@ -5,9 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\WaterMeterResource\Pages;
 use App\Filament\Resources\WaterMeterResource\RelationManagers;
 use App\Models\WaterMeter;
+use App\Models\Campus;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
@@ -29,6 +31,10 @@ class WaterMeterResource extends Resource
     {
         return $form
             ->schema([
+                Select::make('campus_id')
+                ->label('Campus')
+                ->options(Campus::all()->pluck('name', 'id'))
+                ->searchable()->required(),
                 TextInput::make('meter_number')->required(),
             ]);
     }
@@ -47,6 +53,7 @@ class WaterMeterResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('campus.name')->searchable()->sortable(),
                 TextColumn::make('meter_number')->searchable()->sortable(),
             ])
             ->filters([

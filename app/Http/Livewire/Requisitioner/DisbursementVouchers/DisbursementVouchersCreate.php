@@ -166,7 +166,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                             //Electricity, Water, Fuel (start)
 
                             Repeater::make('electricity_utility_particulars')
-                                ->columns(4)
+                                ->columns(5)
                                 ->schema([
                                     Select::make('electricity_utility_type')
                                         ->label('Meter Number')
@@ -279,19 +279,23 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                 ],
                                             ]);
                                         })->required(),
+                                    TextInput::make('bill_number')
+                                        ->label('Bill No.')
+                                        ->numeric()
+                                        ->required(),     
                                     TextInput::make('electricity_total')
                                         ->label('Total')
                                         ->numeric()
                                         ->reactive()
                                         ->default(0)
-                                        ->disabled(),
+                                        ->disabled(),   
                                 ])
                                 ->label('Utility Particulars')
                                 ->createItemButtonLabel('Add New Row')
                                 ->visible(fn ($get) => in_array($this->voucher_subtype->id, [27])),
 
                             Repeater::make('water_utility_particulars')
-                                ->columns(4)
+                                ->columns(5)
                                 ->schema([
                                     Select::make('water_utility_type')
                                         ->label('Meter Number')
@@ -366,6 +370,10 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                 ],
                                             ]);
                                         })->required(),
+                                    TextInput::make('bill_number')
+                                        ->label('Bill No.')
+                                        ->numeric()
+                                        ->required(),  
                                     TextInput::make('water_total')
                                         ->label('Total')
                                         ->numeric()
