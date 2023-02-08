@@ -34,11 +34,6 @@ class LiquidationReportsCreate extends Component implements HasForms
     public $data = [];
     public $disbursement_voucher;
 
-    protected $listeners = [
-        'wizard::nextStep' => 'next',
-    ];
-
-
     protected function getFormSchema()
     {
         return [
@@ -172,7 +167,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                         Placeholder::make('related_documents')
                             ->view('components.liquidation_reports.liquidation-report-preview')
                     ])
-            ])->submitAction(view('components.forms.save-button'))
+            ])->submitAction(new HtmlString(view('components.forms.save-button')->render()))
         ];
     }
 
@@ -185,6 +180,27 @@ class LiquidationReportsCreate extends Component implements HasForms
     {
         $this->form->fill();
         $this->data['refund_particulars'] = [];
+        if (request('disbursement_voucher')) {
+            $dv = DisbursementVoucher::withSum('disbursement_voucher_particulars as total_amount', 'final_amount')->findOrFail(request('disbursement_voucher'));
+            if ($dv->user_id != auth()->id()) {
+                abort(403);
+            }
+            $this->disbursement_voucher = $dv;
+            $this->data['disbursement_voucher_id'] = $dv->id;
+            $this->data['signatory_id'] = $this->disbursement_voucher->signatory_id;
+            $particulars = collect();
+            foreach ($this->disbursement_voucher->disbursement_voucher_particulars as $key => $particular) {
+                $purpose = str($particular->purpose);
+                if ($key == 0) {
+                    $purpose = $purpose->prepend("To liquidate the cash advance granted for the following purpose(s):\n");
+                }
+                $particulars->push([
+                    'purpose' => $purpose->toString(),
+                    'amount' => $particular->final_amount
+                ]);
+            }
+            $this->data['particulars'] = $particulars->toArray();
+        }
     }
 
     public function render()

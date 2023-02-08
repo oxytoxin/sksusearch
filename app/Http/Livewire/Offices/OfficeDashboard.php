@@ -20,10 +20,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Grid;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
+use App\Models\LiquidationReport;
 
-class OfficeDashboard extends Component implements HasTable
+class OfficeDashboard extends Component
 {
-    use InteractsWithTable, OfficeDashboardActions;
 
     public function mount()
     {
@@ -31,126 +31,11 @@ class OfficeDashboard extends Component implements HasTable
             abort(403, 'You are not allowed to access this page.');
         }
     }
-
     public function render()
     {
-        return view('livewire.offices.office-dashboard');
-    }
-
-    protected function getTableQuery()
-    {
-        return DisbursementVoucher::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest();
-    }
-
-    protected function getTableFilters(): array
-    {
-        return [
-            SelectFilter::make('for_cancellation')->options([
-                true => 'For Cancellation',
-                false => 'For Approval',
-            ])->default(0)->label('Status'),
-        ];
-    }
-
-
-    protected function getTableFiltersFormColumns(): int
-    {
-        return 2;
-    }
-
-    protected function getTableFiltersLayout(): ?string
-    {
-        return Layout::AboveContent;
-    }
-
-    protected function getTableColumns()
-    {
-        return [
-            ...$this->officeTableColumns()
-        ];
-    }
-
-    protected function getTableActions()
-    {
-        return [
-            ...$this->commonActions(),
-            ...$this->budgetOfficeActions(),
-            ...$this->accountingActions(),
-            ...$this->cashierActions(),
-            ...$this->icuActions(),
-            Action::make('certify')->button()->action(function ($record) {
-                DB::beginTransaction();
-                $record->update([
-                    'certified_by_accountant' => true,
-                ]);
-                $record->activity_logs()->create([
-                    'description' => 'Disbursement voucher certified.',
-                ]);
-                DB::commit();
-                Notification::make()->title('Disbursement voucher certified.')->success()->send();
-            })
-                ->visible(fn ($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == 12)
-                ->requiresConfirmation(),
-            Action::make('return')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                if ($record->current_step_id < $record->previous_step_id) {
-                    $previous_step_id = $record->previous_step_id;
-                } else {
-                    $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('id', '<', $record->current_step->id)->latest('id')->first()->id;
-                }
-                $record->update([
-                    'current_step_id' => $data['return_step_id'],
-                    'previous_step_id' => $previous_step_id,
-                ]);
-                $record->refresh();
-                $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient,
-                    'remarks' => $data['remarks'] ?? null,
-                ]);
-                DB::commit();
-                Notification::make()->title('Disbursement Voucher returned.')->success()->send();
-            })
-                ->color('danger')
-                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false)
-                ->form(function () {
-                    return [
-                        Select::make('return_step_id')
-                            ->label('Return to')
-                            ->options(fn ($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
-                            ->required(),
-                        RichEditor::make('remarks')
-                            ->label('Remarks (Optional)')
-                            ->fileAttachmentsDisk('remarks'),
-                    ];
-                })
-                ->modalWidth('4xl')
-                ->requiresConfirmation(),
-            Action::make('Cancel')->action(function ($record) {
-                DB::beginTransaction();
-                $process_ids = DisbursementVoucherStep::where('process', 'Received by')->orWhere('process', 'Received in')->pluck('id');
-                $next_step = $process_ids->last(fn ($value) => $value < auth()->user()->employee_information->office->office_group->disbursement_voucher_starting_step->id);
-                $record->update([
-                    'current_step_id' => $next_step,
-                ]);
-                $record->activity_logs()->create([
-                    'description' => 'Cancellation approved by ' . auth()->user()->employee_information->full_name,
-                ]);
-                DB::commit();
-                Notification::make()->title('Disbursement voucher approved for cancellation.')->success()->send();
-                return;
-            })
-                ->visible(function ($record) {
-                    if (!$record) {
-                        Notification::make()->title('Selected document not found in office.')->warning()->send();
-                        return false;
-                    }
-                    return $record->for_cancellation && !$record->cancelled_at;
-                })
-                ->requiresConfirmation()
-                ->button()
-                ->color('danger'),
-            ...$this->viewActions(),
-
-        ];
+        return view('livewire.offices.office-dashboard', [
+            'disbursement_vouchers_count' => DisbursementVoucher::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->count(),
+            'liquidation_reports_count' => LiquidationReport::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->count()
+        ]);
     }
 }

@@ -117,7 +117,7 @@ class LiquidationReportsIndex extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Liquidation Report requested for cancellation.')->success()->send();
             })
-                ->visible(fn ($record) => !$record->cheque_number && !$record->cancelled_at && !$record->for_cancellation)
+                ->visible(fn ($record) => !$record->cheque_number && !$record->cancelled_at && !$record->for_cancellation && !$record->certified_by_accountant)
                 ->requiresConfirmation()
                 ->button()
                 ->color('danger'),

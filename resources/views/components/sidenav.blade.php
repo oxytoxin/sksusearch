@@ -68,9 +68,8 @@
 
     {{-- unliquidated dv's --}}
     <div class="space-y-1" x-data="{ open: false }">
-        <button class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
-                type="button" aria-controls="sub-menu-1" aria-expanded="false" x-on:click="open=!open">
-            <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
+        <a class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2"
+           type="button" href="{{ route('requisitioner.disbursement-vouchers.unliquidated') }}" aria-controls="sub-menu-1" aria-expanded="false">
             <svg class="" aria-hidden="true"
                  :class="open ?
                      'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
@@ -79,23 +78,7 @@
                 <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
             </svg>
             Unliquidated Cash Advances
-        </button>
-
-        {{-- for unliquidated --}}
-
-        {{-- <div class="space-y-1" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300'
-            x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100'
-            x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100'
-            x-transition:leave-end='opacity-0 scale-95' class="origin-top-left">
-            <a href="{{ route('requisitioner.travel-orders.index') }}"
-                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                My Travel Orders
-            </a>
-            <a href="{{ route('signatory.travel-orders.index') }}"
-                class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900">
-                Signatory Travel orders
-            </a>
-        </div> --}}
+        </a>
     </div>
 
     {{-- liquidation reports --}}

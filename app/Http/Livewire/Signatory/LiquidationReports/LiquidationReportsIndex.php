@@ -156,7 +156,7 @@ class LiquidationReportsIndex extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000 && $record->for_cancellation && !$record->cancelled_at;
+                    return $record->current_step_id == 4000 && $record->for_cancellation && !$record->cancelled_at && !$record->certified_by_accountant;
                 })
                 ->requiresConfirmation()
                 ->button()

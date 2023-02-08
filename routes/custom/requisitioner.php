@@ -4,6 +4,7 @@ use App\Http\Livewire\LiquidationReports\LiquidationReportsShow;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCancelled;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCreate;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersIndex;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersUnliquidated;
 use App\Http\Livewire\Requisitioner\Itinerary\ItineraryCreate;
 use App\Http\Livewire\Requisitioner\Itinerary\ItineraryPrint;
 use App\Http\Livewire\Requisitioner\Itinerary\ItineraryShow;
@@ -23,10 +24,9 @@ Route::middleware([
     config('jetstream.auth_session'),
 ])->prefix('requisitioner')->name('requisitioner.')->group(function () {
     Route::get('my-dashboard', function () {
-        if(auth()->user()->employee_information->contact_number == null)
-        {
+        if (auth()->user()->employee_information->contact_number == null) {
             return redirect()->route('requisitioner.contact-number');
-        }else{
+        } else {
             return view('dashboard');
         }
     })->name('dashboard');
@@ -40,6 +40,7 @@ Route::middleware([
     Route::get('/itinerary/{itinerary}', ItineraryShow::class)->name('itinerary.show');
     Route::get('/itinerary/print/{itinerary}', ItineraryPrint::class)->name('itinerary.print');
     Route::get('/disbursement-vouchers', DisbursementVouchersIndex::class)->name('disbursement-vouchers.index');
+    Route::get('/unliquidated-disbursement-vouchers', DisbursementVouchersUnliquidated::class)->name('disbursement-vouchers.unliquidated');
     Route::get('/cancelled-disbursement-vouchers', DisbursementVouchersCancelled::class)->name('disbursement-vouchers.cancelled');
     Route::get('/disbursement-vouchers/{voucher_subtype}/create', DisbursementVouchersCreate::class)->name('disbursement-vouchers.create');
     Route::get('/liquidation-reports/create', LiquidationReportsCreate::class)->name('liquidation-reports.create');

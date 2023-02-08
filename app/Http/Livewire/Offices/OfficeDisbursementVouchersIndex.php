@@ -66,13 +66,6 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
         }
     }
 
-    public function mount()
-    {
-        if (!in_array(auth()->user()->employee_information?->office->office_group_id, [1, 2, 3, 4, 5])) {
-            abort(403, 'You are not allowed to access this page.');
-        }
-    }
-
     protected function getTableQuery()
     {
         return DisbursementVoucher::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest();
@@ -123,27 +116,6 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                             fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
                         );
                 })
-
-            // Filter::make('submitted_at')
-            // ->form([
-            //     Grid::make(2)
-            //     ->schema([
-            //         Forms\Components\DatePicker::make('from')->default(\Carbon\Carbon::now()->format('Y-m-d')),
-            //         Forms\Components\DatePicker::make('to')->default(\Carbon\Carbon::now()->format('Y-m-d')),
-            //     ])
-            // ])
-            // ->query(function (Builder $query, array $data): Builder {
-            //     return $query
-            //         ->when(
-            //             $data['from'],
-            //             fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
-            //         )
-            //         ->when(
-            //             $data['to'],
-            //             fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
-            //         );
-            // })
-
         ];
     }
 
