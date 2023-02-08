@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Signatory\TravelOrders;
 
+use App\Models\Itinerary;
 use App\Models\TravelOrder;
 use App\Models\User;
 use Livewire\Component;
@@ -16,9 +17,9 @@ class TravelOrdersToSignView extends Component
     public TravelOrder $travel_order;
 
     public $modal = false;
-    public $modalRejection= false;
+    public $modalRejection = false;
 
-    public $limit = 2;
+    public $limit = 3;
 
     public $note = '';
 
@@ -28,6 +29,7 @@ class TravelOrdersToSignView extends Component
 
     public function mount()
     {
+        $this->travel_order->load('applicants.employee_information');
         if (request('from_oic')) {
             $this->from_oic = (bool) request('from_oic');
             $this->oic_signatory =  (int) request('oic_signatory');
@@ -37,11 +39,21 @@ class TravelOrdersToSignView extends Component
 
     public function render()
     {
-        return view('livewire.signatory.travel-orders.travel-orders-to-sign-view');
+        return view('livewire.signatory.travel-orders.travel-orders-to-sign-view', [
+            'sidenotes' => $this->travel_order->sidenotes()->limit($this->limit)->with('user.employee_information')->get(),
+            'itineraries' => $this->travel_order->itineraries()->with('user.employee_information')->get(),
+        ]);
     }
 
     public function showDialog()
     {
+    }
+
+    public function approveItinerary(Itinerary $itinerary)
+    {
+        $itinerary->update([
+            'approved_at' => now()
+        ]);
     }
 
     public function showMore()
@@ -88,24 +100,24 @@ class TravelOrdersToSignView extends Component
         $this->validate(['rejectionNote' => 'required|min:10']);
         $this->modalRejection = false;
         $this->dialog()->id('custom')->confirm([
-           "icon"=>'question',
-           "iconColor"=>'text-primary-500',
-           'accept'  => [
-            'label'  => 'Proceed',
-            'method' => 'rejectFinal',
-            ],           
+            "icon" => 'question',
+            "iconColor" => 'text-primary-500',
+            'accept'  => [
+                'label'  => 'Proceed',
+                'method' => 'rejectFinal',
+            ],
         ]);
     }
-    
+
     public function rejectFinal()
     {
         if ($this->from_oic) {
             $this->travel_order->signatories()->updateExistingPivot($this->oic_signatory, ['is_approved' => 2]);
             $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected as OIC for: ' . User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
-            $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : '.$this->rejectionNote, 'user_id' => auth()->id()]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : ' . $this->rejectionNote, 'user_id' => auth()->id()]);
         } else {
             $this->travel_order->signatories()->updateExistingPivot(auth()->id(), ['is_approved' => 2]);
-            $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : '.$this->rejectionNote, 'user_id' => auth()->id()]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : ' . $this->rejectionNote, 'user_id' => auth()->id()]);
         }
         $this->travel_order->refresh();
         $this->dialog()->success(
@@ -114,6 +126,4 @@ class TravelOrdersToSignView extends Component
             $icon = 'success',
         );
     }
-
-
 }

@@ -3,21 +3,17 @@
     <div id="print_to" class="col-span-2">
         <div class="flex justify-between w-full p-6 border-b-4 border-black print:flex">
             <div id="header" class="flex w-full ml-3 text-left">
-                <div class="inline my-auto"><img src="{{ asset('images/sksulogo.png') }}" alt="sksu logo"
-                        class="object-scale-down w-20 h-full">
+                <div class="inline my-auto"><img src="{{ asset('images/sksulogo.png') }}" alt="sksu logo" class="object-scale-down w-20 h-full">
                 </div>
                 <div class="my-auto ml-3">
                     <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-left text-black">Republic of the
-                            Philippines</span>
+                        <span class="text-sm font-semibold tracking-wide text-left text-black">Republic of the Philippines</span>
                     </div>
                     <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-left uppercase text-primary-600">sultan
-                            kudarat state university</span>
+                        <span class="text-sm font-semibold tracking-wide text-left uppercase text-primary-600">sultan kudarat state university</span>
                     </div>
                     <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-black">ACCESS, EJC Montilla, 9800 City of
-                            Tacurong</span>
+                        <span class="text-sm font-semibold tracking-wide text-black">ACCESS, EJC Montilla, 9800 City of Tacurong</span>
                     </div>
                     <div class="block">
                         <span class="text-sm font-semibold tracking-wide text-black">Province of Sultan Kudarat</span>
@@ -26,8 +22,7 @@
             </div>
             <div class="relative right-0">
                 <div class="m-auto">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $travel_order->tracking_code }}&amp;size=100x100"
-                        alt="" title="" />
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $travel_order->tracking_code }}&amp;size=100x100" alt="" title="" />
                     <span class="font-xs flex justify-center text-[11px]">{{ $travel_order->tracking_code }}</span>
                 </div>
             </div>
@@ -39,13 +34,11 @@
                     <div id="header" class="items-start block w-full space-y-4 text-left">
 
                         <div class="flex">
-                            <span
-                                class="mx-auto text-5xl font-extrabold tracking-wide text-black uppercase print:text-xl">travel
+                            <span class="mx-auto text-5xl font-extrabold tracking-wide text-black uppercase print:text-xl">travel
                                 order</span>
                         </div>
                         <div class="block">
-                            <span
-                                class="text-sm font-semibold tracking-wide text-left text-black">{{ $travel_order->created_at == '' ? 'Date Not Set' : $travel_order->created_at->format('F d, Y') }}</span>
+                            <span class="text-sm font-semibold tracking-wide text-left text-black">{{ $travel_order->created_at == '' ? 'Date Not Set' : $travel_order->created_at->format('F d, Y') }}</span>
                         </div>
                         <div class="grid grid-cols-4">
                             <span class="col-span-1 text-sm font-semibold tracking-wide text-black uppercase">Memorandum
@@ -85,8 +78,7 @@
                         <div class="flex-wrap block -space-y-1">
                             @if ($travel_order->travel_order_type->name == 'Official Time')
                                 <span class="font-semibold tracking-wide text-left text-black text-md">
-                                    You are scheduled to travel on <strong
-                                        class="underline">{{ $travel_order->date_from->format('F j') . '-' . $travel_order->date_to->format('j, Y') }}</strong>
+                                    You are scheduled to travel on <strong class="underline">{{ $travel_order->date_from->format('F j') . '-' . $travel_order->date_to->format('j, Y') }}</strong>
                                     to do the following:
                                 </span>
                             @else
@@ -101,27 +93,21 @@
                                         {{ $travel_order->philippine_region_id == null ? 'City Not Set' : $travel_order->philippine_region->region_description }}
                                     </strong>
                                     on
-                                    <strong
-                                        class="underline">{{ $travel_order->date_from->format('F j') . '-' . $travel_order->date_to->format('j, Y') }}</strong>
+                                    <strong class="underline">{{ $travel_order->date_from->format('F j') . '-' . $travel_order->date_to->format('j, Y') }}</strong>
                                     to do the following:
                                 </span>
                             @endif
 
-                            <span
-                                class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
+                            <span class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
                                 {{ $travel_order->purpose == '' ? 'Purpose not Found' : $travel_order->purpose }}
                             </span>
 
-                            <span
-                                class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
-                                Your travel is on <span
-                                    class="underline">{{ $travel_order->travel_order_type->name }}</span>. A report of
-                                activities should be made immediately upon termination of this travel order.
-                            </span>
+                            <p class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
+                                Your travel is on <span class="underline">{{ $travel_order->travel_order_type->name }}</span>. A report of activities should be made immediately upon termination of this travel order.
+                            </p>
 
                             @foreach ($travel_order->signatories as $signatory)
-                                <span
-                                    class="block pt-16 font-semibold tracking-wide text-center text-black underline text-md">
+                                <span class="block pt-16 font-semibold tracking-wide text-center text-black underline text-md">
                                     {{ $signatory->employee_information->full_name }}
                                 </span>
                                 <span class="block pt-3 font-semibold tracking-wide text-center text-black text-md">
@@ -137,18 +123,14 @@
                                     @endif
                                 </span>
                             @endforeach
-
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
     </div>
     <div class="flex justify-center">
-        <button type="button" value="click" onclick="printDiv('print_to')" id="printto"
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">
+        <button type="button" value="click" onclick="printDiv('print_to')" id="printto" class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">
             Print Travel Order
         </button>
     </div>
@@ -157,16 +139,10 @@
             function printDiv(divName) {
                 var printContents = document.getElementById(divName).innerHTML;
                 var originalContents = document.body.innerHTML;
-
                 document.body.innerHTML = printContents;
-
                 window.print();
-
-                window.location.href = "/requisitioner/travel-orders";
-
+                window.location.href = "{{ request()->route()->getPrefix() }}/travel-orders";
                 document.body.innerHTML = originalContents;
-
-
             }
         </script>
     @endpush

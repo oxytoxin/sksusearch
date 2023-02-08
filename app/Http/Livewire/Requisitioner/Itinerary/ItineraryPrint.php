@@ -9,20 +9,20 @@ use Livewire\Component;
 class ItineraryPrint extends Component
 {
     public Itinerary $itinerary;
-    public $travel_order_id;
+    public $travel_order;
     public $coverage;
+    public $immediate_signatory;
 
     public function mount()
     {
         $this->travel_order = $this->itinerary->travel_order;
         $this->coverage = $this->itinerary->coverage;
-        
+        $this->itinerary->load('user.employee_information');
+        $this->immediate_signatory = $this->itinerary->travel_order->signatories()->with('employee_information')->first();
     }
 
     public function render()
     {
-        
-        // dd($this->itinerary->itinerary_entries->where('place','==','Home')->get);
         return view('livewire.requisitioner.itinerary.itinerary-print');
     }
 }

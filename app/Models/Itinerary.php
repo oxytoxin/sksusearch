@@ -11,6 +11,7 @@ class Itinerary extends Model
 
     protected $casts = [
         'coverage' => 'array',
+        'approved_at' => 'immutable_datetime',
     ];
 
     public function travel_order()

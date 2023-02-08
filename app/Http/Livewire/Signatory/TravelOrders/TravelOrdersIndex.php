@@ -13,7 +13,7 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
 
     protected function getTableQuery()
     {
-        return TravelOrder::whereRelation('signatories', 'user_id', auth()->id());
+        return TravelOrder::query()->whereRelation('signatories', 'user_id', auth()->id())->latest();
     }
 
     protected function getTableColumns(): array
@@ -37,7 +37,7 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
                 ->url(fn (TravelOrder $record): string => route('signatory.travel-orders.view', $record))
                 ->icon('heroicon-o-eye'),
             Action::make('print')
-                ->url(fn (TravelOrder $record): string => route('requisitioner.travel-orders.show', $record))
+                ->url(fn (TravelOrder $record): string => route('signatory.travel-orders.show', $record))
                 ->icon('heroicon-o-printer'),
         ];
     }

@@ -58,10 +58,12 @@ class TravelOrdersCreate extends Component implements HasForms
                 ->options(TravelOrderType::pluck('name', 'id'))
                 ->reactive()
                 ->required(),
-            MultiSelect::make('applicants')
+            Select::make('applicants')
+                ->multiple()
                 ->required()
                 ->options(EmployeeInformation::pluck('full_name', 'user_id')),
-            MultiSelect::make('signatories')
+            Select::make('signatories')
+                ->multiple()
                 ->required()
                 ->options(EmployeeInformation::pluck('full_name', 'user_id')),
             Textarea::make('purpose')
@@ -109,8 +111,7 @@ class TravelOrdersCreate extends Component implements HasForms
     public function save()
     {
         $this->validate();
-        if(in_array(auth()->user()->id, $this->applicants)) 
-        {
+        if (in_array(auth()->user()->id, $this->applicants)) {
             if ($this->date_from > $this->date_to) {
                 Notification::make()->title('Operation Failed')->body('Invalid Dates. Please Check again')->danger()->send();
             } else {
@@ -132,19 +133,18 @@ class TravelOrdersCreate extends Component implements HasForms
                 $to->signatories()->sync($this->signatories);
                 DB::commit();
                 Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
-    
-                return redirect()->route('requisitioner.travel-orders.show', $to);
-            }
-        }else{
-            Notification::make()->title('Operation Failed')->body('Travel Order applicants must include you.')->danger()->send();
 
+                return redirect()->route('requisitioner.itinerary.create', ['travel_order' => $to]);
+            }
+        } else {
+            Notification::make()->title('Operation Failed')->body('Travel Order applicants must include you.')->danger()->send();
         }
-       
     }
 
     public function mount()
     {
         $this->form->fill();
+        $this->applicants = [auth()->id()];
     }
 
     public function render()

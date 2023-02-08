@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use DB;
 use Hash;
-use Carbon\Carbon;
 use App\Models\User;
 use App\Models\VoucherSubType;
 use Illuminate\Console\Command;
@@ -38,8 +37,8 @@ class ProcessLegacyCashAdvances extends Command
         DB::beginTransaction();
         $user = User::create([
             'id' => 450,
-            'email' => 'legacy-accounts@sksu.edu.ph',
-            'password' => Hash::make('legacy-accounts'),
+            'email' => 'searchlegacyaccountsadmin@sksu.edu.ph',
+            'password' => Hash::make('sksu@12345'),
         ]);
         $employee = EmployeeInformation::create([
             'first_name' => 'LEGACY',

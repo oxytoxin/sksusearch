@@ -9,7 +9,7 @@ use Livewire\Component;
 class ItineraryShow extends Component
 {
     public Itinerary $itinerary;
-    public $travel_order_id;
+    public $travel_order;
     public $coverage;
     public $purpose;
 
@@ -26,13 +26,10 @@ class ItineraryShow extends Component
 
     public function save()
     {
-        if ($this->purpose != null || $this->purpose != " ") {
-            Itinerary::find($this->itinerary->id)->update(
-                [
-                    'purpose' => $this->purpose,
-                ]
-            );
-
+        if (filled($this->purpose)) {
+            $this->itinerary->update([
+                'purpose' => $this->purpose,
+            ]);
             Notification::make()->title('Saved')->body('Purpose for this itinerary is updated')->success()->send();
         }
     }

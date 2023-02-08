@@ -40,64 +40,21 @@ class ItineraryCreate extends Component implements HasForms
                 ->label('Travel Order')
                 ->searchable()
                 ->preload()
-                ->options(TravelOrder::approved()
-                    ->whereDoesntHave('itineraries', function ($query) {
+                ->options(
+                    TravelOrder::whereDoesntHave('itineraries', function ($query) {
                         $query->where('user_id', auth()->id());
                     })
-                    ->whereHas('applicants', function ($query) {
-                        $query->whereUserId(auth()->id());
-                    })
-                    ->whereIn('travel_order_type_id', [TravelOrderType::OFFICIAL_BUSINESS, TravelOrderType::OFFICIAL_TIME])
-                    ->select(
-                        DB::raw("CONCAT(purpose,' ( ',tracking_code,' )') AS tcAndP"),'id')
-                    ->pluck('tcAndP', 'id'))
-
-
-
-                ->afterStateUpdated(function () {
-                    $to = TravelOrder::with('philippine_region.dte')->find($this->travel_order_id);
-                    $entries = [];
-                    if (isset($to)) {
-                        $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
-                        foreach ($days as  $day) {
-                            if ($to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
-                                if ($day != $to->date_to) {
-                                    $per_diem = $to->philippine_region->dte->amount;
-                                } else {
-                                    $per_diem = $to->philippine_region->dte->amount / 2;
-                                }
-                            } else {
-                                $per_diem = 0;
-                            }
-
-                            $entries[Str::uuid()->toString()] = [
-                                'type' => 'new_entry',
-                                'data' => [
-                                    'date' => $day->toDateString(),
-                                    'per_diem' => $per_diem,
-                                    'has_per_diem' => true,
-                                    'original_per_diem' => $per_diem,
-                                    'total_expenses' => 0,
-                                    'breakfast' => false,
-                                    'lunch' => false,
-                                    'dinner' => false,
-                                    'lodging' => false,
-                                    'itinerary_entries' => [
-                                        [
-                                            'mot_id' => null,
-                                            'place' => '',
-                                            'departure_time' => null,
-                                            'arrival_time' => null,
-                                            'transportation_expenses' => 0,
-                                            'other_expenses' => 0,
-                                        ],
-                                    ],
-                                ],
-                            ];
-                        }
-                    }
-                    $this->itinerary_entries = $entries;
-                })
+                        ->whereHas('applicants', function ($query) {
+                            $query->whereUserId(auth()->id());
+                        })
+                        ->whereIn('travel_order_type_id', [TravelOrderType::OFFICIAL_BUSINESS, TravelOrderType::OFFICIAL_TIME])
+                        ->select(
+                            DB::raw("CONCAT(purpose,' ( ',tracking_code,' )') AS tcAndP"),
+                            'id'
+                        )
+                        ->pluck('tcAndP', 'id')
+                )
+                ->afterStateUpdated(fn () => $this->generateItineraryEntries())
                 ->reactive(),
             Card::make([
                 Placeholder::make('travel_order_details')
@@ -114,13 +71,14 @@ class ItineraryCreate extends Component implements HasForms
                                 ->columnSpan(1),
                             Grid::make([
                                 'sm' => 4,
-                                'md' => 4,])
+                                'md' => 4,
+                            ])
                                 ->schema([
-                                Toggle::make('breakfast')->inline(false)->reactive()->columnSpan(1),
-                                Toggle::make('lunch')->inline(false)->reactive()->columnSpan(1),
-                                Toggle::make('dinner')->inline(false)->reactive()->columnSpan(1),
-                                Toggle::make('lodging')->inline(false)->reactive()->columnSpan(1),
-                            ])->columnSpan(1),
+                                    Toggle::make('breakfast')->inline(false)->reactive()->columnSpan(1),
+                                    Toggle::make('lunch')->inline(false)->reactive()->columnSpan(1),
+                                    Toggle::make('dinner')->inline(false)->reactive()->columnSpan(1),
+                                    Toggle::make('lodging')->inline(false)->reactive()->columnSpan(1),
+                                ])->columnSpan(1),
                         ])->columnSpan(1),
                         Fieldset::make('Total Amount')->schema([
                             Toggle::make('has_per_diem')
@@ -134,23 +92,24 @@ class ItineraryCreate extends Component implements HasForms
                         Grid::make([
                             'sm' => 1,
                             'md' => 2,
-                            'lg' => 6,])
-                            ->schema([
-                            Select::make('mot_id')
-                                ->options(Mot::pluck('name', 'id'))
-                                ->label('Mode of Transportation')
-                                ->required(),
-                            TextInput::make('place')->required(),
-                            Flatpickr::make('departure_time')
-                                ->disableDate()
-                                ->required(),
-                            Flatpickr::make('arrival_time')
-                                ->disableDate()
-                                ->afterOrEqual('departure_time')
-                                ->required(),
-                            TextInput::make('transportation_expenses')->label('Transportation')->default(0)->required()->numeric()->reactive(),
-                            TextInput::make('other_expenses')->label('Others')->default(0)->numeric()->reactive(),
+                            'lg' => 6,
                         ])
+                            ->schema([
+                                Select::make('mot_id')
+                                    ->options(Mot::pluck('name', 'id'))
+                                    ->label('Mode of Transportation')
+                                    ->required(),
+                                TextInput::make('place')->required(),
+                                Flatpickr::make('departure_time')
+                                    ->disableDate()
+                                    ->required(),
+                                Flatpickr::make('arrival_time')
+                                    ->disableDate()
+                                    ->afterOrEqual('departure_time')
+                                    ->required(),
+                                TextInput::make('transportation_expenses')->label('Transportation')->default(0)->required()->numeric()->reactive(),
+                                TextInput::make('other_expenses')->label('Others')->default(0)->numeric()->reactive(),
+                            ])
                     ]),
                 ]),
             ])->disableItemCreation()->disableItemDeletion()->visible(fn ($get) => $get('travel_order_id')),
@@ -202,6 +161,14 @@ class ItineraryCreate extends Component implements HasForms
     public function mount()
     {
         $this->form->fill();
+        if (request('travel_order')) {
+            $to = TravelOrder::findOrFail(request('travel_order'));
+            if (!$to->applicants()->where('users.id', auth()->id())->exists()) {
+                abort(403);
+            }
+            $this->travel_order_id = $to->id;
+            $this->generateItineraryEntries();
+        }
     }
 
     public function render()
@@ -237,5 +204,52 @@ class ItineraryCreate extends Component implements HasForms
         }
 
         return view('livewire.requisitioner.itinerary.itinerary-create');
+    }
+
+
+    private function generateItineraryEntries()
+    {
+        $to = TravelOrder::with('philippine_region.dte')->find($this->travel_order_id);
+        $entries = [];
+        if (isset($to)) {
+            $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
+            foreach ($days as  $day) {
+                if ($to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+                    if ($day != $to->date_to) {
+                        $per_diem = $to->philippine_region->dte->amount;
+                    } else {
+                        $per_diem = $to->philippine_region->dte->amount / 2;
+                    }
+                } else {
+                    $per_diem = 0;
+                }
+
+                $entries[Str::uuid()->toString()] = [
+                    'type' => 'new_entry',
+                    'data' => [
+                        'date' => $day->toDateString(),
+                        'per_diem' => $per_diem,
+                        'has_per_diem' => true,
+                        'original_per_diem' => $per_diem,
+                        'total_expenses' => 0,
+                        'breakfast' => false,
+                        'lunch' => false,
+                        'dinner' => false,
+                        'lodging' => false,
+                        'itinerary_entries' => [
+                            [
+                                'mot_id' => null,
+                                'place' => '',
+                                'departure_time' => null,
+                                'arrival_time' => null,
+                                'transportation_expenses' => 0,
+                                'other_expenses' => 0,
+                            ],
+                        ],
+                    ],
+                ];
+            }
+        }
+        $this->itinerary_entries = $entries;
     }
 }
