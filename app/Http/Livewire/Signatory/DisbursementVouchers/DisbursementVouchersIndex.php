@@ -25,7 +25,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereSignatoryId(auth()->id())->latest();
+        return DisbursementVoucher::whereSignatoryId(auth()->id())->latest('submitted_at');
     }
 
     protected function getTableColumns()

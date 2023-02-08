@@ -22,7 +22,7 @@ class LiquidationReportsIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return LiquidationReport::whereForCancellation(false)->whereUserId(auth()->id());
+        return LiquidationReport::whereForCancellation(false)->whereUserId(auth()->id())->latest();
     }
 
     protected function getTableColumns()

@@ -24,7 +24,7 @@ class LiquidationReportsIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return LiquidationReport::whereSignatoryId(auth()->id())->latest();
+        return LiquidationReport::whereSignatoryId(auth()->id())->latest('report_date');
     }
 
     protected function getTableColumns()

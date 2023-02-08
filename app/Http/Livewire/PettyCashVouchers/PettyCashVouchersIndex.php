@@ -29,7 +29,7 @@ class PettyCashVouchersIndex extends Component implements HasTable
 
     protected function getTableQuery(): Builder|Relation
     {
-        return PettyCashVoucher::whereRelation('petty_cash_fund', 'campus_id', $this->petty_cash_fund->campus_id)->orderByDesc('created_at');
+        return PettyCashVoucher::whereRelation('petty_cash_fund', 'campus_id', $this->petty_cash_fund->campus_id)->latest('created_at');
     }
 
     protected function getTableColumns(): array

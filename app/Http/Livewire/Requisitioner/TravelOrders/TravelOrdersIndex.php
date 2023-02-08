@@ -13,7 +13,7 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
 
     protected function getTableQuery()
     {
-        return TravelOrder::whereRelation('applicants', 'user_id', auth()->id());
+        return TravelOrder::whereRelation('applicants', 'user_id', auth()->id())->latest();
     }
 
     protected function getTableColumns(): array
