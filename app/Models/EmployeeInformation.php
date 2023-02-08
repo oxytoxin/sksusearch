@@ -33,6 +33,11 @@ class EmployeeInformation extends Model
         return $this->belongsTo(Office::class);
     }
 
+    public function campus()
+    {
+        return $this->belongsTo(Campus::class);
+    }
+
     public function bond()
     {
         return $this->belongsTo(Bond::class);

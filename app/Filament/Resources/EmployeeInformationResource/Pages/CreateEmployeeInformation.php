@@ -41,6 +41,7 @@ class CreateEmployeeInformation extends CreateRecord
                 'role_id' => $data['role_id'],
                 'position_id' => $data['position_id'],
                 'office_id' => $data['office_id'],
+                'campus_id' => $data['campus_id'],
             ]);
         } else {
             $user->employee_information()->create([
@@ -53,6 +54,7 @@ class CreateEmployeeInformation extends CreateRecord
                 'role_id' => $data['role_id'],
                 'position_id' => $data['position_id'],
                 'office_id' => $data['office_id'],
+                'campus_id' => $data['campus_id'],
             ]);
         }
         $user->refresh();
