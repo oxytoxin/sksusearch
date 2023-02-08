@@ -78,7 +78,7 @@
                  viewBox="0 0 20 20">
                 <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
             </svg>
-            Unliquidated DVs
+            Unliquidated Cash Advances
         </button>
 
         {{-- for unliquidated --}}

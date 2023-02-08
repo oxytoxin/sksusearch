@@ -48,7 +48,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                 ->placeholder('Select User')
                 ->options(EmployeeInformation::whereIn('user_id', OicUser::valid()->distinct('user_id')->pluck('user_id'))->pluck('full_name', 'user_id'))
                 ->query(function ($query, $state) {
-                    $query->whereRelation('current_step', 'office_group_id', '=', User::find($state)->first()?->employee_information->office->office_group_id);
+                    $query->whereRelation('current_step', 'office_group_id', '=', User::find($state)->first()?->employee_information->office->office_group_id ?? -777);
                 }),
             SelectFilter::make('for_cancellation')->options([
                 true => 'For Cancellation',

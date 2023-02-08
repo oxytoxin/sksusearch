@@ -196,7 +196,7 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
                     'lr_number' => $data['lr_number'],
                     'journal_date' => $data['journal_date'],
                     'related_documents' => [
-                        'required_documents' => $record?->disbursement_voucher->voucher_subtype->related_documents_list->documents,
+                        'required_documents' => $record?->disbursement_voucher->voucher_subtype->related_documents_list?->liquidation_report_documents ?? [],
                         'verified_documents' => $data['verified_documents'],
                         'remarks' => $data['remarks'] ?? '',
                     ],
