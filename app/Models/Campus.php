@@ -29,6 +29,11 @@ class Campus extends Model
         return $this->hasMany(Vehicle::class);
     }
 
+    public function employee_information()
+    {
+        return $this->hasMany(EmployeeInformation::class);
+    }
+
     public function electricity_meters()
     {
         return $this->hasMany(ElectricityMeter::class);

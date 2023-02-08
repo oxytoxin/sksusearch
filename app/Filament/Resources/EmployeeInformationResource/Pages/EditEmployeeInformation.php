@@ -37,14 +37,14 @@ class EditEmployeeInformation extends EditRecord
         $employee = EmployeeInformation::with(['user', 'office'])->find($data['id']);
         if ($employee) {
             $data['email'] = $employee->user->email;
-            $data['office_id'] = $employee->office_id;
-            if (isset($employee->office)) {
-                $data['campus'] = $employee->office->campus_id;
-            } else {
-                $data['campus'] = "";
+            if (isset($employee->campus) && isset($employee->office)) {
+                $data['campus_id'] = $employee->campus_id;
+                $data['office_id'] = $employee->office->name;                        
+            }else
+            {
+                $data['campus_id'] = "";  
             }
         }
-
         return $data;
     }
 
@@ -64,6 +64,7 @@ class EditEmployeeInformation extends EditRecord
             'role_id' => $data['role_id'],
             'position_id' => $data['position_id'],
             'office_id' => $data['office_id'],
+            'campus_id' => $data['campus_id'],
         ]);
 
         DB::commit();

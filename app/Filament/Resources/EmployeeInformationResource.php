@@ -63,17 +63,21 @@ class EmployeeInformationResource extends Resource
 
                         Grid::make(2)
                             ->schema([
-                                Select::make('campus')
+                                Select::make('campus_id')
                                     ->label('Campus')
                                     ->options(Campus::pluck('name', 'id'))
                                     ->searchable()->reactive()
+                                    ->afterStateUpdated(function ($set, $state) {
+                                        $set('office_id', null);
+                                    })
                                     ->required(),
                                 Select::make('office_id')
                                     ->label('Office')
-                                    ->visible(fn ($get) => $get('campus'))
-                                    ->options(fn ($get) => Office::where('campus_id', $get('campus'))->pluck('name', 'id'))
+                                    ->reactive()
+                                    ->visible(fn ($get) => $get('campus_id'))
+                                    ->options(fn ($get) => Office::where('campus_id', $get('campus_id'))->pluck('name', 'id'))
                                     ->searchable()->required(),
-                            ]),
+                            ]), 
                         Select::make('role_id')
                             ->label('Role')
                             ->options(Role::pluck('description', 'id'))
@@ -102,14 +106,18 @@ class EmployeeInformationResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('user_id')->label('USER ID'),
+                // TextColumn::make('user_id')->label('USER ID'),
                 TextColumn::make('full_name')->searchable(['first_name', 'last_name'])->sortable(),
                 TextColumn::make('position.description')->searchable()->sortable()->limit(20)
                     ->tooltip(fn ($record): string => $record->position?->description ?? 'No Position')
                     ->default('No Position'),
+                TextColumn::make('campus.name')->searchable()->sortable()->limit(20)
+                    ->tooltip(fn ($record): string => $record->campus?->name ?? "Not Assigned")
+                    ->default('Not Assigned'),    
                 TextColumn::make('office.name')->searchable()->sortable()->limit(20)
                     ->tooltip(fn ($record): string => $record->office?->name ?? "No Office")
                     ->default('No Office'),
+               
             ])
             ->filters([
                 //
