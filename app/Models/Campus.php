@@ -44,4 +44,14 @@ class Campus extends Model
         return $this->hasMany(WaterMeter::class);
     }
 
+    public function telephone_account_numbers()
+    {
+        return $this->hasMany(TelephoneAccountNumber::class);
+    }
+
+    public function internet_accounts_numbers()
+    {
+        return $this->hasMany(InternetAccountNumber::class);
+    }
+
 }
