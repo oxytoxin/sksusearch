@@ -28,6 +28,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Livewire\Component;
 use Str;
 
@@ -297,13 +298,13 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     TextInput::make('bill_number')
                                         ->label('Bill No.')
                                         ->numeric()
-                                        ->required(),     
+                                        ->required(),
                                     TextInput::make('electricity_total')
                                         ->label('Total')
                                         ->numeric()
                                         ->reactive()
                                         ->default(0)
-                                        ->disabled(),   
+                                        ->disabled(),
                                 ])
                                 ->label('Utility Particulars')
                                 ->createItemButtonLabel('Add New Row')
@@ -388,7 +389,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     TextInput::make('bill_number')
                                         ->label('Bill No.')
                                         ->numeric()
-                                        ->required(),  
+                                        ->required(),
                                     TextInput::make('water_total')
                                         ->label('Total')
                                         ->numeric()
@@ -488,66 +489,66 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->visible(fn ($get) => in_array($this->voucher_subtype->id, [71])),
 
                             Repeater::make('telephone_utility_particulars')
-                            ->columns(2)
-                            ->schema([
-                                Select::make('telephone_account_number')
-                                ->label('Account Number')
-                                ->options(TelephoneAccountNumber::pluck('account_number', 'id'))
-                                ->required(),
-                                TextInput::make('telephone_amount')
-                                ->label('Amount')
-                                ->numeric()
-                                ->reactive()
-                                ->lazy()
-                                ->default(0)
-                                ->afterStateUpdated(function ($set, $get, $state) {
-                                    $utility_particulars = collect($this->telephone_utility_particulars);
-                                    $other_expense = collect($this->other_expenses);
-                                    $total = round($utility_particulars->sum('telephone_amount') + $other_expense->sum('amount'), 2);
-                                    $set('../../disbursement_voucher_particulars', [
-                                        [
-                                            'purpose' => $get('../../purpose'),
-                                            'responsibility_center' => '',
-                                            'mfo_pap' => '',
-                                            'amount' => round($total, 2),
-                                        ],
-                                    ]);
-                                })->required(),
-                            ])
-                            ->label('Utility Particulars')
-                            ->createItemButtonLabel('Add New Row')
-                            ->visible(fn ($get) => in_array($this->voucher_subtype->id, [74])),
-                            
+                                ->columns(2)
+                                ->schema([
+                                    Select::make('telephone_account_number')
+                                        ->label('Account Number')
+                                        ->options(TelephoneAccountNumber::pluck('account_number', 'id'))
+                                        ->required(),
+                                    TextInput::make('telephone_amount')
+                                        ->label('Amount')
+                                        ->numeric()
+                                        ->reactive()
+                                        ->lazy()
+                                        ->default(0)
+                                        ->afterStateUpdated(function ($set, $get, $state) {
+                                            $utility_particulars = collect($this->telephone_utility_particulars);
+                                            $other_expense = collect($this->other_expenses);
+                                            $total = round($utility_particulars->sum('telephone_amount') + $other_expense->sum('amount'), 2);
+                                            $set('../../disbursement_voucher_particulars', [
+                                                [
+                                                    'purpose' => $get('../../purpose'),
+                                                    'responsibility_center' => '',
+                                                    'mfo_pap' => '',
+                                                    'amount' => round($total, 2),
+                                                ],
+                                            ]);
+                                        })->required(),
+                                ])
+                                ->label('Utility Particulars')
+                                ->createItemButtonLabel('Add New Row')
+                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [74])),
+
                             Repeater::make('internet_utility_particulars')
-                            ->columns(2)
-                            ->schema([
-                                Select::make('internet_account_number')
-                                ->label('Account Number')
-                                ->options(InternetAccountNumber::pluck('account_number', 'id'))
-                                ->required(),
-                                TextInput::make('internet_amount')
-                                ->label('Amount')
-                                ->numeric()
-                                ->reactive()
-                                ->lazy()
-                                ->default(0)
-                                ->afterStateUpdated(function ($set, $get, $state) {
-                                    $utility_particulars = collect($this->internet_utility_particulars);
-                                    $other_expense = collect($this->other_expenses);
-                                    $total = round($utility_particulars->sum('internet_amount') + $other_expense->sum('amount'), 2);
-                                    $set('../../disbursement_voucher_particulars', [
-                                        [
-                                            'purpose' => $get('../../purpose'),
-                                            'responsibility_center' => '',
-                                            'mfo_pap' => '',
-                                            'amount' => round($total, 2),
-                                        ],
-                                    ]);
-                                })->required(),
-                            ])
-                            ->label('Utility Particulars')
-                            ->createItemButtonLabel('Add New Row')
-                            ->visible(fn ($get) => in_array($this->voucher_subtype->id, [75])),    
+                                ->columns(2)
+                                ->schema([
+                                    Select::make('internet_account_number')
+                                        ->label('Account Number')
+                                        ->options(InternetAccountNumber::pluck('account_number', 'id'))
+                                        ->required(),
+                                    TextInput::make('internet_amount')
+                                        ->label('Amount')
+                                        ->numeric()
+                                        ->reactive()
+                                        ->lazy()
+                                        ->default(0)
+                                        ->afterStateUpdated(function ($set, $get, $state) {
+                                            $utility_particulars = collect($this->internet_utility_particulars);
+                                            $other_expense = collect($this->other_expenses);
+                                            $total = round($utility_particulars->sum('internet_amount') + $other_expense->sum('amount'), 2);
+                                            $set('../../disbursement_voucher_particulars', [
+                                                [
+                                                    'purpose' => $get('../../purpose'),
+                                                    'responsibility_center' => '',
+                                                    'mfo_pap' => '',
+                                                    'amount' => round($total, 2),
+                                                ],
+                                            ]);
+                                        })->required(),
+                                ])
+                                ->label('Utility Particulars')
+                                ->createItemButtonLabel('Add New Row')
+                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [75])),
 
                             Repeater::make('other_expenses')
                                 ->columns(2)
@@ -585,10 +586,10 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                     $total = $utility_particulars->sum('fuel_total') + $sum;
                                                 } else if ($this->voucher_subtype->id == 74) {
                                                     $utility_particulars = collect($this->telephone_utility_particulars);
-                                                    $total = round(($utility_particulars->sum('telephone_amount') + $sum),2);
+                                                    $total = round(($utility_particulars->sum('telephone_amount') + $sum), 2);
                                                 } else if ($this->voucher_subtype->id == 75) {
                                                     $utility_particulars = collect($this->internet_utility_particulars);
-                                                    $total = round(($utility_particulars->sum('internet_amount') + $sum),2);
+                                                    $total = round(($utility_particulars->sum('internet_amount') + $sum), 2);
                                                 }
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
@@ -605,23 +606,15 @@ class DisbursementVouchersCreate extends Component implements HasForms
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
                                     Textarea::make('purpose')
-                                        ->required(function ($get, $set) {
-                                            if ($this->voucher_subtype->id == 27) {
-                                                $set('purpose', 'Electricity Bill For ');
-                                            } else if ($this->voucher_subtype->id == 70) {
-                                                $set('purpose', 'Water Bill For ');
-                                            } else {
-                                                $set('purpose', '');
-                                            }
-                                        }),
+                                        ->required(),
                                     Grid::make(3)->schema([
                                         TextInput::make('responsibility_center'),
                                         TextInput::make('mfo_pap')
                                             ->label('MFO/PAP'),
                                         TextInput::make('amount')
-                                            // ->disabled(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71]))
                                             ->reactive()
                                             ->numeric()
+                                            ->minValue(1)
                                             ->required(),
                                     ]),
                                 ])
@@ -661,7 +654,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ViewField::make('voucher_preview')->label('Voucher Preview')->view('components.forms.voucher-preview'),
                             ]),
                     ]),
-            ])->submitAction(view('components.forms.save-button')),
+            ])->submitAction(new HtmlString(view('components.forms.save-button'))),
         ];
     }
 
@@ -694,7 +687,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
             'voucher_subtype_id' => $this->voucher_subtype->id,
             'user_id' => auth()->id(),
             'signatory_id' => $this->signatory_id,
-            'mop_id' => $this->mop_id,
+            'mop_id' => filled($this->mop_id) ? $this->mop_id : null,
             'payee' => $this->payee,
             'travel_order_id' => $this->travel_order_id,
             'tracking_number' => $this->tracking_number,
