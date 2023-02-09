@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\VoucherSubTypeResource\Pages;
 
 use App\Filament\Resources\VoucherSubTypeResource;
+use DB;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +16,15 @@ class EditVoucherSubType extends EditRecord
     protected function getActions(): array
     {
         return [
-            // Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->action(function ($record) {
+                    DB::beginTransaction();
+                    $record->related_documents_list()->delete();
+                    $record->delete();
+                    DB::commit();
+                    Notification::make()->title('Deleted.')->success()->send();
+                    $this->redirect(route('filament.resources.voucher-sub-types.index'));
+                }),
         ];
     }
 
