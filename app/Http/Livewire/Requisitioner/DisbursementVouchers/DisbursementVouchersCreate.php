@@ -8,6 +8,8 @@ use App\Models\Mop;
 use App\Models\ElectricityMeter;
 use App\Models\WaterMeter;
 use App\Models\Vehicle;
+use App\Models\TelephoneAccountNumber;
+use App\Models\InternetAccountNumber;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
 use App\Models\VoucherSubType;
@@ -62,6 +64,19 @@ class DisbursementVouchersCreate extends Component implements HasForms
     public $fuel_consumption;
 
     public $fuel_cost;
+
+    public $telephone_utility_particulars = [];
+
+    public $telephone_account_number;
+
+    public $telephone_amount;
+
+
+    public $internet_utility_particulars = [];
+
+    public $internet_account_number;
+
+    public $internet_amount;
 
     public $tracking_number;
 
@@ -325,13 +340,13 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $set('water_total', round($total_consumption, 2));
                                             $utility_particulars = collect($this->water_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = round($utility_particulars->sum('water_total'), $other_expense->sum('amount'), 2);
+                                            $total = round($utility_particulars->sum('water_total') + $other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
                                                     'responsibility_center' => '',
                                                     'mfo_pap' => '',
-                                                    'amount' =>  $total,
+                                                    'amount' =>  round($total, 2),
                                                 ],
                                             ]);
                                         })
@@ -366,7 +381,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                     'purpose' => $get('../../purpose'),
                                                     'responsibility_center' => '',
                                                     'mfo_pap' => '',
-                                                    'amount' => $total,
+                                                    'amount' => round($total, 2),
                                                 ],
                                             ]);
                                         })->required(),
@@ -416,13 +431,13 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $set('fuel_total', round($total_consumption, 2));
                                             $utility_particulars = collect($this->fuel_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = round($utility_particulars->sum('fuel_total'), $other_expense->sum('amount'), 2);
+                                            $total = round($utility_particulars->sum('fuel_total') + $other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
                                                     'responsibility_center' => '',
                                                     'mfo_pap' => '',
-                                                    'amount' =>  $total,
+                                                    'amount' =>  round($total, 2),
                                                 ],
                                             ]);
                                         })
@@ -451,13 +466,13 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             $set('fuel_total', round($total_consumption, 2));
                                             $utility_particulars = collect($this->fuel_utility_particulars);
                                             $other_expense = collect($this->other_expenses);
-                                            $total = round($utility_particulars->sum('fuel_total'), $other_expense->sum('amount'), 2);
+                                            $total = round($utility_particulars->sum('fuel_total') + $other_expense->sum('amount'), 2);
                                             $set('../../disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $get('../../purpose'),
                                                     'responsibility_center' => '',
                                                     'mfo_pap' => '',
-                                                    'amount' => $total,
+                                                    'amount' => round($total, 2),
                                                 ],
                                             ]);
                                         })->required(),
@@ -471,6 +486,68 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->label('Utility Particulars')
                                 ->createItemButtonLabel('Add New Row')
                                 ->visible(fn ($get) => in_array($this->voucher_subtype->id, [71])),
+
+                            Repeater::make('telephone_utility_particulars')
+                            ->columns(2)
+                            ->schema([
+                                Select::make('telephone_account_number')
+                                ->label('Account Number')
+                                ->options(TelephoneAccountNumber::pluck('account_number', 'id'))
+                                ->required(),
+                                TextInput::make('telephone_amount')
+                                ->label('Amount')
+                                ->numeric()
+                                ->reactive()
+                                ->lazy()
+                                ->default(0)
+                                ->afterStateUpdated(function ($set, $get, $state) {
+                                    $utility_particulars = collect($this->telephone_utility_particulars);
+                                    $other_expense = collect($this->other_expenses);
+                                    $total = round($utility_particulars->sum('telephone_amount') + $other_expense->sum('amount'), 2);
+                                    $set('../../disbursement_voucher_particulars', [
+                                        [
+                                            'purpose' => $get('../../purpose'),
+                                            'responsibility_center' => '',
+                                            'mfo_pap' => '',
+                                            'amount' => round($total, 2),
+                                        ],
+                                    ]);
+                                })->required(),
+                            ])
+                            ->label('Utility Particulars')
+                            ->createItemButtonLabel('Add New Row')
+                            ->visible(fn ($get) => in_array($this->voucher_subtype->id, [74])),
+                            
+                            Repeater::make('internet_utility_particulars')
+                            ->columns(2)
+                            ->schema([
+                                Select::make('internet_account_number')
+                                ->label('Account Number')
+                                ->options(InternetAccountNumber::pluck('account_number', 'id'))
+                                ->required(),
+                                TextInput::make('internet_amount')
+                                ->label('Amount')
+                                ->numeric()
+                                ->reactive()
+                                ->lazy()
+                                ->default(0)
+                                ->afterStateUpdated(function ($set, $get, $state) {
+                                    $utility_particulars = collect($this->internet_utility_particulars);
+                                    $other_expense = collect($this->other_expenses);
+                                    $total = round($utility_particulars->sum('internet_amount') + $other_expense->sum('amount'), 2);
+                                    $set('../../disbursement_voucher_particulars', [
+                                        [
+                                            'purpose' => $get('../../purpose'),
+                                            'responsibility_center' => '',
+                                            'mfo_pap' => '',
+                                            'amount' => round($total, 2),
+                                        ],
+                                    ]);
+                                })->required(),
+                            ])
+                            ->label('Utility Particulars')
+                            ->createItemButtonLabel('Add New Row')
+                            ->visible(fn ($get) => in_array($this->voucher_subtype->id, [75])),    
 
                             Repeater::make('other_expenses')
                                 ->columns(2)
@@ -506,6 +583,12 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                 } else if ($this->voucher_subtype->id == 71) {
                                                     $utility_particulars = collect($this->fuel_utility_particulars);
                                                     $total = $utility_particulars->sum('fuel_total') + $sum;
+                                                } else if ($this->voucher_subtype->id == 74) {
+                                                    $utility_particulars = collect($this->telephone_utility_particulars);
+                                                    $total = round(($utility_particulars->sum('telephone_amount') + $sum),2);
+                                                } else if ($this->voucher_subtype->id == 75) {
+                                                    $utility_particulars = collect($this->internet_utility_particulars);
+                                                    $total = round(($utility_particulars->sum('internet_amount') + $sum),2);
                                                 }
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
@@ -517,7 +600,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                 ]);
                                             }
                                         }),
-                                ])->createItemButtonLabel('Add New Row')->visible(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71])),
+                                ])->createItemButtonLabel('Add New Row')->visible(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71, 74, 75])),
                             //Electricity, Water, Fuel (end)
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
