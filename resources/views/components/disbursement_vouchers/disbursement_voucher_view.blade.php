@@ -1,7 +1,6 @@
 <x-app-layout>
     <div>
-        <div id="dvPrint"
-            style="flex border-collapse  max-w-8xl print:block print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
+        <div id="dvPrint" style="flex border-collapse  max-w-8xl print:block print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
             <div class="grid grid-cols-8 border-4 border-collapse border-black">
 
                 <div class="col-span-6 border border-black">
@@ -9,21 +8,16 @@
                         <div class="flex mt-1 ml-1">
                             <div class="flow-root my-auto">
                                 <div class="inline-block mr-2">
-                                    <img src="{{ asset('images/sksulogo.png') }}" alt="sksu logo"
-                                        class="object-scale-down h-full mx-auto w-14">
-                                    <span class="text-xs text-center text-black print:text-8">SKSU Works for
-                                        Success!</span>
+                                    <img class="object-scale-down h-full mx-auto w-14" src="{{ asset('images/sksulogo.png') }}" alt="sksu logo">
+                                    <span class="text-xs text-center text-black print:text-8">SKSU Works for Success!</span>
                                     {{-- <span class="text-xs font-bold text-center text-black"> ISO 9001:2015</span> --}}
                                 </div>
                             </div>
                             <div class="flex place-items-center">
                                 <div class="ext-left">
-                                    <span class="block text-sm font-bold text-black uppercase">Republic of the
-                                        Philippines</span>
-                                    <span class="block text-sm font-bold text-green-600 uppercase">SULTAN KUDARAT STATE
-                                        UNIVERSITY</span>
-                                    <span class="block text-sm text-black">ACCESS, EJC Montilla, 9800 City of
-                                        Tacurong</span>
+                                    <span class="block text-sm font-bold text-black uppercase">Republic of the Philippines</span>
+                                    <span class="block text-sm font-bold text-green-600 uppercase">SULTAN KUDARAT STATE UNIVERSITY</span>
+                                    <span class="block text-sm text-black">ACCESS, EJC Montilla, 9800 City of Tacurong</span>
                                     <span class="block text-sm text-black">Province of Sultan Kudarat</span>
                                 </div>
                             </div>
@@ -31,25 +25,21 @@
                         <div class="flex">
                             <div class="m-3 text-center">
 
-                                <img class="w-12 h-auto mx-auto"
-                                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $disbursement_voucher->tracking_number }}"
-                                    alt="N/A">
-                                <span
-                                    class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>
+                                <img class="w-12 h-auto mx-auto" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $disbursement_voucher->tracking_number }}" alt="N/A">
+                                <span class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>
                             </div>
 
                         </div>
                     </div>
                     <div class="min-w-full text-center border-t-4 border-black">
-                        <span class="mx-auto font-serif font-extrabold text-black uppercase text-md">Disbursement
-                            Voucher</span>
+                        <span class="mx-auto font-serif font-extrabold text-black uppercase text-md">
+                            Disbursement Voucher</span>
                     </div>
                 </div>
 
                 <div class="grid col-span-2 grid-rows-2 border border-black">
                     <div class="row-span-1 border-b border-l border-black">
-                        <span
-                            class="mx-auto ml-1 font-serif text-xs font-extrabold text-black capitalize print:text-12">
+                        <span class="mx-auto ml-1 font-serif text-xs font-extrabold text-black capitalize print:text-12">
                             fund cluster:
                         </span>
                     </div>
@@ -72,15 +62,11 @@
                             <div class="relative flex items-start">
                                 <div class="flex items-center h-5">
                                     @if ($mop->id == $disbursement_voucher->mop_id)
-                                        <input id="comments" aria-describedby="comments-description" name="comments"
-                                            type="checkbox"
-                                            class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" readonly
-                                            disabled checked>
+                                        <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="comments" name="comments" type="checkbox"
+                                               aria-describedby="comments-description" readonly disabled checked>
                                     @else
-                                        <input id="comments" aria-describedby="comments-description" name="comments"
-                                            type="checkbox"
-                                            class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500"
-                                            readonly disabled>
+                                        <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="comments" name="comments" type="checkbox"
+                                               aria-describedby="comments-description" readonly disabled>
                                     @endif
                                 </div>
                                 <div class="ml-1 text-sm">
@@ -162,7 +148,7 @@
                     <div class="text-right h-44 w-36">
                         <div class="flex flex-col">
                             @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                                <span>{{ $particular->amount }}</span>
+                                <span>{{ number_format($particular->amount, 2) }}</span>
                             @endforeach
                         </div>
                     </div>
@@ -178,29 +164,28 @@
                         &nbsp
                     </div>
                     <div class="h-auto text-right border-t-4 border-black border-double print:text-10 w-36">
-                        {{ $disbursement_voucher->disbursement_voucher_particulars->sum('amount') + $disbursement_voucher->travel_order?->registration_amount }}
+                        {{ number_format($disbursement_voucher->disbursement_voucher_particulars->sum('amount') + $disbursement_voucher->travel_order?->registration_amount, 2) }}
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black">
                     <div class="w-full">
                         <div class="flex row-span-1">
                             <div class="px-1 font-extrabold border-b border-r border-black print:text-12">A.</div>
-                            <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary,
-                                lawful and incurred
-                                under my direct supervision.</span>
+                            <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary, lawful and incurred under my direct supervision.</span>
                         </div>
                         <div class="block row-span-1 mx-auto text-center">
                             @php
                                 $full_name = explode(',', $disbursement_voucher->signatory->employee_information->full_name)[0];
                             @endphp
-                            <span
-                                class="font-extrabold underline uppercase print:text-10">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                            <span class="font-extrabold underline uppercase print:text-10">
+                                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                                 {{ isset($full_name) ? $full_name : 'none' }}
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
                             <p class="font-extrabold capitalize print:text-10">
                                 {{ $disbursement_voucher->signatory->employee_information->position->description }}
                                 <span class="lowercase">of</span>
-                                {{ $disbursement_voucher->signatory->employee_information->office->name }}</p>
+                                {{ $disbursement_voucher->signatory->employee_information->office->name }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -307,8 +292,7 @@
 
                         <div class="w-full h-auto text-center print:h-8">
                             <div class="w-full h-4 border-b border-black">
-                                <span
-                                    class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">University
+                                <span class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">University
                                     Accountant</span>
                             </div>
                             <div class="w-full h-4">
@@ -325,13 +309,11 @@
                         </div>
                         <div class="w-full h-auto text-center print:h-8">
                             <div class="w-full h-4 border-b border-black">
-                                <span
-                                    class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">University
+                                <span class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">University
                                     President</span>
                             </div>
                             <div class="w-full h-4">
-                                <span
-                                    class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">Agency
+                                <span class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">Agency
                                     Head/Authorized
                                     Representative</span>
                             </div>
@@ -360,8 +342,7 @@
                             <span class="pl-1 font-extrabold print:text-12">Receipt of Payment</span>
                         </div>
                         <div class="flex flex-row w-full border-b-2 border-black">
-                            <div
-                                class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
+                            <div class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
                                 Check / ADA No.: </div>
                             <div class="w-1/3 h-auto border-r border-black shrink-0">
                                 <div class="h-5"></div>
@@ -381,8 +362,7 @@
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-12">
                     <div class="flex-col w-full">
                         <div class="flex flex-row w-full border-b-2 border-black">
-                            <div
-                                class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
+                            <div class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
                                 Signature </div>
                             <div class="w-1/3 h-auto border-r border-black shrink-0">
                                 <div class="h-5"></div>
@@ -406,15 +386,14 @@
 
             </div>
         </div>
-        <button type="button" onclick="printDiv('dvPrint')"
-            class="inline-flex items-center px-4 py-2 mt-2 text-xs font-medium text-white border border-transparent rounded-md shadow-sm bg-primary-500 hover:bg-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+        <button class="inline-flex items-center px-4 py-2 mt-2 text-xs font-medium text-white border border-transparent rounded-md shadow-sm bg-primary-500 hover:bg-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                type="button" onclick="printDiv('dvPrint')">
             <!-- Heroicon name: mini/envelope -->
 
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                class="w-5 h-5 mr-2 -ml-1">
+            <svg class="w-5 h-5 mr-2 -ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                 <path fill-rule="evenodd"
-                    d="M7.875 1.5C6.839 1.5 6 2.34 6 3.375v2.99c-.426.053-.851.11-1.274.174-1.454.218-2.476 1.483-2.476 2.917v6.294a3 3 0 003 3h.27l-.155 1.705A1.875 1.875 0 007.232 22.5h9.536a1.875 1.875 0 001.867-2.045l-.155-1.705h.27a3 3 0 003-3V9.456c0-1.434-1.022-2.7-2.476-2.917A48.716 48.716 0 0018 6.366V3.375c0-1.036-.84-1.875-1.875-1.875h-8.25zM16.5 6.205v-2.83A.375.375 0 0016.125 3h-8.25a.375.375 0 00-.375.375v2.83a49.353 49.353 0 019 0zm-.217 8.265c.178.018.317.16.333.337l.526 5.784a.375.375 0 01-.374.409H7.232a.375.375 0 01-.374-.409l.526-5.784a.373.373 0 01.333-.337 41.741 41.741 0 018.566 0zm.807-3.97a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H18a.75.75 0 01-.75-.75V10.5zM15 9.75a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V10.5a.75.75 0 00-.75-.75H15z"
-                    clip-rule="evenodd" />
+                      d="M7.875 1.5C6.839 1.5 6 2.34 6 3.375v2.99c-.426.053-.851.11-1.274.174-1.454.218-2.476 1.483-2.476 2.917v6.294a3 3 0 003 3h.27l-.155 1.705A1.875 1.875 0 007.232 22.5h9.536a1.875 1.875 0 001.867-2.045l-.155-1.705h.27a3 3 0 003-3V9.456c0-1.434-1.022-2.7-2.476-2.917A48.716 48.716 0 0018 6.366V3.375c0-1.036-.84-1.875-1.875-1.875h-8.25zM16.5 6.205v-2.83A.375.375 0 0016.125 3h-8.25a.375.375 0 00-.375.375v2.83a49.353 49.353 0 019 0zm-.217 8.265c.178.018.317.16.333.337l.526 5.784a.375.375 0 01-.374.409H7.232a.375.375 0 01-.374-.409l.526-5.784a.373.373 0 01.333-.337 41.741 41.741 0 018.566 0zm.807-3.97a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H18a.75.75 0 01-.75-.75V10.5zM15 9.75a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V10.5a.75.75 0 00-.75-.75H15z"
+                      clip-rule="evenodd" />
             </svg>
 
             Print Voucher
