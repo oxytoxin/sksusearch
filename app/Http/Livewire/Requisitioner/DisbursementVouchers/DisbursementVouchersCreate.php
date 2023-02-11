@@ -103,7 +103,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                         Card::make()->schema([
                             Select::make('voucher_subtype_id')
                                 ->label('Disbursement Voucher for')
-                                ->options(VoucherSubType::all()->pluck('name', 'id'))
+                                ->options(VoucherSubType::with('voucher_type')->get()->map(fn ($v) => ['id' => $v->id, 'name' => "{$v->voucher_type->name} - {$v->name}"])->pluck('name', 'id'))
                                 ->disabled()
                                 ->default($this->voucher_subtype->id),
                             Select::make('travel_order_id')
