@@ -21,7 +21,7 @@ class TravelOrder extends Model
     {
         return 'to-' . today()->format('y') . '-' . Str::random(8);
     }
-    
+
     protected function registrationAmount(): Attribute
     {
         return Attribute::make(
@@ -53,6 +53,11 @@ class TravelOrder extends Model
     public function sidenotes()
     {
         return $this->morphMany(Sidenote::class, 'sidenoteable');
+    }
+
+    public function disbursement_vouchers()
+    {
+        return $this->hasMany(DisbursementVoucher::class);
     }
 
     public function philippine_region()

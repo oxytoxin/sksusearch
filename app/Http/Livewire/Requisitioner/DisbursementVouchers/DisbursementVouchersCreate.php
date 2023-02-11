@@ -121,6 +121,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 })->orWhere(function ($q) {
                                     $q->approved()->where('travel_order_type_id', TravelOrderType::OFFICIAL_TIME);
                                 })
+                                    ->whereDoesntHave('disbursement_vouchers', function ($q) {
+                                        $q->where('user_id', auth()->id())->whereNotNull('cancelled_at');
+                                    })
                                     ->pluck('tracking_code', 'id'))
                                 ->reactive()
                                 ->afterStateUpdated(function ($set, $state) {

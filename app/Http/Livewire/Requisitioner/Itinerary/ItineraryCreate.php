@@ -31,6 +31,8 @@ class ItineraryCreate extends Component implements HasForms
 
     public $travel_order_id;
 
+    public $travel_order;
+
     public $itinerary_entries = [];
 
     public function getFormSchema()
@@ -54,11 +56,17 @@ class ItineraryCreate extends Component implements HasForms
                         )
                         ->pluck('tcAndP', 'id')
                 )
-                ->afterStateUpdated(fn () => $this->generateItineraryEntries())
+                ->afterStateUpdated(function ($state) {
+                    $this->travel_order = TravelOrder::find($state);
+                    $this->generateItineraryEntries();
+                })
                 ->reactive(),
             Card::make([
                 Placeholder::make('travel_order_details')
-                    ->view('components.travel_orders.travel-order-details'),
+                    ->content(fn () => view('components.travel_orders.travel-order-details', [
+                        'travel_order' => $this->travel_order,
+                        'itinerary_entries' => $this->itinerary_entries,
+                    ])),
             ])->visible(fn ($get) => $get('travel_order_id')),
             Builder::make('itinerary_entries')->blocks([
                 Block::make('new_entry')->schema([
@@ -97,7 +105,7 @@ class ItineraryCreate extends Component implements HasForms
                             ->schema([
                                 Select::make('mot_id')
                                     ->options(Mot::pluck('name', 'id'))
-                                    ->label('Mode of Transportation')
+                                    ->label('Mode of Transport')
                                     ->required(),
                                 TextInput::make('place')->required(),
                                 Flatpickr::make('departure_time')
@@ -163,9 +171,10 @@ class ItineraryCreate extends Component implements HasForms
         $this->form->fill();
         if (request('travel_order')) {
             $to = TravelOrder::findOrFail(request('travel_order'));
-            if (!$to->applicants()->where('users.id', auth()->id())->exists()) {
+            if (!$to->applicants()->where('users.id', auth()->id())->exists() || $to->itineraries()->where('user_id', auth()->id())->exists()) {
                 abort(403);
             }
+            $this->travel_order = $to;
             $this->travel_order_id = $to->id;
             $this->generateItineraryEntries();
         }
@@ -209,7 +218,7 @@ class ItineraryCreate extends Component implements HasForms
 
     private function generateItineraryEntries()
     {
-        $to = TravelOrder::with('philippine_region.dte')->find($this->travel_order_id);
+        $to = $this->travel_order;
         $entries = [];
         if (isset($to)) {
             $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();

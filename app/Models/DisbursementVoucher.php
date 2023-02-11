@@ -56,6 +56,11 @@ class DisbursementVoucher extends Model
         return $this->belongsTo(User::class, 'signatory_id');
     }
 
+    public function travel_order()
+    {
+        return $this->belongsTo(TravelOrder::class);
+    }
+
     public function mop()
     {
         return $this->belongsTo(Mop::class);

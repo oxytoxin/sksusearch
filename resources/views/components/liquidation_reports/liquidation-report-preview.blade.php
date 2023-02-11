@@ -35,7 +35,7 @@
                     </div>
                     <div class="flex gap-2">
                         <h5 class="font-semibold w-28">Fund Cluster:</h5>
-                        <p class="flex-1 border-b border-black">{{ $this->disbursement_voucher?->fund_cluster->name }}
+                        <p class="flex-1 border-b border-black">{{ $this->disbursement_voucher?->fund_cluster?->name }}
                         </p>
                     </div>
                 </div>
@@ -86,8 +86,7 @@
         <div class="flex text-sm divide-x-2 divide-black">
             <h4 class="flex-1 p-1">AMOUNT OF CASH ADVANCE PER DV NO.
                 <span class="border-b border-black">{{ $this->disbursement_voucher->dv_number }}</span>
-                DTD.<span
-                    class="border-b border-black">{{ $this->disbursement_voucher->created_at->format('m/d/Y') }}</span>
+                DTD.<span class="border-b border-black">{{ $this->disbursement_voucher->created_at->format('m/d/Y') }}</span>
             </h4>
             <h4 class="w-1/3 p-1 px-4 text-right">
                 {{ Akaunting\Money\Money::PHP($this->disbursement_voucher->total_amount, true) }}
@@ -97,8 +96,7 @@
             <div class="flex text-sm divide-x-2 divide-black">
                 <h4 class="flex-1 p-1">AMOUNT REFUNDED PER OR NO.
                     <span class="border-b border-black">{{ $refund_particular['or_number'] }}</span>
-                    DTD.<span
-                        class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
+                    DTD.<span class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
                 </h4>
                 <h4 class="w-1/3 p-1 pl-12 text-left">
                     {{ Akaunting\Money\Money::PHP($refund_particular['amount'] ? $refund_particular['amount'] : 0, true) }}

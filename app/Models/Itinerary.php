@@ -19,6 +19,11 @@ class Itinerary extends Model
         return $this->belongsTo(TravelOrder::class);
     }
 
+    public function scopeActualItinerary($query)
+    {
+        return $query->where('is_actual', true);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

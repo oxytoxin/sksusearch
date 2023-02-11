@@ -1,8 +1,11 @@
 @php
     $particulars = collect($this->data['particulars']);
     $refund_particulars = collect($this->data['refund_particulars']);
-    $cheque_amount = $this->disbursement_voucher->total_suggested_amount > 0 ? $this->disbursement_voucher->total_suggested_amount : $this->disbursement_voucher->total_amount;
+    $cheque_amount = $this->disbursement_voucher->total_amount;
     $ready = false;
+    if ($this->disbursement_voucher?->travel_order_id) {
+        $expenses = collect($this->data['itinerary_entries'])->sum('data.total_expenses');
+    }
     try {
         Akaunting\Money\Money::PHP($particulars->sum('amount'));
         Akaunting\Money\Money::PHP($refund_particulars->sum('amount'));
