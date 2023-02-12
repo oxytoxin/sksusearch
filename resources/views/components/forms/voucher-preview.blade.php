@@ -19,7 +19,7 @@
                         <div class="flex mt-1 ml-1">
                             <div class="flow-root my-auto">
                                 <div class="inline-block mr-2">
-                                    <img src="http://sksu.edu.ph/wp-content/uploads/2020/09/512x512-1.png" alt="sksu logo" class="object-scale-down h-full mx-auto w-14">
+                                    <img class="object-scale-down h-full mx-auto w-14" src="http://sksu.edu.ph/wp-content/uploads/2020/09/512x512-1.png" alt="sksu logo">
                                     <span class="text-xs text-center text-black print:text-8">SKSU Works for Success!</span>
                                     {{-- <span class="text-xs font-bold text-center text-black"> ISO 9001:2015</span> --}}
                                 </div>
@@ -38,7 +38,8 @@
                         <div class="flex">
                             <div class="m-3 text-center">
 
-                                <img class="w-12 h-auto mx-auto" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $evaluate(fn($get) => $get('tracking_number')) }}" alt="N/A">
+                                <img class="w-12 h-auto mx-auto" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $evaluate(fn($get) => $get('tracking_number')) }}"
+                                     alt="N/A">
                                 <span class="flex justify-center text-xs font-normal">{{ $evaluate(fn($get) => $get('tracking_number')) }}</span>
                             </div>
 
@@ -74,9 +75,11 @@
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
                                 @if ($mop == '1')
-                                    <input id="comments" aria-describedby="comments-description" name="comments" type="checkbox" class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" readonly disabled checked>
+                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="comments" name="comments" type="checkbox" aria-describedby="comments-description"
+                                           readonly disabled checked>
                                 @else
-                                    <input id="comments" aria-describedby="comments-description" name="comments" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled>
+                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="comments" name="comments" type="checkbox" aria-describedby="comments-description"
+                                           readonly disabled>
                                 @endif
 
                             </div>
@@ -88,9 +91,11 @@
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
                                 @if ($mop == '2')
-                                    <input id="candidates" aria-describedby="candidates-description" name="candidates" type="checkbox" class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" readonly disabled checked>
+                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="candidates" name="candidates" type="checkbox"
+                                           aria-describedby="candidates-description" readonly disabled checked>
                                 @else
-                                    <input id="candidates" aria-describedby="candidates-description" name="candidates" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled>
+                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="candidates" name="candidates" type="checkbox"
+                                           aria-describedby="candidates-description" readonly disabled>
                                 @endif
 
                             </div>
@@ -102,9 +107,11 @@
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
                                 @if ($mop == '3')
-                                    <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" readonly disabled checked>
+                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description"
+                                           readonly disabled checked>
                                 @else
-                                    <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled>
+                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description"
+                                           readonly disabled>
                                 @endif
 
                             </div>
@@ -116,9 +123,11 @@
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
                                 @if ($mop == 4)
-                                    <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" readonly disabled checked>
+                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description"
+                                           readonly disabled checked>
                                 @else
-                                    <input id="offers" aria-describedby="offers-description" name="offers" type="checkbox" class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" readonly disabled>
+                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description"
+                                           readonly disabled>
                                 @endif
 
                             </div>
@@ -178,30 +187,30 @@
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-10">
                     <div class="w-1/2 pl-2 text-left border-r-2 border-black h-44">
                         <div class="flex flex-col">
-                        @foreach ($particulars as $particular)
-                            {{ $particular['purpose'] }}
-                        @endforeach
+                            @foreach ($particulars as $particular)
+                                {{ $particular['purpose'] }}
+                            @endforeach
                         </div>
                     </div>
                     <div class="w-64 text-center border-r-2 border-black h-44">
                         <div class="flex flex-col">
-                        @foreach ($particulars as $particular)
-                            {{ $particular['responsibility_center'] }}
-                        @endforeach
+                            @foreach ($particulars as $particular)
+                                {{ $particular['responsibility_center'] }}
+                            @endforeach
                         </div>
                     </div>
                     <div class="text-center border-r-2 border-black h-44 w-36">
                         <div class="flex flex-col">
-                        @foreach ($particulars as $particular)
-                            {{ $particular['mfo_pap'] }}
-                        @endforeach
+                            @foreach ($particulars as $particular)
+                                {{ $particular['mfo_pap'] }}
+                            @endforeach
                         </div>
                     </div>
                     <div class="text-right h-44 w-36">
                         <div class="flex flex-col">
-                        @foreach ($particulars as $particular)
-                            {{ $particular['amount'] }}
-                        @endforeach
+                            @foreach ($particulars as $particular)
+                                {{ number_format($particular['amount'], 2) }}
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -216,7 +225,7 @@
                         &nbsp
                     </div>
                     <div class="h-auto text-right border-t-4 border-black border-double print:text-10 w-36">
-                        {{ $total_amount }}
+                        {{ number_format($total_amount, 2) }}
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black">
@@ -243,7 +252,7 @@
                                 }
                             @endphp
                             <span
-                                class="font-extrabold underline uppercase print:text-10">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                                  class="font-extrabold underline uppercase print:text-10">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                                 {{ isset($full_name) ? $full_name : 'none' }}
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
                             <p class="font-extrabold capitalize print:text-10">

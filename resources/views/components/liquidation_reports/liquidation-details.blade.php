@@ -19,7 +19,7 @@
 
 
 @if ($ready)
-    <div class="grid grid-cols-2">
+    <div class="grid grid-cols-2 gap-4">
         <div>
             <h3>Cheque/ADA Amount</h3>
             <p>

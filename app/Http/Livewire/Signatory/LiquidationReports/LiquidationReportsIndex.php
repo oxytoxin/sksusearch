@@ -9,6 +9,8 @@ use Filament\Tables\Actions\Action;
 use App\Models\LiquidationReportStep;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
+use App\Models\VoucherSubType;
+use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
@@ -16,6 +18,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Illuminate\Support\HtmlString;
 
 class LiquidationReportsIndex extends Component implements HasTable
 {
@@ -97,6 +100,13 @@ class LiquidationReportsIndex extends Component implements HasTable
             })
                 ->form(function () {
                     return [
+                        Placeholder::make('confirmation')
+                            ->label('Important!')
+                            ->content(
+                                fn () => new HtmlString("By forwarding this transaction, you are concurring in the contents of the Disbursement Voucher <br/>(including its supporting documents) and the related Actual Itinerary of Travel and are hereby approving the same.")
+                            )->visible(function ($record) {
+                                return in_array($record->voucher_subtype_id, VoucherSubType::TRAVELS);
+                            }),
                         RichEditor::make('remarks')
                             ->label('Remarks (Optional)')
                             ->fileAttachmentsDisk('remarks'),

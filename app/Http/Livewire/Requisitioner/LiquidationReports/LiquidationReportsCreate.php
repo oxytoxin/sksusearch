@@ -130,7 +130,6 @@ class LiquidationReportsCreate extends Component implements HasForms
                                         ])),
                                 ]),
                                 Builder::make('itinerary_entries')
-                                    // ->disableItemMovement()
                                     ->blocks([
                                         Block::make('new_entry')->schema([
                                             Grid::make(2)->schema([
@@ -188,55 +187,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                                     ]),
                             ]),
                     ]),
-                Step::make('Print Actual Itinerary')
-                    ->schema([
-                        Placeholder::make('actual_itinerary')
-                            ->content(
-                                function () {
-                                    if ($this->disbursement_voucher->travel_order_id) {
-                                        $coverage = [];
-                                        foreach ($this->data['itinerary_entries'] as $entry) {
-                                            $coverage[] = [
-                                                'date' => $entry['data']['date'],
-                                                'per_diem' => $entry['data']['per_diem'],
-                                                'total_expenses' => $entry['data']['total_expenses'],
-                                                'breakfast' => $entry['data']['breakfast'],
-                                                'lunch' => $entry['data']['lunch'],
-                                                'dinner' => $entry['data']['dinner'],
-                                                'lodging' => $entry['data']['lodging'],
-                                            ];
-                                        }
-                                        $itinerary = Itinerary::make([
-                                            'is_actual' => true,
-                                            'user_id' => auth()->id(),
-                                            'travel_order_id' => $this->disbursement_voucher->travel_order_id,
-                                            'coverage' => $coverage,
-                                        ]);
-                                        $itinerary_entries = [];
-                                        foreach ($this->data['itinerary_entries'] as $itinerary_entry) {
-                                            foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
-                                                $itinerary_entries[] = ItineraryEntry::make([
-                                                    'date' => $itinerary_entry['data']['date'],
-                                                    'mot_id' => $entry['mot_id'],
-                                                    'place' => $entry['place'],
-                                                    'departure_time' => $entry['departure_time'],
-                                                    'arrival_time' => $entry['arrival_time'],
-                                                    'transportation_expenses' => $entry['transportation_expenses'],
-                                                    'other_expenses' => $entry['other_expenses'],
-                                                ]);
-                                            }
-                                        }
-                                        return view('livewire.requisitioner.itinerary.itinerary-print', [
-                                            'itinerary' => $itinerary,
-                                            'itinerary_entries' => $itinerary_entries,
-                                            'travel_order' => $this->disbursement_voucher?->travel_order,
-                                            'immediate_signatory' => $this->disbursement_voucher?->travel_order?->signatories()->with('employee_information')->first(),
-                                        ]);
-                                    }
-                                    return new HtmlString('Itinerary not required by this liquidation report.');
-                                }
-                            )->disableLabel()
-                    ]),
+                ...$this->itinerarySection(),
                 Step::make('Refund / Reimbursement')
                     ->schema([
                         Placeholder::make('gross_amount')
@@ -287,19 +238,16 @@ class LiquidationReportsCreate extends Component implements HasForms
                             }),
                     ])
                     ->afterValidation(function () {
-                        try {
-                            $particulars = collect($this->data['particulars']);
-                            $refund_particulars = collect($this->data['refund_particulars']);
-                            $cheque_amount = $this->disbursement_voucher->total_suggested_amount > 0 ? $this->disbursement_voucher->total_suggested_amount : $this->disbursement_voucher->total_amount;
-                            if ($cheque_amount > $particulars->sum('amount')) {
-                                if (($refund_particulars->sum('amount') ?? 0) != ($cheque_amount - $particulars->sum('amount') ?? 0)) {
-                                    Notification::make()->title('Refund Error')->body('Refunded amount must be equal to the amount to be refunded.')->danger()->send();
-                                    throw ValidationException::withMessages([
-                                        'refund_amount' => 'Refunded amount must be equal to the amount to be refunded.'
-                                    ]);
-                                }
+                        $particulars = collect($this->data['particulars']);
+                        $refund_particulars = collect($this->data['refund_particulars']);
+                        $cheque_amount = $this->disbursement_voucher->total_amount;
+                        if ($cheque_amount > $particulars->sum('amount')) {
+                            if (($refund_particulars->sum('amount') ?? 0) != ($cheque_amount - $particulars->sum('amount') ?? 0)) {
+                                Notification::make()->title('Refund Error')->body('Refunded amount must be equal to the amount to be refunded.')->danger()->send();
+                                throw ValidationException::withMessages([
+                                    'refund_amount' => 'Refunded amount must be equal to the amount to be refunded.'
+                                ]);
                             }
-                        } catch (\Throwable $th) {
                         }
                     }),
                 Step::make('Related Documents')
@@ -457,11 +405,69 @@ class LiquidationReportsCreate extends Component implements HasForms
         return redirect()->route('requisitioner.liquidation-reports.index');
     }
 
+    private function itinerarySection()
+    {
+        if (!in_array($this->disbursement_voucher?->voucher_subtype->id, [1, 2]))
+            return [];
+        else
+            return [
+                Step::make('Print Actual Itinerary')
+                    ->schema([
+                        Placeholder::make('actual_itinerary')
+                            ->content(
+                                function () {
+                                    if ($this->disbursement_voucher?->travel_order_id) {
+                                        $coverage = [];
+                                        foreach ($this->data['itinerary_entries'] as $entry) {
+                                            $coverage[] = [
+                                                'date' => $entry['data']['date'],
+                                                'per_diem' => $entry['data']['per_diem'],
+                                                'total_expenses' => $entry['data']['total_expenses'],
+                                                'breakfast' => $entry['data']['breakfast'],
+                                                'lunch' => $entry['data']['lunch'],
+                                                'dinner' => $entry['data']['dinner'],
+                                                'lodging' => $entry['data']['lodging'],
+                                            ];
+                                        }
+                                        $itinerary = Itinerary::make([
+                                            'is_actual' => true,
+                                            'user_id' => auth()->id(),
+                                            'travel_order_id' => $this->disbursement_voucher->travel_order_id,
+                                            'coverage' => $coverage,
+                                        ]);
+                                        $itinerary_entries = [];
+                                        foreach ($this->data['itinerary_entries'] as $itinerary_entry) {
+                                            foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
+                                                $itinerary_entries[] = ItineraryEntry::make([
+                                                    'date' => $itinerary_entry['data']['date'],
+                                                    'mot_id' => $entry['mot_id'],
+                                                    'place' => $entry['place'],
+                                                    'departure_time' => $entry['departure_time'],
+                                                    'arrival_time' => $entry['arrival_time'],
+                                                    'transportation_expenses' => $entry['transportation_expenses'],
+                                                    'other_expenses' => $entry['other_expenses'],
+                                                ]);
+                                            }
+                                        }
+                                        return view('livewire.requisitioner.itinerary.itinerary-print', [
+                                            'itinerary' => $itinerary,
+                                            'itinerary_entries' => $itinerary_entries,
+                                            'travel_order' => $this->disbursement_voucher?->travel_order,
+                                            'immediate_signatory' => $this->disbursement_voucher?->travel_order?->signatories()->with('employee_information')->first(),
+                                        ]);
+                                    }
+                                    return new HtmlString('Itinerary not required by this liquidation report.');
+                                }
+                            )->disableLabel()
+                    ])
+            ];
+    }
+
     private function generateItineraryEntries($old_itinerary)
     {
         $entries = [];
         $itinerary_entries = $old_itinerary->itinerary_entries;
-        $original_per_diem = $this->disbursement_voucher->travel_order->philippine_region->dte->amount;
+        $original_per_diem = $this->disbursement_voucher->travel_order->philippine_region?->dte->amount ?? 0;
         foreach ($old_itinerary->coverage as $key => $coverage) {
             if ($this->disbursement_voucher->travel_order->date_to == Carbon::make($coverage['date'])) {
                 $original_per_diem /= 2;

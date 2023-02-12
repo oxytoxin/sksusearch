@@ -48,20 +48,39 @@
                                         <li class="flex items-end justify-between">
                                             <p>{{ $applicant->employee_information->full_name }}</p>
                                             @php
-                                                $itinerary = $itineraries->firstWhere('user_id', $applicant->id);
+                                                $proposed_itinerary = $itineraries
+                                                    ->where('user_id', $applicant->id)
+                                                    ->where('is_actual', false)
+                                                    ->first();
+                                                $actual_itinerary = $itineraries
+                                                    ->where('user_id', $applicant->id)
+                                                    ->where('is_actual', true)
+                                                    ->first();
                                             @endphp
-                                            @if ($itinerary)
+                                            @if ($proposed_itinerary)
                                                 <div class="flex items-end space-x-2">
-                                                    <a class="font-semibold underline" href="{{ route('signatory.itinerary.show', ['itinerary' => $itinerary]) }}">View Itinerary</a>
-                                                    @if ($itinerary->approved_at)
-                                                        <span class="fon-semibold text-primary-600">Approved</span>
+                                                    <a class="font-semibold underline" href="{{ route('signatory.itinerary.show', ['itinerary' => $proposed_itinerary]) }}" target="_blank">View
+                                                        Proposed Itinerary</a>
+                                                    @if ($proposed_itinerary->approved_at)
+                                                        <span class="text-primary-600">Approved</span>
                                                     @else
-                                                        <x-filament-support::button size="sm" wire:target="approveItinerary({{ $itinerary->id }})"
-                                                                                    wire:click="approveItinerary({{ $itinerary->id }})">Approve</x-filament-support::button>
+                                                        <x-filament-support::button size="sm" wire:target="approveItinerary({{ $proposed_itinerary->id }})"
+                                                                                    wire:click="approveItinerary({{ $proposed_itinerary->id }})">Approve</x-filament-support::button>
                                                     @endif
                                                 </div>
                                             @else
                                                 <span class="font-semibold underline text-amber-600">No Itinerary Created</span>
+                                            @endif
+                                            @if ($actual_itinerary)
+                                                <div class="flex items-end space-x-2">
+                                                    <a class="font-semibold underline" href="{{ route('signatory.itinerary.show', ['itinerary' => $actual_itinerary]) }}" target="_blank">
+                                                        View Actual Itinerary</a>
+                                                    @if ($actual_itinerary->approved_at)
+                                                        <span class="text-primary-600">Approved</span>
+                                                    @else
+                                                        <span class="text-amber-600">Needs Approval</span>
+                                                    @endif
+                                                </div>
                                             @endif
                                         </li>
                                     @endforeach

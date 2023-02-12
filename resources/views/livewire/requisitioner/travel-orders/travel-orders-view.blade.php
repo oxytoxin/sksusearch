@@ -27,30 +27,56 @@
                         @endif
                         <p class="mt-1 text-sm text-primary-500">Purpose:</p>
                         <p class="mt-1 text-sm whitespace-pre-line text-primary-500">{{ $travel_order->purpose }}</p>
+                        @php
+                            $proposed_itinerary = $travel_order
+                                ->itineraries()
+                                ->whereIsActual(false)
+                                ->where('user_id', auth()->id())
+                                ->first();
+                            $actual_itinerary = $travel_order
+                                ->itineraries()
+                                ->whereIsActual(true)
+                                ->where('user_id', auth()->id())
+                                ->first();
+                        @endphp
 
-                        @if ($travel_order->itineraries()->firstWhere('user_id', auth()->id()))
-                            <a class="flex float-right px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
-                               href="{{ route('requisitioner.itinerary.show', ['itinerary' => $travel_order->itineraries()->firstWhere('user_id', auth()->id())]) }}" target="_blank">
-                                <svg class="w-5 h-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span class="pl-2">
-                                    View Itinerary
+                        <div class="gap-2 justify-end flex">
+                            @if ($proposed_itinerary)
+                                <a class="flex px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
+                                   href="{{ route('requisitioner.itinerary.show', ['itinerary' => $proposed_itinerary]) }}" target="_blank">
+                                    <svg class="w-5 h-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span class="pl-2">
+                                        View Proposed Itinerary
 
-                            </a>
-                        @else
-                            <a class="flex float-right px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
-                               href="{{ route('requisitioner.itinerary.create', ['travel_order' => $travel_order]) }}" target="_blank">
-                                <svg class="w-5 h-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span class="pl-2">
-                                    Create Itinerary
-                                </span>
-                            </a>
-                        @endif
+                                </a>
+                            @else
+                                <a class="flex px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
+                                   href="{{ route('requisitioner.itinerary.create', ['travel_order' => $travel_order]) }}" target="_blank">
+                                    <svg class="w-5 h-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="pl-2">
+                                        Create Itinerary
+                                    </span>
+                                </a>
+                            @endif
+                            @if ($actual_itinerary)
+                                <a class="flex px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
+                                   href="{{ route('requisitioner.itinerary.show', ['itinerary' => $actual_itinerary]) }}" target="_blank">
+                                    <svg class="w-5 h-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span class="pl-2">
+                                        View Actual Itinerary
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>

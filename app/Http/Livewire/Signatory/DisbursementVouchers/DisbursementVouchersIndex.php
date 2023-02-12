@@ -3,7 +3,9 @@
 namespace App\Http\Livewire\Signatory\DisbursementVouchers;
 
 use Livewire\Component;
+use App\Models\VoucherSubType;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use App\Models\DisbursementVoucher;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Layout;
@@ -16,6 +18,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 
@@ -87,6 +90,18 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     $record->update([
                         'current_step_id' => $record->current_step->next_step->id,
                     ]);
+                    if ($record->travel_order_id && in_array($record->voucher_subtype_id, [6, 7])) {
+                        $actual_itinerary = $record->travel_order?->itineraries()->whereIsActual(true)->first();
+                        if (!$actual_itinerary) {
+                            DB::rollBack();
+                            Notification::make()->title('Actual itinerary not found.')->warning()->send();
+                            return false;
+                        } else {
+                            $actual_itinerary->update([
+                                'approved_at' => now(),
+                            ]);
+                        }
+                    }
                 } else {
                     $record->update([
                         'current_step_id' => $record->previous_step_id,
@@ -102,6 +117,16 @@ class DisbursementVouchersIndex extends Component implements HasTable
             })
                 ->form(function () {
                     return [
+                        Placeholder::make('confirmation')
+                            ->label('Important!')
+                            ->content(
+                                function ($record) {
+                                    if (in_array($record->voucher_subtype_id, [6, 7]))
+                                        return new HtmlString("By forwarding this transaction, you are concurring in the contents of the Disbursement Voucher <br/>(including its supporting documents) and the related Actual Itinerary of Travel and are hereby approving the same.");
+                                    else
+                                        return new HtmlString("By forwarding this transaction, you are concurring in the contents of the Disbursement Voucher <br/>(including its supporting documents) and are hereby approving the same.");
+                                }
+                            ),
                         RichEditor::make('remarks')
                             ->label('Remarks (Optional)')
                             ->fileAttachmentsDisk('remarks'),
