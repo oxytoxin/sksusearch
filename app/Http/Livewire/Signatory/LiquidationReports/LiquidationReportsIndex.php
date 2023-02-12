@@ -24,7 +24,7 @@ class LiquidationReportsIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return LiquidationReport::whereSignatoryId(auth()->id())->latest('report_date');
+        return LiquidationReport::whereSignatoryId(auth()->id())->whereNull('cancelled_at')->latest('report_date');
     }
 
     protected function getTableColumns()
@@ -64,6 +64,18 @@ class LiquidationReportsIndex extends Component implements HasTable
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
+                if ($record->disbursement_voucher->travel_order_id) {
+                    $actual_itinerary = $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->first();
+                    if (!$actual_itinerary) {
+                        DB::rollBack();
+                        Notification::make()->title('Actual itinerary not found.')->warning()->send();
+                        return false;
+                    } else {
+                        $actual_itinerary->update([
+                            'approved_at' => now(),
+                        ]);
+                    }
+                }
                 if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
                     $record->update([
                         'signatory_date' => now(),
@@ -184,6 +196,11 @@ class LiquidationReportsIndex extends Component implements HasTable
                     ->modalContent(fn ($record) => view('components.liquidation_reports.liquidation-report-verified-documents', [
                         'liquidation_report' => $record,
                     ])),
+                ViewAction::make('actual_itinerary')
+                    ->label('Actual Itinerary')
+                    ->icon('ri-file-copy-line')
+                    ->url(fn ($record) => route('signatory.itinerary.print', ['itinerary' => $record->disbursement_voucher->travel_order->itineraries()->whereIsActual(true)->first()]), true)
+                    ->visible(fn ($record) => $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->exists()),
                 ViewAction::make('view')
                     ->label('Preview')
                     ->openUrlInNewTab()

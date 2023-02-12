@@ -9,7 +9,8 @@
                 <h3>Campus: {{ $petty_cash_fund->campus->name }}</h3>
             </div>
             <div class="space-y-2">
-                <h3>Remaining Balance: <span class="p-1 px-2 text-sm text-white rounded-full bg-primary-400">P{{ number_format($petty_cash_fund->latest_petty_cash_fund_record?->running_balance, 2) }}</span></h3>
+                <h3>Remaining Balance: <span
+                          class="p-1 px-2 text-sm text-white rounded-full bg-primary-400">P{{ number_format($petty_cash_fund->latest_petty_cash_fund_record?->running_balance, 2) }}</span></h3>
                 <h3>Voucher Limit: <span class="p-1 px-2 text-sm text-white rounded-full bg-primary-400">P{{ number_format($petty_cash_fund->voucher_limit, 2) }}</span></h3>
             </div>
         </div>
@@ -34,7 +35,9 @@
             mywindow.document.close();
             mywindow.focus();
 
-            mywindow.print();
+            setTimeout(() => {
+                mywindow.print();
+            }, 1000);
             return true;
         }
     </script>

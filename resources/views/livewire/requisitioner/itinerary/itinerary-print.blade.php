@@ -1,6 +1,6 @@
-<div class="p-8">
+<div class="p-8" x-data>
     <div class="flex justify-end w-full px-2">
-        <button class="flex px-4 py-2 text-center rounded-md bg-primary-700 text-primary-100 hover:bg-primary-900 hover:shadow-primary-600 hover:shadow-sm" onclick="printDiv('dvPrint')">
+        <button class="flex px-4 py-2 text-center rounded-md bg-primary-700 text-primary-100 hover:bg-primary-900 hover:shadow-primary-600 hover:shadow-sm" @click="printOut($refs.dvPrint.outerHTML)">
             <svg class="w-5 h-5 my-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round"
                       d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
@@ -8,7 +8,7 @@
             <span class="my-auto ml-2 text-sm">Print</span>
         </button>
     </div>
-    <div class="rounded-lg bg-white font-serif print:block print:h-[297mm] print:max-h-[297mm] print:w-[220mm] print:max-w-[220mm] print:rounded-none print:font-serif" id="dvPrint">
+    <div class="rounded-lg bg-white font-serif print:block print:h-[297mm] print:max-h-[297mm] print:w-[220mm] print:max-w-[220mm] print:rounded-none print:font-serif" x-ref="dvPrint">
         <div class="grid grid-cols-10 p-2 m-2 border-collapse print:text-12">
             <div class="col-span-10 text-center"><strong class="text-sm font-extrabold tracking-wide uppercase print:text-sm">Itinerary of Travel</strong>
             </div>
@@ -114,23 +114,23 @@
                         $per_diem = $coverage['per_diem'] + $per_diem;
                     @endphp
 
-                    @foreach ($itinerary->itinerary_entries as $entry)
-                        @if ($entry->date->format('Y-m-d') == $coverage['date'])
-                            <div class="col-span-1 px-2 py-1 border-r border-black">{{ $entry->date->format('M d, Y') }}
+                    @foreach ($itinerary_entries as $entry)
+                        @if ($entry->date?->format('Y-m-d') == $coverage['date'])
+                            <div class="col-span-1 px-2 py-1 border-r border-black">{{ $entry->date?->format('M d, Y') }}
                             </div>
                             <div class="col-span-2 px-2 py-1 border-r border-black">{{ $entry->place }}</div>
                             <div class="col-span-1 px-2 py-1 border-r border-black">
-                                {{ $entry->departure_time->format('g:i A') }}</div>
+                                {{ $entry->departure_time?->format('g:i A') }}</div>
                             <div class="col-span-1 px-2 py-1 border-r border-black">
-                                {{ $entry->arrival_time->format('g:i A') }}</div>
-                            <div class="col-span-1 px-2 py-1 border-r border-black">{{ $entry->mot->name }}</div>
+                                {{ $entry->arrival_time?->format('g:i A') }}</div>
+                            <div class="col-span-1 px-2 py-1 border-r border-black">{{ $entry->mot?->name }}</div>
                             <div class="col-span-1 px-2 py-1 text-right border-r border-black">
                                 {{ $entry->transportation_expenses }}</div>
                             <div class="col-span-1 px-2 py-1 text-right border-r border-black"></div>
                             <div class="col-span-1 px-2 py-1 text-right border-r border-black">{{ $entry->other_expenses }}
                             </div>
                             <div class="col-span-1 px-2 py-1 text-right">
-                                {{ $entry->itinerary->coverage[0]['per_diem'] + $entry->other_expenses + $entry->transportation_expenses }}
+                                {{ $itinerary->coverage[0]['per_diem'] + $entry->other_expenses + $entry->transportation_expenses }}
                             </div>
                             @php
                                 $trans_exp = $entry->transportation_expenses + $trans_exp;
@@ -185,13 +185,20 @@
     </div>
     @push('scripts')
         <script>
-            function printDiv(divName) {
-                var originalContents = document.body.innerHTML;
-                var element = document.getElementById("toPrint");
-                var printContents = document.getElementById(divName).innerHTML;
-                document.body.innerHTML = printContents;
-                window.print();
-                document.body.innerHTML = originalContents;
+            function printOut(data) {
+                var mywindow = window.open('', 'Print Itinerary', 'height=1000,width=1000');
+                mywindow.document.write('<html><head>');
+                mywindow.document.write('<title>Print Itinerary</title>');
+                mywindow.document.write(`<link rel="stylesheet" href="{{ Vite::asset('resources/css/app.css') }}" />`);
+                mywindow.document.write('</head><body >');
+                mywindow.document.write(data);
+                mywindow.document.write('</body></html>');
+                mywindow.document.close();
+                mywindow.focus();
+                setTimeout(() => {
+                    mywindow.print();
+                }, 1000);
+                return false;
             }
         </script>
     @endpush

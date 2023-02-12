@@ -8,7 +8,7 @@
             <x-filament::button @click="printOut($refs.printContainer.outerHTML);">Print</x-filament::button>
         </div>
     </div>
-    <div x-ref="printContainer" style="font-family: 'Times New Roman', Times, serif" class="p-4 mt-4 bg-white">
+    <div class="p-4 mt-4 bg-white" style="font-family: 'Times New Roman', Times, serif" x-ref="printContainer">
         <h1 class="text-lg font-semibold text-center">PETTY CASH FUND RECORD</h1>
         <div class="mt-8 font-bold">
             <h3>Entity Name: {{ $data['entity_name'] }}</h3>
@@ -54,16 +54,20 @@
                         @endphp
                         <tr class="border border-collapse border-black divide-x divide-black">
                             <td class="px-2 text-left whitespace-nowrap">{{ $record->created_at->format('m/d/Y') }}</td>
-                            <td class="px-2 text-left whitespace-nowrap">{{ $record->type == App\Models\PettyCashFundRecord::REPLENISHMENT ? $record->recordable->cheque_number : $record->recordable->pcv_number }}</td>
+                            <td class="px-2 text-left whitespace-nowrap">
+                                {{ $record->type == App\Models\PettyCashFundRecord::REPLENISHMENT ? $record->recordable->cheque_number : $record->recordable->pcv_number }}</td>
                             <td class="px-2 text-left whitespace-nowrap">{{ $record->recordable->payee }}</td>
                             <td class="px-2 text-left">{{ $record->nature_of_payment }}</td>
-                            <td class="px-2 text-right">{{ in_array($record->type, [App\Models\PettyCashFundRecord::REPLENISHMENT, App\Models\PettyCashFundRecord::REFUND]) ? number_format($record->amount, 2) : '' }}</td>
-                            <td class="px-2 text-right">{{ in_array($record->type, [App\Models\PettyCashFundRecord::DISBURSEMENT, App\Models\PettyCashFundRecord::REIMBURSEMENT]) ? number_format($record->amount, 2) : '' }}</td>
+                            <td class="px-2 text-right">
+                                {{ in_array($record->type, [App\Models\PettyCashFundRecord::REPLENISHMENT, App\Models\PettyCashFundRecord::REFUND]) ? number_format($record->amount, 2) : '' }}</td>
+                            <td class="px-2 text-right">
+                                {{ in_array($record->type, [App\Models\PettyCashFundRecord::DISBURSEMENT, App\Models\PettyCashFundRecord::REIMBURSEMENT]) ? number_format($record->amount, 2) : '' }}
+                            </td>
                             <td class="px-2 text-right">{{ number_format($record->running_balance, 2) }}</td>
                         </tr>
                     @empty
                         <tr class="border border-collapse border-black divide-x divide-black">
-                            <td colspan="7" class="px-2 text-center">No records found.</td>
+                            <td class="px-2 text-center" colspan="7">No records found.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -72,7 +76,8 @@
                 <h4 class="text-xl font-bold">CERTIFICATION</h4>
                 <p>I hereby certify that the foregoing is a correct and complete record of all cash advances received and disbursements made by me in my capacity as Petty Cash Fund Custodian of
                     <span class="px-4 border-b border-black">{{ $petty_cash_fund->campus->name }} Campus</span> during the period from
-                    <span class="px-4 border-b border-black">{{ date_format(date_create($data['date_from']), 'm/d/Y') }}</span> to <span class="px-4 border-b border-black">{{ date_format(date_create($data['date_to']), 'm/d/Y') }}</span>, inclusive,
+                    <span class="px-4 border-b border-black">{{ date_format(date_create($data['date_from']), 'm/d/Y') }}</span> to <span
+                          class="px-4 border-b border-black">{{ date_format(date_create($data['date_to']), 'm/d/Y') }}</span>, inclusive,
                     as indicated in the corresponding columns.
                 </p>
                 <div class="flex flex-col items-center mt-16 space-y-8">
@@ -101,8 +106,9 @@
 
             mywindow.document.close();
             mywindow.focus();
-
-            mywindow.print();
+            setTimeout(() => {
+                mywindow.print();
+            }, 1000);
             return true;
         }
     </script>

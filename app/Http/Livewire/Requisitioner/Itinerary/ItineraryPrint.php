@@ -9,6 +9,7 @@ use Livewire\Component;
 class ItineraryPrint extends Component
 {
     public Itinerary $itinerary;
+    public $itinerary_entries;
     public $travel_order;
     public $coverage;
     public $immediate_signatory;
@@ -18,6 +19,7 @@ class ItineraryPrint extends Component
         $this->travel_order = $this->itinerary->travel_order;
         $this->coverage = $this->itinerary->coverage;
         $this->itinerary->load('user.employee_information');
+        $this->itinerary_entries = $this->itinerary->itinerary_entries;
         $this->immediate_signatory = $this->itinerary->travel_order->signatories()->with('employee_information')->first();
     }
 
