@@ -2,35 +2,45 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
+use Str;
+use App\Models\Mop;
+use App\Models\Mot;
+use App\Models\Vehicle;
+use Livewire\Component;
+use App\Models\WaterMeter;
+use App\Models\TravelOrder;
+use App\Models\VoucherSubType;
+use Illuminate\Support\Carbon;
+use App\Models\TravelOrderType;
+use App\Models\ElectricityMeter;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
+use App\Forms\Components\Flatpickr;
 use App\Models\DisbursementVoucher;
 use App\Models\EmployeeInformation;
-use App\Models\Mop;
-use App\Models\ElectricityMeter;
-use App\Models\WaterMeter;
-use App\Models\Vehicle;
-use App\Models\TelephoneAccountNumber;
-use App\Models\InternetAccountNumber;
-use App\Models\TravelOrder;
-use App\Models\TravelOrderType;
-use App\Models\VoucherSubType;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Repeater;
+use App\Models\InternetAccountNumber;
+use App\Models\Itinerary;
+use App\Models\ItineraryEntry;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Wizard;
+use App\Models\TelephoneAccountNumber;
+use Filament\Forms\Components\Builder;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ViewField;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\HtmlString;
-use Livewire\Component;
-use Str;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Wizard\Step;
+use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Concerns\InteractsWithForms;
 
 class DisbursementVouchersCreate extends Component implements HasForms
 {
@@ -72,7 +82,6 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public $telephone_amount;
 
-
     public $internet_utility_particulars = [];
 
     public $internet_account_number;
@@ -84,6 +93,8 @@ class DisbursementVouchersCreate extends Component implements HasForms
     public $travel_order_id;
 
     public $disbursement_voucher_particulars = [];
+
+    public $itinerary_entries = [];
 
     public $payee;
 
@@ -130,7 +141,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     $to = TravelOrder::find($state);
                                     if ($to && $to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                         $itinerary = $to->itineraries()->whereUserId(auth()->id())->first();
-
+                                        $this->generateItineraryEntries($itinerary, $to);
                                         $amount = $to->registration_amount;
                                         foreach ($itinerary['coverage'] as $entry) {
                                             $amount += $entry['total_expenses'];
@@ -147,7 +158,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     } else {
                                         $set('disbursement_voucher_particulars', [
                                             [
-                                                'purpose' => '',
+                                                'purpose' => $to->purpose,
                                                 'responsibility_center' => '',
                                                 'mfo_pap' => '',
                                                 'amount' => 0,
@@ -182,8 +193,8 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->label('Mode of Payment')
                                     ->options(Mop::pluck('name', 'id')),
                             ]),
+                            #region Utilities
                             //Electricity, Water, Fuel (start)
-
                             Repeater::make('electricity_utility_particulars')
                                 ->columns(5)
                                 ->schema([
@@ -606,6 +617,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         }),
                                 ])->createItemButtonLabel('Add New Row')->visible(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71, 74, 75])),
                             //Electricity, Water, Fuel (end)
+                            #endregion
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
                                     Textarea::make('purpose')
@@ -618,6 +630,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             ->reactive()
                                             ->numeric()
                                             ->minValue(1)
+                                            ->disabled(fn () => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
                                             ->required(),
                                     ]),
                                 ])
@@ -626,7 +639,76 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
                                 ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS)),
                         ]),
+
+                        Section::make('Actual Itinerary')
+                            ->visible(fn () => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && in_array($this->voucher_subtype->id, [6, 7]))
+                            ->schema([
+                                Card::make([
+                                    Placeholder::make('travel_order_details')
+                                        ->content(fn () => view('components.travel_orders.travel-order-details', [
+                                            'travel_order' => TravelOrder::find($this->travel_order_id),
+                                            'itinerary_entries' => $this->itinerary_entries ?? [],
+                                        ])),
+                                ]),
+                                Builder::make('itinerary_entries')
+                                    ->blocks([
+                                        Block::make('new_entry')->schema([
+                                            Grid::make(2)->schema([
+                                                Fieldset::make('Coverage')->schema([
+                                                    Flatpickr::make('date')
+                                                        ->disableTime()
+                                                        ->required()
+                                                        ->disabled()
+                                                        ->columnSpan(1),
+                                                    Grid::make([
+                                                        'sm' => 4,
+                                                        'md' => 4,
+                                                    ])
+                                                        ->schema([
+                                                            Toggle::make('breakfast')->inline(false)->reactive()->columnSpan(1),
+                                                            Toggle::make('lunch')->inline(false)->reactive()->columnSpan(1),
+                                                            Toggle::make('dinner')->inline(false)->reactive()->columnSpan(1),
+                                                            Toggle::make('lodging')->inline(false)->reactive()->columnSpan(1),
+                                                        ])->columnSpan(1),
+                                                ])->columnSpan(1),
+                                                Fieldset::make('Total Amount')->schema([
+                                                    Toggle::make('has_per_diem')
+                                                        ->label('Has Per Diem')
+                                                        ->reactive(),
+                                                    TextInput::make('per_diem')->disabled(),
+                                                    TextInput::make('total_expenses')->disabled()->default(0),
+                                                ])->columns(1)->columnSpan(1),
+                                            ]),
+                                            Repeater::make('itinerary_entries')->schema([
+                                                Grid::make([
+                                                    'sm' => 1,
+                                                    'md' => 2,
+                                                    'lg' => 6,
+                                                ])
+                                                    ->schema([
+                                                        Select::make('mot_id')
+                                                            ->options(Mot::pluck('name', 'id'))
+                                                            ->label('Mode of Transport')
+                                                            ->required(),
+                                                        TextInput::make('place')->required(),
+                                                        Flatpickr::make('departure_time')
+                                                            ->disableDate()
+                                                            ->required(),
+                                                        Flatpickr::make('arrival_time')
+                                                            ->disableDate()
+                                                            ->afterOrEqual('departure_time')
+                                                            ->required(),
+                                                        TextInput::make('transportation_expenses')
+                                                            ->label('Transportation')->default(0)->required()->numeric()->reactive(),
+                                                        TextInput::make('other_expenses')
+                                                            ->label('Others')->default(0)->numeric()->reactive(),
+                                                    ])
+                                            ]),
+                                        ]),
+                                    ]),
+                            ]),
                     ]),
+                ...$this->itinerarySection(),
                 Step::make('Review Related Documents')
                     ->description('Ensure all the required documents are complete before proceeding.')
                     ->schema([
@@ -657,7 +739,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ViewField::make('voucher_preview')->label('Voucher Preview')->view('components.forms.voucher-preview'),
                             ]),
                     ]),
-            ])->submitAction(new HtmlString(view('components.forms.save-button'))),
+            ])->submitAction(new HtmlString(view('components.forms.save-button')->render())),
         ];
     }
 
@@ -665,6 +747,41 @@ class DisbursementVouchersCreate extends Component implements HasForms
     {
         $this->validate();
         DB::beginTransaction();
+        if (TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+            $coverage = [];
+            foreach ($this->itinerary_entries as $entry) {
+                $coverage[] = [
+                    'date' => $entry['data']['date'],
+                    'per_diem' => $entry['data']['per_diem'],
+                    'total_expenses' => $entry['data']['total_expenses'],
+                    'breakfast' => $entry['data']['breakfast'],
+                    'lunch' => $entry['data']['lunch'],
+                    'dinner' => $entry['data']['dinner'],
+                    'lodging' => $entry['data']['lodging'],
+                ];
+            }
+
+            $itinerary = Itinerary::create([
+                'is_actual' => true,
+                'user_id' => auth()->id(),
+                'travel_order_id' => $this->travel_order_id,
+                'coverage' => $coverage,
+            ]);
+
+            foreach ($this->itinerary_entries as $itinerary_entry) {
+                foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
+                    $itinerary->itinerary_entries()->create([
+                        'date' => $itinerary_entry['data']['date'],
+                        'mot_id' => $entry['mot_id'],
+                        'place' => $entry['place'],
+                        'departure_time' => $entry['departure_time'],
+                        'arrival_time' => $entry['arrival_time'],
+                        'transportation_expenses' => $entry['transportation_expenses'],
+                        'other_expenses' => $entry['other_expenses'],
+                    ]);
+                }
+            }
+        }
         if ($this->voucher_subtype->id == 27) {
             $other_details = [
                 'type' => 'Electricity',
@@ -717,6 +834,68 @@ class DisbursementVouchersCreate extends Component implements HasForms
         return redirect()->route('requisitioner.disbursement-vouchers.index');
     }
 
+    private function itinerarySection()
+    {
+        if (!in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
+            return [];
+        else
+            return [
+                Step::make(in_array($this->voucher_subtype->id, [6, 7]) ? 'Print Actual Itinerary' : 'Print Itinerary')
+                    ->schema([
+                        Card::make()
+                            ->schema([
+                                Placeholder::make('actual_itinerary')
+                                    ->content(
+                                        function () {
+                                            if (TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+                                                $coverage = [];
+                                                $to = TravelOrder::find($this->travel_order_id);
+                                                foreach ($this->itinerary_entries as $entry) {
+                                                    $coverage[] = [
+                                                        'date' => $entry['data']['date'],
+                                                        'per_diem' => $entry['data']['per_diem'],
+                                                        'total_expenses' => $entry['data']['total_expenses'],
+                                                        'breakfast' => $entry['data']['breakfast'],
+                                                        'lunch' => $entry['data']['lunch'],
+                                                        'dinner' => $entry['data']['dinner'],
+                                                        'lodging' => $entry['data']['lodging'],
+                                                    ];
+                                                }
+                                                $itinerary = Itinerary::make([
+                                                    'is_actual' => true,
+                                                    'user_id' => auth()->id(),
+                                                    'travel_order_id' => $this->travel_order_id,
+                                                    'coverage' => $coverage,
+                                                ]);
+                                                $itinerary_entries = [];
+                                                foreach ($this->itinerary_entries as $itinerary_entry) {
+                                                    foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
+                                                        $itinerary_entries[] = ItineraryEntry::make([
+                                                            'date' => $itinerary_entry['data']['date'],
+                                                            'mot_id' => $entry['mot_id'],
+                                                            'place' => $entry['place'],
+                                                            'departure_time' => $entry['departure_time'],
+                                                            'arrival_time' => $entry['arrival_time'],
+                                                            'transportation_expenses' => $entry['transportation_expenses'],
+                                                            'other_expenses' => $entry['other_expenses'],
+                                                        ]);
+                                                    }
+                                                }
+                                                return view('livewire.requisitioner.itinerary.itinerary-print', [
+                                                    'itinerary' => $itinerary,
+                                                    'itinerary_entries' => $itinerary_entries,
+                                                    'travel_order' => $to,
+                                                    'immediate_signatory' => $to?->signatories()->with('employee_information')->first(),
+                                                ]);
+                                            }
+                                            return new HtmlString('Itinerary not required by this disbursement voucher.');
+                                        }
+                                    )->disableLabel()
+                            ])
+                    ])
+            ];
+    }
+
     public function mount()
     {
         $this->tracking_number = DisbursementVoucher::generateTrackingNumber();
@@ -726,5 +905,45 @@ class DisbursementVouchersCreate extends Component implements HasForms
     public function render()
     {
         return view('livewire.requisitioner.disbursement-vouchers.disbursement-vouchers-create');
+    }
+
+    private function generateItineraryEntries($old_itinerary, $travel_order)
+    {
+        $entries = [];
+        $itinerary_entries = $old_itinerary->itinerary_entries;
+        $original_per_diem = $travel_order->philippine_region?->dte->amount ?? 0;
+        foreach ($old_itinerary->coverage as $key => $coverage) {
+            if ($travel_order->date_to == Carbon::make($coverage['date'])) {
+                $original_per_diem /= 2;
+            }
+            $daily_entries = $itinerary_entries->where('date', Carbon::make($coverage['date']));
+            $daily_itinerary_entries = [];
+            foreach ($daily_entries as $k => $entry) {
+                $daily_itinerary_entries[] =  [
+                    'mot_id' => $entry->mot_id,
+                    'place' => $entry->place,
+                    'departure_time' => $entry->departure_time,
+                    'arrival_time' => $entry->arrival_time,
+                    'transportation_expenses' => $entry->transportation_expenses,
+                    'other_expenses' => $entry->other_expenses,
+                ];
+            }
+            $entries[Str::uuid()->toString()] = [
+                'type' => 'new_entry',
+                'data' => [
+                    'date' => $coverage['date'],
+                    'per_diem' => $coverage['per_diem'],
+                    'original_per_diem' => $original_per_diem,
+                    'has_per_diem' => $coverage['per_diem'] > 0,
+                    'total_expenses' => $coverage['total_expenses'],
+                    'breakfast' => $coverage['breakfast'],
+                    'lunch' => $coverage['lunch'],
+                    'dinner' => $coverage['dinner'],
+                    'lodging' => $coverage['lodging'],
+                    'itinerary_entries' => $daily_itinerary_entries,
+                ],
+            ];
+        }
+        $this->itinerary_entries = $entries;
     }
 }

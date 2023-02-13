@@ -133,8 +133,10 @@ class TravelOrdersCreate extends Component implements HasForms
                 $to->signatories()->sync($this->signatories);
                 DB::commit();
                 Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
-
-                return redirect()->route('requisitioner.itinerary.create', ['travel_order' => $to]);
+                if ($to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
+                    return redirect()->route('requisitioner.itinerary.create', ['travel_order' => $to]);
+                else
+                    return redirect()->route('requisitioner.travel-orders.index');
             }
         } else {
             Notification::make()->title('Operation Failed')->body('Travel Order applicants must include you.')->danger()->send();

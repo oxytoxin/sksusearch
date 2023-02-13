@@ -31,6 +31,11 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
     protected function getTableActions()
     {
         return [
+            // Action::make('cancel')
+            //     ->icon('heroicon-o-x-circle')
+            //     ->button()
+            //     ->color('danger')
+            //     ->action(fn (TravelOrder $record) => $record->applicants()->detach(auth()->id())),
             Action::make('view')
                 ->url(fn (TravelOrder $record): string => route('requisitioner.travel-orders.view', $record))
                 ->icon('heroicon-o-eye'),

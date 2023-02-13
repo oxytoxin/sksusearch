@@ -85,6 +85,18 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                     $record->update([
                         'current_step_id' => $record->current_step->next_step->id,
                     ]);
+                    if ($record->travel_order_id && in_array($record->voucher_subtype_id, [6, 7])) {
+                        $actual_itinerary = $record->travel_order?->itineraries()->whereIsActual(true)->first();
+                        if (!$actual_itinerary) {
+                            DB::rollBack();
+                            Notification::make()->title('Actual itinerary not found.')->warning()->send();
+                            return false;
+                        } else {
+                            $actual_itinerary->update([
+                                'approved_at' => now(),
+                            ]);
+                        }
+                    }
                 } else {
                     $record->update([
                         'current_step_id' => $record->previous_step_id,

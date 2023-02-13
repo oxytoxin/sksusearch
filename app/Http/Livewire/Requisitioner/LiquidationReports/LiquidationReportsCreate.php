@@ -23,6 +23,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
 use App\Forms\Components\SlimRepeater;
 use App\Models\Itinerary;
+use App\Models\ItineraryEntry;
 use Carbon\Carbon;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Contracts\HasForms;
@@ -73,7 +74,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                                 ->afterStateUpdated(function ($set, $state) {
                                     $this->disbursement_voucher = DisbursementVoucher::with('travel_order')->withSum('disbursement_voucher_particulars as total_amount', 'final_amount')->find($state);
                                     if ($this->disbursement_voucher) {
-                                        if ($this->disbursement_voucher->travel_order) {
+                                        if ($this->disbursement_voucher->travel_order &&  $this->disbursement_voucher->travel_order->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                             $this->generateItineraryEntries($this->disbursement_voucher->travel_order->itineraries()->firstWhere('user_id', auth()->id()));
                                         }
                                         $set('signatory_id', $this->disbursement_voucher->signatory_id);
@@ -119,7 +120,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                             ->columns(2)
                             ->visible(fn () => $this->disbursement_voucher),
                         Section::make('Actual Itinerary')
-                            ->visible(fn () => $this->disbursement_voucher?->travel_order_id)
+                            ->visible(fn () => $this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
                             ->schema([
                                 Card::make([
                                     Placeholder::make('travel_order_details')
@@ -128,64 +129,66 @@ class LiquidationReportsCreate extends Component implements HasForms
                                             'itinerary_entries' => $this->data['itinerary_entries'] ?? [],
                                         ])),
                                 ]),
-                                Builder::make('itinerary_entries')->blocks([
-                                    Block::make('new_entry')->schema([
-                                        Grid::make(2)->schema([
-                                            Fieldset::make('Coverage')->schema([
-                                                Flatpickr::make('date')
-                                                    ->disableTime()
-                                                    ->required()
-                                                    ->disabled()
-                                                    ->columnSpan(1),
+                                Builder::make('itinerary_entries')
+                                    ->blocks([
+                                        Block::make('new_entry')->schema([
+                                            Grid::make(2)->schema([
+                                                Fieldset::make('Coverage')->schema([
+                                                    Flatpickr::make('date')
+                                                        ->disableTime()
+                                                        ->required()
+                                                        ->disabled()
+                                                        ->columnSpan(1),
+                                                    Grid::make([
+                                                        'sm' => 4,
+                                                        'md' => 4,
+                                                    ])
+                                                        ->schema([
+                                                            Toggle::make('breakfast')->inline(false)->reactive()->columnSpan(1),
+                                                            Toggle::make('lunch')->inline(false)->reactive()->columnSpan(1),
+                                                            Toggle::make('dinner')->inline(false)->reactive()->columnSpan(1),
+                                                            Toggle::make('lodging')->inline(false)->reactive()->columnSpan(1),
+                                                        ])->columnSpan(1),
+                                                ])->columnSpan(1),
+                                                Fieldset::make('Total Amount')->schema([
+                                                    Toggle::make('has_per_diem')
+                                                        ->label('Has Per Diem')
+                                                        ->reactive(),
+                                                    TextInput::make('per_diem')->disabled(),
+                                                    TextInput::make('total_expenses')->disabled()->default(0),
+                                                ])->columns(1)->columnSpan(1),
+                                            ]),
+                                            Repeater::make('itinerary_entries')->schema([
                                                 Grid::make([
-                                                    'sm' => 4,
-                                                    'md' => 4,
+                                                    'sm' => 1,
+                                                    'md' => 2,
+                                                    'lg' => 6,
                                                 ])
                                                     ->schema([
-                                                        Toggle::make('breakfast')->inline(false)->reactive()->columnSpan(1),
-                                                        Toggle::make('lunch')->inline(false)->reactive()->columnSpan(1),
-                                                        Toggle::make('dinner')->inline(false)->reactive()->columnSpan(1),
-                                                        Toggle::make('lodging')->inline(false)->reactive()->columnSpan(1),
-                                                    ])->columnSpan(1),
-                                            ])->columnSpan(1),
-                                            Fieldset::make('Total Amount')->schema([
-                                                Toggle::make('has_per_diem')
-                                                    ->label('Has Per Diem')
-                                                    ->reactive(),
-                                                TextInput::make('per_diem')->disabled(),
-                                                TextInput::make('total_expenses')->disabled()->default(0),
-                                            ])->columns(1)->columnSpan(1),
-                                        ]),
-                                        Repeater::make('itinerary_entries')->schema([
-                                            Grid::make([
-                                                'sm' => 1,
-                                                'md' => 2,
-                                                'lg' => 6,
-                                            ])
-                                                ->schema([
-                                                    Select::make('mot_id')
-                                                        ->options(Mot::pluck('name', 'id'))
-                                                        ->label('Mode of Transport')
-                                                        ->required(),
-                                                    TextInput::make('place')->required(),
-                                                    Flatpickr::make('departure_time')
-                                                        ->disableDate()
-                                                        ->required(),
-                                                    Flatpickr::make('arrival_time')
-                                                        ->disableDate()
-                                                        ->afterOrEqual('departure_time')
-                                                        ->required(),
-                                                    TextInput::make('transportation_expenses')
-                                                        ->label('Transportation')->default(0)->required()->numeric()->reactive(),
-                                                    TextInput::make('other_expenses')
-                                                        ->label('Others')->default(0)->numeric()->reactive(),
-                                                ])
+                                                        Select::make('mot_id')
+                                                            ->options(Mot::pluck('name', 'id'))
+                                                            ->label('Mode of Transport')
+                                                            ->required(),
+                                                        TextInput::make('place')->required(),
+                                                        Flatpickr::make('departure_time')
+                                                            ->disableDate()
+                                                            ->required(),
+                                                        Flatpickr::make('arrival_time')
+                                                            ->disableDate()
+                                                            ->afterOrEqual('departure_time')
+                                                            ->required(),
+                                                        TextInput::make('transportation_expenses')
+                                                            ->label('Transportation')->default(0)->required()->numeric()->reactive(),
+                                                        TextInput::make('other_expenses')
+                                                            ->label('Others')->default(0)->numeric()->reactive(),
+                                                    ])
+                                            ]),
                                         ]),
                                     ]),
-                                ]),
                             ]),
                     ]),
-                Step::make('Refund/Reimbursement')
+                ...$this->itinerarySection(),
+                Step::make('Refund / Reimbursement')
                     ->schema([
                         Placeholder::make('gross_amount')
                             ->view('components.liquidation_reports.liquidation-details')
@@ -201,13 +204,14 @@ class LiquidationReportsCreate extends Component implements HasForms
                             ->columns(1)
                             ->visible(function ($get) {
                                 try {
-                                    if ($this->disbursement_voucher?->travel_order_id) {
+                                    if ($this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                         $expenses = collect($this->data['itinerary_entries'])->sum('data.total_expenses');
                                         return $this->disbursement_voucher && $expenses < $this->disbursement_voucher->total_amount;
                                     }
                                     $particulars = collect($this->data['particulars']);
                                     return $this->disbursement_voucher && $particulars->sum('amount') < $this->disbursement_voucher->total_amount;
                                 } catch (\Throwable $th) {
+                                    return false;
                                 }
                             }),
                         Fieldset::make('Reimbursement')
@@ -229,13 +233,14 @@ class LiquidationReportsCreate extends Component implements HasForms
                                     $particulars = collect($this->data['particulars']);
                                     return $this->disbursement_voucher && $particulars->sum('amount') > $this->disbursement_voucher->total_amount;
                                 } catch (\Throwable $th) {
+                                    return false;
                                 }
                             }),
                     ])
                     ->afterValidation(function () {
                         $particulars = collect($this->data['particulars']);
                         $refund_particulars = collect($this->data['refund_particulars']);
-                        $cheque_amount = $this->disbursement_voucher->total_suggested_amount > 0 ? $this->disbursement_voucher->total_suggested_amount : $this->disbursement_voucher->total_amount;
+                        $cheque_amount = $this->disbursement_voucher->total_amount;
                         if ($cheque_amount > $particulars->sum('amount')) {
                             if (($refund_particulars->sum('amount') ?? 0) != ($cheque_amount - $particulars->sum('amount') ?? 0)) {
                                 Notification::make()->title('Refund Error')->body('Refunded amount must be equal to the amount to be refunded.')->danger()->send();
@@ -247,7 +252,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                     }),
                 Step::make('Related Documents')
                     ->schema([
-                        Placeholder::make('preview')
+                        Placeholder::make('related_documents')
                             ->disableLabel()
                             ->content(fn ($record) => view('components.liquidation_reports.related-documents', [
                                 'voucher_subtype' => $this->disbursement_voucher?->voucher_subtype
@@ -256,8 +261,11 @@ class LiquidationReportsCreate extends Component implements HasForms
                     ]),
                 Step::make('Preview')
                     ->schema([
-                        Placeholder::make('related_documents')
-                            ->view('components.liquidation_reports.liquidation-report-preview')
+                        Placeholder::make('preview')
+                            ->disableLabel()
+                            ->content(function () {
+                                return view('components.liquidation_reports.liquidation-report-preview');
+                            })
                     ])
             ])->submitAction(new HtmlString(view('components.forms.save-button')->render()))
         ];
@@ -273,8 +281,8 @@ class LiquidationReportsCreate extends Component implements HasForms
         $this->form->fill();
         $this->data['refund_particulars'] = [];
         if (request('disbursement_voucher')) {
-            $dv = DisbursementVoucher::with('travel_order')->withSum('disbursement_voucher_particulars as total_amount', 'final_amount')->findOrFail(request('disbursement_voucher'));
-            if ($dv->user_id != auth()->id()) {
+            $dv = DisbursementVoucher::with('travel_order')->withSum('disbursement_voucher_particulars as total_amount', 'final_amount')->whereRelation('voucher_subtype', 'voucher_type_id', 1)->findOrFail(request('disbursement_voucher'));
+            if ($dv->user_id != auth()->id() || $dv->liquidation_report()->whereNull('cancelled_at')->exists()) {
                 abort(403);
             }
             $this->disbursement_voucher = $dv;
@@ -293,7 +301,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                 ]);
             }
             $this->data['particulars'] = $particulars->toArray();
-            if ($dv->travel_order_id) {
+            if ($dv->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                 $this->generateItineraryEntries($dv->travel_order->itineraries()->firstWhere('user_id', auth()->id()));
             }
         }
@@ -301,9 +309,9 @@ class LiquidationReportsCreate extends Component implements HasForms
 
     public function render()
     {
-        if ($this->disbursement_voucher?->travel_order_id) {
+        if ($this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
             foreach ($this->data['itinerary_entries'] as  $key => $entry) {
-                $original_per_diem = $entry['data']['original_per_diem'];
+                $original_per_diem = $entry['data']['original_per_diem'] ?? $this->disbursement_voucher->travel_order->philippine_region->dte->amount;
                 $per_diem = $original_per_diem;
                 if (!$entry['data']['has_per_diem']) {
                     $per_diem = 0;
@@ -340,7 +348,7 @@ class LiquidationReportsCreate extends Component implements HasForms
     {
         $this->form->validate();
         DB::beginTransaction();
-        if ($this->disbursement_voucher->travel_order_id) {
+        if ($this->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
             $coverage = [];
             foreach ($this->data['itinerary_entries'] as $entry) {
                 $coverage[] = [
@@ -397,11 +405,69 @@ class LiquidationReportsCreate extends Component implements HasForms
         return redirect()->route('requisitioner.liquidation-reports.index');
     }
 
+    private function itinerarySection()
+    {
+        if (!in_array($this->disbursement_voucher?->voucher_subtype->id, [1, 2]))
+            return [];
+        else
+            return [
+                Step::make('Print Actual Itinerary')
+                    ->schema([
+                        Placeholder::make('actual_itinerary')
+                            ->content(
+                                function () {
+                                    if ($this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+                                        $coverage = [];
+                                        foreach ($this->data['itinerary_entries'] as $entry) {
+                                            $coverage[] = [
+                                                'date' => $entry['data']['date'],
+                                                'per_diem' => $entry['data']['per_diem'],
+                                                'total_expenses' => $entry['data']['total_expenses'],
+                                                'breakfast' => $entry['data']['breakfast'],
+                                                'lunch' => $entry['data']['lunch'],
+                                                'dinner' => $entry['data']['dinner'],
+                                                'lodging' => $entry['data']['lodging'],
+                                            ];
+                                        }
+                                        $itinerary = Itinerary::make([
+                                            'is_actual' => true,
+                                            'user_id' => auth()->id(),
+                                            'travel_order_id' => $this->disbursement_voucher->travel_order_id,
+                                            'coverage' => $coverage,
+                                        ]);
+                                        $itinerary_entries = [];
+                                        foreach ($this->data['itinerary_entries'] as $itinerary_entry) {
+                                            foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
+                                                $itinerary_entries[] = ItineraryEntry::make([
+                                                    'date' => $itinerary_entry['data']['date'],
+                                                    'mot_id' => $entry['mot_id'],
+                                                    'place' => $entry['place'],
+                                                    'departure_time' => $entry['departure_time'],
+                                                    'arrival_time' => $entry['arrival_time'],
+                                                    'transportation_expenses' => $entry['transportation_expenses'],
+                                                    'other_expenses' => $entry['other_expenses'],
+                                                ]);
+                                            }
+                                        }
+                                        return view('livewire.requisitioner.itinerary.itinerary-print', [
+                                            'itinerary' => $itinerary,
+                                            'itinerary_entries' => $itinerary_entries,
+                                            'travel_order' => $this->disbursement_voucher?->travel_order,
+                                            'immediate_signatory' => $this->disbursement_voucher?->travel_order?->signatories()->with('employee_information')->first(),
+                                        ]);
+                                    }
+                                    return new HtmlString('Itinerary not required by this liquidation report.');
+                                }
+                            )->disableLabel()
+                    ])
+            ];
+    }
+
     private function generateItineraryEntries($old_itinerary)
     {
         $entries = [];
         $itinerary_entries = $old_itinerary->itinerary_entries;
-        $original_per_diem = $this->disbursement_voucher->travel_order->philippine_region->dte->amount;
+        $original_per_diem = $this->disbursement_voucher->travel_order->philippine_region?->dte->amount ?? 0;
         foreach ($old_itinerary->coverage as $key => $coverage) {
             if ($this->disbursement_voucher->travel_order->date_to == Carbon::make($coverage['date'])) {
                 $original_per_diem /= 2;
@@ -418,7 +484,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                     'other_expenses' => $entry->other_expenses,
                 ];
             }
-            $entries[] = [
+            $entries[Str::uuid()->toString()] = [
                 'type' => 'new_entry',
                 'data' => [
                     'date' => $coverage['date'],

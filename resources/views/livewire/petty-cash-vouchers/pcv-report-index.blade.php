@@ -8,7 +8,7 @@
             <x-filament::button @click="printOut($refs.printContainer.outerHTML);">Print</x-filament::button>
         </div>
     </div>
-    <div x-ref="printContainer" style="font-family: 'Times New Roman', Times, serif" class="p-4 mt-4 bg-white">
+    <div class="p-4 mt-4 bg-white" style="font-family: 'Times New Roman', Times, serif" x-ref="printContainer">
         <h1 class="text-lg font-semibold text-center">Report On Paid Petty Cash Vouchers</h1>
         <h3 class="text-sm font-bold text-center">Period Covered: {{ date_format(date_create($data['date_from']), 'm/d/Y') }} - {{ date_format(date_create($data['date_to']), 'm/d/Y') }}</h3>
         <div class="flex justify-between mt-8 text-sm font-bold">
@@ -45,7 +45,7 @@
                         </tr>
                     @empty
                         <tr class="border border-collapse border-black divide-x divide-black">
-                            <td colspan="4" class="px-2 max-w-[4rem] text-center">No records found.</td>
+                            <td class="px-2 max-w-[4rem] text-center" colspan="4">No records found.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -78,8 +78,9 @@
 
             mywindow.document.close();
             mywindow.focus();
-
-            mywindow.print();
+            setTimeout(() => {
+                mywindow.print();
+            }, 1000);
             return true;
         }
     </script>

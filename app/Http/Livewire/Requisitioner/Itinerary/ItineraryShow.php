@@ -12,12 +12,16 @@ class ItineraryShow extends Component
     public $travel_order;
     public $coverage;
     public $purpose;
+    public $print_route;
+    public $is_requisitioner;
 
     public function mount()
     {
         $this->travel_order = $this->itinerary->travel_order;
         $this->coverage = $this->itinerary->coverage;
         $this->purpose = $this->itinerary->purpose != null ? $this->itinerary->purpose : '';
+        $this->is_requisitioner = str_replace('/', '', request()->route()->getPrefix()) == 'requisitioner';
+        $this->print_route = route(str_replace('/', '', request()->route()->getPrefix()) . '.itinerary.print', ['itinerary' => $this->itinerary]);
     }
     public function render()
     {

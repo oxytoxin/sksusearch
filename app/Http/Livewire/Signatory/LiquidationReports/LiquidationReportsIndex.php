@@ -9,6 +9,9 @@ use Filament\Tables\Actions\Action;
 use App\Models\LiquidationReportStep;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
+use App\Models\TravelOrderType;
+use App\Models\VoucherSubType;
+use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
@@ -16,6 +19,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Illuminate\Support\HtmlString;
 
 class LiquidationReportsIndex extends Component implements HasTable
 {
@@ -24,7 +28,7 @@ class LiquidationReportsIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return LiquidationReport::whereSignatoryId(auth()->id())->latest('report_date');
+        return LiquidationReport::whereSignatoryId(auth()->id())->whereNull('cancelled_at')->latest('report_date');
     }
 
     protected function getTableColumns()
@@ -64,6 +68,18 @@ class LiquidationReportsIndex extends Component implements HasTable
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
+                if ($record->disbursement_voucher->travel_order_id) {
+                    $actual_itinerary = $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->first();
+                    if (!$actual_itinerary) {
+                        DB::rollBack();
+                        Notification::make()->title('Actual itinerary not found.')->warning()->send();
+                        return false;
+                    } else {
+                        $actual_itinerary->update([
+                            'approved_at' => now(),
+                        ]);
+                    }
+                }
                 if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
                     $record->update([
                         'signatory_date' => now(),
@@ -85,6 +101,14 @@ class LiquidationReportsIndex extends Component implements HasTable
             })
                 ->form(function () {
                     return [
+                        Placeholder::make('confirmation')
+                            ->label('Important!')
+                            ->content(
+                                fn ($record) => in_array($record->disbursement_voucher->voucher_subtype_id, [6, 7]) ?
+                                    new HtmlString("By forwarding this transaction, you are concurring in the contents of the Liquidation Report <br/>(including its supporting documents) and the related Actual Itinerary of Travel and are hereby approving the same.")
+                                    :
+                                    new HtmlString("By forwarding this transaction, you are concurring in the contents of the Liquidation Report <br/>(including its supporting documents) and are hereby approving the same.")
+                            ),
                         RichEditor::make('remarks')
                             ->label('Remarks (Optional)')
                             ->fileAttachmentsDisk('remarks'),
@@ -184,6 +208,11 @@ class LiquidationReportsIndex extends Component implements HasTable
                     ->modalContent(fn ($record) => view('components.liquidation_reports.liquidation-report-verified-documents', [
                         'liquidation_report' => $record,
                     ])),
+                ViewAction::make('actual_itinerary')
+                    ->label('Actual Itinerary')
+                    ->icon('ri-file-copy-line')
+                    ->url(fn ($record) => route('signatory.itinerary.print', ['itinerary' => $record->disbursement_voucher->travel_order->itineraries()->where('user_id', $record->user_id)->whereIsActual(true)->first()]), true)
+                    ->visible(fn ($record) => $record->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->exists()),
                 ViewAction::make('view')
                     ->label('Preview')
                     ->openUrlInNewTab()

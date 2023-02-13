@@ -48,6 +48,7 @@
                 </div>
             </div>
         </div>
+
         <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-lg">
             <form class="flex flex-col gap-4" wire:submit.prevent='save'>
 
@@ -56,26 +57,23 @@
                     <p class="mt-1 mb-2 text-primary-500">Purpose:
                     </p>
                     <textarea class="block w-full px-3 py-3 m-0 text-base font-normal text-gray-700 transition ease-in-out bg-white border border-gray-300 border-solid rounded form-control bg-clip-padding focus:text-gray-700 focus:bg-white focus:outline-none"
-                              rows="3" placeholder="{{ $travel_order->purpose }}" wire:model="purpose"></textarea>
+                              @if (!$is_requisitioner) disabled @endif rows="3" placeholder="{{ $travel_order->purpose }}" wire:model="purpose"></textarea>
                 </div>
-                <div class="flex justify-between w-full">
-                    <div>
-                    </div>
-                    <x-filament-support::button class="mr-4" type="submit" wire:target='save'>Save
-                    </x-filament-support::button>
+                <div class="flex justify-end w-full">
+                    @if ($is_requisitioner)
+                        <x-filament-support::button class="mr-4" type="submit" wire:target='save'>Save
+                        </x-filament-support::button>
+                    @endif
                 </div>
             </form>
         </div>
-
         <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-lg">
             <div class="flex-wrap items-center justify-between w-full -mt-4 -ml-4 sm:flex-nowrap">
                 <div class="mt-4 ml-4">
                     <div class="flex justify-between w-full">
-                        <h3 class="flex justify-between w-full text-lg font-medium leading-6 text-primary-700 hover:text-primary-400 hover:cursor-pointer" x-on:click="open= !open">Itinerary
-
-                        </h3>
+                        <h3 class="flex justify-between w-full text-lg font-medium leading-6 text-primary-700 hover:text-primary-400 hover:cursor-pointer" x-on:click="open= !open">Itinerary</h3>
                         <a class="max-w-sm px-4 py-2 text-sm font-semibold tracking-wider text-white rounded-lg w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white"
-                           id="print" href="{{ route(str_replace('/','',request()->route()->getPrefix()) . '.itinerary.print',['itinerary' => $itinerary]) }}">
+                           id="print" href="{{ $print_route }}">
                             Print
                         </a>
                     </div>

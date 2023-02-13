@@ -6,6 +6,7 @@ use App\Forms\Components\Flatpickr;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
 use App\Models\FundCluster;
+use App\Models\TravelOrderType;
 use Filament\Forms\Components\CheckboxList;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\Action;
@@ -77,6 +78,11 @@ trait OfficeDashboardActions
                     ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_documents', [
                         'disbursement_voucher' => $record,
                     ])),
+                ViewAction::make('actual_itinerary')
+                    ->label('Actual Itinerary')
+                    ->icon('ri-file-copy-line')
+                    ->url(fn ($record) => route('signatory.itinerary.print', ['itinerary' => $record->travel_order->itineraries()->where('user_id', $record->user_id)->whereIsActual(true)->first()]), true)
+                    ->visible(fn ($record) => $record->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && $record->travel_order?->itineraries()->where('user_id', $record->user_id)->whereIsActual(true)->exists()),
                 ViewAction::make('view')
                     ->label('Preview')
                     ->openUrlInNewTab()
