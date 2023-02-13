@@ -74,7 +74,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                                 ->afterStateUpdated(function ($set, $state) {
                                     $this->disbursement_voucher = DisbursementVoucher::with('travel_order')->withSum('disbursement_voucher_particulars as total_amount', 'final_amount')->find($state);
                                     if ($this->disbursement_voucher) {
-                                        if ($this->disbursement_voucher->travel_order) {
+                                        if ($this->disbursement_voucher->travel_order &&  $this->disbursement_voucher->travel_order->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                             $this->generateItineraryEntries($this->disbursement_voucher->travel_order->itineraries()->firstWhere('user_id', auth()->id()));
                                         }
                                         $set('signatory_id', $this->disbursement_voucher->signatory_id);
@@ -120,7 +120,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                             ->columns(2)
                             ->visible(fn () => $this->disbursement_voucher),
                         Section::make('Actual Itinerary')
-                            ->visible(fn () => $this->disbursement_voucher?->travel_order_id)
+                            ->visible(fn () => $this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
                             ->schema([
                                 Card::make([
                                     Placeholder::make('travel_order_details')
@@ -204,7 +204,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                             ->columns(1)
                             ->visible(function ($get) {
                                 try {
-                                    if ($this->disbursement_voucher?->travel_order_id) {
+                                    if ($this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                         $expenses = collect($this->data['itinerary_entries'])->sum('data.total_expenses');
                                         return $this->disbursement_voucher && $expenses < $this->disbursement_voucher->total_amount;
                                     }
@@ -301,7 +301,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                 ]);
             }
             $this->data['particulars'] = $particulars->toArray();
-            if ($dv->travel_order_id) {
+            if ($dv->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                 $this->generateItineraryEntries($dv->travel_order->itineraries()->firstWhere('user_id', auth()->id()));
             }
         }
@@ -309,7 +309,7 @@ class LiquidationReportsCreate extends Component implements HasForms
 
     public function render()
     {
-        if ($this->disbursement_voucher?->travel_order_id) {
+        if ($this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
             foreach ($this->data['itinerary_entries'] as  $key => $entry) {
                 $original_per_diem = $entry['data']['original_per_diem'] ?? $this->disbursement_voucher->travel_order->philippine_region->dte->amount;
                 $per_diem = $original_per_diem;
@@ -348,7 +348,7 @@ class LiquidationReportsCreate extends Component implements HasForms
     {
         $this->form->validate();
         DB::beginTransaction();
-        if ($this->disbursement_voucher->travel_order_id) {
+        if ($this->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
             $coverage = [];
             foreach ($this->data['itinerary_entries'] as $entry) {
                 $coverage[] = [
@@ -416,7 +416,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                         Placeholder::make('actual_itinerary')
                             ->content(
                                 function () {
-                                    if ($this->disbursement_voucher?->travel_order_id) {
+                                    if ($this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                         $coverage = [];
                                         foreach ($this->data['itinerary_entries'] as $entry) {
                                             $coverage[] = [

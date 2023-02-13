@@ -9,6 +9,7 @@ use Filament\Tables\Actions\Action;
 use App\Models\LiquidationReportStep;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
+use App\Models\TravelOrderType;
 use App\Models\VoucherSubType;
 use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Actions\ViewAction;
@@ -103,10 +104,11 @@ class LiquidationReportsIndex extends Component implements HasTable
                         Placeholder::make('confirmation')
                             ->label('Important!')
                             ->content(
-                                fn () => new HtmlString("By forwarding this transaction, you are concurring in the contents of the Disbursement Voucher <br/>(including its supporting documents) and the related Actual Itinerary of Travel and are hereby approving the same.")
-                            )->visible(function ($record) {
-                                return in_array($record->voucher_subtype_id, VoucherSubType::TRAVELS);
-                            }),
+                                fn ($record) => in_array($record->disbursement_voucher->voucher_subtype_id, [6, 7]) ?
+                                    new HtmlString("By forwarding this transaction, you are concurring in the contents of the Liquidation Report <br/>(including its supporting documents) and the related Actual Itinerary of Travel and are hereby approving the same.")
+                                    :
+                                    new HtmlString("By forwarding this transaction, you are concurring in the contents of the Liquidation Report <br/>(including its supporting documents) and are hereby approving the same.")
+                            ),
                         RichEditor::make('remarks')
                             ->label('Remarks (Optional)')
                             ->fileAttachmentsDisk('remarks'),
@@ -209,8 +211,8 @@ class LiquidationReportsIndex extends Component implements HasTable
                 ViewAction::make('actual_itinerary')
                     ->label('Actual Itinerary')
                     ->icon('ri-file-copy-line')
-                    ->url(fn ($record) => route('signatory.itinerary.print', ['itinerary' => $record->disbursement_voucher->travel_order->itineraries()->whereIsActual(true)->first()]), true)
-                    ->visible(fn ($record) => $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->exists()),
+                    ->url(fn ($record) => route('signatory.itinerary.print', ['itinerary' => $record->disbursement_voucher->travel_order->itineraries()->where('user_id', $record->user_id)->whereIsActual(true)->first()]), true)
+                    ->visible(fn ($record) => $record->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->exists()),
                 ViewAction::make('view')
                     ->label('Preview')
                     ->openUrlInNewTab()

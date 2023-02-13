@@ -68,7 +68,7 @@
                                                                                     wire:click="approveItinerary({{ $proposed_itinerary->id }})">Approve</x-filament-support::button>
                                                     @endif
                                                 </div>
-                                            @else
+                                            @elseif($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
                                                 <span class="font-semibold underline text-amber-600">No Itinerary Created</span>
                                             @endif
                                             @if ($actual_itinerary)
@@ -92,7 +92,7 @@
                         @elseif($rejectedAlready)
                             <p class="mt-4 text-amber-700">Travel Order already rejected by preliminary signatories.</p>
                         @elseif(!$actingSignatory->pivot->is_approved)
-                            @if ($itineraries->where('approved_at', '!=', null)->count() != $travel_order->applicants()->count())
+                            @if ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS && $itineraries->where('approved_at', '!=', null)->count() != $travel_order->applicants()->count())
                                 <p class="mt-4 text-amber-700">Incomplete approved itinerary entries from travel order's applicants.</p>
                             @else
                                 <div class="flex justify-between w-full">

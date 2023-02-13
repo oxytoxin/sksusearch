@@ -53,7 +53,7 @@
                                         View Proposed Itinerary
 
                                 </a>
-                            @else
+                            @elseif($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
                                 <a class="flex px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
                                    href="{{ route('requisitioner.itinerary.create', ['travel_order' => $travel_order]) }}" target="_blank">
                                     <svg class="w-5 h-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

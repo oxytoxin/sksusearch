@@ -139,7 +139,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->reactive()
                                 ->afterStateUpdated(function ($set, $state) {
                                     $to = TravelOrder::find($state);
-                                    if ($to) {
+                                    if ($to && $to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                         $itinerary = $to->itineraries()->whereUserId(auth()->id())->first();
                                         $this->generateItineraryEntries($itinerary, $to);
                                         $amount = $to->registration_amount;
@@ -158,7 +158,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     } else {
                                         $set('disbursement_voucher_particulars', [
                                             [
-                                                'purpose' => '',
+                                                'purpose' => $to->purpose,
                                                 'responsibility_center' => '',
                                                 'mfo_pap' => '',
                                                 'amount' => 0,
@@ -630,7 +630,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             ->reactive()
                                             ->numeric()
                                             ->minValue(1)
-                                            ->disabled(fn () => $this->travel_order_id)
+                                            ->disabled(fn () => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
                                             ->required(),
                                     ]),
                                 ])
@@ -641,7 +641,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                         ]),
 
                         Section::make('Actual Itinerary')
-                            ->visible(fn () => $this->travel_order_id && in_array($this->voucher_subtype->id, [6, 7]))
+                            ->visible(fn () => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && in_array($this->voucher_subtype->id, [6, 7]))
                             ->schema([
                                 Card::make([
                                     Placeholder::make('travel_order_details')
@@ -747,7 +747,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
     {
         $this->validate();
         DB::beginTransaction();
-        if ($this->travel_order_id) {
+        if (TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
             $coverage = [];
             foreach ($this->itinerary_entries as $entry) {
                 $coverage[] = [
@@ -847,7 +847,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 Placeholder::make('actual_itinerary')
                                     ->content(
                                         function () {
-                                            if ($this->travel_order_id) {
+                                            if (TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                                 $coverage = [];
                                                 $to = TravelOrder::find($this->travel_order_id);
                                                 foreach ($this->itinerary_entries as $entry) {
