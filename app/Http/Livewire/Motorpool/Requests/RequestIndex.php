@@ -17,34 +17,43 @@ class RequestIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return RequestSchedule::query();
+        return RequestSchedule::query()->where('status', 'Approved');
     }
 
     protected function getTableColumns()
     {
         return [
             Tables\Columns\TextColumn::make('purpose')
-                ->searchable(),
-            Tables\Columns\TextColumn::make('date_of_travel')
-                ->label('Date of travel')
+                ->searchable()
+                ->wrap(),
+            Tables\Columns\TextColumn::make('date_of_travel_from')
+                ->label('From')
                 ->date()
                 ->sortable()
                 ->searchable(),
+            Tables\Columns\TextColumn::make('date_of_travel_to')
+                ->label('To')
+                ->date()
+                ->sortable()
+                ->searchable(),  
+            Tables\Columns\TextColumn::make('status')
+                ->label('Status'),       
+
         ];
     }
 
     protected function getTableActions(): array
     {
         return [
-            ActionGroup::make([
-                Action::make('edit')
-                    ->icon('ri-edit-line'),
-                ViewAction::make('print')
-                    ->label('Print')
-                    ->icon('ri-printer-fill')
-                    ->openUrlInNewTab()
-                ->url(fn ($record) => route('motorpool.request.show', ['request' => $record]), true),
-            ])
+            Action::make('view')
+            ->icon('ri-eye-line')
+            ->url(fn ($record) => route('requisitioner.motorpool.show', ['request' => $record]), false),
+            ViewAction::make('print')
+            ->label('Print')
+            ->icon('ri-printer-fill')
+            ->openUrlInNewTab()
+            ->url(fn ($record) => route('motorpool.request.show', ['request' => $record]), true)
+            ->visible(fn ($record) => $record->driver_id != null),                  
         ];
     }
 

@@ -13,8 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('itineraries', function (Blueprint $table) {
-            $table->boolean('is_actual')->after('id')->default(false);  
+        Schema::table('request_schedules', function (Blueprint $table) {
+            $table->dateTime('approved_at')->after('remarks')->nullable();
+            $table->dateTime('rejected_at')->after('approved_at')->nullable();
+
         });
     }
 
@@ -25,8 +27,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('itineraries', function (Blueprint $table) {
-            //
+        Schema::table('request_schedules', function (Blueprint $table) {
+            $table->dropColumn('approved_at');
+            $table->dropColumn('rejected_at');
         });
     }
 };

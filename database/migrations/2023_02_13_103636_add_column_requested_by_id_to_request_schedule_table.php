@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('itineraries', function (Blueprint $table) {
-            $table->boolean('is_actual')->after('id')->default(false);  
+        Schema::table('request_schedules', function (Blueprint $table) {
+            $table->foreignId('requested_by_id')->after('driver_id')->index()->nullable();
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('itineraries', function (Blueprint $table) {
-            //
+        Schema::table('request_schedules', function (Blueprint $table) {
+            $table->dropColumn('requested_by_id');
         });
     }
 };
