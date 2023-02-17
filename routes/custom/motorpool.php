@@ -3,6 +3,7 @@
 use App\Http\Livewire\Motorpool\Requests\RequestIndex;
 use App\Http\Livewire\Motorpool\Requests\RequestNewSchedule;
 use App\Http\Livewire\Motorpool\Requests\RequestShow;
+use App\Http\Livewire\Motorpool\Schedule\ViewSchedules;
 use App\Http\Livewire\Motorpool\Schedule\ViewWeeklySchedule;
 use App\Http\Livewire\Motorpool\Vehicle\VehicleCreate;
 use App\Http\Livewire\Motorpool\Vehicle\VehicleEdit;
@@ -16,6 +17,7 @@ Route::middleware([
     Route::get('/vehicle', VehicleIndex::class)->name('vehicle.index');
     Route::get('/vehicle/create/{from_schedules}', VehicleCreate::class)->name('vehicle.create');
     Route::get('/vehicle/edit/{vehicle}', VehicleEdit::class)->name('vehicle.edit');
+    Route::get('/schedule/view', ViewSchedules::class)->name('view-schedule');
     Route::get('/schedule/weekly', ViewWeeklySchedule::class)->name('weekly-schedule');
     Route::get('/requests', RequestIndex::class)->name('request.index');
     Route::get('/requests/new', RequestNewSchedule::class)->name('request.new');

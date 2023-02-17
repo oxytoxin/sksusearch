@@ -20,6 +20,7 @@
     "dependencies": {
         "@ryangjchandler/alpine-tooltip": "^1.2.0",
         "flatpickr": "^4.6.13",
+        "fullcalendar": "^6.1.4",
         "tippy.js": "^6.3.7"
     }
 }
