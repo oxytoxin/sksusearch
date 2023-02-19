@@ -1,5 +1,15 @@
 <div class="p-10">
-    <div>
+    <div class="bg-primary-200 p-4 rounded-md">
+        <div class="grid grid-cols-4 mb-4">
+            <x-native-select id="vehicle-select" label="Vehicle" wire:model="vehicle" class="col-span-1">
+                <option selected>All</option>
+                @forelse ($vehicless as $vehicle)
+                  <option class="uppercase" value="{{ $vehicle->id }}">{{ $vehicle->model }}</option>
+                @empty
+                  <option>No vehicle</option>
+                @endforelse
+              </x-native-select>
+        </div>
         <div id="calendar"></div>
       </div>
       <!-- Modal -->
@@ -56,11 +66,11 @@
           }
         },
         headerToolbar: {
-          start: 'prev,next',
+          start: 'prev next',
           center: 'title',
-          end: 'timeGridWeek today dayGridMonth'
+          end: 'today timeGridWeek dayGridMonth'
         },
-        events: {!! $events !!},
+        events: {!! json_encode($events) !!},
         eventClick: function(info) {
            // Display additional information in a modal-like dialog
            var modal = document.getElementById('myModal');
@@ -77,6 +87,12 @@
         }
       });
       calendar.render();
+
+      var vehicleSelect = document.getElementById('vehicle-select');
+      vehicleSelect.addEventListener('change', function(event) {
+        var vehicleId = event.target.value;
+        calendar.updateEvents(vehicleId);
+      });
     });
   </script>
 @endpush
