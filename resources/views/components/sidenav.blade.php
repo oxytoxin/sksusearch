@@ -284,9 +284,23 @@
                     </a>
                 @endif
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900"
+                   href="{{ route('requisitioner.motorpool.index') }}">
+                    Request Vehicle
+                </a>
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900"
                    href="{{ route('motorpool.weekly-schedule') }}">
                     Schedules
                 </a>
+                @if(auth()->user()->id == 64)
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900"
+                   href="{{ route('signatory.motorpool.for-signature') }}">
+                    For Signature
+                </a>
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900"
+                   href="{{ route('signatory.motorpool.signed') }}">
+                    Signed
+                </a>
+                @endif
             </div>
         </div>
 

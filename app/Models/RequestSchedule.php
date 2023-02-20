@@ -14,6 +14,11 @@ class RequestSchedule extends Model
         return $this->belongsToMany(User::class, 'request_applicants', 'request_schedule_id', 'user_id')->withTimestamps();
     }
 
+    public function requested_by()
+    {
+        return $this->belongsTo(User::class, 'requested_by_id');
+    }
+
     public function driver()
     {
         return $this->belongsTo(EmployeeInformation::class, 'driver_id');

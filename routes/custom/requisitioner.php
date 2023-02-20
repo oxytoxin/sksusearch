@@ -17,6 +17,10 @@ use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersCreate;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersIndex;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersShow;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersView;
+use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleIndex;
+use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleCreate;
+use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleShow;
+use App\Http\Livewire\Requisitioner\Motorpool\VehicleRequestFormShow;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([
@@ -47,4 +51,8 @@ Route::middleware([
     Route::get('/cancelled-liquidation-reports', LiquidationReportsCancelled::class)->name('liquidation-reports.cancelled');
     Route::get('/liquidation-reports', LiquidationReportsIndex::class)->name('liquidation-reports.index');
     Route::get('/liquidation-reports/{liquidation_report}', LiquidationReportsShow::class)->name('liquidation-reports.show');
+    Route::get('/motorpool/request-vehicle', RequestVehicleIndex::class)->name('motorpool.index');
+    Route::get('/motorpool/request-vehicle/new', RequestVehicleCreate::class)->name('motorpool.create');
+    Route::get('/motorpool/vehicle-request-form/{request}', VehicleRequestFormShow::class)->name('motorpool.show-request-form');
+    Route::get('/motorpool/vehicle-request-details/{request}', RequestVehicleShow::class)->name('motorpool.show');
 });
