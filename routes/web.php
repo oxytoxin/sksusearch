@@ -29,6 +29,5 @@ Route::view('/info', 'php-info')->name('php-info');
 
 //mailables previerw
 Route::get('/mailable', function () {
- 
     return new App\Mail\VerificationCode('1251212312',LegacyDocument::first());
 });
