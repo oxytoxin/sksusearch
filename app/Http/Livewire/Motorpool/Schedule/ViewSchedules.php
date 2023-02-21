@@ -21,48 +21,29 @@ class ViewSchedules extends Component
         $this->events = $this->getFormattedEvents();
     }
 
-    public function updatedVehicle()
+    public function updatedVehicle($value)
     {
-    // if($this->vehicle == "All")
-    // {
-    //     $events = RequestSchedule::where('status', 'Approved')->get();
-    // }else{
-    //     $events = RequestSchedule::where('status', 'Approved')
-    //     ->where('vehicle_id', $this->vehicle)
-    //     ->get();
-    // }
-    $events = RequestSchedule::where('status', 'Approved')
-        ->where('vehicle_id', 1)
-        ->get();
-    $formattedEvents = [];
-        foreach ($events as $event) {
-            $startDateTime = date('Y-m-d H:i', strtotime($event->date_of_travel_from . ' ' . $event->time_start));
-            $endDateTime = date('Y-m-d H:i', strtotime($event->date_of_travel_to . ' ' . $event->time_end));
-            $formattedEvents[] = [
-                'title' => $event->other_details != null ? $event->other_details .', '. $event->philippine_city->city_municipality_description .', '.
-                $event->philippine_province->province_description . ', '. $event->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_start)) . ' - ' . date('g:i A', strtotime($event->time_end)) . ')' :
-                $event->philippine_city->city_municipality_description .', '.
-                $event->philippine_province->province_description . ', '. $event->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_start)) . ' - ' . date('g:i A', strtotime($event->time_end)) . ')',
-                'start' =>  $startDateTime,
-                'end' => $endDateTime,
-                'purpose' => $event->purpose,
-            ];
-        }
-        return $formattedEvents;
+        $this->dispatchBrowserEvent('refreshCalendar', [
+            'events' => $this->getFormattedEvents()
+        ]);
     }
 
     private function getFormattedEvents()
     {
-        $events = RequestSchedule::get();
+        $events = RequestSchedule::query()
+            ->when($this->vehicle, function ($query) {
+                $query->where('vehicle_id', $this->vehicle);
+            })
+            ->get();
         $formattedEvents = [];
         foreach ($events as $event) {
             $startDateTime = date('Y-m-d H:i', strtotime($event->date_of_travel_from . ' ' . $event->time_start));
             $endDateTime = date('Y-m-d H:i', strtotime($event->date_of_travel_to . ' ' . $event->time_end));
             $formattedEvents[] = [
-                'title' => $event->other_details != null ? $event->other_details .', '. $event->philippine_city->city_municipality_description .', '.
-                $event->philippine_province->province_description . ', '. $event->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_start)) . ' - ' . date('g:i A', strtotime($event->time_end)) . ')' :
-                $event->philippine_city->city_municipality_description .', '.
-                $event->philippine_province->province_description . ', '. $event->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_start)) . ' - ' . date('g:i A', strtotime($event->time_end)) . ')',
+                'title' => $event->other_details != null ? $event->other_details . ', ' . $event->philippine_city->city_municipality_description . ', ' .
+                    $event->philippine_province->province_description . ', ' . $event->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_start)) . ' - ' . date('g:i A', strtotime($event->time_end)) . ')' :
+                    $event->philippine_city->city_municipality_description . ', ' .
+                    $event->philippine_province->province_description . ', ' . $event->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_start)) . ' - ' . date('g:i A', strtotime($event->time_end)) . ')',
                 'start' =>  $startDateTime,
                 'end' => $endDateTime,
                 'purpose' => $event->purpose,
@@ -74,6 +55,6 @@ class ViewSchedules extends Component
 
     public function render()
     {
-        return view('livewire.motorpool.schedule.view-schedules')->with('vehicless', $this->vehicles);
+        return view('livewire.motorpool.schedule.view-schedules');
     }
 }
