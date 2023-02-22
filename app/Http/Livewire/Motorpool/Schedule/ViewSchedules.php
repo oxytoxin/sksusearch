@@ -31,6 +31,9 @@ class ViewSchedules extends Component
     private function getFormattedEvents()
     {
         $events = RequestSchedule::query()
+            ->where('status', 'Approved')
+            ->whereNotNull('vehicle_id')
+            ->whereNotNull('driver_id')
             ->when($this->vehicle, function ($query) {
                 $query->where('vehicle_id', $this->vehicle);
             })
