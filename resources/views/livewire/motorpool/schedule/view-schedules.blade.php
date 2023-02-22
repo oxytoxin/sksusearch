@@ -17,8 +17,11 @@
     <!-- Modal -->
     <div class="modal" id="myModal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 id="modalTitle"></h2>
+            <div class="flex justify-between items-center">
+                <h2 class="text-center" id="modalTitle"></h2>
+                <span class="close">&times;</span>
+
+            </div>
             <p id="modalBody"></p>
         </div>
     </div>
@@ -34,6 +37,12 @@
                 height: 100%;
                 overflow: auto;
                 background-color: rgba(0, 0, 0, 0.4);
+                transition: opacity 0.5s;
+            }
+
+            .modal.fade {
+                opacity: 0;
+                pointer-events: none;
             }
 
             .modal-content {
@@ -42,6 +51,13 @@
                 padding: 20px;
                 border: 1px solid #888;
                 width: 80%;
+                border-radius: 8px;
+                line-height: 1.5;
+            }
+
+            .modal-content p {
+                margin-bottom: 5px;
+                margin-top: 5px;
             }
 
             .close {
@@ -77,21 +93,33 @@
                         center: 'title',
                         end: 'today timeGridWeek dayGridMonth'
                     },
+                    displayEventTime: false,
                     events: {!! json_encode($events) !!},
                     eventClick: function(info) {
                         // Display additional information in a modal-like dialog
                         var modal = document.getElementById('myModal');
                         var modalTitle = document.getElementById('modalTitle');
                         var modalBody = document.getElementById('modalBody');
-                        modalTitle.innerHTML = info.event.title;
-                        modalBody.innerHTML = '<p>Date: ' + info.event.start.toLocaleDateString() + '</p><p>Time: ' + info.event.start.toLocaleTimeString() + ' - ' + info.event.end
-                            .toLocaleTimeString() + '</p><p>Purpose: ' + info.event.extendedProps.purpose + '</p>';
+                        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+                        const formattedDateFrom = info.event.start.toLocaleString('en-US', options);
+                        const formattedDateTo = info.event.end.toLocaleString('en-US', options);
+                        modalTitle.innerHTML = '<span class="font-bold">' + info.event.title + '</span>';
+                        modalBody.innerHTML = '<div class="bg-primary-100 mt-3 p-3 rounded-md"><p>Date of Travel: ' + formattedDateFrom + ' - ' + formattedDateTo +
+                            '</p><p>Time: ' + info.event.start.toLocaleTimeString() + ' - ' + info.event.end
+                            .toLocaleTimeString() + '</p><p>Purpose: ' + info.event.extendedProps.purpose +
+                                 '</p><p>Vehicle: ' + info.event.extendedProps.vehicle + ' (' + info.event.extendedProps.plate_number + ') '
+                                    + '</p><p>Driver: ' + info.event.extendedProps.driver +
+                                     '</p><p>Passengers: ' + info.event.extendedProps.passengers + '</p><p>Requested By: ' + info.event.extendedProps.requisitioner + '</p></div>';
                         modal.style.display = 'block';
-
                         var closeButton = document.getElementsByClassName('close')[0];
                         closeButton.onclick = function() {
                             modal.style.display = 'none';
                         }
+                        document.addEventListener('keydown', function(event) {
+                        if (event.key === 'Escape') {
+                            modal.style.display = 'none';
+                        }
+                        });
                     }
                 });
                 calendar.render();
