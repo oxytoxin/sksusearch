@@ -5,6 +5,7 @@
             $to_sign_count = App\Models\DisbursementVoucher::whereSignatoryId(auth()->id())
                 ->where('current_step_id', '<=', 4000)
                 ->where('previous_step_id', '<=', 4000)
+                ->whereNull('cancelled_at')
                 ->count();
         @endphp
         <!-- Current: "bg-primary-100 text-primary-900", Default: "bg-white text-primary-600 hover:bg-primary-50 hover:text-primary-900" -->
