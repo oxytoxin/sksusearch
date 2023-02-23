@@ -39,10 +39,10 @@ class EditEmployeeInformation extends EditRecord
             $data['email'] = $employee->user->email;
             if (isset($employee->campus) && isset($employee->office)) {
                 $data['campus_id'] = $employee->campus_id;
-                $data['office_id'] = $employee->office->name;                        
+                $data['office_id'] = $employee->office->id;
             }else
             {
-                $data['campus_id'] = "";  
+                $data['campus_id'] = "";
             }
         }
         return $data;
