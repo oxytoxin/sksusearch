@@ -60,6 +60,16 @@
                 margin-top: 5px;
             }
 
+            .fc-event{
+                cursor: pointer;
+                text-align: center;
+            }
+
+            #calendar .fc-button {
+                background-color: #0a5200;
+                border-color: #0a5200;
+            }
+
             .close {
                 color: #aaa;
                 float: right;
@@ -94,6 +104,7 @@
                         end: 'today timeGridWeek dayGridMonth'
                     },
                     displayEventTime: false,
+                    eventColor: '#0a5200',
                     events: {!! json_encode($events) !!},
                     eventClick: function(info) {
                         // Display additional information in a modal-like dialog
