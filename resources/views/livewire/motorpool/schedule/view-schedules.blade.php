@@ -105,6 +105,7 @@
                     },
                     displayEventTime: false,
                     eventColor: '#0a5200',
+                    eventDisplay: 'block',
                     events: {!! json_encode($events) !!},
                     eventClick: function(info) {
                         // Display additional information in a modal-like dialog
