@@ -112,7 +112,7 @@
                         @php
                             $per_diem_total += $coverage['per_diem'] ?? 0;
                         @endphp
-                        @foreach ($itinerary_entries->where('date', Carbon\Carbon::make($coverage['date'])) as $itinerary_entry)
+                        @foreach (collect($itinerary_entries)->where('date', Carbon\Carbon::make($coverage['date'])) as $itinerary_entry)
                             <tr class="text-right border print:text-12 border-black">
                                 <td class="border-x py-2 align-baseline whitespace-nowrap border-black text-center">{{ $itinerary_entry->date->format('M d, Y') }}</td>
                                 <td class="border-x min-w-[12rem] py-2 align-baseline border-black text-center" colspan="2">{{ $itinerary_entry->place }}</td>
@@ -184,3 +184,4 @@
             }
         </script>
     </div>
+</div>
