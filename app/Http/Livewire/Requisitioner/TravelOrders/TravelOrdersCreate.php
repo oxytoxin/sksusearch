@@ -69,7 +69,7 @@ class TravelOrdersCreate extends Component implements HasForms
             Textarea::make('purpose')
                 ->required(),
             Grid::make(2)->schema([
-                Toggle::make('has_registration')->reactive()->default(false),
+                Toggle::make('has_registration')->reactive()->label('With Registration')->default(false),
                 TextInput::make('registration_amount')
                     ->numeric()
                     ->visible(fn ($get) => $get('has_registration') == true)

@@ -23,6 +23,11 @@
             <h4 class="block text-sm font-medium text-gray-700">Name: {{ $this->user->employee_information->full_name }}</h4>
         </div>
 
+         <!-- Contact Number -->
+         <div class="col-span-6 sm:col-span-4">
+            <h4 class="block text-sm font-medium text-gray-700">Contact Number: {{ $this->user->employee_information->contact_number == null ? 'N/A' : $this->user->employee_information->contact_number }}</h4>
+        </div>
+
         <!-- Email -->
         <div class="col-span-6 sm:col-span-4">
             <h4 class="block text-sm font-medium text-gray-700">Email: {{ $this->user->email }}</h4>
