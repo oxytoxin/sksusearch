@@ -4,5 +4,5 @@
                 {{ __('Dashboard') }}
             </h2>
         </x-slot>
-
+        <livewire:requisitioner.dashboard />
     </x-app-layout>

@@ -106,6 +106,13 @@ class ItineraryCreate extends Component implements HasForms
                                 Select::make('mot_id')
                                     ->options(Mot::pluck('name', 'id'))
                                     ->label('Mode of Transport')
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, $set) {
+                                        if($state == 13)
+                                        {
+                                            $set('transportation_expenses', 0);
+                                        }
+                                    })
                                     ->required(),
                                 TextInput::make('place')->required(),
                                 Flatpickr::make('departure_time')
@@ -115,7 +122,12 @@ class ItineraryCreate extends Component implements HasForms
                                     ->disableDate()
                                     ->afterOrEqual('departure_time')
                                     ->required(),
-                                TextInput::make('transportation_expenses')->label('Transportation')->default(0)->required()->numeric()->reactive(),
+                                TextInput::make('transportation_expenses')->label('Transportation')
+                                ->default(0)
+                                ->required()
+                                ->numeric()
+                                ->disabled(fn ($get) => $get('mot_id') == 13)
+                                ->reactive(),
                                 TextInput::make('other_expenses')->label('Others')->default(0)->numeric()->reactive(),
                             ])
                     ]),
