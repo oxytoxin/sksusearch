@@ -32,6 +32,8 @@ trait OfficeDashboardActions
             TextColumn::make('tracking_number')->searchable(),
             TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
             TextColumn::make('payee')
+                ->limit(10)
+                ->tooltip(fn ($record) => $record->payee)
                 ->label('Payee'),
             TextColumn::make('submitted_at')->dateTime('F d, Y'),
             TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php'),

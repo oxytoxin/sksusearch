@@ -5,11 +5,13 @@
         <ul class="mt-4">
             @forelse ($disbursement_voucher->voucher_subtype->related_documents_list?->documents as $document)
                 <li class="flex gap-2">
-                    @if (in_array($document, $disbursement_voucher->related_documents['verified_documents']))
-                        <x-ri-checkbox-circle-fill class="text-primary-400" />
-                    @else
-                        <x-ri-close-circle-fill class="text-red-500" />
-                    @endif
+                    <span class="w-6 flex-shrink-0">
+                        @if (in_array($document, $disbursement_voucher->related_documents['verified_documents']))
+                            <x-ri-checkbox-circle-fill class="text-primary-400" />
+                        @else
+                            <x-ri-close-circle-fill class="text-red-500" />
+                        @endif
+                    </span>
                     <span>{{ $document }}</span>
                 </li>
             @empty
@@ -28,6 +30,13 @@
                 <p>No remarks.</p>
             @endif
         </div>
+        @if (auth()->user()->employee_information->office->office_group_id == 3)
+            <div class="mt-4">
+                <a href="{{ route('icu.verified_documents', ['disbursement_voucher' => $disbursement_voucher]) }}" target="_blank">
+                    <x-filament-support::button>View Report</x-filament-support::button>
+                </a>
+            </div>
+        @endif
     @else
         <p>Disbursement Voucher documents are not yet verified by ICU.</p>
     @endif

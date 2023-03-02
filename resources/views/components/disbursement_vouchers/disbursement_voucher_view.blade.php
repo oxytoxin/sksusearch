@@ -1,8 +1,7 @@
 <x-app-layout>
     <div>
-        <div id="dvPrint" style="flex border-collapse  max-w-8xl print:block print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
+        <div class="flex border-collapse  max-w-[90%] mx-auto print:block print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]" id="dvPrint">
             <div class="grid grid-cols-8 border-4 border-collapse border-black">
-
                 <div class="col-span-6 border border-black">
                     <div class="flex justify-between min-w-full place-items-center">
                         <div class="flex mt-1 ml-1">
@@ -77,7 +76,6 @@
 
                         @if ($mop->id == 4)
                             <div class="relative flex items-start">
-
                                 <div class="ml-1 text-sm">
                                     <span class="font-medium text-black"></span>
                                 </div>
@@ -164,7 +162,7 @@
                         &nbsp
                     </div>
                     <div class="h-auto text-right border-t-4 border-black border-double print:text-10 w-36">
-                        {{ number_format($disbursement_voucher->disbursement_voucher_particulars->sum('amount') + $disbursement_voucher->travel_order?->registration_amount, 2) }}
+                        {{ number_format($disbursement_voucher->disbursement_voucher_particulars->sum('final_amount'), 2) }}
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black">
@@ -389,13 +387,11 @@
         <button class="inline-flex items-center px-4 py-2 mt-2 text-xs font-medium text-white border border-transparent rounded-md shadow-sm bg-primary-500 hover:bg-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 type="button" onclick="printDiv('dvPrint')">
             <!-- Heroicon name: mini/envelope -->
-
             <svg class="w-5 h-5 mr-2 -ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                 <path fill-rule="evenodd"
                       d="M7.875 1.5C6.839 1.5 6 2.34 6 3.375v2.99c-.426.053-.851.11-1.274.174-1.454.218-2.476 1.483-2.476 2.917v6.294a3 3 0 003 3h.27l-.155 1.705A1.875 1.875 0 007.232 22.5h9.536a1.875 1.875 0 001.867-2.045l-.155-1.705h.27a3 3 0 003-3V9.456c0-1.434-1.022-2.7-2.476-2.917A48.716 48.716 0 0018 6.366V3.375c0-1.036-.84-1.875-1.875-1.875h-8.25zM16.5 6.205v-2.83A.375.375 0 0016.125 3h-8.25a.375.375 0 00-.375.375v2.83a49.353 49.353 0 019 0zm-.217 8.265c.178.018.317.16.333.337l.526 5.784a.375.375 0 01-.374.409H7.232a.375.375 0 01-.374-.409l.526-5.784a.373.373 0 01.333-.337 41.741 41.741 0 018.566 0zm.807-3.97a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H18a.75.75 0 01-.75-.75V10.5zM15 9.75a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V10.5a.75.75 0 00-.75-.75H15z"
                       clip-rule="evenodd" />
             </svg>
-
             Print Voucher
         </button>
         <style>

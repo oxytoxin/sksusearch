@@ -8,7 +8,7 @@
                     :class="tab == 'office_dv' && 'bg-white -mt-2 text-primary-600'">
                 Disbursement Vouchers To Sign
                 @if ($disbursement_vouchers_count > 0)
-                    <span class="inline-flex items-center justify-center w-2 h-2 p-3 mx-auto text-xs font-semibold rounded-full text-primary-600 bg-primary-100">
+                    <span class="inline-flex items-center justify-center w-2 h-2 p-3 mx-auto text-xs font-semibold rounded-full text-primary-600 bg-primary-200">
                         {{ $disbursement_vouchers_count }}
                     </span>
                 @endif

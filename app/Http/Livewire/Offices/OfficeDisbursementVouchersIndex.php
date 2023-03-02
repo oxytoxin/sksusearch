@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\Grid;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
+use Carbon\Carbon;
 
 class OfficeDisbursementVouchersIndex extends Component implements HasTable
 {
@@ -78,31 +79,26 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 true => 'For Cancellation',
                 false => 'For Approval',
             ])->default(0)->label('Status'),
-
             Filter::make('created_at')
                 ->form([
                     Grid::make(2)
                         ->schema([
-                            Forms\Components\DatePicker::make('from')->default(\Carbon\Carbon::parse(now())->toFormattedDateString()),
-                            Forms\Components\DatePicker::make('until')->default(\Carbon\Carbon::parse(now())->toFormattedDateString()),
+                            Forms\Components\DatePicker::make('from')->default(now()),
+                            Forms\Components\DatePicker::make('until')->default(now()),
                         ])
                 ])
-                // ...
                 ->indicateUsing(function (array $data): array {
                     $indicators = [];
-                    if (\Carbon\Carbon::parse($data['from'])->toFormattedDateString() == \Carbon\Carbon::parse(now())->toFormattedDateString() && \Carbon\Carbon::parse($data['until'])->toFormattedDateString() == \Carbon\Carbon::parse(now())->toFormattedDateString()) {
+                    if (date_create($data['from']) == date_create($data['until']) && date_create($data['from']) == date_create(now())) {
                         $indicators['from'] = 'Today';
                     } else {
                         if ($data['from'] ?? null) {
-                            $indicators['from'] = 'Created from ' . \Carbon\Carbon::parse($data['from'])->toFormattedDateString();
+                            $indicators['from'] = 'Created from ' . Carbon::parse($data['from'])->toFormattedDateString();
                         }
-
                         if ($data['until'] ?? null) {
-                            $indicators['until'] = 'Created until ' . \Carbon\Carbon::parse($data['until'])->toFormattedDateString();
+                            $indicators['until'] = 'Created until ' . Carbon::parse($data['until'])->toFormattedDateString();
                         }
                     }
-
-
                     return $indicators;
                 })
                 ->query(function (Builder $query, array $data): Builder {
