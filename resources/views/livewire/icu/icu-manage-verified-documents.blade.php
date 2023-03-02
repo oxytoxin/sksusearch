@@ -1,4 +1,12 @@
 <div>
+    @if (!$disbursement_voucher->log_number || !$disbursement_voucher->documents_verified_at)
+        <div class="mb-4 space-y-2 bg-white rounded-lg p-4">
+            {{ $this->form }}
+            <div class="flex justify-end">
+                <x-filament-support::button wire:click="save" wire:target="save">Save</x-filament-support::button>
+            </div>
+        </div>
+    @endif
     <div id="dvPrint">
         <div class="flex flex-col max-w-fit mx-auto divide-y-2 divide-black border-collapse border-4 border-black items-center print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
             <div class="grid grid-cols-8 border-collapse divide-x-2 divide-black w-full">
