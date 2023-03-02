@@ -104,25 +104,28 @@ trait OfficeDashboardActions
                 ->action(function ($record, $data) {
                     $record->refresh();
                     DB::beginTransaction();
-                    if ($record->voucher_subtype->related_documents_list && blank($record->related_documents)) {
-                        $record->update(['related_documents' => [
-                            'required_documents' => $record->voucher_subtype->related_documents_list->documents,
+                    $record->update([
+                        'log_number' => $data['log_number'],
+                        'documents_verified_at' => now(),
+                        'related_documents' => [
+                            'required_documents' => $record->voucher_subtype->related_documents_list?->documents ?? [],
                             'verified_documents' => $data['verified_documents'],
                             'remarks' => $data['remarks'] ?? '',
-                        ]]);
-                        $description = 'Related documents have been verified.';
-                        if ($this->isOic()) {
-                            $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
-                        }
-                        $record->activity_logs()->create([
-                            'description' => $description,
-                        ]);
-                        DB::commit();
-                        Notification::make()->title('Related documents have been verified.')->success()->send();
+                        ]
+                    ]);
+                    $description = 'Related documents have been verified.';
+                    if ($this->isOic()) {
+                        $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
                     }
-                    DB::rollBack();
+                    $record->activity_logs()->create([
+                        'description' => $description,
+                    ]);
+                    DB::commit();
+                    Notification::make()->title('Related documents have been verified.')->success()->send();
                 })
                 ->form([
+                    TextInput::make('log_number')
+                        ->required(),
                     CheckboxList::make('verified_documents')
                         ->options(function ($record) {
                             return collect($record?->voucher_subtype->related_documents_list?->documents)->flatMap(fn ($d) => [$d => $d]) ?? [];

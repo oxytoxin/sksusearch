@@ -1,7 +1,7 @@
 <div>
     <div id="dvPrint">
         <div class="flex flex-col max-w-fit mx-auto divide-y-2 divide-black border-collapse border-4 border-black items-center print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
-            <div class="grid grid-cols-8 border-collapse divide-x-2 divide-black">
+            <div class="grid grid-cols-8 border-collapse divide-x-2 divide-black w-full">
                 <div class="col-span-6">
                     <div class="flex justify-between min-w-full place-items-center">
                         <div class="flex mt-1 ml-1">
@@ -31,22 +31,22 @@
                     </div>
                 </div>
                 <div class="col-span-2">
-                    <div class="row-span-1 pb-6">
+                    <div class="row-span-1 pb-2 space-y-4 p-2">
                         <p class="mx-auto ml-1 font-serif text-xs font-extrabold text-black print:text-12">
-                            Date <span class="ml-2"> {{ $disbursement_voucher->submitted_at->format('m/d/Y') }}</span>
+                            Date: <span class="ml-2"> {{ $disbursement_voucher->documents_verified_at?->format('m/d/Y') }}</span>
                         </p>
                         <p class="mx-auto ml-1 font-serif text-xs font-extrabold text-black print:text-12">
-                            DV No.
+                            Log No.: <span class="block mt-2 ml-4"> {{ $disbursement_voucher->log_number }}</span>
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div class="w-full p-8">
+            <div class="w-full p-4">
                 @if ($disbursement_voucher->related_documents && filled($disbursement_voucher->related_documents))
                     <h4 class="text-center capitalize">{{ str($disbursement_voucher->voucher_subtype->voucher_type->name)->singular() }} for {{ $disbursement_voucher->voucher_subtype->name }}</h4>
-                    <h5 class="mt-8 text-sm italic">Checklist for Documentary Requirements</h5>
-                    <ul class="mt-8 space-y-2">
+                    <h5 class="mt-4 text-sm italic">Checklist for Documentary Requirements</h5>
+                    <ul class="mt-4 space-y-1">
                         @forelse ($disbursement_voucher->voucher_subtype->related_documents_list?->documents as $document)
                             <li class="flex gap-2">
                                 <span class="w-6 flex-shrink-0">
@@ -79,12 +79,12 @@
                 @endif
             </div>
             <div class="flex-1"></div>
-            <div class="w-full p-8">
+            <div class="w-full p-4">
                 <div>
                     <p>Reviewed/Checked By:</p>
                 </div>
                 <div>
-                    <span class="block mt-20 font-semibold tracking-wide text-center text-black underline text-md">
+                    <span class="block mt-12 font-semibold tracking-wide text-center text-black underline text-md">
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ auth()->user()->employee_information->full_name }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </span>
                     <span class="block mt-2 tracking-wide text-center text-black text-md">

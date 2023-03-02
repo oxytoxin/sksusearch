@@ -14,6 +14,7 @@ class DisbursementVoucher extends Model
     protected $casts = [
         'closed_at' => 'immutable_date',
         'submitted_at' => 'immutable_date',
+        'documents_verified_at' => 'immutable_datetime',
         'due_date' => 'immutable_date',
         'journal_date' => 'immutable_date',
         'certified_by_accountant' => 'boolean',
