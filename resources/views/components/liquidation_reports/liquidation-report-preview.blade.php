@@ -10,7 +10,7 @@
         foreach ($this->data['refund_particulars'] as $particular) {
             Akaunting\Money\Money::PHP($refund_particular['amount'] ?? 0, true);
         }
-        $to_reimburse = collect($this->data['particulars'])->sum('amount') - $this->disbursement_voucher->total_amount;
+        $to_reimburse = collect($this->data['particulars'])->sum('amount') - $this->disbursement_voucher?->total_amount;
         if ($this->disbursement_voucher) {
             $ready = true;
         }

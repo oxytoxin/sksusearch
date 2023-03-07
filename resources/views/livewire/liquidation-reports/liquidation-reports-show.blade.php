@@ -3,10 +3,20 @@
         <div class="w-[48rem] bg-white mx-auto font-serif border-2 border-black divide-y-2 divide-black">
             <div class="flex w-full gap-2 divide-x-2 divide-black">
                 <div class="flex-1 p-2">
-                    <h2 class="text-lg font-semibold text-center">Liquidation Report</h2>
-                    <div class="flex justify-center gap-2 text-sm">
-                        <h4>Period Covered</h4>
-                        <h4 class="min-w-[12rem] border-b border-black">&nbsp;</h4>
+                    <div class="flex gap-4 items-center justify-center mt-2">
+                        <div>
+                            <h2 class="text-lg font-semibold text-center">Liquidation Report</h2>
+                            <div class="flex justify-center gap-2 text-sm">
+                                <h4>Period Covered</h4>
+                                <h4 class="min-w-[12rem] border-b border-black">&nbsp;</h4>
+                            </div>
+                        </div>
+                        <div class="relative right-0">
+                            <div class="m-auto flex justify-center items-center flex-col">
+                                <img class="w-12" src="https://api.qrserver.com/v1/create-qr-code/?data={{ $liquidation_report->tracking_number }}&amp;size=100x100" title="" alt="" />
+                                <span class="font-xs flex justify-center text-[11px]">{{ $liquidation_report->tracking_number }}</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="mt-4 text-sm">
                         <div class="flex gap-2">

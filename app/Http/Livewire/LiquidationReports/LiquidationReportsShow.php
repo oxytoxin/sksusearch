@@ -18,7 +18,7 @@ class LiquidationReportsShow extends Component
     public function render()
     {
         return view('livewire.liquidation-reports.liquidation-reports-show', [
-            'to_reimburse' => $this->liquidation_report->disbursement_voucher->total_amount - collect($this->liquidation_report->particulars)->sum('amount'),
+            'to_reimburse' => collect($this->liquidation_report->particulars)->sum('amount') - $this->liquidation_report->disbursement_voucher->total_amount,
         ]);
     }
 }
