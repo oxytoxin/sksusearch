@@ -12,7 +12,7 @@ class ItineraryEntry extends Model
 
     protected $casts = [
         'date' => 'date:Y-m-d',
-        'date' =>'immutable_date',
+        'date' => 'immutable_date',
         'departure_time' => 'immutable_datetime',
         'arrival_time' => 'immutable_datetime',
     ];
@@ -20,16 +20,16 @@ class ItineraryEntry extends Model
     protected function transportationExpenses(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value / 100,
-            set: fn ($value) => $value * 100,
+            get: fn ($value) => $value == '' ? 0 : $value / 100,
+            set: fn ($value) => $value == '' ? 0 : $value * 100,
         );
     }
 
     protected function otherExpenses(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value / 100,
-            set: fn ($value) => $value * 100,
+            get: fn ($value) => $value == '' ? 0 : $value / 100,
+            set: fn ($value) => $value == '' ? 0 : $value * 100,
         );
     }
 
