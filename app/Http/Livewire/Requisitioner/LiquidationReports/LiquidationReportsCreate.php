@@ -103,17 +103,18 @@ class LiquidationReportsCreate extends Component implements HasForms
                         Repeater::make('particulars')
                             ->schema([
                                 Textarea::make('purpose')->required(),
-                                TextInput::make('amount')->disabled(fn () => $this->disbursement_voucher?->travel_order_id)->numeric()->minValue(0)->required()->reactive()->afterStateUpdated(function ($set, $get) {
-                                    try {
-                                        $particulars = collect($this->data['particulars']);
-                                        if ($particulars->sum('amount') > $this->disbursement_voucher->total_amount) {
-                                            $this->data['refund_particulars'] = [];
-                                        } else {
-                                            $this->data['reimbursement_waived'] = true;
+                                TextInput::make('amount')->disabled(fn () => $this->disbursement_voucher?->travel_order_id)->numeric()->minValue(0)->required()->reactive()
+                                    ->afterStateUpdated(function ($set, $get) {
+                                        try {
+                                            $particulars = collect($this->data['particulars']);
+                                            if ($particulars->sum('amount') > $this->disbursement_voucher->total_amount) {
+                                                $this->data['refund_particulars'] = [];
+                                            } else {
+                                                $this->data['reimbursement_waived'] = true;
+                                            }
+                                        } catch (\Throwable $th) {
                                         }
-                                    } catch (\Throwable $th) {
-                                    }
-                                }),
+                                    }),
                             ])
                             ->disableItemDeletion(fn () => $this->disbursement_voucher?->travel_order_id)
                             ->disableItemCreation(fn () => $this->disbursement_voucher?->travel_order_id)
@@ -206,7 +207,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                                 try {
                                     if ($this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                                         $expenses = collect($this->data['itinerary_entries'])->sum('data.total_expenses');
-                                        return $this->disbursement_voucher && $expenses < $this->disbursement_voucher->total_amount;
+                                        return $this->disbursement_voucher && ($expenses + $this->disbursement_voucher?->travel_order?->registration_amount ?? 0) < $this->disbursement_voucher->total_amount;
                                     }
                                     $particulars = collect($this->data['particulars']);
                                     return $this->disbursement_voucher && $particulars->sum('amount') < $this->disbursement_voucher->total_amount;
@@ -228,7 +229,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                                 try {
                                     if ($this->disbursement_voucher?->travel_order_id) {
                                         $expenses = collect($this->data['itinerary_entries'])->sum('data.total_expenses');
-                                        return $this->disbursement_voucher && $expenses > $this->disbursement_voucher->total_amount;
+                                        return $this->disbursement_voucher && ($expenses + $this->disbursement_voucher?->travel_order?->registration_amount ?? 0) > $this->disbursement_voucher->total_amount;
                                     }
                                     $particulars = collect($this->data['particulars']);
                                     return $this->disbursement_voucher && $particulars->sum('amount') > $this->disbursement_voucher->total_amount;
@@ -339,7 +340,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                 $this->data['itinerary_entries'][$key]['data']['per_diem'] = $per_diem;
                 $this->data['itinerary_entries'][$key]['data']['total_expenses'] = $transportation_expenses + $other_expenses + $per_diem;
             }
-            $this->data['particulars'][0]['amount'] = collect($this->data['itinerary_entries'])->sum('data.total_expenses');
+            $this->data['particulars'][0]['amount'] = collect($this->data['itinerary_entries'])->sum('data.total_expenses') + $this->disbursement_voucher?->travel_order?->registration_amount ?? 0;
         }
         return view('livewire.requisitioner.liquidation-reports.liquidation-reports-create');
     }
