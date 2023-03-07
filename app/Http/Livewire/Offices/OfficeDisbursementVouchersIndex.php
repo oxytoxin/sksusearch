@@ -83,8 +83,8 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 ->form([
                     Grid::make(2)
                         ->schema([
-                            Forms\Components\DatePicker::make('from')->default(now()),
-                            Forms\Components\DatePicker::make('until')->default(now()),
+                            Forms\Components\DatePicker::make('from'),
+                            Forms\Components\DatePicker::make('until'),
                         ])
                 ])
                 ->indicateUsing(function (array $data): array {
