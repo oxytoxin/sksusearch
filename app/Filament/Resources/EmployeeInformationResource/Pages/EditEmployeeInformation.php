@@ -40,8 +40,7 @@ class EditEmployeeInformation extends EditRecord
             if (isset($employee->campus) && isset($employee->office)) {
                 $data['campus_id'] = $employee->campus_id;
                 $data['office_id'] = $employee->office->id;
-            }else
-            {
+            } else {
                 $data['campus_id'] = "";
             }
         }
@@ -61,14 +60,11 @@ class EditEmployeeInformation extends EditRecord
             'full_name' => strtoupper($data['full_name']),
             'address' =>  $data['address'],
             'birthday' => $data['birthday'],
-            'role_id' => $data['role_id'],
             'position_id' => $data['position_id'],
             'office_id' => $data['office_id'],
             'campus_id' => $data['campus_id'],
         ]);
-
         DB::commit();
-
         return $record;
     }
 

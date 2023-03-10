@@ -38,10 +38,6 @@ class OfficeResource extends Resource
                     ->label('Campus')
                     ->options(Campus::all()->pluck('name', 'id'))
                     ->searchable()->required(),
-                Select::make('head_id')
-                    ->label('Head')
-                    ->options(EmployeeInformation::all()->pluck('full_name', 'id'))
-                    ->searchable()->required(),
             ]);
     }
 
@@ -64,7 +60,6 @@ class OfficeResource extends Resource
                     ->sortable(),
                 TextColumn::make('code')->searchable()->sortable(),
                 TextColumn::make('campus.name')->searchable()->sortable(),
-                TextColumn::make('head.name')->default('Not Added')->searchable()->sortable(),
             ])
             ->filters([
                 //
@@ -81,7 +76,7 @@ class OfficeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            'employee_information' => RelationManagers\EmployeeInformationRelationManager::class,
         ];
     }
 

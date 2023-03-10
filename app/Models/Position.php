@@ -9,7 +9,7 @@ class Position extends Model
 {
     use HasFactory;
 
-    public function employee_informations()
+    public function employee_information()
     {
         return $this->hasMany(EmployeeInformation::class);
     }
