@@ -19,13 +19,19 @@ class Office extends Model
         return $this->belongsTo(Campus::class);
     }
 
-    public function head()
+    public function head_position()
     {
-        return $this->belongsTo(User::class, 'head_id');
+        return $this->belongsTo(Position::class, 'head_position_id');
     }
 
     public function office_group()
     {
         return $this->belongsTo(OfficeGroup::class);
+    }
+
+    public function head_employee()
+    {
+        return $this->hasOne(EmployeeInformation::class)
+            ->where('position_id', $this->head_position_id);
     }
 }

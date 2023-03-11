@@ -38,6 +38,10 @@ class OfficeResource extends Resource
                     ->label('Campus')
                     ->options(Campus::all()->pluck('name', 'id'))
                     ->searchable()->required(),
+                Select::make('head_position_id')
+                    ->label('Head Position')
+                    ->relationship('head_position', 'description')
+                    ->required(),
             ]);
     }
 
@@ -56,10 +60,15 @@ class OfficeResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->searchable()->limit(20)
-                    ->tooltip(fn ($record): string => "{$record->name}")
+                    ->tooltip(fn ($record) => $record->name)
                     ->sortable(),
                 TextColumn::make('code')->searchable()->sortable(),
                 TextColumn::make('campus.name')->searchable()->sortable(),
+                TextColumn::make('head_position.description')->label('Head Position')->sortable(),
+                TextColumn::make('head')
+                    ->getStateUsing(function ($record) {
+                        return $record->head_employee?->full_name;
+                    }),
             ])
             ->filters([
                 //
