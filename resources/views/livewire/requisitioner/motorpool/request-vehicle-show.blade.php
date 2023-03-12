@@ -8,30 +8,30 @@
                         <p class="mt-4 text-sm text-primary-500">Requisitioner: {{$request->requested_by->name}}</p>
                         <p class="mt-1 text-sm text-primary-500">Travel Order : {{$request->travel_order_id == null ? 'No' : 'Yes'}}</p>
                         <p class="mt-1 text-sm text-primary-500">Date : {{\Carbon\Carbon::parse($request->date_of_travel_from)->format('F d, Y')}}
-                           to {{\Carbon\Carbon::parse($request->date_of_travel_to)->format('F d, Y')}}
+                           to {{\Carbon\Carbon::parse($request->date_of_travel_to)->format('F d, Y')}} <button wire:click="$set('modifyDates',true)" class="italic underline ml-2">(Click to modify)</button>
                             </p>
-                        <p class="mt-1 text-sm text-primary-500">Time : 
+                        <p class="mt-1 text-sm text-primary-500">Time :
                             {{($request->time_start == null || $request->time_end == null) ? 'Not yet set' :
                                  \Carbon\Carbon::parse($request->time_start)->format('h: i A') . ' to ' . \Carbon\Carbon::parse($request->time_end)->format('h: i A') }}
                             </p>
-                        <p class="mt-1 text-sm text-primary-500">Vehicle : 
+                        <p class="mt-1 text-sm text-primary-500">Vehicle :
                             {{$request->vehicle_id == null ? 'Not yet set' : $request->vehicle->model }}
-                            </p>                            
+                            </p>
                                 <p class="mt-1 text-sm text-primary-500">Destination : {{ $request->other_details != null ? $request->other_details . ', ' : '' }}
                                     {{ $request->philippine_city->city_municipality_description }},
                                     {{ $request->philippine_province->province_description }},
                                     {{ $request->philippine_region->region_description }}
                                    </p>
-                        <p class="mt-1 text-sm text-primary-500">Driver : 
+                        <p class="mt-1 text-sm text-primary-500">Driver :
                             {{$request->driver_id == null ? 'Not yet set' : $request->driver->full_name }}
-                            </p>    
-                        <p class="mt-1 text-sm text-primary-500">Passengers :  
+                            </p>
+                        <p class="mt-1 text-sm text-primary-500">Passengers :
                             @foreach($request->applicants()->get() as $index => $applicant)
                             {{ $applicant->employee_information->full_name }}
                             @if($index < count($request->applicants()->get()) - 1)
                                 ,
                             @endif
-                            @endforeach</p>       
+                            @endforeach</p>
                         <p class="mt-1 text-sm text-primary-500">Purpose :  {{ $request->purpose }}</p>
                         <p class="mt-1 text-sm whitespace-pre-line text-primary-500"></p>
                         @if(auth()->user()->id == 64 && $request->status == 'Pending')
@@ -85,7 +85,7 @@
                             @if($request->driver_id != null && $request->vehicle_id != null)
                             <a class="flex float-right px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
                                href="{{route('motorpool.request.show', $request)}}" target="_blank">
-                               
+
                                 <svg class="w-5 h-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -103,8 +103,8 @@
                 <div class="flex flex-wrap items-center justify-between -mt-4 -ml-4 sm:flex-nowrap">
                     <div class="mt-4 ml-4">
                         <h3 class="text-lg font-medium leading-6 text-primary-900">Status</h3>
-                      
-                            <p class="mt-4 text-sm text-primary-500">Signatory: SAMSON L. MOLAO, EdD 
+
+                            <p class="mt-4 text-sm text-primary-500">Signatory: SAMSON L. MOLAO, EdD
                                </p>
                             <p class="mt-1 text-sm text-primary-500">Approval Status: {{$request->status}}
                                </p>
@@ -124,7 +124,7 @@
                                 </p>
                             @endif
 
-                     
+
 
                     </div>
                 </div>
@@ -139,7 +139,7 @@
 
                     </div>
 
-                  
+
                         <li class="py-5">
                             <div class="relative focus-within:ring-2 focus-within:ring-indigo-500">
                                 <h3 class="flex justify-between text-sm font-semibold text-primary-800">
@@ -161,24 +161,44 @@
                                    </p>
                             </div>
                         </li>
-                   
-                      
-                  
+
+
+
 
                 </ul>
             </div>
         </div>
 
+        <x-modal.card align="center" title="Travel Dates" blur wire:model.defer="modifyDates">
+            <span class="italic text-md">Uncheck the dates that the vehicle will be available</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+            <div class="col-span-1 space-y-3 sm:col-span-2">
+                @foreach ((json_decode($travel_dates)) as $travel_date)
+                <x-checkbox id="right-label" lg label="{{\Carbon\Carbon::parse($travel_date)->format('F d, Y')}}" wire:model.defer="travelDates.{{ $travel_date }}" />
+                @endforeach
+            </div>
+        </div>
+
+        <x-slot name="footer">
+            <div class="flex justify-end gap-x-4">
+                <div class="flex">
+                    <x-button flat label="Cancel" x-on:click="close" />
+                    <x-button primary label="Save" wire:click="updateTravelDates" />
+                </div>
+            </div>
+        </x-slot>
+        </x-modal.card>
+
         <x-modal.card align="center" title="Reject Vehicle Request" blur wire:model.defer="rejectModal">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    
+
             <div class="col-span-1 sm:col-span-2">
                 <x-textarea label="Remarks" placeholder="Reason for rejection..." wire:model="remarks" />
             </div>
         </div>
-    
+
         <x-slot name="footer">
-            <div class="flex justify-end gap-x-4">    
+            <div class="flex justify-end gap-x-4">
                 <div class="flex">
                     <x-button flat label="Cancel" x-on:click="close" />
                     <x-button primary label="Save" wire:click="rejectRequest({{$request->id}})" />
@@ -189,7 +209,7 @@
 
         <x-modal.card align="center" title="Assign Driver" blur wire:model.defer="assignDriverModal">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    
+
             <div class="col-span-1 sm:col-span-2">
             <x-native-select label="Driver" wire:model="driverss">
                 <option>Select Driver</option>
@@ -199,9 +219,9 @@
             </x-native-select>
             </div>
         </div>
-    
+
         <x-slot name="footer">
-            <div class="flex justify-end gap-x-4">    
+            <div class="flex justify-end gap-x-4">
                 <div class="flex">
                     <x-button flat label="Cancel" x-on:click="close" />
                     <x-button primary label="Save" wire:click="assignDriver({{$request->id}})" />
@@ -212,7 +232,7 @@
 
         <x-modal.card align="center" title="Assign Vehicle" blur wire:model.defer="assignVehicleModal">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    
+
             <div class="col-span-1 px-8 sm:col-span-2">
             <x-native-select label="Vehicle" wire:model="vehicless">
                 <option>Select Vehicle</option>
@@ -223,12 +243,12 @@
             <div class="grid grid-cols-2 p-4 gap-14">
             <x-time-picker class="col-span-1" label="Time Start" placeholder="12:00 AM" wire:model.defer="time_start"/>
             <x-time-picker class="col-span-1" label="Time End" placeholder="12:00 AM" wire:model.defer="time_end"/>
-            </div>                
             </div>
             </div>
-    
+            </div>
+
         <x-slot name="footer">
-            <div class="flex justify-end gap-x-4">    
+            <div class="flex justify-end gap-x-4">
                 <div class="flex">
                     <x-button flat label="Cancel" x-on:click="close" />
                     <x-button primary label="Save" spinner="assignVehicle({{$request->id}})" wire:click="assignVehicle({{$request->id}})" />
