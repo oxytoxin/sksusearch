@@ -22,6 +22,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Str;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -109,7 +110,11 @@ class EmployeeInformationResource extends Resource
                 TextColumn::make('office.name')->searchable()->sortable()->limit(20)
                     ->tooltip(fn ($record): string => $record->office?->name ?? "No Office")
                     ->default('No Office'),
-
+                ToggleColumn::make('active')
+                    ->label('Active')
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->sortable()
             ])
             ->filters([
                 //

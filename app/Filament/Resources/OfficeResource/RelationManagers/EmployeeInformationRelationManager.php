@@ -2,13 +2,22 @@
 
 namespace App\Filament\Resources\OfficeResource\RelationManagers;
 
+use App\Models\EmployeeInformation;
+use App\Models\Position;
 use Closure;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\AttachAction;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,10 +34,6 @@ class EmployeeInformationRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('full_name')
-                    ->label('Full Name')
-                    ->required()
-                    ->maxLength(255),
                 Select::make('position_id')
                     ->label('Position')
                     ->relationship('position', 'description')
@@ -55,9 +60,52 @@ class EmployeeInformationRelationManager extends RelationManager
             ->filters([
                 //
             ])
-            ->headerActions([])
+            ->headerActions([
+                Action::make('assign')
+                    ->form([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('employee_information_id')
+                                    ->label('Employee')
+                                    ->options(EmployeeInformation::pluck('full_name', 'id'))
+                                    ->searchable()
+                                    ->required(),
+                                Select::make('position_id')
+                                    ->options(Position::pluck('description', 'id'))
+                                    ->label('Position')
+                                    ->required()
+                            ])
+                    ])
+                    ->action(function ($data, $livewire) {
+                        $office = $livewire->getOwnerRecord();
+                        EmployeeInformation::where('id', $data['employee_information_id'])
+                            ->update([
+                                'position_id' => $data['position_id'],
+                                'office_id' => $office->id
+                            ]);
+                        Notification::make()
+                            ->title('Employee Assigned.')
+                            ->success()
+                            ->send();
+                    })
+                    ->button()
+            ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
+                DeleteAction::make()
+                    ->label('Unassign')
+                    ->modalHeading('Unassign Employee')
+                    ->modalSubheading('Are you sure you want to unassign this employee?')
+                    ->action(function ($record) {
+                        $record->update([
+                            'position_id' => null,
+                            'office_id' => null
+                        ]);
+                        Notification::make()
+                            ->title('Employee Unassigned.')
+                            ->success()
+                            ->send();
+                    })
             ])
             ->bulkActions([]);
     }

@@ -101,7 +101,7 @@ class RequestNewSchedule extends Component implements HasForms
                 ->reactive(),
             Select::make('driver_id')
                 ->label('Driver')
-                ->options(EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))
+                ->options(EmployeeInformation::where('position_id', 28)
                     ->whereHas('office', function ($query) {
                         return $query->where('campus_id', '=', auth()->user()->employee_information->office->campus_id);
                     })->pluck('full_name', 'id'))
