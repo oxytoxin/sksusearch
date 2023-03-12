@@ -14,13 +14,17 @@ class RequestVehicleShow extends Component
     use Actions;
     public $request;
     public $request_schedule;
+    public $travel_dates;
+    public $available_travel_dates;
     public $remarks;
     public $driverss;
     public $vehicless;
     public $time_start;
     public $time_end;
+    public $travelDates = [];
 
     //modals
+    public $modifyDates = false;
     public $rejectModal = false;
     public $assignDriverModal = false;
     public $assignVehicleModal = false;
@@ -33,6 +37,14 @@ class RequestVehicleShow extends Component
     public function mount($request)
     {
         $this->request = RequestSchedule::find($request);
+        $this->travel_dates = $this->request->travel_dates;
+        $this->available_travel_dates = $this->request->available_travel_dates;
+
+        $availableTravelDates = json_decode($this->request->available_travel_dates);
+        // Set the initial state of the checkboxes to checked only if the date is in the available travel dates
+        foreach (json_decode($this->travel_dates) as $travelDate) {
+            $this->travelDates[$travelDate] = in_array($travelDate, $availableTravelDates);
+        }
     }
 
     public function approveRequest($id)
@@ -44,7 +56,7 @@ class RequestVehicleShow extends Component
             'method'      => 'confirmApprove',
             'params'      => 'Saved',
         ]);
-     
+
     }
 
     public function confirmApprove()
@@ -121,7 +133,7 @@ class RequestVehicleShow extends Component
                 $description = 'Invalid time'
             );
         }
-       
+
     }
 
     public function assignDriver($id)
@@ -147,6 +159,21 @@ class RequestVehicleShow extends Component
                 $description = 'Driver is assigned'
             );
             return redirect()->route('motorpool.request.index');
+    }
+
+    public function updateTravelDates()
+    {
+        $selectedCheckboxValues = array_keys(array_filter($this->travelDates));
+        $this->request->update([
+            'available_travel_dates' => json_encode($selectedCheckboxValues)
+        ]);
+
+        $this->dialog()->success(
+            $title = 'Success',
+            $description = 'Available dates updated'
+        );
+
+        $this->modifyDates = false;
     }
 
     public function render()
