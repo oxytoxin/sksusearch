@@ -250,7 +250,7 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Liquidation Report certified.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 8000 && !$record->for_cancellation && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->office->head_position_id)
+                ->visible(fn ($record) => $record->current_step_id == 8000 && !$record->for_cancellation && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id)
                 ->requiresConfirmation(),
             ActionGroup::make([
                 ViewAction::make('progress')
