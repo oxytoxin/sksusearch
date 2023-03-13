@@ -63,6 +63,7 @@
             .fc-event{
                 cursor: pointer;
                 text-align: center;
+                margin-bottom: 1rem;
             }
 
             #calendar .fc-button {
