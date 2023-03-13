@@ -1,9 +1,9 @@
 <div>
 
-    <div id="print_to" class="col-span-2">
+    <div class="col-span-2" id="print_to">
         <div class="flex justify-between w-full p-6 border-b-4 border-black print:flex">
-            <div id="header" class="flex w-full ml-3 text-left">
-                <div class="inline my-auto"><img src="{{ asset('images/sksulogo.png') }}" alt="sksu logo" class="object-scale-down w-20 h-full">
+            <div class="flex w-full ml-3 text-left" id="header">
+                <div class="inline my-auto"><img class="object-scale-down w-20 h-full" src="{{ asset('images/sksulogo.png') }}" alt="sksu logo">
                 </div>
                 <div class="my-auto ml-3">
                     <div class="block">
@@ -22,7 +22,7 @@
             </div>
             <div class="relative right-0">
                 <div class="m-auto">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $travel_order->tracking_code }}&amp;size=100x100" alt="" title="" />
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $travel_order->tracking_code }}&amp;size=100x100" title="" alt="" />
                     <span class="font-xs flex justify-center text-[11px]">{{ $travel_order->tracking_code }}</span>
                 </div>
             </div>
@@ -31,14 +31,15 @@
         <div class="w-full">
             <div class="m-6 divide-y divide-black divide-solid print:divide-y-2">
                 <div class="flex items-start w-full h-auto p-6 print:block">
-                    <div id="header" class="items-start block w-full space-y-4 text-left">
+                    <div class="items-start block w-full space-y-4 text-left" id="header">
 
                         <div class="flex">
                             <span class="mx-auto text-5xl font-extrabold tracking-wide text-black uppercase print:text-xl">travel
                                 order</span>
                         </div>
                         <div class="block">
-                            <span class="text-sm font-semibold tracking-wide text-left text-black">{{ $travel_order->created_at == '' ? 'Date Not Set' : $travel_order->created_at->format('F d, Y') }}</span>
+                            <span
+                                  class="text-sm font-semibold tracking-wide text-left text-black">{{ $travel_order->created_at == '' ? 'Date Not Set' : $travel_order->created_at->format('F d, Y') }}</span>
                         </div>
                         <div class="grid grid-cols-4">
                             <span class="col-span-1 text-sm font-semibold tracking-wide text-black uppercase">Memorandum
@@ -73,8 +74,8 @@
                         </div>
                     </div>
                 </div>
-                <div id="contents" class="flex w-full h-auto px-6 pt-10 print:pt-5">
-                    <div id="header" class="items-start block w-full space-y-4 text-left">
+                <div class="flex w-full h-auto px-6 pt-10 print:pt-5" id="contents">
+                    <div class="items-start block w-full space-y-4 text-left" id="header">
                         <div class="flex-wrap block -space-y-1">
                             @if ($travel_order->travel_order_type->name == 'Official Time')
                                 <span class="font-semibold tracking-wide text-left text-black text-md">
@@ -103,7 +104,8 @@
                             </span>
 
                             <p class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
-                                Your travel is on <span class="underline">{{ $travel_order->travel_order_type->name }}</span>. A report of activities should be made immediately upon termination of this travel order.
+                                Your travel is on <span class="underline">{{ $travel_order->travel_order_type->name }}</span>. A report of activities should be made immediately upon termination of
+                                this travel order.
                             </p>
 
                             @foreach ($travel_order->signatories as $signatory)
@@ -111,15 +113,14 @@
                                     {{ $signatory->employee_information->full_name }}
                                 </span>
                                 <span class="block pt-3 font-semibold tracking-wide text-center text-black text-md">
-                                    @if ($signatory->employee_information->position->description == 'University President')
-                                        {{ $signatory->employee_information->position->description }}
-                                    @elseif ($signatory->employee_information->position->description == 'Faculty')
-                                        {{ $signatory->employee_information->position->description }}
+                                    @if ($signatory->employee_information->position?->description == 'University President')
+                                        {{ $signatory->employee_information->position?->description }}
+                                    @elseif ($signatory->employee_information->position?->description == 'Faculty')
+                                        {{ $signatory->employee_information->position?->description }}
                                     @elseif($signatory->employee_information->office == null)
-                                        {{ $signatory->employee_information->position->description }}
+                                        {{ $signatory->employee_information->position?->description }}
                                     @else
-                                        {{ $signatory->employee_information->position->description }} of
-                                        {{ $signatory->employee_information->office->name }}
+                                        {{ $signatory->employee_information->position?->description }}, {{ $signatory->employee_information->office->name }}
                                     @endif
                                 </span>
                             @endforeach
@@ -130,7 +131,8 @@
         </div>
     </div>
     <div class="flex justify-center">
-        <button type="button" value="click" onclick="printDiv('print_to')" id="printto" class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white">
+        <button class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white"
+                id="printto" type="button" value="click" onclick="printDiv('print_to')">
             Print Travel Order
         </button>
     </div>

@@ -23,8 +23,7 @@
             </div>
             <div class="flex-1 px-8 pt-4 text-center">
                 <div class="min-w-[8rem] flex items-end justify-center text-sm border-b whitespace-nowrap border-black min-h-[2rem]">
-                    <p>{{ auth()->user()->employee_information->position->description }} <span class="lowercase">of</span>
-                        {{ auth()->user()->employee_information->office->name }}</p>
+                    <p>{{ auth()->user()->employee_information->position?->description }}, {{ auth()->user()->employee_information->office->name }}</p>
                 </div>
                 <p class="text-xs">Official Designation</p>
             </div>

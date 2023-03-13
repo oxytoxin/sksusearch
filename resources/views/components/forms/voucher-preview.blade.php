@@ -256,8 +256,8 @@
                                 {{ isset($full_name) ? $full_name : 'none' }}
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
                             <p class="font-extrabold capitalize print:text-10">
-                                {{ isset($signatory_details) ? $signatory_details->position->description : 'none' }} <span class="lowercase">of</span>
-                                {{ isset($signatory_details) ? $signatory_details->office->name : 'none' }}</p>
+                                {{ isset($signatory_details) ? $signatory_details->position?->description : 'none' }}, {{ isset($signatory_details) ? $signatory_details->office->name : 'none' }}
+                            </p>
                         </div>
                     </div>
                 </div>

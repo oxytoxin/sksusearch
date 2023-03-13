@@ -152,7 +152,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == 12)
+                ->visible(fn ($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->office->head_position_id)
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();

@@ -180,9 +180,7 @@
                                 {{ isset($full_name) ? $full_name : 'none' }}
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
                             <p class="font-extrabold capitalize print:text-10">
-                                {{ $disbursement_voucher->signatory->employee_information->position->description }}
-                                <span class="lowercase">of</span>
-                                {{ $disbursement_voucher->signatory->employee_information->office->name }}
+                                {{ $disbursement_voucher->signatory->employee_information->position?->description }}, {{ $disbursement_voucher->signatory->employee_information->office->name }}
                             </p>
                         </div>
                     </div>

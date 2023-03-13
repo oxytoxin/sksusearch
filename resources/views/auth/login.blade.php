@@ -9,6 +9,7 @@
             <x-login-link email="juliealbano@sksu.edu.ph" label="Login as signatory 1" />
             <x-login-link email="christineabo@sksu.edu.ph" label="Login as signatory 2" />
             <x-login-link email="desireelegaspi@sksu.edu.ph" label="Login as ICU" />
+            <x-login-link email="jaybadilla@sksu.edu.ph" label="Login as Budget" />
             <x-login-link email="searchlegacyaccountsadmin@sksu.edu.ph" label="Login as legacy accounts" />
         </div>
         @endenv

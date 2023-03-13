@@ -96,7 +96,7 @@
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ auth()->user()->employee_information->full_name }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </span>
                     <span class="block mt-2 tracking-wide text-center text-black text-md">
-                        {{ auth()->user()->employee_information->position->description }}
+                        {{ auth()->user()->employee_information->position?->description }}, {{ auth()->user()->employee_information->office->name }}
                     </span>
                 </div>
             </div>

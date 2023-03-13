@@ -38,7 +38,7 @@
                                 </p>
 
                                 <p>Position:
-                                    <span class="font-extrabold">{{ $itinerary->user->employee_information->position->description }}</span>
+                                    <span class="font-extrabold">{{ $itinerary->user->employee_information->position?->description }}</span>
                                 </p>
 
                                 <p>Official Station:
@@ -151,16 +151,15 @@
                 <div class="col-start-2 text-center">
                     <div class="flex flex-col w-full pt-5 border-t-2 border-black px-16">
                         <span class="font-extrabold capitalize print:text-sm">{{ $itinerary->user->name }}</span>
-                        <span class="text-xs font-extrabold capitalize print:text-12">{{ $itinerary->user->employee_information->position->description }}
-                            <span class="lowercase">of</span>
-                            {{ $itinerary->user->employee_information->office->name }}</span>
+                        <span class="text-xs font-extrabold capitalize print:text-12">{{ $itinerary->user->employee_information->position?->description }},
+                            {{ $itinerary->user->employee_information->office->name }}
+                        </span>
                     </div>
                 </div>
                 <div class="col-start-7 text-center">
                     <div class="flex flex-col w-full pt-5 border-t-2 border-black px-16">
                         <span class="font-extrabold capitalize print:text-sm">{{ $immediate_signatory->name }}</span>
-                        <span class="text-xs font-extrabold capitalize print:text-12">{{ $immediate_signatory->employee_information->position->description }}
-                            <span class="lowercase">of</span>
+                        <span class="text-xs font-extrabold capitalize print:text-12">{{ $immediate_signatory->employee_information->position?->description }},
                             {{ $immediate_signatory->employee_information->office->name }}</span>
                     </div>
                 </div>
