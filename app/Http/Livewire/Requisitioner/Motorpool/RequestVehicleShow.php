@@ -158,7 +158,7 @@ class RequestVehicleShow extends Component
                 $title = 'Success',
                 $description = 'Driver is assigned'
             );
-            return redirect()->route('motorpool.request.index');
+            return redirect()->route('motorpool.request.show', $this->request_schedule->id);
     }
 
     public function updateTravelDates()

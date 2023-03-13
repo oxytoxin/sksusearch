@@ -7,8 +7,14 @@
                         <h3 class="text-lg font-medium leading-6 text-primary-900">Vehicle Request Details</h3>
                         <p class="mt-4 text-sm text-primary-500">Requisitioner: {{$request->requested_by->name}}</p>
                         <p class="mt-1 text-sm text-primary-500">Travel Order : {{$request->travel_order_id == null ? 'No' : 'Yes'}}</p>
+                        @php
+                        $motorpool_head = App\Models\Office::where('name', 'like', '%Motorpool%')->first();
+                        @endphp
                         <p class="mt-1 text-sm text-primary-500">Date : {{\Carbon\Carbon::parse($request->date_of_travel_from)->format('F d, Y')}}
-                           to {{\Carbon\Carbon::parse($request->date_of_travel_to)->format('F d, Y')}} <button wire:click="$set('modifyDates',true)" class="italic underline ml-2">(Click to modify)</button>
+                           to {{\Carbon\Carbon::parse($request->date_of_travel_to)->format('F d, Y')}}
+                           @if($motorpool_head?->head_id == auth()->user()->id || $motorpool_head?->admin_user_id == auth()->user()->id)
+                           <button wire:click="$set('modifyDates',true)" class="italic underline ml-2">(Click to modify)</button>
+                           @endif
                             </p>
                         <p class="mt-1 text-sm text-primary-500">Time :
                             {{($request->time_start == null || $request->time_end == null) ? 'Not yet set' :
@@ -56,9 +62,7 @@
                                     </div>
                         </div>
                         @endif
-                        @php
-                        $motorpool_head = App\Models\Office::where('name', 'like', '%Motorpool%')->first();
-                        @endphp
+
 
                         @if ($motorpool_head?->head_id == auth()->user()->id || $motorpool_head?->admin_user_id == auth()->user()->id)
                             @if($request->driver_id == null && $request->vehicle_id != null)
