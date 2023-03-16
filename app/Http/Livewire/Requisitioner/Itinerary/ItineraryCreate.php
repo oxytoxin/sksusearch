@@ -108,8 +108,7 @@ class ItineraryCreate extends Component implements HasForms
                                     ->label('Mode of Transport')
                                     ->reactive()
                                     ->afterStateUpdated(function ($state, $set) {
-                                        if($state == 13)
-                                        {
+                                        if ($state == 13) {
                                             $set('transportation_expenses', 0);
                                         }
                                     })
@@ -123,11 +122,11 @@ class ItineraryCreate extends Component implements HasForms
                                     ->afterOrEqual('departure_time')
                                     ->required(),
                                 TextInput::make('transportation_expenses')->label('Transportation')
-                                ->default(0)
-                                ->required()
-                                ->numeric()
-                                ->disabled(fn ($get) => $get('mot_id') == 13)
-                                ->reactive(),
+                                    ->default(0)
+                                    ->required()
+                                    ->numeric()
+                                    ->disabled(fn ($get) => $get('mot_id') == 13)
+                                    ->reactive(),
                                 TextInput::make('other_expenses')->label('Others')->default(0)->numeric()->reactive(),
                             ])
                     ]),
@@ -182,13 +181,15 @@ class ItineraryCreate extends Component implements HasForms
     {
         $this->form->fill();
         if (request('travel_order')) {
-            $to = TravelOrder::findOrFail(request('travel_order'));
+            $to = TravelOrder::find(request('travel_order'));
             if (!$to->applicants()->where('users.id', auth()->id())->exists() || $to->itineraries()->where('user_id', auth()->id())->exists()) {
                 abort(403);
             }
-            $this->travel_order = $to;
-            $this->travel_order_id = $to->id;
-            $this->generateItineraryEntries();
+            if ($to) {
+                $this->travel_order = $to;
+                $this->travel_order_id = $to->id;
+                $this->generateItineraryEntries();
+            }
         }
     }
 

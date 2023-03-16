@@ -23,7 +23,7 @@
             <div class="relative right-0">
                 <div class="m-auto">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $travel_order->tracking_code }}&amp;size=100x100" title="" alt="" />
-                    <span class="font-xs flex justify-center text-[11px]">{{ $travel_order->tracking_code }}</span>
+                    <span class="font-xs flex justify-center text-[11px] whitespace-nowrap">{{ $travel_order->tracking_code }}</span>
                 </div>
             </div>
         </div>
@@ -38,39 +38,17 @@
                                 order</span>
                         </div>
                         <div class="block">
-                            <span
-                                  class="text-sm font-semibold tracking-wide text-left text-black">{{ $travel_order->created_at == '' ? 'Date Not Set' : $travel_order->created_at->format('F d, Y') }}</span>
+                            <span class="text-sm font-semibold tracking-wide text-left text-black">{{ $travel_order->created_at == '' ? 'Date Not Set' : $travel_order->created_at->format('F d, Y') }}</span>
                         </div>
-                        <div class="grid grid-cols-4">
-                            <span class="col-span-1 text-sm font-semibold tracking-wide text-black uppercase">Memorandum
-                                to:</span>
-                            @if ($travel_order->applicants->count() < 10)
+                        <div class="flex gap-8">
+                            <p class="col-span-1 text-sm font-semibold tracking-wide text-black uppercase">Memorandum to:</p>
+                            <div class="grid-cols-2 grid flex-1 gap-2">
                                 @foreach ($travel_order->applicants as $applicant)
-                                    <h4 class="col-span-3 text-sm tracking-wide text-black uppercase whitespace-nowrap">
-                                        {{ $applicant->employee_information->full_name }}</h4>
+                                    <h4 class="text-sm text-black uppercase whitespace-nowrap">
+                                        {{ $applicant->employee_information->full_name }}
+                                    </h4>
                                 @endforeach
-                            @elseif ($travel_order->applicants->count() <= 30)
-                                <div class="col-span-3 text-sm font-semibold tracking-wide text-black uppercase">
-                                    @if ($travel_order->applicants->count() > 10)
-                                        <div class="grid grid-cols-3 grid-rows-10">
-                                            @foreach ($travel_order->applicants as $applicant)
-                                                <h4 class="whitespace-nowrap">
-                                                    {{ $applicant->employee_information->full_name }}
-                                                </h4>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        @foreach ($travel_order->applicants as $applicant)
-                                            <h4 class="whitespace-nowrap">
-                                                {{ $applicant->employee_information->full_name }}</h4>
-                                        @endforeach
-                                    @endif
-
-                                </div>
-                            @else
-                                <h4 class="col-span-1 text-sm tracking-wide text-black uppercase whitespace-nowrap">
-                                    {{ $applicant->employee_information->full_name }}</h4>
-                            @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -131,8 +109,7 @@
         </div>
     </div>
     <div class="flex justify-center">
-        <button class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white"
-                id="printto" type="button" value="click" onclick="printDiv('print_to')">
+        <button class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white" id="printto" type="button" value="click" onclick="printDiv('print_to')">
             Print Travel Order
         </button>
     </div>
