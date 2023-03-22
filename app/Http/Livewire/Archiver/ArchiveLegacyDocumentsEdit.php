@@ -216,8 +216,10 @@ class ArchiveLegacyDocumentsEdit extends Component implements HasForms
 
     public function save()
     {
-
-        $this->validate();
+        $this->validate([
+            'document_code' => 'required|unique:legacy_documents,document_code',
+            'dv_number' => 'required|unique:legacy_documents,dv_number',
+        ]);
         DB::beginTransaction();
         $dv_particulars = [];
 
