@@ -28,7 +28,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
     public $document_code;
 
     public $document_category;
-    
+
     public $cheque_no;
 
     public $cheque_amt;
@@ -42,7 +42,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
     public $attachment;
 
     public $dv_number;
-    
+
     public $payee;
 
     public $cheque_state;
@@ -75,14 +75,14 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->afterStateUpdated(function ($set, $state) {
                         $code = FundCluster::find($state);
                         $set('document_code', $code->name.'-00-00-0000');
-    
+
                     })
                     ->columnSpan(1),
 
                     TextInput::make("document_code")
                     ->label("Document Code")
                     ->columnSpan(2)
-                    ->mask(fn (TextInput\Mask $mask) => $mask->pattern('000-00-00-0000'))
+                    ->mask(fn (TextInput\Mask $mask) => $mask->pattern('000-00-00-0000a'))
                     ->unique('App\Models\LegacyDocument')
                     ->required(fn () => in_array($this->document_category,['1','2']))
                     ->visible(fn () => in_array($this->document_category,['1','2']))
@@ -93,7 +93,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->placeholder("Full name of requisitioner/payee")
                     ->required()
                     ->columnSpan(4),
-                    
+
                     TextInput::make("cheque_no")
                     ->label("ADA / CHEQUE NO")
                     ->placeholder("0000000")
@@ -109,13 +109,13 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->columnSpan(1),
 
                     Flatpickr::make('cheque_date')
-                    ->label('Cheque Date') 
+                    ->label('Cheque Date')
                     ->disableTime()
                     ->required()
                     ->visible()
                     ->columnSpan(1),
                     Select::make("cheque_state")
-                    ->label('Cheque State') 
+                    ->label('Cheque State')
                     ->required()
                     ->preload()
                     ->options([
@@ -129,13 +129,13 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
 
 
                     Flatpickr::make('journal_date')
-                    ->label('Journal Date') 
+                    ->label('Journal Date')
                     ->disableTime()
                     ->required(fn () => in_array($this->document_category,['1','2']))
                     ->visible(fn () => in_array($this->document_category,['1','2']))
                     ->columnSpan(1),
 
-                    
+
                     TextInput::make("dv_number")
                     ->label("Disbursement Voucher Number")
                     ->placeholder("")
@@ -153,8 +153,8 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->required(fn () => in_array($this->document_category,['1','2']))
                     ->visible(fn () => in_array($this->document_category,['1','2']))
                     ->columnSpan(4),
-                    
-                    
+
+
 
                     FileUpload::make('attachment')
                     ->enableOpen()
@@ -163,7 +163,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->acceptedFileTypes(['application/pdf'])
                     ->reactive()
                     ->disk('scanned_documents')
-                    ->columnSpan(4)                    
+                    ->columnSpan(4)
                    ])
                 ])
 
@@ -171,13 +171,13 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
     }
     public function mount()
     {
-      
+
         $this->form->fill();
-    
+
     }
     public function save()
     {
-        
+
         $this->validate();
         DB::beginTransaction();
         $dv_particulars=[];
@@ -205,7 +205,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
         ]);
 
         //save Files from fileupload
-        foreach($this->attachment as $document){            
+        foreach($this->attachment as $document){
             $ldc->scanned_documents()->create(
                 [
                     "path"=>$document->storeAs('scanned_documents',now()->format("HismdY-").$document->getClientOriginalName()),
@@ -220,7 +220,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
         Notification::make()->title('Operation Success')->body('Legacy document has been archived successfully')->success()->send();
 
         return redirect()->route('archiver.archive-leg-doc.create');
-    
+
     }
 
     public function render()
