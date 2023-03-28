@@ -107,7 +107,7 @@ class ArchiveLegacyDocumentsEdit extends Component implements HasForms
                             TextInput::make("document_code")
                                 ->label("Document Code")
                                 ->columnSpan(2)
-                                ->mask(fn (TextInput\Mask $mask) => $mask->pattern('000-00-00-0000'))
+                                ->mask(fn (TextInput\Mask $mask) => $mask->pattern('000-00-00-0000a'))
                                 // ->exists('App\Models\LegacyDocument')
                                 ->required(fn () => in_array($this->document_category, ['1', '2']))
                                 ->visible(fn () => in_array($this->document_category, ['1', '2']))
@@ -216,8 +216,10 @@ class ArchiveLegacyDocumentsEdit extends Component implements HasForms
 
     public function save()
     {
-
-        $this->validate();
+        $this->validate([
+            'document_code' => 'required|unique:legacy_documents,document_code',
+            'dv_number' => 'required|unique:legacy_documents,dv_number',
+        ]);
         DB::beginTransaction();
         $dv_particulars = [];
 
