@@ -1,5 +1,4 @@
 <div>
-
     <div class="col-span-2" id="print_to">
         <div class="flex justify-between w-full p-6 border-b-4 border-black print:flex">
             <div class="flex w-full ml-3 text-left" id="header">

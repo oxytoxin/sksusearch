@@ -28,6 +28,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
 use App\Models\TelephoneAccountNumber;
+use App\Models\TravelCompletedCertificate;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Contracts\HasForms;
@@ -46,6 +47,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
 {
     use InteractsWithForms;
 
+    #region Variables
     public $other_expenses = [];
 
     public $total_expense;
@@ -107,6 +109,14 @@ class DisbursementVouchersCreate extends Component implements HasForms
     public $activity_date_to;
 
     public VoucherSubType $voucher_subtype;
+    // ctc
+
+    public $condition;
+    public $amount;
+    public $or_number;
+    public $explanation;
+
+    #endregion
 
     protected function getFormSchema()
     {
@@ -638,6 +648,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->columnSpan(1),
                             ])->columns(2)
                             ->visible(fn ($get) => in_array($this->voucher_subtype->id, [3, 5])),
+                            #region DV PARTICULARS
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
                                     Textarea::make('purpose')
@@ -658,10 +669,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->visible(fn ($get) => $get('travel_order_id') || !in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
                                 ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
                                 ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS)),
+                            #endregion
                         ]),
-
+                        #region Actual Itinerary
                         Section::make('Actual Itinerary')
-                            ->visible(fn () => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && in_array($this->voucher_subtype->id, [6, 7]))
+                            ->visible(fn () => $this->shouldItineraryBeVisible())
                             ->schema([
                                 Card::make([
                                     Placeholder::make('travel_order_details')
@@ -727,8 +739,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         ]),
                                     ]),
                             ]),
+                        #endregion
                     ]),
                 ...$this->itinerarySection(),
+                ...$this->ctcSection(),
+                #region Related Documents
                 Step::make('Review Related Documents')
                     ->description('Ensure all the required documents are complete before proceeding.')
                     ->schema([
@@ -739,6 +754,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ])),
                             ]),
                     ]),
+                #endregion
+
+                #region Signatory
                 Step::make('DV Signatory')
                     ->description('Select the appropriate signatory for the disbursement voucher.')
                     ->schema([
@@ -751,6 +769,9 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     ->options(EmployeeInformation::pluck('full_name', 'user_id')),
                             ]),
                     ]),
+                #endregion
+
+                #region Preview
                 Step::make('Preview DV')
                     ->description('Review and confirm information for submission.')
                     ->schema([
@@ -759,6 +780,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ViewField::make('voucher_preview')->label('Voucher Preview')->view('components.forms.voucher-preview'),
                             ]),
                     ]),
+                #endregion
             ])->submitAction(new HtmlString(view('components.forms.save-button')->render())),
         ];
     }
@@ -767,7 +789,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
     {
         $this->validate();
         DB::beginTransaction();
-        if (TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+        if (in_array($this->voucher_subtype->id, [6, 7]) && TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
             $coverage = [];
             foreach ($this->itinerary_entries as $entry) {
                 $coverage[] = [
@@ -802,6 +824,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                 }
             }
         }
+
         if ($this->voucher_subtype->id == 27) {
             $other_details = [
                 'type' => 'Electricity',
@@ -850,6 +873,17 @@ class DisbursementVouchersCreate extends Component implements HasForms
                 'amount' => $particulars['amount'],
             ]);
         }
+        if (in_array($this->voucher_subtype->id, [6, 7])) {
+            TravelCompletedCertificate::create([
+                'user_id' => auth()->id(),
+                'signatory_id' => TravelOrder::find($this->travel_order_id)?->signatories()->first()?->id,
+                'travel_order_id' => $this->travel_order_id,
+                'itinerary_id' => $itinerary->id,
+                'disbursement_voucher_id' => $dv->id,
+                'condition' => $this->condition,
+                'explanation' => $this->explanation,
+            ]);
+        }
         $dv->activity_logs()->create([
             'description' => $dv->current_step->process . ' ' . $dv->signatory->employee_information->full_name . ' ' . $dv->current_step->sender,
         ]);
@@ -857,6 +891,48 @@ class DisbursementVouchersCreate extends Component implements HasForms
         Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
 
         return redirect()->route('requisitioner.disbursement-vouchers.index');
+    }
+    private function ctcSection()
+    {
+        if (!in_array($this->voucher_subtype->id, [6, 7]))
+            return [];
+        else
+            return [
+                Step::make('Certificate of Travel Completed')
+                    ->schema([
+                        Card::make([
+                            Radio::make('condition')->options([
+                                '1' => 'Strictly in accordance with the approved itinerary.',
+                                '2' => 'Cut short as explained below.',
+                                '3' => 'Extended as explained below, additional itinerary was submitted',
+                                '4' => 'Other deviation as explained below.',
+                            ])
+                                ->required()
+                                ->default('1'),
+                            Textarea::make('explanation')->placeholder('Explanation or justifications')
+                                ->required(fn ($get) => $get('condition') != 1),
+                        ])
+                    ]),
+                Step::make('Print Certificate of Travel Completed')
+                    ->schema([
+                        Placeholder::make('ctc')
+                            ->disableLabel()
+                            ->content(function ($get) {
+                                $travel_order = TravelOrder::find($this->travel_order_id);
+                                $supervisor = $travel_order?->signatories()->first()?->employee_information?->full_name;
+                                return view('components.forms.ctc-preview', [
+                                    'condition' => $get('condition'),
+                                    'explanation' => $get('explanation'),
+                                    'employee' => auth()->user()->employee_information->full_name,
+                                    'travel_order' => $travel_order,
+                                    'supervisor' => $supervisor,
+                                    'ctc' => TravelCompletedCertificate::make([
+                                        'created_at' => today(),
+                                    ])
+                                ]);
+                            }),
+                    ]),
+            ];
     }
 
     private function itinerarySection()
@@ -930,6 +1006,11 @@ class DisbursementVouchersCreate extends Component implements HasForms
     public function render()
     {
         return view('livewire.requisitioner.disbursement-vouchers.disbursement-vouchers-create');
+    }
+
+    private function shouldItineraryBeVisible()
+    {
+        return TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && in_array($this->voucher_subtype->id, [6, 7]);
     }
 
     private function generateItineraryEntries($old_itinerary, $travel_order)
