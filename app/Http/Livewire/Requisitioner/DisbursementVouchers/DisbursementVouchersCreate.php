@@ -882,6 +882,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 '3' => 'Extended as explained below, additional itinerary was submitted',
                                 '4' => 'Other deviation as explained below.',
                             ])
+                                ->required()
                                 ->default('1'),
                             Textarea::make('explanation')->placeholder('Explanation or justifications')
                                 ->required(fn ($get) => $get('condition') != 1),
