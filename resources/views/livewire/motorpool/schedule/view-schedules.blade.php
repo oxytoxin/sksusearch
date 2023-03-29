@@ -9,6 +9,7 @@
                     <option>No vehicle</option>
                 @endforelse
             </x-native-select>
+            @dump($events)
         </div>
         <div wire:ignore>
             <div id="calendar"></div>

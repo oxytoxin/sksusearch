@@ -26,6 +26,21 @@ class RequestIndex extends Component implements HasTable
             Tables\Columns\TextColumn::make('purpose')
                 ->searchable()
                 ->wrap(),
+            Tables\Columns\TextColumn::make('vehicle.model')
+                ->label('Vehicle')
+                ->sortable()
+                ->default('NOT SET')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('vehicle.plate_number')
+                ->label('Plate Number')
+                ->sortable()
+                ->default('NOT SET')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('driver.full_name')
+                ->label('Driver')
+                ->sortable()
+                ->default('NOT SET')
+                ->searchable(),
             Tables\Columns\TextColumn::make('date_of_travel_from')
                 ->label('From')
                 ->date()
@@ -35,9 +50,9 @@ class RequestIndex extends Component implements HasTable
                 ->label('To')
                 ->date()
                 ->sortable()
-                ->searchable(),  
+                ->searchable(),
             Tables\Columns\TextColumn::make('status')
-                ->label('Status'),       
+                ->label('Status'),
 
         ];
     }
@@ -53,7 +68,7 @@ class RequestIndex extends Component implements HasTable
             ->icon('ri-printer-fill')
             ->openUrlInNewTab()
             ->url(fn ($record) => route('motorpool.request.show', ['request' => $record]), true)
-            ->visible(fn ($record) => $record->driver_id != null),                  
+            ->visible(fn ($record) => $record->driver_id != null),
         ];
     }
 

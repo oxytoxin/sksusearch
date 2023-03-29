@@ -1,6 +1,7 @@
 <div class="">
     @php
-        $is_motorpool_head = auth()->user()->employee_information->office_id == 32 && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id;
+    $is_motorpool_head = auth()->user()->employee_information->office_id == 32 && auth()->user()->employee_information->position_id == 12;
+        // $is_motorpool_head = auth()->user()->employee_information->office_id == 32 && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id;
     @endphp
     <div class="grid grid-cols-1 lg:grid-cols-3">
         <div class="flex-row col-span-1 lg:col-span-2">
