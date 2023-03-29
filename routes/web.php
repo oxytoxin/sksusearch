@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Livewire\Shared\TravelCompletedCertificatePrint;
 use App\Http\Livewire\TestComponent;
 use App\Models\LegacyDocument;
 use Illuminate\Support\Facades\Route;
@@ -19,15 +20,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth')->group(function () {
     Route::get('/', TestComponent::class);
     Route::get('/disbursement-voucher-view/{disbursement_voucher}', [HomeController::class, 'disbursement_voucher_view'])->name('disbursement-vouchers.show');
+    Route::get('/certification-of-travel-completion/{ctc}', TravelCompletedCertificatePrint::class)->name('ctc.show');
 });
 Route::get('auth/google', 'App\Http\Controllers\GoogleController@redirectToGoogle');
 Route::get('auth/google/callback', 'App\Http\Controllers\GoogleController@handleGoogleCallback');
 Route::middleware(['auth:sanctum', 'verified'])->get('redirects', 'App\Http\Controllers\HomeController@index')->name('redirect');
-Route::view('/401-page', 'error_pages.401-page')->name('401-error');
-Route::view('/info', 'php-info')->name('php-info');
 
-
-//mailables previerw
-Route::get('/mailable', function () {
-    return new App\Mail\VerificationCode('1251212312',LegacyDocument::first());
-});
+Route::get('/test', TestComponent::class);

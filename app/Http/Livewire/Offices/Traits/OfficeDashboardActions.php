@@ -30,6 +30,7 @@ trait OfficeDashboardActions
     {
         return [
             TextColumn::make('tracking_number')->searchable(),
+            TextColumn::make('voucher_subtype.voucher_type.name')->limit(20)->tooltip(fn ($record) => $record->voucher_subtype->voucher_type->name)->label('Voucher Type'),
             TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
             TextColumn::make('payee')
                 ->limit(10)
@@ -80,6 +81,11 @@ trait OfficeDashboardActions
                     ->modalContent(fn ($record) => view('components.disbursement_vouchers.disbursement_voucher_documents', [
                         'disbursement_voucher' => $record,
                     ])),
+                ViewAction::make('ctc')
+                    ->label('Certificate of Travel Completion')
+                    ->icon('ri-file-text-line')
+                    ->url(fn ($record) => route('ctc.show', ['ctc' => $record->travel_completed_certificate]), true)
+                    ->visible(fn ($record) => $record->travel_completed_certificate()->exists()),
                 ViewAction::make('actual_itinerary')
                     ->label('Actual Itinerary')
                     ->icon('ri-file-copy-line')

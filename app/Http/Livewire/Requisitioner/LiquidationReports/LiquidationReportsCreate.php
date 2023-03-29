@@ -3,12 +3,15 @@
 namespace App\Http\Livewire\Requisitioner\LiquidationReports;
 
 use DB;
+use Carbon\Carbon;
 use App\Models\Mot;
 use Livewire\Component;
 use Carbon\CarbonPeriod;
+use App\Models\Itinerary;
 use App\Models\TravelOrder;
 use App\Models\VoucherType;
 use Illuminate\Support\Str;
+use App\Models\ItineraryEntry;
 use App\Models\TravelOrderType;
 use App\Models\LiquidationReport;
 use Illuminate\Support\HtmlString;
@@ -22,10 +25,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
 use App\Forms\Components\SlimRepeater;
-use App\Models\Itinerary;
-use App\Models\ItineraryEntry;
-use Carbon\Carbon;
 use Filament\Forms\Components\Builder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
@@ -33,10 +34,10 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
+use App\Models\TravelCompletedCertificate;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Components\Builder\Block;
-use Filament\Forms\Components\Section;
 use Illuminate\Validation\ValidationException;
 use Filament\Forms\Concerns\InteractsWithForms;
 
@@ -189,6 +190,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                             ]),
                     ]),
                 ...$this->itinerarySection(),
+
                 Step::make('Refund / Reimbursement')
                     ->schema([
                         Placeholder::make('gross_amount')
@@ -238,7 +240,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                                 }
                             }),
                     ])
-                    ->afterValidation(function () {
+                    ->afterValidation(function ($set, $get) {
                         $particulars = collect($this->data['particulars']);
                         $refund_particulars = collect($this->data['refund_particulars']);
                         $cheque_amount = $this->disbursement_voucher->total_amount;
@@ -251,6 +253,8 @@ class LiquidationReportsCreate extends Component implements HasForms
                             }
                         }
                     }),
+                ...$this->ctcSection(),
+
                 Step::make('Related Documents')
                     ->schema([
                         Placeholder::make('related_documents')
@@ -345,10 +349,65 @@ class LiquidationReportsCreate extends Component implements HasForms
         return view('livewire.requisitioner.liquidation-reports.liquidation-reports-create');
     }
 
+    private function ctcSection()
+    {
+
+        if (!in_array($this->disbursement_voucher?->voucher_subtype_id, [1, 2]))
+            return [];
+        else {
+            $refund_particular = collect($this->data['refund_particulars'])->first();
+            $or_number = $refund_particular['or_number'] ?? null;
+            $or_date = $refund_particular ? date_format(date_create($refund_particular['date']), 'm/d/Y') : null;
+            $or_amount = $refund_particular['amount'] ?? null;
+            return [
+                Step::make('Certificate of Travel Completed')
+                    ->schema(fn () => [
+                        Card::make([
+                            Radio::make('condition')->options([
+                                '1' => 'Strictly in accordance with the approved itinerary.',
+                                '2' => "Cut short as explained below. Excess payment in the amount of P{$or_amount} was refunded under O. R. No. {$or_number} dated {$or_date}",
+                                '3' => 'Extended as explained below, additional itinerary was submitted',
+                                '4' => 'Other deviation as explained below.',
+                            ])
+                                ->default('1'),
+                            Textarea::make('explanation')->placeholder('Explanation or justifications')
+                                ->required(fn ($get) => $get('condition') != 1),
+                        ])
+                    ]),
+                Step::make('Print Certificate of Travel Completed')
+                    ->visible(fn () => in_array($this->disbursement_voucher?->voucher_subtype_id, [1, 2]))
+                    ->schema([
+                        Placeholder::make('ctc')
+                            ->disableLabel()
+                            ->content(function ($get) use ($or_number, $or_amount, $or_date) {
+                                $travel_order = $this->disbursement_voucher->travel_order;
+                                $supervisor = $travel_order?->signatories()->first()?->employee_information?->full_name;
+                                return view('components.forms.ctc-preview', [
+                                    'condition' => $get('condition'),
+                                    'explanation' => $get('explanation'),
+                                    'employee' => auth()->user()->employee_information->full_name,
+                                    'travel_order' => $travel_order,
+                                    'supervisor' => $supervisor,
+                                    'ctc' => TravelCompletedCertificate::make([
+
+                                        'created_at' => today(),
+                                    ]),
+                                    'or_number' => $or_number,
+                                    'or_date' => $or_date,
+                                    'refund_amount' => $or_amount,
+                                ]);
+                            }),
+                    ]),
+            ];
+        }
+    }
+
     public function save()
     {
+
         $this->form->validate();
         DB::beginTransaction();
+
         if ($this->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
             $coverage = [];
             foreach ($this->data['itinerary_entries'] as $entry) {
@@ -400,6 +459,31 @@ class LiquidationReportsCreate extends Component implements HasForms
         $lr->activity_logs()->create([
             'description' => $lr->current_step->process . ' ' . $lr->signatory->employee_information->full_name . ' ' . $lr->current_step->sender,
         ]);
+
+        if ($this->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+            $other_details = null;
+            if (isset($this->data['condition']) && $this->data['condition'] == 2) {
+                $refund_particular = collect($this->data['refund_particulars'])->first();
+                $or_number = $refund_particular['or_number'] ?? null;
+                $or_date = $refund_particular ? date_format(date_create($refund_particular['date']), 'm/d/Y') : null;
+                $or_amount = $refund_particular['amount'] ?? null;
+                if ($refund_particular) {
+                    $other_details['or_number'] = $or_number;
+                    $other_details['or_date'] = $or_date;
+                    $other_details['or_amount'] = $or_amount;
+                }
+            }
+            TravelCompletedCertificate::create([
+                'user_id' => auth()->id(),
+                'signatory_id' => $this->disbursement_voucher->travel_order?->signatories()->first()?->id,
+                'travel_order_id' => $this->disbursement_voucher->travel_order_id,
+                'itinerary_id' => $itinerary->id,
+                'liquidation_report_id' => $lr->id,
+                'condition' => $this->data['condition'],
+                'explanation' => $this->data['explanation'],
+                'details' => $other_details
+            ]);
+        }
 
         DB::commit();
         Notification::make()->title('Liquidation Report Submitted!')->success()->send();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DisbursementVoucher;
+use App\Models\TravelCompletedCertificate;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
