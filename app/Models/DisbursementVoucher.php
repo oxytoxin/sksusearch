@@ -100,4 +100,9 @@ class DisbursementVoucher extends Model
     {
         return $this->hasOne(LiquidationReport::class);
     }
+
+    public function travel_completed_certificate()
+    {
+        return $this->hasOne(TravelCompletedCertificate::class);
+    }
 }

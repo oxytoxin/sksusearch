@@ -208,6 +208,11 @@ class LiquidationReportsIndex extends Component implements HasTable
                     ->modalContent(fn ($record) => view('components.liquidation_reports.liquidation-report-verified-documents', [
                         'liquidation_report' => $record,
                     ])),
+                ViewAction::make('ctc')
+                    ->label('Certificate of Travel Completion')
+                    ->icon('ri-file-text-line')
+                    ->url(fn ($record) => route('ctc.show', ['ctc' => $record->travel_completed_certificate]), true)
+                    ->visible(fn ($record) => $record->travel_completed_certificate()->exists()),
                 ViewAction::make('actual_itinerary')
                     ->label('Actual Itinerary')
                     ->icon('ri-file-copy-line')

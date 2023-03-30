@@ -56,4 +56,9 @@ class LiquidationReport extends Model
     {
         return $this->belongsTo(DisbursementVoucher::class);
     }
+
+    public function travel_completed_certificate()
+    {
+        return $this->hasOne(TravelCompletedCertificate::class);
+    }
 }

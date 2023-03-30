@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\Action;
 use App\Models\DisbursementVoucherStep;
 use App\Models\LiquidationReportStep;
+use App\Models\TravelOrderType;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
@@ -144,6 +145,16 @@ class LiquidationReportsIndex extends Component implements HasTable
                     ->modalContent(fn ($record) => view('components.liquidation_reports.liquidation-report-verified-documents', [
                         'liquidation_report' => $record,
                     ])),
+                ViewAction::make('ctc')
+                    ->label('Certificate of Travel Completion')
+                    ->icon('ri-file-text-line')
+                    ->url(fn ($record) => route('ctc.show', ['ctc' => $record->travel_completed_certificate]), true)
+                    ->visible(fn ($record) => $record->travel_completed_certificate()->exists()),
+                ViewAction::make('actual_itinerary')
+                    ->label('Actual Itinerary')
+                    ->icon('ri-file-copy-line')
+                    ->url(fn ($record) => route('signatory.itinerary.print', ['itinerary' => $record->disbursement_voucher->travel_order->itineraries()->where('user_id', $record->user_id)->whereIsActual(true)->first()]), true)
+                    ->visible(fn ($record) => $record->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->exists()),
                 ViewAction::make('view')
                     ->label('Preview')
                     ->openUrlInNewTab()
