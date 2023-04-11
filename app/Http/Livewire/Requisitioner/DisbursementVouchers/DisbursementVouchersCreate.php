@@ -647,7 +647,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->disabled()
                                 ->columnSpan(1),
                             ])->columns(2)
-                            ->visible(fn ($get) => in_array($this->voucher_subtype->id, [3, 5])),
+                            ->visible(fn ($get) => in_array($this->voucher_subtype->id, [3, 4, 5])),
                             #region DV PARTICULARS
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
@@ -843,7 +843,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                 'details' => collect($this->fuel_utility_particulars)->values()->toArray(),
                 'other_expenses' => collect($this->other_expenses)->values()->toArray(),
             ];
-        } else if ($this->voucher_subtype->id == 3 || $this->voucher_subtype->id == 5){
+        } else if ($this->voucher_subtype->id == 3 || $this->voucher_subtype->id == 4 || $this->voucher_subtype->id == 5){
             $other_details = [
                 'activity_date_from' => $this->activity_date_from,
                 'activity_date_to' => $this->activity_date_to,

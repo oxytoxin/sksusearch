@@ -16,6 +16,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Grid;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class BondResource extends Resource
@@ -35,11 +36,16 @@ class BondResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('employee')
+                Grid::make(3)
+                ->schema([
+                    Select::make('employee')
                     ->label('Employee')
                     ->options(EmployeeInformation::where('bond_id', null)->pluck('full_name', 'id'))
                     ->helperText('Employees without bond are shown here')
                     ->searchable()->required(),
+                TextInput::make('bond_certificate_number')
+                ->label('Bond Certificate Number')
+                ->required(),
 
                 TextInput::make('amount')
                     ->label('Bond')
@@ -55,7 +61,12 @@ class BondResource extends Resource
                     )
                     ->helperText('Set amount of bond here')
                     ->required(),
-                DatePicker::make('validity_date')->required(),
+                    ]),
+                Grid::make(2)
+                    ->schema([
+                        DatePicker::make('validity_date_from')->required(),
+                        DatePicker::make('validity_date_to')->required(),
+                    ])
             ]);
     }
 
@@ -76,8 +87,10 @@ class BondResource extends Resource
             ->columns([
                 TextColumn::make('employee_information.full_name')
                     ->label('Employee')->searchable()->sortable(),
+                TextColumn::make('bond_certificate_number')->label('Certificate Number')->searchable()->sortable(),
                 TextColumn::make('amount')->label('Bond')->searchable()->sortable(),
-                TextColumn::make('validity_date')->searchable()->sortable()->date(),
+                TextColumn::make('validity_date_from')->label('From')->searchable()->sortable()->date(),
+                TextColumn::make('validity_date_to')->label('To')->searchable()->sortable()->date(),
             ])
             ->filters([
                 //
