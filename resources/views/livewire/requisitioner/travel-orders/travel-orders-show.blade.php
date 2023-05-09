@@ -119,7 +119,6 @@
                 var originalContents = document.body.innerHTML;
                 document.body.innerHTML = printContents;
                 window.print();
-                window.location.href = "{{ request()->route()->getPrefix() }}/travel-orders";
                 document.body.innerHTML = originalContents;
             }
         </script>
