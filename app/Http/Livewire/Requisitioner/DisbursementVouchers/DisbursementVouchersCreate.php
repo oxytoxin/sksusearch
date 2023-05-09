@@ -104,6 +104,10 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public $signatory_id;
 
+    public $activity_date_from;
+
+    public $activity_date_to;
+
     public VoucherSubType $voucher_subtype;
     // ctc
 
@@ -628,6 +632,22 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ])->createItemButtonLabel('Add New Row')->visible(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71, 74, 75])),
                             //Electricity, Water, Fuel (end)
                             #endregion
+                            Fieldset::make('Date Range')
+                            ->schema([
+                                Flatpickr::make('activity_date_from')
+                                ->label('From')
+                                ->disableTime()
+                                ->required()
+                                ->disabled()
+                                ->columnSpan(1),
+                                Flatpickr::make('activity_date_to')
+                                ->label('To')
+                                ->disableTime()
+                                ->required()
+                                ->disabled()
+                                ->columnSpan(1),
+                            ])->columns(2)
+                            ->visible(fn ($get) => in_array($this->voucher_subtype->id, [3, 4, 5])),
                             #region DV PARTICULARS
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
@@ -823,7 +843,12 @@ class DisbursementVouchersCreate extends Component implements HasForms
                 'details' => collect($this->fuel_utility_particulars)->values()->toArray(),
                 'other_expenses' => collect($this->other_expenses)->values()->toArray(),
             ];
-        } else {
+        } else if ($this->voucher_subtype->id == 3 || $this->voucher_subtype->id == 4 || $this->voucher_subtype->id == 5){
+            $other_details = [
+                'activity_date_from' => $this->activity_date_from,
+                'activity_date_to' => $this->activity_date_to,
+            ];
+        }else{
             $other_details = [];
         }
         $dv = DisbursementVoucher::create([

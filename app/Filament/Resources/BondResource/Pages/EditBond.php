@@ -28,7 +28,9 @@ class EditBond extends EditRecord
         DB::beginTransaction();
         $record->update([
             'amount' => $data['amount'],
-            'validity_date' => $data['validity_date'],
+            'bond_certificate_number' => $data['bond_certificate_number'],
+            'validity_date_from' => $data['validity_date_from'],
+            'validity_date_to' => $data['validity_date_to'],
             'user_id' => $data['employee'],
         ]);
 
