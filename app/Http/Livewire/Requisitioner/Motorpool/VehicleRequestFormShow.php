@@ -7,12 +7,7 @@ use Livewire\Component;
 
 class VehicleRequestFormShow extends Component
 {
-    public $request;
-
-    public function mount($request)
-    {
-        $this->request = RequestSchedule::find($request);
-    }
+    public RequestSchedule $request;
 
     public function render()
     {

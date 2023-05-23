@@ -12,6 +12,9 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @mixin IdeHelperUser
+ */
 class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens;
@@ -123,7 +126,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function travel_order_signatories()
     {
-        return $this->belongsToMany(TravelOrder::class, 'travel_order_signatories', 'user_id', 'travel_order_id')->withPivot('is_approved')->withTimestamps();
+        return $this->belongsToMany(TravelOrder::class, 'travel_order_signatories', 'user_id', 'travel_order_id')->withPivot(['is_approved', 'id', 'role'])->withTimestamps();
     }
 
     public function sidenotes()

@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Str;
 
+/**
+ * @mixin IdeHelperDisbursementVoucher
+ */
 class DisbursementVoucher extends Model
 {
     use HasFactory;

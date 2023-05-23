@@ -5,6 +5,7 @@ use App\Http\Livewire\Requisitioner\Itinerary\ItineraryShow;
 use App\Http\Livewire\Requisitioner\Itinerary\ItineraryPrint;
 use App\Http\Livewire\Signatory\TravelOrders\TravelOrdersIndex;
 use App\Http\Livewire\LiquidationReports\LiquidationReportsShow;
+use App\Http\Livewire\Requisitioner\Motorpool\VehicleRequestFormShow;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersShow;
 use App\Http\Livewire\Signatory\TravelOrders\TravelOrdersToSignView;
 use App\Http\Livewire\Signatory\LiquidationReports\LiquidationReportsIndex;
@@ -29,4 +30,5 @@ Route::middleware([
     Route::get('/liquidation-reports/{liquidation_report}', LiquidationReportsShow::class)->name('liquidation-reports.show');
     Route::get('/motorpool/request-vehicle/for-signature', RequestVehicleForSignature::class)->name('motorpool.for-signature');
     Route::get('/motorpool/request-vehicle/signed', RequestVehicleSigned::class)->name('motorpool.signed');
+    Route::get('/motorpool/vehicle-request-form/{request}', VehicleRequestFormShow::class)->name('motorpool.show-request-form');
 });
