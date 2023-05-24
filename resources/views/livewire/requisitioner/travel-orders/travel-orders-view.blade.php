@@ -112,7 +112,6 @@
                                 } }}
                             </p>
                         @endforeach
-
                     </div>
                 </div>
             </div>

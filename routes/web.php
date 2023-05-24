@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', TestComponent::class);
+    Route::redirect('/', '/requisitioner/dashboard');
     Route::get('/disbursement-voucher-view/{disbursement_voucher}', [HomeController::class, 'disbursement_voucher_view'])->name('disbursement-vouchers.show');
     Route::get('/certification-of-travel-completion/{ctc}', TravelCompletedCertificatePrint::class)->name('ctc.show');
 });

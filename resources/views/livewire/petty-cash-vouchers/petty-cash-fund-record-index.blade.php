@@ -17,13 +17,13 @@
         <div class="flex mt-4 border-t border-l border-r border-black divide-x divide-black">
             <div class="flex-1 px-8 pt-4 text-center">
                 <div class="min-w-[8rem] flex items-end justify-center text-sm border-b whitespace-nowrap border-black min-h-[2rem]">
-                    {{ auth()->user()->employee_information->full_name }}
+                    {{ $petty_cash_fund->custodian?->employee_information?->full_name }}
                 </div>
                 <p class="text-xs">Petty Cash Fund Custodian</p>
             </div>
             <div class="flex-1 px-8 pt-4 text-center">
                 <div class="min-w-[8rem] flex items-end justify-center text-sm border-b whitespace-nowrap border-black min-h-[2rem]">
-                    <p>{{ auth()->user()->employee_information->position?->description }}, {{ auth()->user()->employee_information->office->name }}</p>
+                    <p>{{ $petty_cash_fund->custodian?->employee_information?->designation }}</p>
                 </div>
                 <p class="text-xs">Official Designation</p>
             </div>
@@ -75,13 +75,12 @@
                 <h4 class="text-xl font-bold">CERTIFICATION</h4>
                 <p>I hereby certify that the foregoing is a correct and complete record of all cash advances received and disbursements made by me in my capacity as Petty Cash Fund Custodian of
                     <span class="px-4 border-b border-black">{{ $petty_cash_fund->campus->name }} Campus</span> during the period from
-                    <span class="px-4 border-b border-black">{{ date_format(date_create($data['date_from']), 'm/d/Y') }}</span> to <span
-                          class="px-4 border-b border-black">{{ date_format(date_create($data['date_to']), 'm/d/Y') }}</span>, inclusive,
+                    <span class="px-4 border-b border-black">{{ date_format(date_create($data['date_from']), 'm/d/Y') }}</span> to <span class="px-4 border-b border-black">{{ date_format(date_create($data['date_to']), 'm/d/Y') }}</span>, inclusive,
                     as indicated in the corresponding columns.
                 </p>
                 <div class="flex flex-col items-center mt-16 space-y-8">
                     <div class="flex flex-col items-center">
-                        <h4 class="px-4 border-b border-black">{{ auth()->user()->employee_information->full_name }}</h4>
+                        <h4 class="px-4 border-b border-black">{{ $petty_cash_fund->custodian?->employee_information?->full_name }}</h4>
                         <h5 class="text-xs">Custodian</h5>
                     </div>
                     <div class="flex flex-col items-center">

@@ -55,7 +55,7 @@
                 <p>I hereby certify to the correctness of the above information.</p>
                 <div class="flex justify-center mt-16 space-x-12">
                     <div class="flex flex-col items-center">
-                        <h4 class="px-4 border-b border-black">{{ auth()->user()->employee_information->full_name }}</h4>
+                        <h4 class="px-4 border-b border-black">{{ $petty_cash_fund->custodian?->employee_information?->full_name }}</h4>
                         <h5 class="text-xs">Petty Cash Custodian</h5>
                     </div>
                     <div class="flex flex-col items-center">
