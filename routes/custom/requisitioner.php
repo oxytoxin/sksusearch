@@ -27,7 +27,7 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
 ])->prefix('requisitioner')->name('requisitioner.')->group(function () {
-    Route::get('my-dashboard', function () {
+    Route::get('dashboard', function () {
         if (auth()->user()->employee_information->contact_number == null) {
             return redirect()->route('requisitioner.contact-number');
         } else {
