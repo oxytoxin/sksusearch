@@ -43,10 +43,15 @@
                             <hr>
                             <div>
                                 <h5>Applicants:</h5>
-                                <ul class="gap-2 p-4">
+                                <ul class="p-4 space-y-2">
                                     @foreach ($travel_order->applicants as $applicant)
-                                        <li class="flex items-end justify-between">
-                                            <p>{{ $applicant->employee_information->full_name }}</p>
+                                        <li class="flex items-center justify-between">
+                                            <div class="flex gap-4 items-center">
+                                                <button class="flex items-center">
+                                                    <x-ri-delete-bin-line class="w-5 h-5 text-red-600" onclick="confirm('Are you sure you want to remove this applicant?') || event.stopImmediatePropagation()" wire:click="removeApplicant({{ $applicant->id }})" />
+                                                </button>
+                                                <p>{{ $applicant->employee_information->full_name }}</p>
+                                            </div>
                                             @php
                                                 $proposed_itinerary = $itineraries
                                                     ->where('user_id', $applicant->id)
@@ -85,6 +90,21 @@
                                     @endforeach
                                 </ul>
                             </div>
+                            @if (count($travel_order->removed_applicants))
+                                <div>
+                                    <h5>Removed Applicants:</h5>
+                                    <ul class="gap-2 p-4">
+                                        @foreach ($travel_order->removed_applicants as $removed_applicant)
+                                            <div class="flex gap-4 items-center">
+                                                <button class="flex items-center">
+                                                    <x-ri-arrow-go-back-line class="w-5 h-5 text-green-600" onclick="confirm('Are you sure you want to restore this applicant?') || event.stopImmediatePropagation()" wire:click="restoreApplicant({{ $removed_applicant->id }})" />
+                                                </button>
+                                                <p>{{ $removed_applicant->employee_information->full_name }}</p>
+                                            </div>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                         </div>
                         @if ($needs_approval)
                             <p class="mt-4 text-amber-700">Travel Order needs approval on preliminary signatories.</p>

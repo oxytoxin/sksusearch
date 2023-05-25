@@ -72,6 +72,30 @@ class TravelOrdersToSignView extends Component
         ]);
     }
 
+    public function removeApplicant(User $user)
+    {
+        $this->travel_order->applicants()->updateExistingPivot($user->id, ['deleted_at' => now()]);
+        $this->travel_order->refresh();
+
+        $this->dialog()->success(
+            $title = 'Applicant removed',
+            $description = 'The applicant has been removed from the travel order.',
+            $icon = 'success',
+        );
+    }
+
+    public function restoreApplicant(User $user)
+    {
+        $this->travel_order->removed_applicants()->updateExistingPivot($user->id, ['deleted_at' => null]);
+        $this->travel_order->refresh();
+
+        $this->dialog()->success(
+            $title = 'Applicant restored',
+            $description = 'The applicant has been restored from the travel order.',
+            $icon = 'success',
+        );
+    }
+
     public function showDialog()
     {
     }

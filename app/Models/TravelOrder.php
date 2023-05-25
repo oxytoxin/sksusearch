@@ -46,7 +46,18 @@ class TravelOrder extends Model
 
     public function applicants()
     {
-        return $this->belongsToMany(User::class, 'travel_order_applicants', 'travel_order_id', 'user_id')->withTimestamps();
+        return $this
+            ->belongsToMany(User::class, 'travel_order_applicants', 'travel_order_id', 'user_id')
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps();
+    }
+
+    public function removed_applicants()
+    {
+        return $this
+            ->belongsToMany(User::class, 'travel_order_applicants', 'travel_order_id', 'user_id')
+            ->wherePivotNotNull('deleted_at')
+            ->withTimestamps();
     }
 
     public function signatories()
