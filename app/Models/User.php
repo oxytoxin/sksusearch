@@ -122,7 +122,7 @@ class User extends Authenticatable implements FilamentUser
     public function travel_order_applications()
     {
         return $this->belongsToMany(TravelOrder::class, 'travel_order_applicants', 'user_id', 'travel_order_id')
-            ->wherePivotNotNull('deleted_at')
+            ->wherePivotNull('deleted_at')
             ->withTimestamps();
     }
 
