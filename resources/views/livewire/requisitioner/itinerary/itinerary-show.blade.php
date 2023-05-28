@@ -11,34 +11,22 @@
                 <div class="mt-4 ml-4" x-data="{ open: true }">
                     <div class="flex justify-between w-full">
                         <h3 class="flex justify-between w-full text-lg font-medium leading-6 text-primary-700 hover:text-primary-400 hover:cursor-pointer" x-on:click="open= !open">Travel Order Details
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" :class="open ? 'rotate-180' : 'rotate-360'" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 stroke="currentColor">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" :class="open ? 'rotate-180' : 'rotate-360'" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </h3>
                     </div>
-                    <div class="mt-4 space-y-1 origin-top-left text-primary-500" x-show='open' x-transition:enter='ease-out transition duration-400' x-transition:enter-start='opacity-0 scale-100'
-                         x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-400' x-transition:leave-start='opacity-100 scale-100'
-                         x-transition:leave-end='opacity-0 scale-0'>
+                    <div class="mt-4 space-y-1 origin-top-left text-primary-500" x-show='open' x-transition:enter='ease-out transition duration-400' x-transition:enter-start='opacity-0 scale-100' x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-400' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-0'>
                         <p>Tracking Code: {{ $travel_order->tracking_code }}</p>
                         <p>Travel Order Type: {{ $travel_order->travel_order_type->name }}
                         </p>
                         <p>Date Range: {{ $travel_order->date_from->format('F d Y') }} to
                             {{ $travel_order->date_to->format('F d Y') }}</p>
                         @if ($travel_order->travel_order_type_id == 1)
-                            @if ($travel_order->other_details == '')
-                                <p>Destination:
-                                    {{ $travel_order->philippine_city->city_municipality_description }},
-                                    {{ $travel_order->philippine_province->province_description }},
-                                    {{ $travel_order->philippine_region->region_description }}</p>
-                            @else
-                                <p>Destination: {{ $travel_order->other_details }},
-                                    {{ $travel_order->philippine_city->city_municipality_description }},
-                                    {{ $travel_order->philippine_province->province_description }},
-                                    {{ $travel_order->philippine_region->region_description }}</p>
-                            @endif
+                            <p>Destination: {{ $travel_order->destination }}</p>
                         @endif
-                        <p>Purpose: {{ $travel_order->purpose }}</p>
+                        <p>Purpose:</p>
+                        <p class="whitespace-pre p-4">{{ $travel_order->purpose }}</p>
                         <p>Registration Fee: <span>{{ number_format($travel_order->registration_amount, 2) > 0 ? number_format($travel_order->registration_amount, 2) : 'N/A' }}</span>
                         </p>
                         <p>Total Amount: <span>{{ number_format($total_amount, 2) }}</span>
@@ -56,8 +44,7 @@
 
                     <p class="mt-1 mb-2 text-primary-500">Purpose:
                     </p>
-                    <textarea class="block w-full px-3 py-3 m-0 text-base font-normal text-gray-700 transition ease-in-out bg-white border border-gray-300 border-solid rounded form-control bg-clip-padding focus:text-gray-700 focus:bg-white focus:outline-none"
-                              @if (!$is_requisitioner) disabled @endif rows="3" placeholder="{{ $travel_order->purpose }}" wire:model="purpose"></textarea>
+                    <textarea class="block w-full px-3 py-3 m-0 text-base font-normal text-gray-700 transition ease-in-out bg-white border border-gray-300 border-solid rounded form-control bg-clip-padding focus:text-gray-700 focus:bg-white focus:outline-none" @if (!$is_requisitioner) disabled @endif rows="3" placeholder="{{ $travel_order->purpose }}" wire:model="purpose"></textarea>
                 </div>
                 <div class="flex justify-end w-full">
                     @if ($is_requisitioner)
@@ -72,8 +59,7 @@
                 <div class="mt-4 ml-4">
                     <div class="flex justify-between w-full">
                         <h3 class="flex justify-between w-full text-lg font-medium leading-6 text-primary-700 hover:text-primary-400 hover:cursor-pointer" x-on:click="open= !open">Itinerary</h3>
-                        <a class="max-w-sm px-4 py-2 text-sm font-semibold tracking-wider text-white rounded-lg w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white"
-                           id="print" href="{{ $print_route }}">
+                        <a class="max-w-sm px-4 py-2 text-sm font-semibold tracking-wider text-white rounded-lg w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white" id="print" href="{{ $print_route }}">
                             Print
                         </a>
                     </div>
@@ -83,19 +69,14 @@
                             <div class="block w-full p-2 border-b-0 bg-primary-200 rounded-t-md" :class="open ? 'shadow-md shadow-slate-400' : 'rounded-md'">
                                 <h3 class="flex justify-between w-full font-bold text-primary-900" x-on:click="open = !open">
                                     {{ date_format(date_create($covered['date']), 'F d, Y') }}
-                                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" :class="open ? 'rotate-180' : 'rotate-360'" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                         stroke="currentColor">
+                                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" :class="open ? 'rotate-180' : 'rotate-360'" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
                                     </svg>
                                 </h3>
                             </div>
                             <div>
-                                <div class="origin-top-left" x-show='open' x-transition:enter='ease-out transition duration-400' x-transition:enter-start='opacity-0 scale-100'
-                                     x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-400' x-transition:leave-start='opacity-100 scale-100'
-                                     x-transition:leave-end='opacity-0 scale-0'>
-
+                                <div class="origin-top-left" x-show='open' x-transition:enter='ease-out transition duration-400' x-transition:enter-start='scale-y-0' x-transition:enter-end='scale-y-100' x-transition:leave='transition ease-in duration-400' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-y-0'>
                                     <div class="flex-col px-4 pt-2 pb-5">
-
                                         <p class="mt-4 font-semibold text-primary-500">
                                             <span>Per Diem: </span>
                                             <span class="font-normal">

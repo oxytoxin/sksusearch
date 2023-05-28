@@ -13,9 +13,9 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
 ])->prefix('motorpool')->name('motorpool.')->group(function () {
-    Route::get('/vehicle', VehicleIndex::class)->name('vehicle.index');
-    Route::get('/vehicle/create/{from_schedules}', VehicleCreate::class)->name('vehicle.create');
-    Route::get('/vehicle/edit/{vehicle}', VehicleEdit::class)->name('vehicle.edit');
+    // Route::get('/vehicle', VehicleIndex::class)->name('vehicle.index');
+    // Route::get('/vehicle/create/{from_schedules}', VehicleCreate::class)->name('vehicle.create');
+    // Route::get('/vehicle/edit/{vehicle}', VehicleEdit::class)->name('vehicle.edit');
     Route::get('/schedule/view', ViewSchedules::class)->name('view-schedule');
     Route::get('/requests', RequestIndex::class)->name('request.index');
     Route::get('/requests/new', RequestNewSchedule::class)->name('request.new');

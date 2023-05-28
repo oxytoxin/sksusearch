@@ -2,9 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @mixin IdeHelperEmployeeInformation
+ */
 class EmployeeInformation extends Model
 {
     protected $casts = [
@@ -16,11 +20,6 @@ class EmployeeInformation extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
     }
 
     public function position()
@@ -41,5 +40,20 @@ class EmployeeInformation extends Model
     public function bond()
     {
         return $this->belongsTo(Bond::class);
+    }
+
+    public function designation(): Attribute
+    {
+        $this->load(['position', 'office']);
+        $designation = [];
+        if ($this->position_id) {
+            $designation[] = $this->position->description;
+        }
+        if ($this->office_id) {
+            $designation[] = $this->office->name;
+        }
+        return Attribute::make(
+            get: fn () => implode(' - ', $designation),
+        );
     }
 }

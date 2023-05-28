@@ -57,7 +57,7 @@ class PcvReportIndex extends Component implements HasForms
 
     public function mount()
     {
-        $this->petty_cash_fund = auth()->user()->petty_cash_fund;
+        $this->petty_cash_fund = PettyCashFund::whereCampusId(auth()->user()->employee_information?->campus_id)->first();
         if (!$this->petty_cash_fund) {
             abort(403, 'No petty cash fund found for your campus.');
         }

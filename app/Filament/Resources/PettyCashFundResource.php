@@ -66,7 +66,6 @@ class PettyCashFundResource extends Resource
                 Tables\Columns\TextColumn::make('campus.name'),
                 Tables\Columns\TextColumn::make('custodian.employee_information.full_name'),
                 Tables\Columns\TextColumn::make('voucher_limit')->formatStateUsing(fn ($state) => number_format($state, 2))->prefix('P'),
-                Tables\Columns\TextColumn::make('balance')->formatStateUsing(fn ($state) => number_format($state, 2))->prefix('P'),
             ])
             ->filters([
                 //

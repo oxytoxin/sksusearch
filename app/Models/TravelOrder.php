@@ -7,14 +7,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+/**
+ * @mixin IdeHelperTravelOrder
+ */
 class TravelOrder extends Model
 {
     use HasFactory;
 
     protected $casts = [
-        'date_from' => 'date',
-        'date_to' => 'date',
+        'date_from' => 'immutable_date',
+        'date_to' => 'immutable_date',
         'has_registration' => 'boolean',
+        'needs_vehicle' => 'boolean',
     ];
 
     public static function generateTrackingCode(): string
@@ -42,12 +46,38 @@ class TravelOrder extends Model
 
     public function applicants()
     {
-        return $this->belongsToMany(User::class, 'travel_order_applicants', 'travel_order_id', 'user_id')->withTimestamps();
+        return $this
+            ->belongsToMany(User::class, 'travel_order_applicants', 'travel_order_id', 'user_id')
+            ->wherePivotNull('deleted_at')
+            ->withTimestamps();
+    }
+
+    public function removed_applicants()
+    {
+        return $this
+            ->belongsToMany(User::class, 'travel_order_applicants', 'travel_order_id', 'user_id')
+            ->wherePivotNotNull('deleted_at')
+            ->withTimestamps();
     }
 
     public function signatories()
     {
-        return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->withPivot(['id', 'is_approved'])->withTimestamps();
+        return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->withPivot(['id', 'is_approved', 'role'])->withTimestamps();
+    }
+
+    public function immediate_supervisors()
+    {
+        return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->wherePivot('role', 'immediate_supervisor')->withPivot(['id', 'is_approved', 'role'])->withTimestamps();
+    }
+
+    public function recommending_approval()
+    {
+        return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->wherePivot('role', 'recommending_approval')->withPivot(['id', 'is_approved', 'role'])->withTimestamps();
+    }
+
+    public function university_president()
+    {
+        return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->wherePivot('role', 'university_president')->withPivot(['id', 'is_approved', 'role'])->withTimestamps();
     }
 
     public function sidenotes()
@@ -58,6 +88,28 @@ class TravelOrder extends Model
     public function disbursement_vouchers()
     {
         return $this->hasMany(DisbursementVoucher::class);
+    }
+
+    public function destination(): Attribute
+    {
+        $this->load(['philippine_region', 'philippine_province', 'philippine_city']);
+        $destination = [];
+        if ($this->philippine_region) {
+            $destination[] = $this->philippine_region->region_description;
+        }
+        if ($this->philippine_province) {
+            $destination[] = $this->philippine_province->province_description;
+        }
+        if ($this->philippine_city) {
+            $destination[] = $this->philippine_city->city_municipality_description;
+        }
+        if ($this->other_details) {
+            $destination[] = $this->other_details;
+        }
+
+        return Attribute::make(
+            get: fn () => implode(', ', $destination),
+        );
     }
 
     public function philippine_region()
@@ -73,6 +125,11 @@ class TravelOrder extends Model
     public function philippine_city()
     {
         return $this->belongsTo(PhilippineCity::class);
+    }
+
+    public function request_schedule()
+    {
+        return $this->hasOne(RequestSchedule::class);
     }
 
     public function scopeApproved($query)

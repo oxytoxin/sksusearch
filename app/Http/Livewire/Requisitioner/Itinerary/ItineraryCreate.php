@@ -7,6 +7,7 @@ use App\Models\Itinerary;
 use App\Models\Mot;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
+use Awcodes\FilamentTableRepeater\Components\TableRepeater;
 use Carbon\CarbonPeriod;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Builder\Block;
@@ -61,6 +62,10 @@ class ItineraryCreate extends Component implements HasForms
                     $this->generateItineraryEntries();
                 })
                 ->reactive(),
+            Placeholder::make('itinerary_template')
+                ->label('Itinerary Template Selector')
+                ->content(fn () => view('components.travel_orders.itinerary-template-selector', ['itineraries' => $this->travel_order->itineraries]))
+                ->visible(fn () => filled($this->travel_order)),
             Card::make([
                 Placeholder::make('travel_order_details')
                     ->content(fn () => view('components.travel_orders.travel-order-details', [
@@ -96,40 +101,35 @@ class ItineraryCreate extends Component implements HasForms
                             TextInput::make('total_expenses')->disabled()->default(0),
                         ])->columns(1)->columnSpan(1),
                     ]),
-                    Repeater::make('itinerary_entries')->schema([
-                        Grid::make([
-                            'sm' => 1,
-                            'md' => 2,
-                            'lg' => 6,
+                    TableRepeater::make('itinerary_entries')
+                        ->hideLabels()
+                        ->schema([
+                            Select::make('mot_id')
+                                ->options(Mot::pluck('name', 'id'))
+                                ->label('Mode of Transport')
+                                ->reactive()
+                                ->afterStateUpdated(function ($state, $set) {
+                                    if ($state == 13) {
+                                        $set('transportation_expenses', 0);
+                                    }
+                                })
+                                ->required(),
+                            TextInput::make('place')->required(),
+                            Flatpickr::make('departure_time')
+                                ->disableDate()
+                                ->required(),
+                            Flatpickr::make('arrival_time')
+                                ->disableDate()
+                                ->afterOrEqual('departure_time')
+                                ->required(),
+                            TextInput::make('transportation_expenses')->label('Transportation')
+                                ->default(0)
+                                ->required()
+                                ->numeric()
+                                ->disabled(fn ($get) => $get('mot_id') == 13)
+                                ->reactive(),
+                            TextInput::make('other_expenses')->label('Others')->default(0)->numeric()->reactive(),
                         ])
-                            ->schema([
-                                Select::make('mot_id')
-                                    ->options(Mot::pluck('name', 'id'))
-                                    ->label('Mode of Transport')
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, $set) {
-                                        if ($state == 13) {
-                                            $set('transportation_expenses', 0);
-                                        }
-                                    })
-                                    ->required(),
-                                TextInput::make('place')->required(),
-                                Flatpickr::make('departure_time')
-                                    ->disableDate()
-                                    ->required(),
-                                Flatpickr::make('arrival_time')
-                                    ->disableDate()
-                                    ->afterOrEqual('departure_time')
-                                    ->required(),
-                                TextInput::make('transportation_expenses')->label('Transportation')
-                                    ->default(0)
-                                    ->required()
-                                    ->numeric()
-                                    ->disabled(fn ($get) => $get('mot_id') == 13)
-                                    ->reactive(),
-                                TextInput::make('other_expenses')->label('Others')->default(0)->numeric()->reactive(),
-                            ])
-                    ]),
                 ]),
             ])->disableItemCreation()->disableItemDeletion()->visible(fn ($get) => $get('travel_order_id')),
         ];
@@ -193,6 +193,18 @@ class ItineraryCreate extends Component implements HasForms
         }
     }
 
+    public function copyItinerary(Itinerary $itinerary)
+    {
+        $this->generateItineraryEntries($itinerary);
+        Notification::make()->title('Operation Success')->body('Itinerary copied.')->success()->send();
+    }
+
+    public function clearItinerary()
+    {
+        $this->generateItineraryEntries();
+        Notification::make()->title('Operation Success')->body('Itinerary has been cleared.')->success()->send();
+    }
+
     public function render()
     {
         foreach ($this->itinerary_entries as  $key => $entry) {
@@ -229,11 +241,38 @@ class ItineraryCreate extends Component implements HasForms
     }
 
 
-    private function generateItineraryEntries()
+    private function generateItineraryEntries($itinerary = null)
     {
         $to = $this->travel_order;
         $entries = [];
-        if (isset($to)) {
+        if ($itinerary) {
+            foreach ($itinerary->coverage as $coverage) {
+                $entries[Str::uuid()->toString()] = [
+                    'type' => 'new_entry',
+                    'data' => [
+                        'date' => $coverage['date'],
+                        'per_diem' => $coverage['per_diem'],
+                        'has_per_diem' => true,
+                        'original_per_diem' => $coverage['per_diem'],
+                        'total_expenses' => $coverage['total_expenses'],
+                        'breakfast' => $coverage['breakfast'],
+                        'lunch' => $coverage['lunch'],
+                        'dinner' => $coverage['dinner'],
+                        'lodging' => $coverage['lodging'],
+                        'itinerary_entries' => $itinerary->itinerary_entries()->whereDate('date', $coverage['date'])->get()->map(function ($entry) {
+                            return [
+                                'mot_id' => $entry->mot_id,
+                                'place' => $entry->place,
+                                'departure_time' => $entry->departure_time,
+                                'arrival_time' => $entry->arrival_time,
+                                'transportation_expenses' => $entry->transportation_expenses,
+                                'other_expenses' => $entry->other_expenses,
+                            ];
+                        })->toArray(),
+                    ],
+                ];
+            }
+        } elseif (isset($to)) {
             $days = CarbonPeriod::between($to->date_from, $to->date_to)->toArray();
             foreach ($days as  $day) {
                 if ($to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {

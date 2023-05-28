@@ -1,127 +1,233 @@
-<div>
-    <div class="col-span-2" id="print_to">
-        <div class="flex justify-between w-full p-6 border-b-4 border-black print:flex">
-            <div class="flex w-full ml-3 text-left" id="header">
-                <div class="inline my-auto"><img class="object-scale-down w-20 h-full" src="{{ asset('images/sksulogo.png') }}" alt="sksu logo">
+<div class="p-16" x-data>
+    <div x-ref="travelOrder">
+        @php
+            $requisitioner = $travel_order->applicants->first();
+            $applicants = $travel_order->applicants->where('id', '!=', $requisitioner->id);
+        @endphp
+        <div class="text-xs">
+            <div class="flex">
+                <div class="flex flex-1 justify-center items-center gap-16">
+                    <img class="h-20" src="{{ asset('images/headerlogo1.png') }}" alt="sksulogo">
+                    <div class="text-sm flex flex-col items-center">
+                        <p>Republic of the Philippines</p>
+                        <p class="text-base text-green-600 font-semibold">SULTAN KUDARAT STATE UNIVERSITY</p>
+                        <p>ACCESS, EJC Montilla, 9800 City of Tacurong</p>
+                        <p>Province of Sultan Kudarat</p>
+                    </div>
+                    <img class="h-20" src="{{ asset('images/headerlogo2.png') }}" alt="headerlogo2">
                 </div>
-                <div class="my-auto ml-3">
-                    <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-left text-black">Republic of the Philippines</span>
-                    </div>
-                    <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-left uppercase text-primary-600">sultan kudarat state university</span>
-                    </div>
-                    <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-black">ACCESS, EJC Montilla, 9800 City of Tacurong</span>
-                    </div>
-                    <div class="block">
-                        <span class="text-sm font-semibold tracking-wide text-black">Province of Sultan Kudarat</span>
-                    </div>
-                </div>
+                <img class="w-24" src="{{ (new chillerlan\QRCode\QRCode())->render($travel_order->tracking_code) }}" alt="qr" />
+
             </div>
-            <div class="relative right-0">
-                <div class="m-auto">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ $travel_order->tracking_code }}&amp;size=100x100" title="" alt="" />
-                    <span class="font-xs flex justify-center text-[11px] whitespace-nowrap">{{ $travel_order->tracking_code }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="w-full">
-            <div class="m-6 divide-y divide-black divide-solid print:divide-y-2">
-                <div class="flex items-start w-full h-auto p-6 print:block">
-                    <div class="items-start block w-full space-y-4 text-left" id="header">
-
-                        <div class="flex">
-                            <span class="mx-auto text-5xl font-extrabold tracking-wide text-black uppercase print:text-xl">travel
-                                order</span>
-                        </div>
-                        <div class="block">
-                            <span class="text-sm font-semibold tracking-wide text-left text-black">{{ $travel_order->created_at == '' ? 'Date Not Set' : $travel_order->created_at->format('F d, Y') }}</span>
-                        </div>
-                        <div class="flex gap-8">
-                            <p class="col-span-1 text-sm font-semibold tracking-wide text-black uppercase">Memorandum to:</p>
-                            <div class="grid-cols-2 grid flex-1 gap-2">
-                                @foreach ($travel_order->applicants as $applicant)
-                                    <h4 class="text-sm text-black uppercase whitespace-nowrap">
-                                        {{ $applicant->employee_information->full_name }}
-                                    </h4>
-                                @endforeach
-                            </div>
-                        </div>
+            <hr class="border my-2 border-black">
+            <div class="flex flex-col items-center gap-2">
+                <p class="text-3xl font-semibold" style="font-family: 'Script MT Bold';">Office of the President</p>
+                <div class="flex flex-col items-center gap-2">
+                    <p class="font-semibold text-xl">Travel Order</p>
+                    <div class="flex gap-2">
+                        <p>No. </p>
+                        <p class="min-w-[4rem] text-center border-b border-black">{{ $travel_order->tracking_code }}</p>
                     </div>
-                </div>
-                <div class="flex w-full h-auto px-6 pt-10 print:pt-5" id="contents">
-                    <div class="items-start block w-full space-y-4 text-left" id="header">
-                        <div class="flex-wrap block -space-y-1">
-                            @if ($travel_order->travel_order_type->name == 'Official Time')
-                                <span class="font-semibold tracking-wide text-left text-black text-md">
-                                    You are scheduled to travel on <strong class="underline">{{ $travel_order->date_from->format('F j') . '-' . $travel_order->date_to->format('j, Y') }}</strong>
-                                    to do the following:
-                                </span>
-                            @else
-                                <span class="font-semibold tracking-wide text-left text-black text-md">
-                                    You are hereby directed to proceed to
-                                    <strong>
-                                        @if ($travel_order->other_details != '')
-                                            {{ $travel_order->other_details == null ? '' : $travel_order->other_details }},
-                                        @endif
-                                        {{ $travel_order->philippine_city_id == null ? 'City Not Set' : $travel_order->philippine_city->city_municipality_description }},
-                                        {{ $travel_order->philippine_province_id == null ? 'Province Not Set' : $travel_order->philippine_province->province_description }},
-                                        {{ $travel_order->philippine_region_id == null ? 'City Not Set' : $travel_order->philippine_region->region_description }}
-                                    </strong>
-                                    on
-                                    <strong class="underline">{{ $travel_order->date_from->format('F j') . '-' . $travel_order->date_to->format('j, Y') }}</strong>
-                                    to do the following:
-                                </span>
-                            @endif
-
-                            <span class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
-                                {{ $travel_order->purpose == '' ? 'Purpose not Found' : $travel_order->purpose }}
-                            </span>
-
-                            <p class="block pl-5 font-semibold tracking-wide text-left text-black whitespace-pre-line text-md">
-                                Your travel is on <span class="underline">{{ $travel_order->travel_order_type->name }}</span>. A report of activities should be made immediately upon termination of
-                                this travel order.
+                    <div class="flex gap-4">
+                        <div class="flex gap-2">
+                            <p class="min-w-[4rem] relative text-center border-b border-black">
+                                @if ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_TIME)
+                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1" />
+                                @endif
                             </p>
-
-                            @foreach ($travel_order->signatories as $signatory)
-                                <span class="block pt-16 font-semibold tracking-wide text-center text-black underline text-md">
-                                    {{ $signatory->employee_information->full_name }}
-                                </span>
-                                <span class="block pt-3 font-semibold tracking-wide text-center text-black text-md">
-                                    @if ($signatory->employee_information->position?->description == 'University President')
-                                        {{ $signatory->employee_information->position?->description }}
-                                    @elseif ($signatory->employee_information->position?->description == 'Faculty')
-                                        {{ $signatory->employee_information->position?->description }}
-                                    @elseif($signatory->employee_information->office == null)
-                                        {{ $signatory->employee_information->position?->description }}
-                                    @else
-                                        {{ $signatory->employee_information->position?->description }}, {{ $signatory->employee_information->office->name }}
-                                    @endif
-                                </span>
-                            @endforeach
+                            <p>Official Time</p>
                         </div>
+                        <div class="flex gap-2">
+                            <p class="min-w-[4rem] relative text-center border-b border-black">
+                                @if ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
+                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1" />
+                                @endif
+                            </p>
+                            <p>Official Business</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mt-8">
+                <div>
+                    <div class="flex gap-2">
+                        <div class="w-36 flex gap-2">
+                            <p class="flex-1">Name</p>
+                            <p>:</p>
+                        </div>
+                        <p class="flex-1 border-b border-black">{{ $requisitioner->employee_information->full_name }}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-36 flex gap-2">
+                            <p class="flex-1">Designation</p>
+                            <p>:</p>
+                        </div>
+                        <p class="flex-1 border-b border-black">
+                            {{ auth()->user()->employee_information->position?->description }}
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-36 flex gap-2">
+                            <p class="flex-1">Station</p>
+                            <p>:</p>
+                        </div>
+                        <p class="flex-1 border-b border-black">{{ auth()->user()->employee_information->office?->name }}</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex gap-2">
+                        <div class="w-36 flex gap-2">
+                            <p class="flex-1">Date</p>
+                            <p>:</p>
+                        </div>
+                        <p class="flex-1 border-b border-black">{{ $travel_order->created_at->format('F d, Y') }}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-36 flex gap-2">
+                            <p class="flex-1">Departure Date</p>
+                            <p>:</p>
+                        </div>
+                        <p class="flex-1 border-b border-black">{{ $travel_order->date_from?->format('F d, Y') }}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-36 flex gap-2">
+                            <p class="flex-1">Return Date</p>
+                            <p>:</p>
+                        </div>
+                        <p class="flex-1 border-b border-black">{{ $travel_order->date_to?->format('F d, Y') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <div class="w-36 flex gap-2">
+                    <p class="flex-1">Destination</p>
+                    <p>:</p>
+                </div>
+                <p class="flex-1 border-b border-black">{{ $travel_order->destination }}</p>
+            </div>
+            <div class="flex gap-2">
+                <div class="w-36 flex gap-2">
+                    <p class="flex-1">Purpose</p>
+                    <p>:</p>
+                </div>
+                <p class="flex-1 border-b whitespace-pre border-black"> {{ $travel_order->purpose }}</p>
+            </div>
+            @if (count($applicants))
+                <div class="mt-8">
+                    <p>Accompanied by:</p>
+                    <ul class="grid grid-cols-2 px-4 py-2 gap-2">
+                        @foreach ($applicants as $applicant)
+                            <li class="border-b text-sm border-black">{{ $loop->iteration }}. {{ $applicant->employee_information->full_name }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <div class="flex gap-4 mt-8">
+                <div class="flex gap-4 flex-1">
+                    <p>Vehicle shall be provided:</p>
+                    <div>
+                        <div class="flex gap-2">
+                            <p class="min-w-[4rem] relative text-center border-b border-black">
+                                @if ($travel_order->needs_vehicle)
+                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1" />
+                                @endif
+                            </p>
+                            <p>Yes</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <p class="min-w-[4rem] relative text-center border-b border-black">
+                                @if (!$travel_order->needs_vehicle)
+                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1" />
+                                @endif
+                            </p>
+                            <p>Not Necessary</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4 flex-1">
+                    <p>Remarks:</p>
+                    <p class="text-justify flex-1 whitespace-pre underline"></p>
+                </div>
+            </div>
+            <div class="mt-8">
+                <p>Noted:</p>
+                <div>
+                    <div class="grid grid-cols-2 px-8 gap-16">
+                        @forelse ($travel_order->immediate_supervisors as $supervisor)
+                            <div class="px-8">
+                                <p class="min-w-[4rem] text-sm text-center border-b border-black">{{ $supervisor->employee_information->full_name }}</p>
+                                <p class="text-center">Immediate Supervisor</p>
+                            </div>
+                        @empty
+                            <div class="px-8">
+                                <p class="min-w-[4rem] text-center text-sm border-b border-black">&nbsp;</p>
+                                <p class="text-center">Immediate Supervisor</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8">
+                <div class="grid grid-cols-2">
+                    <div>
+                        <p>Recommending Approval:</p>
+                        @forelse ($travel_order->recommending_approval as $approver)
+                            <div class="px-16 mt-4">
+                                <p class="min-w-[4rem] text-sm text-center border-b border-black">{{ $approver->employee_information->full_name }}</p>
+                                <p class="text-center">VPAA / VPRDEX / VPFARG</p>
+                            </div>
+                        @empty
+                            <div class="px-16 mt-4">
+                                <p class="min-w-[4rem] text-sm text-center border-b border-black">&nbsp;</p>
+                                <p class="text-center">VPAA / VPRDEX / VPFARG</p>
+                            </div>
+                        @endforelse
+                    </div>
+                    @if ($travel_order->philippine_region_id != 13)
+                        <div>
+                            <p>Approved:</p>
+                            @forelse ($travel_order->university_president as $president)
+                                <div class="px-16 mt-4">
+                                    <p class="min-w-[4rem] text-sm text-center border-b border-black">{{ $president->employee_information->full_name }}</p>
+                                    <p class="text-center">University President</p>
+                                </div>
+                            @empty
+                                <div class="px-16 mt-4">
+                                    <p class="min-w-[4rem] text-sm text-center border-b border-black">&nbsp;</p>
+                                    <p class="text-center">University President</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    @endif
+                </div>
+            </div>
+            <hr class="my-4 border-2 border-black border-dashed">
+            <div>
+                <h2 class="text-xl text-center font-semibold">CERTIFICATE OF APPEARANCE</h2>
+                <p class="mt-8 font-semibold">TO WHOM IT MAY CONCERN:</p>
+                <div class="flex mt-4">
+                    <p class="indent-16 text-justify text-sm">This is to certify that the above-mentioned name actually appeared in this office during
+                        <span class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> to
+                        <span class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>.
+                        This certification is issued his/her request as evidence.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 text-sm mt-4">
+                    <div class="px-16">
+                        <p class="min-w-[4rem] text-center border-b border-black">&nbsp;</p>
+                        <p class="text-center">Date</p>
+                    </div>
+                    <div class="px-16">
+                        <p class="min-w-[4rem] text-center border-b border-black">&nbsp;</p>
+                        <p class="text-center">Position</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="flex justify-center">
-        <button class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white" id="printto" type="button" value="click" onclick="printDiv('print_to')">
+        <button class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white" id="printto" type="button" value="click" @click="printOutData($refs.travelOrder.innerHTML, 'Travel Order')">
             Print Travel Order
         </button>
     </div>
-    @push('scripts')
-        <script>
-            function printDiv(divName) {
-                var printContents = document.getElementById(divName).innerHTML;
-                var originalContents = document.body.innerHTML;
-                document.body.innerHTML = printContents;
-                window.print();
-                window.location.href = "{{ request()->route()->getPrefix() }}/travel-orders";
-                document.body.innerHTML = originalContents;
-            }
-        </script>
-    @endpush
 </div>
