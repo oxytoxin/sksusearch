@@ -47,9 +47,11 @@
                                     @foreach ($travel_order->applicants as $applicant)
                                         <li class="flex items-center justify-between">
                                             <div class="flex gap-4 items-center">
-                                                <button class="flex items-center">
-                                                    <x-ri-delete-bin-line class="w-5 h-5 text-red-600" onclick="confirm('Are you sure you want to remove this applicant?') || event.stopImmediatePropagation()" wire:click="removeApplicant({{ $applicant->id }})" />
-                                                </button>
+                                                @if ($actingSignatory->pivot->is_approved == 0 && !$needs_approval)
+                                                    <button class="flex items-center">
+                                                        <x-ri-delete-bin-line class="w-5 h-5 text-red-600" onclick="confirm('Are you sure you want to remove this applicant?') || event.stopImmediatePropagation()" wire:click="removeApplicant({{ $applicant->id }})" />
+                                                    </button>
+                                                @endif
                                                 <p>{{ $applicant->employee_information->full_name }}</p>
                                             </div>
                                             @php
@@ -96,9 +98,11 @@
                                     <ul class="gap-2 p-4">
                                         @foreach ($travel_order->removed_applicants as $removed_applicant)
                                             <div class="flex gap-4 items-center">
-                                                <button class="flex items-center">
-                                                    <x-ri-arrow-go-back-line class="w-5 h-5 text-green-600" onclick="confirm('Are you sure you want to restore this applicant?') || event.stopImmediatePropagation()" wire:click="restoreApplicant({{ $removed_applicant->id }})" />
-                                                </button>
+                                                @if ($actingSignatory->pivot->is_approved == 0 && !$needs_approval)
+                                                    <button class="flex items-center">
+                                                        <x-ri-arrow-go-back-line class="w-5 h-5 text-green-600" onclick="confirm('Are you sure you want to restore this applicant?') || event.stopImmediatePropagation()" wire:click="restoreApplicant({{ $removed_applicant->id }})" />
+                                                    </button>
+                                                @endif
                                                 <p>{{ $removed_applicant->employee_information->full_name }}</p>
                                             </div>
                                         @endforeach
@@ -116,30 +120,27 @@
                             @elseif ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS && $itineraries->where('approved_at', '!=', null)->count() != $travel_order->applicants()->count())
                                 <p class="mt-4 text-amber-700">Incomplete approved itinerary entries from travel order's applicants.</p>
                             @else
-                                <div class="border border-primary-400 p-4 rounded">
-                                    <div>
-                                        @if ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
-                                            <x-filament::button wire:click="toggleTravelOrderType" wire:target="toggleTravelOrderType">Convert Travel Order Type to Official Time</x-filament::button>
-                                        @else
-                                            <x-filament::button wire:click="toggleTravelOrderType" wire:target="toggleTravelOrderType">Convert Travel Order Type to Official Business</x-filament::button>
-                                        @endif
+                                <div class="border flex flex-col border-primary-400 p-4 rounded">
+                                    <div class="flex justify-evenly gap-4 w-full">
+                                        <button class="flex justify-center flex-1 border-2 p-2 rounded border-primary-600 text-sm bg-primary-600 text-white hover:bg-primary-400" onclick="confirm('Are you sure you want to approve this travel order?') || event.stopImmediatePropagation()" wire:click.prevent="approve">
+                                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="font-bold">Approve Travel Order</span>
+                                        </button>
+                                        <button class="flex justify-center flex-1 text-sm bg-red-600 text-white p-2 border-2 border-red-600 rounded hover:bg-red-500" onclick="confirm('Are you sure you want to reject this travel order?') || event.stopImmediatePropagation()" wire:click="$set('modalRejection',true)">
+                                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                                            </svg>
+                                            <span class="">Reject Travel Order</span>
+                                        </button>
                                     </div>
-                                    <div class="flex justify-between w-full">
-                                        <span>&nbsp;</span>
-                                        <div class="flex space-x-3">
-                                            <button class="flex text-sm text-primary-600 hover:text-primary-400" wire:click.prevent="approve">
-                                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                                                </svg>
-                                                <span class="">Approve Travel Order</span>
-                                            </button>
-                                            <button class="flex text-sm text-red-500 hover:text-red-300" wire:click="$set('modalRejection',true)">
-                                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                                                </svg>
-                                                <span class="">Reject Travel Order</span>
-                                            </button>
-                                        </div>
+                                    <div class="self-end mt-4">
+                                        @if ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
+                                            <x-filament::button class="!text-xs !p-1" outlined onclick="confirm('Are you sure you want to convert this travel order?') || event.stopImmediatePropagation()" wire:click="toggleTravelOrderType" size="sm" wire:target="toggleTravelOrderType">Convert Travel Order Type to Official Time</x-filament::button>
+                                        @else
+                                            <x-filament::button onclick="confirm('Are you sure you want to convert this travel order?') || event.stopImmediatePropagation()" wire:click="toggleTravelOrderType" outlined size="sm" wire:target="toggleTravelOrderType">Convert Travel Order Type to Official Business</x-filament::button>
+                                        @endif
                                     </div>
                                 </div>
                             @endif

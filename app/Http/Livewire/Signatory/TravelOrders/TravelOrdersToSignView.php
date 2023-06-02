@@ -6,6 +6,7 @@ use App\Models\Itinerary;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
 use App\Models\User;
+use DB;
 use Filament\Notifications\Notification;
 use Livewire\Component;
 use WireUi\Traits\Actions;
@@ -74,8 +75,11 @@ class TravelOrdersToSignView extends Component
 
     public function removeApplicant(User $user)
     {
+        DB::beginTransaction();
         $this->travel_order->applicants()->updateExistingPivot($user->id, ['deleted_at' => now()]);
+        $this->travel_order->sidenotes()->create(['content' => "Removed applicant {$user->employee_information->full_name} from travel order.", 'user_id' => auth()->id()]);
         $this->travel_order->refresh();
+        DB::commit();
 
         $this->dialog()->success(
             $title = 'Applicant removed',
@@ -86,9 +90,11 @@ class TravelOrdersToSignView extends Component
 
     public function restoreApplicant(User $user)
     {
+        DB::beginTransaction();
         $this->travel_order->removed_applicants()->updateExistingPivot($user->id, ['deleted_at' => null]);
+        $this->travel_order->sidenotes()->create(['content' => "Restored applicant {$user->employee_information->full_name} to travel order.", 'user_id' => auth()->id()]);
         $this->travel_order->refresh();
-
+        DB::commit();
         $this->dialog()->success(
             $title = 'Applicant restored',
             $description = 'The applicant has been restored from the travel order.',
@@ -138,6 +144,7 @@ class TravelOrdersToSignView extends Component
             $this->travel_order->sidenotes()->create(['content' => 'Travel order approved as OIC for: ' . User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
         } else {
             $this->travel_order->signatories()->updateExistingPivot(auth()->id(), ['is_approved' => true]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order approved.', 'user_id' => auth()->id()]);
         }
         $this->travel_order->refresh();
         $this->dialog()->success(
@@ -164,11 +171,12 @@ class TravelOrdersToSignView extends Component
     {
         if ($this->from_oic) {
             $this->travel_order->signatories()->updateExistingPivot($this->oic_signatory, ['is_approved' => 2]);
-            $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected as OIC for: ' . User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order rejected as OIC for: ' . User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
             if (!$rejectedDueToConversion)
                 $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : ' . $this->rejectionNote, 'user_id' => auth()->id()]);
         } else {
             $this->travel_order->signatories()->updateExistingPivot(auth()->id(), ['is_approved' => 2]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order rejected.', 'user_id' => auth()->id()]);
             if (!$rejectedDueToConversion)
                 $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : ' . $this->rejectionNote, 'user_id' => auth()->id()]);
         }

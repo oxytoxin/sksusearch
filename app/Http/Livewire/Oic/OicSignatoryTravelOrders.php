@@ -36,7 +36,9 @@ class OicSignatoryTravelOrders extends Component implements HasTable
             TextColumn::make('date_from')->label('From')->date()->searchable(),
             TextColumn::make('date_to')->label('To')->date()->searchable(),
             TextColumn::make('approved')->label('Status')
-                ->formatStateUsing(fn ($record) => !$record->signatories->contains('pivot.is_approved', false) ? 'Approved' : 'Pending'),
+                ->formatStateUsing(fn ($record) => $record->signatories->contains('pivot.is_approved', 2) ? 'Cancelled'
+                    : ($record->signatories->contains('pivot.is_approved', 0) ? 'Pending'
+                        : 'Approved')),
             TextColumn::make('signed')->label('Signed')
                 ->formatStateUsing(fn ($record, $livewire) => $record->signatories()->wherePivot('user_id', $livewire->tableFilters['as']['value'])->value('is_approved') ? 'Signed' : 'Pending'),
         ];
