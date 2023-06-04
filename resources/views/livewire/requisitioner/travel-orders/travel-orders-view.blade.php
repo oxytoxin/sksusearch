@@ -16,14 +16,16 @@
                         @endif
                         <p class="mt-1 text-sm text-primary-500">
                             Needs Vehicle: {{ $travel_order->needs_vehicle ? 'Yes' : 'Not Necessary' }},
-                            @if ($travel_order->request_schedule)
-                                <a class="font-semibold underline" href="{{ route('requisitioner.motorpool.show-request-form', ['request' => $travel_order->request_schedule]) }}" target="_blank">
-                                    View Vehicle Request Form
-                                </a>
-                            @else
-                                <a class="font-semibold underline" href="{{ route('requisitioner.motorpool.create', ['travel_order' => $travel_order]) }}" target="_blank">
-                                    Create Vehicle Request
-                                </a>
+                            @if ($travel_order->needs_vehicle)
+                                @if ($travel_order->request_schedule)
+                                    <a class="font-semibold underline" href="{{ route('requisitioner.motorpool.show-request-form', ['request' => $travel_order->request_schedule]) }}" target="_blank">
+                                        View Vehicle Request Form
+                                    </a>
+                                @else
+                                    <a class="font-semibold underline" href="{{ route('requisitioner.motorpool.create', ['travel_order' => $travel_order]) }}" target="_blank">
+                                        Create Vehicle Request
+                                    </a>
+                                @endif
                             @endif
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Purpose:</p>
