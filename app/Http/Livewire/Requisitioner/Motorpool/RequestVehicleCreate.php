@@ -208,64 +208,21 @@ class RequestVehicleCreate extends Component implements HasForms
                         $set('time_start', null);
                         $set('time_end', null);
                     }
-                    // $date_from = $get('date_of_travel_from');
-                    // $date_to = $get('date_of_travel_to');
-                    // if($date_from == null || $date_to == null)
-                    // {
-                    //     $this->dialog()->error(
-                    //         $title = 'Invalid Dates',
-                    //         $description = 'Travel dates must not be empty.'
-                    //     );
-                    //     $set('is_vehicle_preferred', false);
-                    // }elseif($date_from > $date_to){
-                    //     $this->dialog()->error(
-                    //         $title = 'Invalid Dates',
-                    //         $description = 'Date of travel from must not be greater than Date of travel to.'
-                    //     );
-                    //     $set('is_vehicle_preferred', false);
-                    //     $set('date_of_travel_from', '');
-                    //     $set('date_of_travel_to', '');
-                    // }
+
                 }),
 
             Select::make('vehicle_id')
                 ->label('Vehicle')
-                ->options(Vehicle::where('campus_id', auth()->user()->employee_information->office->campus_id)->pluck('model', 'id'))
+                ->options(Vehicle::select(DB::raw("CONCAT(campuses.name, ' - ', vehicles.model) AS value"), 'vehicles.id')
+                ->join('campuses', 'campuses.id', '=', 'vehicles.campus_id')
+                ->where('campus_id', auth()->user()->employee_information->office->campus_id)
+                ->pluck('value', 'id'))
                 ->searchable()
                 ->reactive()
                 ->visible(fn ($get) => $get('is_vehicle_preferred') == true)
                 ->required(),
-
-            // Grid::make(2)->schema([
-            //     Flatpickr::make('time_start')
-            //         ->disableDate()
-            //         ->required(),
-            //     Flatpickr::make('time_end')
-            //         ->disableDate()
-            //         ->afterOrEqual(fn ($get) => $get('time_start'))
-            //         ->required(),
-            // ])->visible(fn ($get) => $get('is_vehicle_preferred') == true),
         ];
     }
-
-    // public function mergeDateAndTime($date_and_time)
-    // {
-    //     $result = [];
-
-    //     foreach ($date_and_time as $item) {
-    //         $date = $item['date'];
-
-    //         foreach ($item['time'] as $timeId => $time) {
-    //             $result[] = [
-    //                 'date' => $date,
-    //                 'time_from' => $time['time_from'],
-    //                 'time_to' => $time['time_to'],
-    //             ];
-    //         }
-    //     }
-
-    //     return $result;
-    // }
 
     public function mergeDateAndTime($date_and_time)
     {
