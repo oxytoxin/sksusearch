@@ -460,7 +460,7 @@ class RequestVehicleShow extends Component implements HasForms
         })->get();
         //$this->vehicles = Vehicle::where('campus_id', auth()->user()->employee_information->office->campus_id)->get();
         return view('livewire.requisitioner.motorpool.request-vehicle-show', [
-             'vehicles' =>  Vehicle::where('campus_id', auth()->user()->employee_information->office->campus_id)->get(),
+             'vehicles' =>  Vehicle::get(),
              'vehicles_for_update' =>  Vehicle::where('campus_id', auth()->user()->employee_information->office->campus_id)->whereNotIn('id', [$this->request->vehicle_id])->get(),
             'drivers' => $this->driverss,
         ]);

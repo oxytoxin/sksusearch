@@ -110,7 +110,9 @@ class RequestNewSchedule extends Component implements HasForms
                 ->required(),
             Select::make('vehicle_id')
                 ->label('Vehicle')
-                ->options(Vehicle::where('campus_id', auth()->user()->employee_information->office->campus_id)->pluck('model', 'id'))
+                ->options(Vehicle::select(DB::raw("CONCAT(campuses.name, ' - ', vehicles.model) AS value"), 'vehicles.id')
+                ->join('campuses', 'campuses.id', '=', 'vehicles.campus_id')
+                ->pluck('value', 'id'))
                 ->searchable()
                 ->reactive()
                 ->required(),
