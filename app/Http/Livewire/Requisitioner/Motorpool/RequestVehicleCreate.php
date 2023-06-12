@@ -383,7 +383,7 @@ class RequestVehicleCreate extends Component implements HasForms
                     }
                     DB::commit();
                      Notification::make()->title('Operation Success')->body('Request has been created.')->success()->send();
-                    return redirect()->route('requisitioner.motorpool.show-request-form', $rq);
+                    return redirect()->route('requisitioner.motorpool.index');
 
                 }
             }
