@@ -45,5 +45,10 @@ class RequestSchedule extends Model
     public function philippine_city()
     {
         return $this->belongsTo(PhilippineCity::class);
-    }   
+    }
+
+    public function date_and_times()
+    {
+        return $this->hasMany(RequestScheduleTimeAndDate::class);
+    }
 }

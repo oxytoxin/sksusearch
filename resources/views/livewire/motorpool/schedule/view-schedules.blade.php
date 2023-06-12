@@ -4,12 +4,12 @@
             <x-native-select class="col-span-1" id="vehicle-select" label="Vehicle" wire:model="vehicle">
                 <option value="" selected>All</option>
                 @forelse ($vehicles as $vehicle)
-                    <option class="uppercase" value="{{ $vehicle->id }}">{{ $vehicle->model }}</option>
+                    <option class="uppercase" value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }}</option>
                 @empty
                     <option>No vehicle</option>
                 @endforelse
             </x-native-select>
-            @dump($events)
+            {{-- @dump($events) --}}
         </div>
         <div wire:ignore>
             <div id="calendar"></div>
@@ -121,9 +121,7 @@
                         modalBody.innerHTML = '<div class="bg-primary-100 mt-3 p-3 rounded-md"><p>Date of Travel: ' + formattedDateFrom + ' - ' + formattedDateTo +
                             '</p><p>Time: ' + info.event.start.toLocaleTimeString() + ' - ' + info.event.end
                             .toLocaleTimeString() + '</p><p>Purpose: ' + info.event.extendedProps.purpose +
-                                 '</p><p>Vehicle: ' + info.event.extendedProps.vehicle + ' (' + info.event.extendedProps.plate_number + ') '
-                                    + '</p><p>Driver: ' + info.event.extendedProps.driver +
-                                     '</p><p>Passengers: ' + info.event.extendedProps.passengers + '</p><p>Requested By: ' + info.event.extendedProps.requisitioner + '</p></div>';
+                                 '</p><p>Vehicle: ' + info.event.extendedProps.campus + ' - '+ info.event.extendedProps.vehicle + ' (' + info.event.extendedProps.plate_number + ') </p>';
                         modal.style.display = 'block';
                         var closeButton = document.getElementsByClassName('close')[0];
                         closeButton.onclick = function() {
