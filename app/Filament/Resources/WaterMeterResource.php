@@ -21,7 +21,7 @@ class WaterMeterResource extends Resource
 {
     protected static ?string $model = WaterMeter::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-newspaper'; 
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?int $navigationSort = 12;
 
@@ -35,6 +35,7 @@ class WaterMeterResource extends Resource
                 ->label('Campus')
                 ->options(Campus::all()->pluck('name', 'id'))
                 ->searchable()->required(),
+                TextInput::make('supplier_name')->required(),
                 TextInput::make('meter_number')->required(),
             ]);
     }
@@ -54,6 +55,7 @@ class WaterMeterResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('campus.name')->searchable()->sortable(),
+                TextColumn::make('supplier_name')->searchable()->sortable(),
                 TextColumn::make('meter_number')->searchable()->sortable(),
             ])
             ->filters([
@@ -67,14 +69,14 @@ class WaterMeterResource extends Resource
                 //Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -82,5 +84,5 @@ class WaterMeterResource extends Resource
             'create' => Pages\CreateWaterMeter::route('/create'),
             'edit' => Pages\EditWaterMeter::route('/{record}/edit'),
         ];
-    }    
+    }
 }
