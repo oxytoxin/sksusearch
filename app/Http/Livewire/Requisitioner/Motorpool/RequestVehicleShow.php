@@ -55,6 +55,7 @@ class RequestVehicleShow extends Component implements HasForms
     {
         $this->form->fill();
         $this->scheduleTimes = RequestScheduleTimeAndDate::where('request_schedule_id', $request)->get();
+        $data = [];
         foreach ($this->scheduleTimes as $scheduleTime) {
             $date = $scheduleTime->travel_date;
             $timeFrom = $scheduleTime->time_from;
