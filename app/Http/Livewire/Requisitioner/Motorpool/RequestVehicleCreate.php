@@ -197,7 +197,8 @@ class RequestVehicleCreate extends Component implements HasForms
                     ])
                 ])->createItemButtonLabel('Add time')
             ])->visible(fn ($get) => $this->date_of_travel_from != null && $this->date_of_travel_to != null)
-            ->reactive()->disableItemCreation()->disableItemDeletion(),
+            ->reactive()->disableItemCreation(),
+            // ->disableItemDeletion(),
             Toggle::make('is_vehicle_preferred')
                 ->label('Select Vehicle')
                 ->onIcon('heroicon-s-check')
