@@ -120,7 +120,7 @@ class ItineraryCreate extends Component implements HasForms
                                 ->required(),
                             Flatpickr::make('arrival_time')
                                 ->disableDate()
-                                ->afterOrEqual('departure_time')
+                                // ->afterOrEqual('departure_time')
                                 ->required(),
                             TextInput::make('transportation_expenses')->label('Transportation')
                                 ->default(0)
