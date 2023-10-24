@@ -338,7 +338,7 @@ class RequestVehicleCreate extends Component implements HasForms
                         }elseif($hasConflictVehicle)
                         {
                             $date = Carbon::parse($item['date'])->format('F d, Y');
-                            Notification::make()->title('Operation Failed')->body("The date vehicle you chose has a conflict in the approved schedules")->danger()->send();
+                            Notification::make()->title('Operation Failed')->body("The vehicle you chose has a conflict in the approved schedules. Date : {$date}")->danger()->send();
                             return;
                         }
 
