@@ -24,6 +24,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Notifications\Actions\Action;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Repeater;
 use Illuminate\Validation\ValidationException;
@@ -99,7 +100,14 @@ class RequestVehicleCreate extends Component implements HasForms
                     $query->whereIn('user_id', [auth()->user()->id]);
                 })
                     ->whereIn('travel_order_type_id', [TravelOrderType::OFFICIAL_BUSINESS, TravelOrderType::OFFICIAL_TIME])
-                    ->pluck('tracking_code', 'id'))
+                    ->get()
+                    ->map(function ($travelOrder) {
+                        return [
+                            'value' => $travelOrder->id,
+                            'label' => $travelOrder->tracking_code . ' | ' . $travelOrder->other_details . ' | ' . Carbon::parse($travelOrder->date_from)->format('F d, Y') . ' - ' . Carbon::parse($travelOrder->date_to)->format('F d, Y'),
+                        ];
+                    })
+                    ->pluck('label', 'value'))
                 ->visible(fn ($get) => $get('is_travel_order') == true)
                 ->required()->disabled(fn ($record) => request()->integer('travel_order'))
                 ->afterStateUpdated(function ($set) {
@@ -276,7 +284,6 @@ class RequestVehicleCreate extends Component implements HasForms
                 Notification::make()->title('Operation Failed')->body('Time must be filled. Please add time to each date.')->danger()->send();
             }
              else {
-
                 $dates_and_time = $this->mergeDateAndTime($this->date_and_time);
                 $hasConflictTime = false;
                 $hasConflictVehicle = false;
@@ -333,24 +340,31 @@ class RequestVehicleCreate extends Component implements HasForms
                         if($hasConflictTime)
                         {
                             $date = Carbon::parse($item['date'])->format('F d, Y');
-                            Notification::make()->title('Operation Failed')->body("The date {$date} has a conflict in the approved schedules")->danger()->send();
+                            Notification::make()->title('Operation Failed')->body("The date {$date} has a conflict in the approved schedules")
+                            ->actions([
+                                Action::make('view')
+                                    ->button()
+                                    ->url(route('motorpool.view-schedule'), shouldOpenInNewTab: true),
+                            ])->persistent()
+                            ->danger()->send();
                             return;
                         }elseif($hasConflictVehicle)
                         {
                             $date = Carbon::parse($item['date'])->format('F d, Y');
-                            Notification::make()->title('Operation Failed')->body("The vehicle you chose has a conflict in the approved schedules. Date : {$date}")->danger()->send();
+                            Notification::make()->title('Operation Failed')->body("The vehicle you chose has a conflict in the approved schedules. Date : {$date}")
+                            ->actions([
+                                Action::make('view')
+                                    ->button()
+                                    ->url(route('motorpool.view-schedule'), shouldOpenInNewTab: true),
+                            ])->persistent()
+                            ->danger()->send();
                             return;
                         }
-
-
-                        // $hasConflict = true;
-                        // $date = Carbon::parse($item['date'])->format('F d, Y');
-                        // Notification::make()->title('Operation Failed')->body("The date {$date} has a conflict in the approved schedules")->danger()->send();
-                        // return;
                     }
                 }
 
                 if (!$conflict) {
+
                     DB::beginTransaction();
                     $rq = RequestSchedule::create([
                         'request_type' => $this->is_travel_order ? '1' : '0',
@@ -365,10 +379,6 @@ class RequestVehicleCreate extends Component implements HasForms
                         'other_details' => $this->other_details,
                         'date_of_travel_from' => $this->date_of_travel_from,
                         'date_of_travel_to' => $this->date_of_travel_to,
-                        // 'travel_dates' => json_encode($dates),
-                        // 'available_travel_dates' => json_encode($dates),
-                        // 'time_start' => $this->time_start,
-                        // 'time_end' => $this->time_end,
                         'status' => 'Pending',
                     ]);
                     $rq->applicants()->sync($this->passengers);

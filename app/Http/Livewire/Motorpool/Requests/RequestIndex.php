@@ -17,7 +17,7 @@ class RequestIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return RequestSchedule::query()->where('status', 'Approved');
+        return RequestSchedule::query()->where('status', 'Approved')->latest();
     }
 
     protected function getTableColumns()

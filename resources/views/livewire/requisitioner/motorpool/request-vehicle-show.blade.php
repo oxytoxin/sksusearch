@@ -33,9 +33,9 @@
                         </p> --}}
                         <p class="mt-1 text-sm text-primary-500">Vehicle :
                             {{ $request->vehicle_id == null ? 'Not yet set' : $request->vehicle->campus->name.' - '.$request->vehicle->model }}
-                            @if ($is_president && $request->vehicle_id == null && $request->status == 'Pending')
+                            @if (($is_president || $is_motorpool_head) && $request->vehicle_id == null)
                             <button class="italic underline ml-2" wire:click="$set('assignVehicleModal',true)">(Assign Vehicle)</button>
-                            @elseif($is_president && $request->vehicle_id != null && $request->status == 'Pending')
+                            @elseif(($is_president || $is_motorpool_head) && $request->vehicle_id != null)
                             <button class="italic underline ml-2" wire:click="$set('modifyVehicleModal',true)">(Click to Modify)</button>
                             @endif
                         </p>
@@ -47,6 +47,9 @@
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Driver :
                             {{ $request->driver_id == null ? 'Not yet set' : $request->driver->full_name }}
+                            @if ($is_motorpool_head && $request->driver_id != null)
+                            <button class="italic underline ml-2" wire:click="$set('modifyDriverModal',true)">(Click to modify)</button>
+                            @endif
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Passengers :
                             @foreach ($request->applicants()->get() as $index => $applicant)
@@ -290,6 +293,30 @@
                 <div class="flex">
                     <x-button flat label="Cancel" x-on:click="close" />
                     <x-button primary label="Save" spinner="changeVehicle({{ $request->id }})" wire:click="changeVehicle({{ $request->id }})" />
+                </div>
+            </div>
+        </x-slot>
+    </x-modal.card>
+
+    <x-modal.card title="Change Driver" align="center" blur wire:model.defer="modifyDriverModal">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div class="col-span-1 px-8 sm:col-span-2">
+                <x-native-select label="Driver" wire:model="change_driver">
+                    <option>Select Driver</option>
+
+                    @foreach ($drivers_for_update as $driver)
+                        <option value="{{ $driver->id }}">{{$driver->full_name}}</option>
+                    @endforeach
+                </x-native-select>
+            </div>
+        </div>
+
+        <x-slot name="footer">
+            <div class="flex justify-end gap-x-4">
+                <div class="flex">
+                    <x-button flat label="Cancel" x-on:click="close" />
+                    <x-button primary label="Save" spinner="changeDriver({{ $request->id }})" wire:click="changeDriver({{ $request->id }})" />
                 </div>
             </div>
         </x-slot>

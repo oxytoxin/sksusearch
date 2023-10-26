@@ -121,7 +121,8 @@
                         modalBody.innerHTML = '<div class="bg-primary-100 mt-3 p-3 rounded-md"><p>Date of Travel: ' + formattedDateFrom + ' - ' + formattedDateTo +
                             '</p><p>Time: ' + info.event.start.toLocaleTimeString() + ' - ' + info.event.end
                             .toLocaleTimeString() + '</p><p>Purpose: ' + info.event.extendedProps.purpose +
-                                 '</p><p>Vehicle: ' + info.event.extendedProps.campus + ' - '+ info.event.extendedProps.vehicle + ' (' + info.event.extendedProps.plate_number + ') </p>';
+                                 '</p><p>Vehicle: ' + info.event.extendedProps.campus + ' - '+ info.event.extendedProps.vehicle + ' (' + info.event.extendedProps.plate_number + ') </p>'
+                                 + '</p><p>Driver: ' + info.event.extendedProps.driver + '</p>';
                         modal.style.display = 'block';
                         var closeButton = document.getElementsByClassName('close')[0];
                         closeButton.onclick = function() {

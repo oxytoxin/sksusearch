@@ -55,7 +55,7 @@ class ViewSchedules extends Component
                 'vehicle' => $event->request_schedule->vehicle->model,
                 'plate_number' => $event->request_schedule->vehicle->plate_number,
                 'campus' => $event->request_schedule->vehicle->campus->name,
-                'driver' => $event->request_schedule->driver == null ?  'No Driver Assigned' :  $event->request_schedule->driver,
+                'driver' => $event->request_schedule->driver == null ?  'No Driver Assigned' :  $event->request_schedule->driver->full_name,
                 // 'passengers' => $passengers,
                 'requisitioner' => $event->request_schedule->requested_by->employee_information->full_name,
                         ];

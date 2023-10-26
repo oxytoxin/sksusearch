@@ -31,6 +31,7 @@ class RequestVehicleShow extends Component implements HasForms
     public $vehicless;
     public $assign_vehicle;
     public $change_vehicle;
+    public $change_driver;
     public $time_start;
     public $time_end;
     public $travelDates = [];
@@ -43,6 +44,7 @@ class RequestVehicleShow extends Component implements HasForms
     public $assignDriverModal = false;
     public $assignVehicleModal = false;
     public $modifyVehicleModal = false;
+    public $modifyDriverModal = false;
 
     protected $rules = [
         'vehicless' => 'required',
@@ -320,10 +322,66 @@ class RequestVehicleShow extends Component implements HasForms
 
         }
         DB::commit();
+    }
 
+    public function changeDriver($id)
+    {
+        $this->request_schedule = RequestSchedule::find($id);
+        $this->request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $id)->get();
+        $this->validate([
+            'change_driver' => 'required',
+        ]);
+        $this->dialog()->confirm([
+            'title'       => 'Are you sure you want to assign this driver?',
+            'acceptLabel' => 'Yes',
+            'method'      => 'confirmChangeDriver',
+            'params'      => 'Saved',
+        ]);
+    }
 
+    public function confirmChangeDriver()
+    {
+        DB::beginTransaction();
 
+        $driverId = $this->change_driver;
 
+        foreach($this->request_schedule_date_and_time as $item)
+        {
+            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($driverId){
+                $query->where('status', 'Approved')->where('driver_id', $driverId);
+            })
+            ->where('travel_date', $item->travel_date)
+            ->where(function ($query) use ($item) {
+                $query->where(function ($query) use ($item) {
+                    $query->where('time_from', '<', $item->time_to)
+                          ->where('time_to', '>', $item->time_from);
+                })->orWhere(function ($query) use ($item) {
+                    $query->where('time_from', '>=', $item->time_from)
+                          ->where('time_to', '<=', $item->time_to);
+                });
+            })
+            ->first();
+
+            if(!$conflict)
+            {
+                $this->request_schedule->driver_id = $this->change_driver;
+                $this->request_schedule->save();
+                $item->save();
+
+                $this->dialog()->success(
+                    $title = 'Success',
+                    $description = 'Driver is updated'
+                );
+                $this->modifyDriverModal = false;
+                $this->emit('refreshComponent');
+            }else{
+                $this->dialog()->error(
+                    $title = 'Driver Unavailable',
+                    $description = 'Driver has an existing schedule with this records date and time.'
+                );
+            }
+        }
+        DB::commit();
     }
 
     public function assignDriver($id)
@@ -463,7 +521,8 @@ class RequestVehicleShow extends Component implements HasForms
         return view('livewire.requisitioner.motorpool.request-vehicle-show', [
              'vehicles' =>  Vehicle::get(),
              'vehicles_for_update' =>  Vehicle::where('campus_id', auth()->user()->employee_information->office->campus_id)->whereNotIn('id', [$this->request->vehicle_id])->get(),
-            'drivers' => $this->driverss,
+             'drivers_for_update' =>  EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))->whereNotIn('id', [$this->request->driver_id])->get(),
+             'drivers' => $this->driverss,
         ]);
     }
 }
