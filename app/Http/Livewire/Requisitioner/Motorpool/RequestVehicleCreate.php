@@ -340,22 +340,28 @@ class RequestVehicleCreate extends Component implements HasForms
                         if($hasConflictTime)
                         {
                             $date = Carbon::parse($item['date'])->format('F d, Y');
+                            $carbonDate = Carbon::createFromFormat('F d, Y', $date);
+                            $year = $carbonDate->year;
+                            $month = $carbonDate->month;
                             Notification::make()->title('Operation Failed')->body("The date {$date} has a conflict in the approved schedules")
                             ->actions([
                                 Action::make('view')
                                     ->button()
-                                    ->url(route('motorpool.view-schedule'), shouldOpenInNewTab: true),
+                                    ->url(route('motorpool.view-schedule',  ['year' => $year, 'month' => $month]), shouldOpenInNewTab: true),
                             ])->persistent()
                             ->danger()->send();
                             return;
                         }elseif($hasConflictVehicle)
                         {
                             $date = Carbon::parse($item['date'])->format('F d, Y');
+                            $carbonDate = Carbon::createFromFormat('F d, Y', $date);
+                            $year = $carbonDate->year;
+                            $month = $carbonDate->month;
                             Notification::make()->title('Operation Failed')->body("The vehicle you chose has a conflict in the approved schedules. Date : {$date}")
                             ->actions([
                                 Action::make('view')
                                     ->button()
-                                    ->url(route('motorpool.view-schedule'), shouldOpenInNewTab: true),
+                                    ->url(route('motorpool.view-schedule', ['year' => $year, 'month' => $month]), shouldOpenInNewTab: true),
                             ])->persistent()
                             ->danger()->send();
                             return;

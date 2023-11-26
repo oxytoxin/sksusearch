@@ -13,14 +13,19 @@ class ViewSchedules extends Component
     public $events = [];
     public $vehicles = [];
     public $vehicle;
+    public $year;
+    public $month;
+
 
     protected $rules = [
         'vehicles' => 'required',
     ];
-    public function mount()
+    public function mount($year = null, $month = null)
     {
         $this->vehicles = Vehicle::get();
         $this->events = $this->getFormattedEvents();
+        $this->year = $year ?? now()->year;
+        $this->month = $month ?? now()->month;
     }
 
     public function updatedVehicle($value)

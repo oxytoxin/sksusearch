@@ -91,6 +91,7 @@
                 var calendarEl = document.getElementById('calendar');
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
+                    initialDate: '{{ $year }}-{{ $month }}-01',
                     views: {
                         timeGridWeek: {
                             type: 'timeGrid',
