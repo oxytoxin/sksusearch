@@ -27,7 +27,9 @@ class RequestVehicleShow extends Component implements HasForms
     public $travel_dates;
     public $available_travel_dates;
     public $remarks;
+    public $driver_lists;
     public $driverss;
+    public $assigned_driver;
     public $vehicless;
     public $assign_vehicle;
     public $change_vehicle;
@@ -388,7 +390,7 @@ class RequestVehicleShow extends Component implements HasForms
     {
         $this->request_schedule = RequestSchedule::find($id);
         $this->validate([
-            'driver' => 'required',
+            'assigned_driver' => 'required',
         ]);
         $this->dialog()->confirm([
             'title'       => 'Are you sure you want to assign this driver?',
@@ -400,7 +402,7 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function confirmDriver()
     {
-            $this->request_schedule->driver_id = $this->driver->first()->id;
+            $this->request_schedule->driver_id = $this->assigned_driver;
             $this->request_schedule->save();
             $this->dialog()->success(
                 $title = 'Success',
@@ -513,7 +515,7 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function render()
     {
-        $this->driver = EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))
+        $this->driver_lists = EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))
         ->whereHas('office', function ($query) {
             return $query->where('campus_id', '=', auth()->user()->employee_information->office->campus_id);
         })->get();
@@ -522,7 +524,7 @@ class RequestVehicleShow extends Component implements HasForms
              'vehicles' =>  Vehicle::get(),
              'vehicles_for_update' =>  Vehicle::whereNotIn('id', [$this->request->vehicle_id])->get(),
              'drivers_for_update' =>  EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))->whereNotIn('id', [$this->request->driver_id])->get(),
-             'drivers' => $this->driverss,
+             'drivers' => $this->driver_lists,
         ]);
     }
 }

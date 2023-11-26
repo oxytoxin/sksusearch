@@ -233,9 +233,9 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div class="col-span-1 sm:col-span-2">
-                <x-native-select label="Driver" wire:model="driverss">
+                <x-native-select label="Driver" wire:model="assigned_driver">
                     <option>Select Driver</option>
-                    @foreach ($driver as $drive)
+                    @foreach ($drivers as $drive)
                         <option value="{{ $drive->id }}">{{ $drive->full_name }}</option>
                     @endforeach
                 </x-native-select>
