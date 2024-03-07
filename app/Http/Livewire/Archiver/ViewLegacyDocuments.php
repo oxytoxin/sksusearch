@@ -7,6 +7,7 @@ use App\Models\LegacyDocument;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\Position;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -22,7 +23,7 @@ class ViewLegacyDocuments extends Component implements HasTable
 {
     use InteractsWithTable;
 
-    
+
     public function mount($document_code)
     {
      if($document_code !=""){
@@ -30,7 +31,7 @@ class ViewLegacyDocuments extends Component implements HasTable
      }
     }
 
-    
+
 
     protected function getTableQuery()
     {
@@ -56,7 +57,7 @@ class ViewLegacyDocuments extends Component implements HasTable
             ]),
         ];
     }
-    
+
     protected function getTableColumns()
     {
         return [
@@ -101,7 +102,7 @@ class ViewLegacyDocuments extends Component implements HasTable
                 ->date()
                 ->sortable()
                 ->searchable(),
-           
+
             TextColumn::make('cheque_state')
                 ->label('Cheque State')
                 ->enum([
@@ -120,6 +121,17 @@ class ViewLegacyDocuments extends Component implements HasTable
                 ])
                 ->searchable()->sortable(),
 
+        ];
+    }
+
+    private function getTableHeaderActions()
+    {
+        return [
+            Action::make('legacy_document_details')
+                    ->label('View Legacy Document Counts')
+                    ->button()
+                    ->icon('ri-list-ordered')
+                    ->url(route('archiver.legacy-docs-count')),
         ];
     }
 
@@ -150,7 +162,7 @@ class ViewLegacyDocuments extends Component implements HasTable
                     ->url(fn (LegacyDocument $record): string => route('archiver.archive-leg-doc.update', [$record]))
                     ->icon('ri-edit-2-line'),
             ])->icon('ri-flashlight-fill'),
-            
+
         ];
     }
     protected function getTableActionsPosition(): ?string

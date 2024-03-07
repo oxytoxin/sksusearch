@@ -13,6 +13,7 @@ use App\Http\Livewire\Archiver\ViewLegacyDocuments;
 use App\Http\Livewire\Archiver\ViewLgcScannedDocuments;
 use App\Http\Livewire\Archiver\ViewScannedDocuments;
 use App\Http\Livewire\Archiver\ViewStaleCheques;
+use App\Http\Livewire\Archiver\ViewRecordCounts;
 use App\Http\Livewire\Cashier\CashierDashboard;
 use App\Http\Livewire\Icu\IcuDashboard;
 use App\Http\Livewire\Signatory\TravelOrders\TravelOrdersIndex;
@@ -33,4 +34,5 @@ Route::middleware([
     Route::get('/view-scanned-documents/chueque/{archived_cheque}-{edit}', ViewChqScannedDocuments::class)->name('view-scanned-docs-chq');
     Route::get('/view-scanned-documents/{disbursement_voucher}', ViewScannedDocuments::class)->name('view-scanned-docs');
     Route::get('/view-legacy-documents/email/{document_code}', ViewLegacyDocuments::class)->name('view-legacy-docs-from-email');
+    Route::get('/view-legacy-documents-count', ViewRecordCounts::class)->name('legacy-docs-count');
 });

@@ -1,5 +1,7 @@
 <?php
+/* @noinspection ALL */
 // @formatter:off
+// phpcs:ignoreFile
 
 namespace PHPSTORM_META {
 
@@ -142,6 +144,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -381,6 +384,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -620,6 +624,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -859,6 +864,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -1098,6 +1104,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -1337,6 +1344,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -1576,6 +1584,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -1815,6 +1824,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -2054,6 +2064,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -2293,6 +2304,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
@@ -2532,6 +2544,7 @@ namespace PHPSTORM_META {
             'Illuminate\Testing\ParallelTesting' => \Illuminate\Testing\ParallelTesting::class,
             'Laravel\Fortify\Contracts\ConfirmPasswordViewResponse' => \Laravel\Fortify\Http\Responses\SimpleViewResponse::class,
             'Laravel\Fortify\Contracts\CreatesNewUsers' => \App\Actions\Fortify\CreateNewUser::class,
+            'Laravel\Fortify\Contracts\EmailVerificationNotificationSentResponse' => \Laravel\Fortify\Http\Responses\EmailVerificationNotificationSentResponse::class,
             'Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse' => \Laravel\Fortify\Http\Responses\FailedPasswordConfirmationResponse::class,
             'Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse' => \Laravel\Fortify\Http\Responses\FailedTwoFactorLoginResponse::class,
             'Laravel\Fortify\Contracts\LockoutResponse' => \Laravel\Fortify\Http\Responses\LockoutResponse::class,
