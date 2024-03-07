@@ -18,11 +18,12 @@ use Filament\Tables\Filters\Layout;
 use Filament\Tables\Filters\MultiSelectFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ViewLegacyDocuments extends Component implements HasTable
 {
     use InteractsWithTable;
-
+    use WithPagination;
 
     public function mount($document_code)
     {

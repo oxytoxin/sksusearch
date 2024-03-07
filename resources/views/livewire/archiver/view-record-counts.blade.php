@@ -44,7 +44,12 @@
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{Carbon\Carbon::parse($doc->journal_date)->format('F d, Y')}}</td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{Carbon\Carbon::parse($doc->cheque_date)->format('F d, Y')}}</td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$doc->fund_cluster->name}}</td>
-                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$doc->document_category == 1 ? 'Disbursement Voucher' : 'Liquidation Report'}}</td>
+                            @if ($doc->document_category == 1)
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Disbursement Voucher</td>
+                            @elseif($doc->document_category == 2)
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">Liquidation Report</td>
+                            @endif
+
                           </tr>
                         @endforeach
 
