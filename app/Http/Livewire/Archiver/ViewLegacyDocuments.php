@@ -23,7 +23,7 @@ use Livewire\WithPagination;
 class ViewLegacyDocuments extends Component implements HasTable
 {
     use InteractsWithTable;
-    use WithPagination;
+    // use WithPagination;
 
     public function mount($document_code)
     {
