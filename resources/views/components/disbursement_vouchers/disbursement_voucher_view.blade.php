@@ -263,20 +263,22 @@
                         </div>
                     </div>
                 </div>
+                @php
+                $president = App\Models\EmployeeInformation::where('position_id', 34)->where('office_id', 51)->first();
+                $accountant = App\Models\EmployeeInformation::where('position_id', 15)->where('office_id', 3)->first();
+                @endphp
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-12">
                     <div class="flex items-center w-1/2 space-y-1 text-center border-r-2 border-black print:text-8">
                         <div class="flex w-20 h-auto text-center border-r border-black print:h-8 print:w-16">
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
-                        <span class="flex mx-auto my-auto font-extrabold uppercase print:text-10">JESHER Y.
-                            PALOMARIA</span>
+                        <span class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{$accountant->full_name}}</span>
                     </div>
                     <div class="flex items-center w-1/2 space-y-1 text-center border-r-2 border-black print:text-8">
                         <div class="flex w-20 h-auto text-center border-r border-black print:h-8 print:w-16">
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
-                        <span class="flex mx-auto my-auto font-extrabold uppercase print:text-10">SAMSON L.
-                            MOLAO</span>
+                        <span class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{$president->full_name}}</span>
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-12">

@@ -4,7 +4,7 @@
         <div class="sm:hidden">
           <label for="tabs" class="sr-only">Select a tab</label>
           <!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
-          <select id="tabs" name="tabs" class="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" x-model="activeTab">
+          <select id="tabs" name="tabs" class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500" x-model="activeTab">
             <option selected>Basic Information</option>
 
             <option>History and Development</option>
@@ -17,21 +17,21 @@
         <div class="hidden sm:block">
           <div class="border-b border-gray-200">
             <nav class="-mb-px flex" aria-label="Tabs">
-              <!-- Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" -->
-              <a href="#" class="border-indigo-500 text-indigo-600 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-bold text-sm"
-                :class="{ 'border-indigo-500 text-indigo-600': activeTab === 'basic', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'basic' }"
+              <!-- Current: "border-green-500 text-green-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" -->
+              <a href="#" class="border-green-500 text-green-600 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-bold text-sm"
+                :class="{ 'border-green-500 text-green-600': activeTab === 'basic', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'basic' }"
                 @click.prevent="activeTab = 'basic'" aria-current="page">Basic Information</a>
 
               <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-bold text-sm"
-                :class="{ 'border-indigo-500 text-indigo-600': activeTab === 'history', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'history' }"
+                :class="{ 'border-green-500 text-green-600': activeTab === 'history', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'history' }"
                 @click.prevent="activeTab = 'history'">History and Development</a>
 
               <a href="#" class="border-transparent text-gray-500 w-1/4 py-4 px-1 text-center border-b-2 font-bold text-sm"
-                :class="{ 'border-indigo-500 text-indigo-600': activeTab === 'guide', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'guide' }"
+                :class="{ 'border-green-500 text-green-600': activeTab === 'guide', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'guide' }"
                 @click.prevent="activeTab = 'guide'">User Guide</a>
 
               <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-bold text-sm"
-                :class="{ 'border-indigo-500 text-indigo-600': activeTab === 'memos', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'memos' }"
+                :class="{ 'border-green-500 text-green-600': activeTab === 'memos', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'memos' }"
                 @click.prevent="activeTab = 'memos'">Memos</a>
             </nav>
           </div>
