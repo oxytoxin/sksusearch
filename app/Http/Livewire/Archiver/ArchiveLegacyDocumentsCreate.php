@@ -103,7 +103,11 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     TextInput::make("cheque_amt")
                     ->label("Cheque Amount")
                     ->placeholder("00000.00")
+                    ->mask(fn (TextInput\Mask $mask) => $mask
                     ->numeric()
+
+                    ->thousandsSeparator(','), // Add a separator for thousands.
+                )
                     ->required()
                     ->visible()
                     ->columnSpan(1),

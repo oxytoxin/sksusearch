@@ -225,6 +225,50 @@
                 @endif
             </div>
         </div>
+        <div class="space-y-1" x-data="{ open: false }">
+            <button class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2" type="button" aria-controls="sub-menu-1" aria-expanded="false" x-on:click="open=!open">
+                <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
+                <svg class="" aria-hidden="true" :class="open ?
+                    'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
+                    'flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400'"
+                     viewBox="0 0 20 20">
+                    <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
+                </svg>
+                Work & Financial Plan
+            </button>
+            @php
+                $is_motorpool_head = auth()->user()->employee_information->office_id == 32 && auth()->user()->employee_information->position_id == 12;
+                $isOfficeHead = auth()->user()->employee_information->office->head_employee?->id == auth()->user()->employee_information->id;
+            @endphp
+            <!-- Expandable link section, show/hide based on state. -->
+            <div class="space-y-1" class="origin-top-left" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'>
+                @if ($isAccountant)
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.fund-allocation') }}">
+                    Fund Allocation
+                </a>
+                @endif
+                @if ($isOfficeHead)
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.assign-personnel') }}">
+                    Assign Personnel
+                </a>
+                @endif
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.create-wfp') }}">
+                    Create WFP
+                </a>
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.wfp-history') }}">
+                    WFP History
+                </a>
+                @if (auth()->user()->id == 64)
+                    <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('signatory.motorpool.for-signature') }}">
+                        For Signature
+                    </a>
+                    <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('signatory.motorpool.signed') }}">
+                        Signed
+                    </a>
+                @endif
+            </div>
+        </div>
+
         @if (in_array(auth()->user()->employee_information->position_id, [24, 12, 15]))
             <div class="space-y-1" x-data="{ open: false }">
                 <button class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2" type="button" aria-controls="sub-menu-1" aria-expanded="false" x-on:click="open=!open">

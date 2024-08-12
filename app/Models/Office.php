@@ -37,4 +37,9 @@ class Office extends Model
         return $this->hasOne(EmployeeInformation::class)
             ->where('position_id', $this->head_position_id);
     }
+
+    public function cost_centers()
+    {
+        return $this->hasMany(CostCenter::class);
+    }
 }
