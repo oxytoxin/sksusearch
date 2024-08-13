@@ -25,4 +25,9 @@ class CostCenter extends Model
         return $this->belongsTo(Office::class);
     }
 
+    public function fundAllocations()
+    {
+        return $this->hasMany(FundAllocation::class);
+    }
+
 }

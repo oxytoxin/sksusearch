@@ -42,4 +42,9 @@ class Office extends Model
     {
         return $this->hasMany(CostCenter::class);
     }
+
+    public function wpf_personnels()
+    {
+            return $this->belongsTo(WpfPersonnel::class);
+    }
 }

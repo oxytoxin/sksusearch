@@ -155,4 +155,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsToMany(RequestSchedule::class, 'request_applicants', 'user_id', 'request_schedule_id')->withTimestamps();
     }
+
+    public function wfp_personnel()
+    {
+        return $this->hasMany(WpfPersonnel::class);
+    }
 }
