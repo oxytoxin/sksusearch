@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MFOResource\Pages;
-use App\Filament\Resources\MFOResource\RelationManagers;
-use App\Models\MFO;
+use App\Filament\Resources\BudgetCategoryResource\Pages;
+use App\Filament\Resources\BudgetCategoryResource\RelationManagers;
+use App\Models\BudgetCategory;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -15,17 +15,17 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class MFOResource extends Resource
+class BudgetCategoryResource extends Resource
 {
-    protected static ?string $model = MFO::class;
+    protected static ?string $model = BudgetCategory::class;
 
-    protected static ?string $modelLabel = 'MFO';
+    protected static ?string $modelLabel = 'Budget Categories';
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-menu';
 
-    protected static ?int $navigationSort = 29;
+    protected static ?int $navigationSort = 31;
 
-    protected static ?string $navigationLabel = 'MFO';
+    protected static ?string $navigationLabel = 'Budget Categories';
 
     protected static ?string $navigationGroup = 'Work & Financial Plan';
 
@@ -33,8 +33,7 @@ class MFOResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('code'),
-                TextInput::make('name'),
+                TextInput::make('name')->required(),
             ]);
     }
 
@@ -42,7 +41,6 @@ class MFOResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('code')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
             ])
             ->filters([
@@ -53,7 +51,7 @@ class MFOResource extends Resource
                 ->color('success'),
             ])
             ->bulkActions([
-                //Tables\Actions\DeleteBulkAction::make(),
+               // Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
@@ -67,9 +65,9 @@ class MFOResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMFOS::route('/'),
-            'create' => Pages\CreateMFO::route('/create'),
-            'edit' => Pages\EditMFO::route('/{record}/edit'),
+            'index' => Pages\ListBudgetCategories::route('/'),
+            'create' => Pages\CreateBudgetCategory::route('/create'),
+            'edit' => Pages\EditBudgetCategory::route('/{record}/edit'),
         ];
     }
 }
