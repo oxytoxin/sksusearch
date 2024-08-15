@@ -66,6 +66,7 @@ class AssignPersonnel extends Component implements HasTable
             Tables\Columns\TextColumn::make('user.employee_information.full_name')
             ->wrap()
             ->searchable(),
+            Tables\Columns\TextColumn::make('user.email')->label('Email')->searchable(),
             Tables\Columns\TextColumn::make('user.employee_information.position.description')
             ->wrap()
             ->searchable(),

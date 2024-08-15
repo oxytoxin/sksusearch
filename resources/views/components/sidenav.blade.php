@@ -239,6 +239,9 @@
             @php
                 $is_motorpool_head = auth()->user()->employee_information->office_id == 32 && auth()->user()->employee_information->position_id == 12;
                 $isOfficeHead = auth()->user()->employee_information->office->head_employee?->id == auth()->user()->employee_information->id;
+                $headOfficeId = auth()->user()->employee_information->office->id;
+                $costCenterExist = DB::table('cost_centers')->where('office_id', $headOfficeId)->exists();
+                $isAssignedPersonnel = DB::table('wpf_personnels')->where('user_id', auth()->user()->id)->exists();
             @endphp
             <!-- Expandable link section, show/hide based on state. -->
             <div class="space-y-1" class="origin-top-left" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'>
@@ -247,25 +250,28 @@
                     Fund Allocation
                 </a>
                 @endif
-                @if ($isOfficeHead)
+                @if ($isOfficeHead && $costCenterExist)
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.assign-personnel') }}">
                     Assign Personnel
                 </a>
                 @endif
+                @if (($isOfficeHead && $costCenterExist) || $isAssignedPersonnel)
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.create-wfp') }}">
                     Create WFP
                 </a>
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.wfp-history') }}">
                     WFP History
                 </a>
-                @if (auth()->user()->id == 64)
+                @endif
+
+                {{-- @if (auth()->user()->id == 64)
                     <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('signatory.motorpool.for-signature') }}">
                         For Signature
                     </a>
                     <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('signatory.motorpool.signed') }}">
                         Signed
                     </a>
-                @endif
+                @endif --}}
             </div>
         </div>
 
