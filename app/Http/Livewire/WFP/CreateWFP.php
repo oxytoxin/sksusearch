@@ -12,12 +12,15 @@ use Livewire\Component;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Awcodes\FilamentTableRepeater\Components\TableRepeater;
+use WireUi\Traits\Actions;
 
 class CreateWFP extends Component implements Forms\Contracts\HasForms
 {
     use Forms\Concerns\InteractsWithForms;
+    use Actions;
     public $data;
     public $total_quantity;
+    public $supply_cost;
     public $costCenter;
 
     public function mount()
@@ -69,7 +72,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     ->label('')
                     ->schema([
                         Forms\Components\TextInput::make('description')->columnSpanFull()->required(),
-                        Repeater::make('test')->columnSpanFull()
+                        Repeater::make('test')->label('')->columnSpanFull()
                         ->schema([
                             Forms\Components\Grid::make(5)
                             ->schema([
@@ -84,6 +87,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                 ->required(),
                                 Forms\Components\Select::make('particulars')
                                 ->reactive()
+                                ->afterStateUpdated(function ($state, $set){
+                                    $cost = Supply::find($state)->unit_cost;
+                                    $set('cost_per_unit', $cost);
+                                })
                                 ->options(fn ($get) => Supply::where('category_item_id', $get('account_title'))->pluck('particulars', 'id'))
                                 ->required(),
                                 Forms\Components\TextInput::make('title_of_program')->required(),
@@ -91,10 +98,22 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             ]),
                             Forms\Components\Grid::make(4)
                             ->schema([
-                                Forms\Components\TextInput::make('quantity')->numeric()->default(0)->required(),
+                                Forms\Components\TextInput::make('quantity')
+                                ->reactive()
+                                ->afterStateUpdated(function ($state, $set, $get) {
+                                    $set('estimated_budget', number_format($state * $get('cost_per_unit'), 2));
+                                   //to be updated
+                                })
+                                ->numeric()->default(0)->required(),
                                 Forms\Components\TextInput::make('unit_of_measurement')->required(),
-                                Forms\Components\TextInput::make('cost_per_unit')->required(),
-                                Forms\Components\TextInput::make('estimated_budget')->required(),
+                                Forms\Components\TextInput::make('cost_per_unit')
+                                ->numeric()
+                                ->default(0)
+                                ->disabled()->required(),
+                                Forms\Components\TextInput::make('estimated_budget')
+                                ->numeric()
+                                ->default(0)
+                                ->disabled()->required(),
                             ]),
                             Forms\Components\Grid::make(1)
                             ->schema([
@@ -106,158 +125,169 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                      ->afterStateUpdated(function ($state, $set){
                                     foreach ($this->data['members'] as $items) {
                                         foreach ($items['test'] as $second_entry) {
+                                            $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                             foreach ($second_entry['quantity_year'] as $entry) {
                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                             }
                                         }
                                     }
                                      $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                     $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('feb')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('mar')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('apr')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('may')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('jun')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('jul')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('aug')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('sep')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('oct')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('nov')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                     Forms\Components\TextInput::make('dec')->numeric()->default(0)
                                     ->reactive()
                                      ->afterStateUpdated(function ($state, $set){
                                         foreach ($this->data['members'] as $items) {
                                             foreach ($items['test'] as $second_entry) {
+                                                $this->supply_cost = Supply::find($second_entry['particulars'])->unit_cost;
                                                 foreach ($second_entry['quantity_year'] as $entry) {
                                                     $this->total_quantity = array_sum(array_slice($entry, 0, 12));
                                                 }
                                             }
                                         }
-
                                          $set('../../quantity', $this->total_quantity);
-                                })
-                                    ->required(),
+                                         $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
+                                }),
                                 ])
                                 ->reactive()
 
@@ -272,13 +302,16 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     ->columnSpanFull()
                     ->columns(2),
                 ])
-            ])
+            ]),
         ];
     }
 
     public function submit()
     {
-        dd($this->data);
+        $this->dialog()->error(
+            $title = 'Operation Failed',
+            $description = 'Your grand total has exceeded the budget allocation',
+        );
     }
 
     protected function getFormStatePath(): string
