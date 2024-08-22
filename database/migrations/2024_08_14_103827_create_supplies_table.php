@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('supplies', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_item_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_group_id')->nullable();
             $table->string('supply_code')->nullable();
             $table->string('particulars')->nullable();
             $table->decimal('unit_cost', 10, 2)->nullable();

@@ -30,4 +30,5 @@ class CostCenter extends Model
         return $this->hasMany(FundAllocation::class);
     }
 
+
 }
