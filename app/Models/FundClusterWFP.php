@@ -19,4 +19,14 @@ class FundClusterWFP extends Model
     {
         return $this->hasMany(FundAllocation::class, 'fund_cluster_w_f_p_s_id', 'id');
     }
+
+    public function mfoFees()
+    {
+        return $this->hasMany(MfoFee::class, 'fund_cluster_w_f_p_s_id', 'id');
+    }
+
+    public function wfps()
+    {
+        return $this->hasMany(Wfp::class, 'fund_cluster_w_f_p_s_id', 'id');
+    }
 }

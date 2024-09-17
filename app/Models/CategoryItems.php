@@ -20,5 +20,10 @@ class CategoryItems extends Model
         return $this->hasMany(Supply::class);
     }
 
+    public function wfpDetails()
+    {
+        return $this->hasMany(WfpDetail::class);
+    }
+
 
 }

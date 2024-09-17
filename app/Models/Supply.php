@@ -19,4 +19,9 @@ class Supply extends Model
     {
         return $this->belongsTo(CategoryGroup::class, 'category_group_id');
     }
+
+    public function wfpDetails()
+    {
+        return $this->hasMany(WfpDetail::class);
+    }
 }

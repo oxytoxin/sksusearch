@@ -24,4 +24,9 @@ class FundAllocation extends Model
     {
         return $this->belongsTo(FundClusterWFP::class, 'fund_cluster_w_f_p_s_id', 'id');
     }
+
+    public function categoryGroup()
+    {
+        return $this->belongsTo(CategoryGroup::class, 'category_group_id', 'id');
+    }
 }

@@ -19,7 +19,7 @@ class VerificationCode extends Mailable
      *
      * @return void
      */
-    public function __construct($code,$legacy_document)
+    public function __construct($code,$legacy_document) 
     {
         $this->code = $code;
         $this->ldc = $legacy_document;
@@ -49,7 +49,7 @@ class VerificationCode extends Mailable
         );
     }
 
-    
+
     public function build()
     {
         return $this->view('emails.verification-code');

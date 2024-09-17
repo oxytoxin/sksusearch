@@ -252,6 +252,12 @@
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.fund-allocation') }}">
                     Fund Allocation
                 </a>
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.wfp-submissions') }}">
+                    WFP Submissions
+                </a>
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.generate-ppmp') }}">
+                    Generate PPMP
+                </a>
                 @endif
                 @if ($isOfficeHead && $costCenterExist)
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.assign-personnel') }}">

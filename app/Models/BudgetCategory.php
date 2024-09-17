@@ -14,4 +14,9 @@ class BudgetCategory extends Model
     {
         return $this->hasMany(CategoryItems::class);
     }
+
+    public function wfpDetails()
+    {
+        return $this->hasMany(WfpDetail::class);
+    }
 }

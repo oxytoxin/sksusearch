@@ -36,6 +36,13 @@ class AllocateFunds extends Component
     public function calculateSubTotal($categoryGroupId)
     {
         // Return the amount associated with the given category group ID
+        if($this->amounts[$categoryGroupId] < 0)
+        {
+            $this->amounts[$categoryGroupId] = 0;
+        }else
+        {
+            $this->amounts[$categoryGroupId] = $this->amounts[$categoryGroupId];
+        }
         return $this->amounts[$categoryGroupId] ?? 0;
     }
 
@@ -59,34 +66,25 @@ class AllocateFunds extends Component
 
     public function submitAllocation()
     {
-       if($this->selectedType === "")
+       if($this->selectedType === "" || $this->selectedType === null)
        {
         Notification::make()->title('Please Select a WFP Type')->danger()->send();
+       }else{
+                //save the data
+                foreach($this->amounts as $categoryGroupId => $amount)
+                {
+                    FundAllocation::create([
+                        'cost_center_id' => $this->record->id,
+                        'wpf_type_id' => $this->selectedType,
+                        'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
+                        'category_group_id' => $categoryGroupId,
+                        'initial_amount' => $amount,
+                    ]);
+                }
+
+                Notification::make()->title('Successfully Saved')->success()->send();
+                return redirect()->route('wfp.fund-allocation');
        }
-
-       //save the data
-        foreach($this->amounts as $categoryGroupId => $amount)
-        {
-            FundAllocation::create([
-                'cost_center_id' => $this->record->id,
-                'wpf_type_id' => $this->selectedType,
-                'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
-                'category_group_id' => $categoryGroupId,
-                'initial_amount' => $amount,
-            ]);
-        }
-
-        Notification::make()->title('Successfully Saved')->success()->send();
-        return redirect()->route('wfp.fund-allocation');
-
-    //    $this->validate([
-    //        'amounts.*' => 'required|numeric|min:100'
-    //    ],
-    //    [
-    //        'amounts.*.required' => 'The amount field is required',
-    //        'amounts.*.numeric' => 'The amount field must be a number',
-    //        'amounts.*.min' => 'The amount field must be at least 100'
-    //    ]);
 
     }
 
@@ -102,16 +100,34 @@ class AllocateFunds extends Component
 
     public function submitAllocation161()
     {
-        FundAllocation::create([
-            'cost_center_id' => $this->record->id,
-            'wpf_type_id' => $this->selectedType,
-            'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
-            'initial_amount' => $this->fundInitialAmount,
-            'description' => $this->fund_description
-        ]);
+        if($this->selectedType === "" || $this->selectedType === null)
+        {
+         Notification::make()->title('Please Select a WFP Type')->danger()->send();
+        }else{
+            $this->validate([
+                'fundInitialAmount' => 'required|numeric|min:100',
+                'fund_description' => 'required'
+            ],
+            [
+                'fundInitialAmount.required' => 'The amount field is required',
+                'fundInitialAmount.numeric' => 'The amount field must be a number',
+                'fundInitialAmount.min' => 'The amount field must be at least 100',
+                'fund_description.required' => 'The description field is required'
 
-        Notification::make()->title('Successfully Saved')->success()->send();
-        return redirect()->route('wfp.fund-allocation');
+            ]);
+
+            FundAllocation::create([
+                'cost_center_id' => $this->record->id,
+                'wpf_type_id' => $this->selectedType,
+                'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
+                'initial_amount' => $this->fundInitialAmount,
+                'description' => $this->fund_description
+            ]);
+
+            Notification::make()->title('Successfully Saved')->success()->send();
+            return redirect()->route('wfp.fund-allocation');
+        }
+
     }
 
     public function render()

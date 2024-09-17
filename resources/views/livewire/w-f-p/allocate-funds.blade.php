@@ -57,7 +57,7 @@
                                               <span class="text-gray-500 sm:text-sm">₱</span>
                                           </div>
                                           <input type="number" name="price" id="price_{{ $item->id }}"
-                                          wire:model="amounts.{{ $item->id }}"
+                                          wire:model.lazy="amounts.{{ $item->id }}"
                                           {{-- wire:change="updatedAmounts" --}}
                                           class="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00" aria-describedby="price-currency">
                                           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -113,6 +113,15 @@
                 </dt>
                 <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->mfo->name}} - MFO</dd>
               </div>
+              <div class="my-4 flex w-full flex-none gap-x-4 px-6">
+                <dt class="flex-none">
+                  <span class="sr-only">Status</span>
+                  <svg class="h-6 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+                  </svg>
+                </dt>
+                <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->mfoFee->name}} - MFO Fee</dd>
+              </div>
               <div class="border-t border-gray-900/5 px-6 py-3">
                 <span class="text-sm font-semibold">Please add an initial amount</span>
                 <div class="px-4 sm:px-6 lg:px-8">
@@ -132,8 +141,10 @@
                                 </div>
                             </div>
                         </div>
+                        @error('fundInitialAmount') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
                         <div class="py-3">
                             <textarea wire:model="fund_description" id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Description"></textarea>
+                            @error('fund_description') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
                         </div>
                         </div>
                       </div>
@@ -184,7 +195,7 @@
             </div>
               @endif
             </div>
-            @if ($record->fundClusterWFP->id === 2 || $record->fundClusterWFP->id === 4 || $record->fundClusterWFP->id === 5)
+            @if ($record->fundClusterWFP->id === 2 || $record->fundClusterWFP->id === 4 || $record->fundClusterWFP->id === 5 || $record->fundClusterWFP->id === 6)
             <div class="flex justify-end mt-2">
                 <button wire:click="confirmAllocation161" class="flex hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-3">

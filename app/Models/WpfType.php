@@ -14,4 +14,9 @@ class WpfType extends Model
     {
         return $this->hasMany(FundAllocation::class);
     }
+
+    public function wfps()
+    {
+        return $this->hasMany(Wfp::class, 'wpf_type_id', 'id');
+    }
 }

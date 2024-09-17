@@ -30,5 +30,15 @@ class CostCenter extends Model
         return $this->hasMany(FundAllocation::class);
     }
 
+    public function mfoFee()
+    {
+        return $this->belongsTo(MfoFee::class, 'mfo_fee_id', 'id');
+    }
+
+    public function wfp()
+    {
+        return $this->hasMany(Wfp::class);
+    }
+
 
 }

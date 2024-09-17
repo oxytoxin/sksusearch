@@ -28,11 +28,11 @@ class FundWFPSeeder extends Seeder
         ]);
 
         FundClusterWFP::create([
-            'name' => '164T',
+            'name' => '164TF',
         ]);
 
         FundClusterWFP::create([
-            'name' => '164F',
+            'name' => '164FF/OSF',
         ]);
     }
 }

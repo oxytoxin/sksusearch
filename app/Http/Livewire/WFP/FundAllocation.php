@@ -58,6 +58,8 @@ class FundAllocation extends Component implements HasTable
             ->wrap()->searchable()->sortable(),
             Tables\Columns\TextColumn::make('fundClusterWFP.name')
             ->label('Fund Cluster')->searchable()->sortable(),
+            Tables\Columns\TextColumn::make('mfoFee.name')
+            ->label('MFO Fee')->searchable()->sortable()->wrap(),
             Tables\Columns\TextColumn::make('fundAllocations.wpf_type_id')
             ->getStateUsing(function ($record) {
                 return $record->fundAllocations->first()?->wpfType->description;
@@ -115,33 +117,34 @@ class FundAllocation extends Component implements HasTable
             ->label('Edit fund')
             ->button()
             ->color('warning')
-            ->mountUsing(fn ($record, Forms\ComponentContainer $form) => $form->fill([
-                'wpf_type_id' => $record->fundAllocations->first()->wpf_type_id,
-                'amount' => $record->fundAllocations->sum('amount')
-            ]))
-            ->form([
-                Select::make('wpf_type_id')
-                ->label('WFP Type')
-                ->required()
-                ->options(WpfType::all()->pluck('description', 'id')),
-                TextInput::make('amount')
-                ->label('Amount')
-                ->required()
-                ->mask(fn (TextInput\Mask $mask) => $mask
-                    ->numeric()
-                    ->thousandsSeparator(','),
-                )
-            ])
-            ->action(function($data, $record) {
-                $record->fundAllocations()->update([
-                    'wpf_type_id' => $data['wpf_type_id'],
-                    'amount' => $data['amount']
-                ]);
+            ->url(fn (CostCenter $record): string => route('wfp.edit-allocate-funds', $record))
+            // ->mountUsing(fn ($record, Forms\ComponentContainer $form) => $form->fill([
+            //     'wpf_type_id' => $record->fundAllocations->first()->wpf_type_id,
+            //     'amount' => $record->fundAllocations->sum('amount')
+            // ]))
+            // ->form([
+            //     Select::make('wpf_type_id')
+            //     ->label('WFP Type')
+            //     ->required()
+            //     ->options(WpfType::all()->pluck('description', 'id')),
+            //     TextInput::make('amount')
+            //     ->label('Amount')
+            //     ->required()
+            //     ->mask(fn (TextInput\Mask $mask) => $mask
+            //         ->numeric()
+            //         ->thousandsSeparator(','),
+            //     )
+            // ])
+            // ->action(function($data, $record) {
+            //     $record->fundAllocations()->update([
+            //         'wpf_type_id' => $data['wpf_type_id'],
+            //         'amount' => $data['amount']
+            //     ]);
 
-                Notification::make()->title('Operation Success')->body('Fund Successfully Updated')->success()->send();
+            //     Notification::make()->title('Operation Success')->body('Fund Successfully Updated')->success()->send();
 
-            })
-            ->requiresConfirmation()
+            // })
+            // ->requiresConfirmation()
             ->visible(fn ($record) => $record->fundAllocations()->exists() && !$record->fundAllocations()->where('is_locked', true)->exists()),
             Action::make('lock_fund')
             ->icon('ri-lock-line')
@@ -169,9 +172,6 @@ class FundAllocation extends Component implements HasTable
     protected function getTableFilters(): array
     {
         return [
-            // SelectFilter::make('fund')
-            // ->label('Fund Cluster')
-            // ->relationship('fundClusterWFP', 'name'),
             SelectFilter::make('mfo')
             ->label('MFO')
             ->relationship('mfo', 'name')

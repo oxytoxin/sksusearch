@@ -4,11 +4,14 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\MfoFee;
+use App\Models\FundClusterWFP;
 use App\Models\Office;
 use App\Models\CostCenter;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
@@ -35,12 +38,28 @@ class CostCenterResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('fund_cluster_w_f_p_s_id')
+                Grid::make(3)
+                ->schema([
+                    Select::make('fund_cluster_w_f_p_s_id')
                     ->label('Fund Cluster')
-                    ->relationship('fundClusterWFP', 'name'),
-                Select::make('m_f_o_s_id')
+                    // ->relationship('fundClusterWFP', 'name')
+                    ->options(fn ($record) => FundClusterWFP::orderBy('id')->pluck('name', 'id'))
+                    ->reactive(),
+                    Select::make('m_f_o_s_id')
                     ->label('MFO')
-                    ->relationship('mfo', 'name'),
+                    ->relationship('mfo', 'name')
+                    ->reactive(),
+                    Select::make('mfo_fee_id')
+                    ->label('MFO Fee')
+                    ->options(function ($get) {
+
+                        return MfoFee::where('m_f_o_s_id', $get('m_f_o_s_id'))->where('fund_cluster_w_f_p_s_id', $get('fund_cluster_w_f_p_s_id'))->pluck('name', 'id');
+                    })
+                    ->searchable()
+                    //->relationship('mfoFee', 'name')
+                    ->visible(fn ($get) => $get('fund_cluster_w_f_p_s_id') > 2),
+                ]),
+
                 Select::make('office_id')
                     ->searchable()
                     ->preload()
@@ -62,6 +81,7 @@ class CostCenterResource extends Resource
                 }),
                 TextColumn::make('mfo.name')->label('MFO')->wrap()->searchable()->sortable(),
                 TextColumn::make('fundClusterWFP.name')->label('Fund Cluster')->searchable()->sortable(),
+                TextColumn::make('mfoFee.name')->label('MFO Fee')->searchable()->sortable(),
             ])
             ->filters([
                 //
