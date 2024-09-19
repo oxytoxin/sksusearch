@@ -260,10 +260,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'supplies_particular_id' => 'required',
             'supplies_uom' => 'required',
+            'supplies_cost_per_unit' => 'required|gt:0',
         ],
         [
             'supplies_particular_id.required' => 'Particulars is required',
             'supplies_uom.required' => 'UOM is required',
+            'supplies_cost_per_unit.required' => 'Cost per unit is required',
+            'supplies_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->supplies_estimated_budget);
         //add to supplies array
@@ -392,10 +395,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'mooe_particular_id' => 'required',
             'mooe_uom' => 'required',
+            'mooe_cost_per_unit' => 'required|gt:0',
         ],
         [
             'mooe_particular_id.required' => 'Particulars is required',
             'mooe_uom.required' => 'UOM is required',
+            'mooe_cost_per_unit.required' => 'Cost per unit is required',
+            'mooe_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->mooe_estimated_budget);
         //add to supplies array
@@ -416,14 +422,48 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'estimated_budget' => $intEstimatedBudget,
         ];
 
-        //add current_total to current balance from estimated budget
-        foreach ($this->current_balance as $key => $balance) {
-            if($balance['category_group_id'] == $this->mooe_category_attr->categoryGroups->id)
-            {
-                $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
-                $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6)
+        {
+            $categoryGroupId = $this->mooe_category_attr->categoryGroups->id;
+            $found = false;
+
+            foreach ($this->current_balance as $key => $balance) {
+                if ($balance['category_group_id'] == $categoryGroupId) {
+                    $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $this->current_balance[] = [
+                    'category_group_id' => $categoryGroupId,
+                    'category_group' => $this->mooe_category_attr->categoryGroups->name,
+                    'initial_amount' => 0,
+                    'current_total' => $intEstimatedBudget,
+                    'balance' => $intEstimatedBudget,
+                ];
+            }
+
+        }else{
+            //add current_total to current balance from estimated budget
+            foreach ($this->current_balance as $key => $balance) {
+                if($balance['category_group_id'] == $this->mooe_category_attr->categoryGroups->id)
+                {
+                    $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+                    $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+                }
             }
         }
+
+        //add current_total to current balance from estimated budget
+        // foreach ($this->current_balance as $key => $balance) {
+        //     if($balance['category_group_id'] == $this->mooe_category_attr->categoryGroups->id)
+        //     {
+        //         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+        //         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+        //     }
+        // }
 
         $this->clearMooe();
     }
@@ -498,10 +538,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'training_particular_id' => 'required',
             'training_uom' => 'required',
+            'training_cost_per_unit' => 'required|gt:0',
         ],
         [
             'training_particular_id.required' => 'Particulars is required',
             'training_uom.required' => 'UOM is required',
+            'training_cost_per_unit.required' => 'Cost per unit is required',
+            'training_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->training_estimated_budget);
         //add to supplies array
@@ -521,14 +564,49 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'uom' => $this->training_uom,
             'estimated_budget' => $intEstimatedBudget,
         ];
-        //add current_total to current balance from estimated budget
-        foreach ($this->current_balance as $key => $balance) {
-            if($balance['category_group_id'] == $this->training_category_attr->categoryGroups->id)
-            {
-                $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
-                $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+
+        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6)
+        {
+            $categoryGroupId = $this->training_category_attr->categoryGroups->id;
+            $found = false;
+
+            foreach ($this->current_balance as $key => $balance) {
+                if ($balance['category_group_id'] == $categoryGroupId) {
+                    $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $this->current_balance[] = [
+                    'category_group_id' => $categoryGroupId,
+                    'category_group' => $this->training_category_attr->categoryGroups->name,
+                    'initial_amount' => 0,
+                    'current_total' => $intEstimatedBudget,
+                    'balance' => $intEstimatedBudget,
+                ];
+            }
+
+        }else{
+            //add current_total to current balance from estimated budget
+            foreach ($this->current_balance as $key => $balance) {
+                if($balance['category_group_id'] == $this->training_category_attr->categoryGroups->id)
+                {
+                    $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+                    $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+                }
             }
         }
+
+        //add current_total to current balance from estimated budget
+        // foreach ($this->current_balance as $key => $balance) {
+        //     if($balance['category_group_id'] == $this->training_category_attr->categoryGroups->id)
+        //     {
+        //         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+        //         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+        //     }
+        // }
 
         $this->clearTrainings();
     }
@@ -603,10 +681,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'machine_particular_id' => 'required',
             'machine_uom' => 'required',
+            'machine_cost_per_unit' => 'required|gt:0',
         ],
         [
             'machine_particular_id.required' => 'Particulars is required',
             'machine_uom.required' => 'UOM is required',
+            'machine_cost_per_unit.required' => 'Cost per unit is required',
+            'machine_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->machine_estimated_budget);
         //add to supplies array
@@ -627,14 +708,50 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'uom' => $this->machine_uom,
             'estimated_budget' => $intEstimatedBudget,
         ];
-        //add current_total to current balance from estimated budget
-        foreach ($this->current_balance as $key => $balance) {
-            if($balance['category_group_id'] == $this->machine_category_attr->categoryGroups->id)
-            {
-                $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
-                $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+
+
+        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6)
+        {
+            $categoryGroupId = $this->machine_category_attr->categoryGroups->id;
+            $found = false;
+
+            foreach ($this->current_balance as $key => $balance) {
+                if ($balance['category_group_id'] == $categoryGroupId) {
+                    $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $this->current_balance[] = [
+                    'category_group_id' => $categoryGroupId,
+                    'category_group' => $this->machine_category_attr->categoryGroups->name,
+                    'initial_amount' => 0,
+                    'current_total' => $intEstimatedBudget,
+                    'balance' => $intEstimatedBudget,
+                ];
+            }
+
+        }else{
+            //add current_total to current balance from estimated budget
+            foreach ($this->current_balance as $key => $balance) {
+                if($balance['category_group_id'] == $this->machine_category_attr->categoryGroups->id)
+                {
+                    $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+                    $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+                }
             }
         }
+
+        //add current_total to current balance from estimated budget
+        // foreach ($this->current_balance as $key => $balance) {
+        //     if($balance['category_group_id'] == $this->machine_category_attr->categoryGroups->id)
+        //     {
+        //         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+        //         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+        //     }
+        // }
 
 
         $this->clearMachine();
@@ -710,10 +827,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'building_particular_id' => 'required',
             'building_uom' => 'required',
+            'building_cost_per_unit' => 'required|gt:0',
         ],
         [
             'building_particular_id.required' => 'Particulars is required',
             'building_uom.required' => 'UOM is required',
+            'building_cost_per_unit.required' => 'Cost per unit is required',
+            'building_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->building_estimated_budget);
         //add to supplies array
@@ -733,14 +853,50 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'uom' => $this->building_uom,
             'estimated_budget' => $intEstimatedBudget,
         ];
-        //add current_total to current balance from estimated budget
-        foreach ($this->current_balance as $key => $balance) {
-            if($balance['category_group_id'] == $this->building_category_attr->categoryGroups->id)
-            {
-                $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
-                $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+
+
+        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6)
+        {
+            $categoryGroupId = $this->building_category_attr->categoryGroups->id;
+            $found = false;
+
+            foreach ($this->current_balance as $key => $balance) {
+                if ($balance['category_group_id'] == $categoryGroupId) {
+                    $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $this->current_balance[] = [
+                    'category_group_id' => $categoryGroupId,
+                    'category_group' => $this->building_category_attr->categoryGroups->name,
+                    'initial_amount' => 0,
+                    'current_total' => $intEstimatedBudget,
+                    'balance' => $intEstimatedBudget,
+                ];
+            }
+
+        }else{
+            //add current_total to current balance from estimated budget
+            foreach ($this->current_balance as $key => $balance) {
+                if($balance['category_group_id'] == $this->building_category_attr->categoryGroups->id)
+                {
+                    $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+                    $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+                }
             }
         }
+
+        //add current_total to current balance from estimated budget
+        // foreach ($this->current_balance as $key => $balance) {
+        //     if($balance['category_group_id'] == $this->building_category_attr->categoryGroups->id)
+        //     {
+        //         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
+        //         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
+        //     }
+        // }
 
 
         $this->clearBuilding();
@@ -767,8 +923,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->building_quantity = array_fill(0, 12, 0);
     }
 
-
-
     public function decreaseStep()
     {
         $this->global_index--;
@@ -779,1108 +933,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->global_index++;
     }
 
-    // protected function getFormSchema(): array
-    // {
-    //     return [
-    //         Wizard::make([
-    //             Wizard\Step::make('Initial Information')
-    //             ->schema([
-    //             Forms\Components\TextInput::make('fund_description')->required(),
-    //             Forms\Components\Select::make('source_fund')
-    //             ->label('Source of Fund')
-    //             ->reactive()
-    //             ->afterStateUpdated(fn ($state, $set) => $state != 'MISCELLANEOUS/FIDUCIARY FEE' ? $set('specify_fund_source', '') : '')
-    //             ->options([
-    //                 'TUITION FEE - RESEARCH FUND' => 'TUITION FEE - RESEARCH FUND',
-    //                 'TUITION FEE - EXTENSION FUND' => 'TUITION FEE - EXTENSION FUND',
-    //                 'TUITION FEE - STUDENT DEVELOPMENT' => 'TUITION FEE - STUDENT DEVELOPMENT',
-    //                 'TUITION FEE - FACILITIES DEVELOPMENT' => 'TUITION FEE - FACILITIES DEVELOPMENT',
-    //                 'TUITION FEE - CURRICULUM DEVELOPMENT' => 'TUITION FEE - CURRICULUM DEVELOPMENT',
-    //                 'MISCELLANEOUS/FIDUCIARY FEE' => 'MISCELLANEOUS/FIDUCIARY FEE ',
-    //             ])->required(),
-    //             Forms\Components\TextInput::make('specify_fund_source')
-    //             ->label('if miscellaneous/fiduciary fee, please specify')
-    //             ->required()
-    //             ->visible(fn ($get) => $get('source_fund') === 'MISCELLANEOUS/FIDUCIARY FEE'),
-    //             Forms\Components\Grid::make(1)
-    //             ->schema([
-    //                 Forms\Components\TextInput::make('specific_fund_source')->required(),
-    //             ]),
-    //             ]),
-    //             Wizard\Step::make('Supplies & Semi-Expendables')
-    //                 ->schema([
-    //                     Forms\Components\Grid::make(4)
-    //                 ->schema([
-    //                     Forms\Components\Select::make('particulars')
-    //                     ->reactive()
-    //                     ->options(fn ($get) => Supply::whereHas('categoryItems', function ($query) use ($get) {
-    //                         $query->where('budget_category_id', 1);
-    //                     })->pluck('particulars', 'id'))
-    //                     ->reactive()
-    //                     ->afterStateUpdated(function ($state, $set, $get){
-    //                                 $uacs_code = Supply::find($state)->categoryItems->uacs_code;
-    //                                 $category_group = Supply::find($state)->categoryGroups->id;
-    //                                 $account_title = Supply::find($state)->categoryItems->id;
-    //                                 $ppmp = Supply::find($state)->is_ppmp;
-    //                                 $this->supply_cost = Supply::find($state)->unit_cost;
-
-    //                                 $set('uacs_code', $uacs_code);
-    //                                 $set('title_group', $category_group);
-    //                                 $set('account_title', $account_title);
-    //                                 $set('is_ppmp', $ppmp ? true : false);
-    //                                 $set('cost_per_unit', $ppmp ? number_format($this->supply_cost, 2) : 0);
-    //                     })
-    //                     ->searchable()
-    //                     ->required(),
-    //                     Forms\Components\TextInput::make('uacs_code')->disabled()->required(),
-    //                     Forms\Components\Select::make('title_group')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryGroup::all()->pluck('name', 'id'))
-    //                     ->required(),
-    //                     Forms\Components\Select::make('account_title')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                     ->required()
-    //                 ]),
-    //                 Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         TableRepeater::make('quantity_year')
-    //                             ->label('')
-    //                             ->schema([
-    //                                 Forms\Components\TextInput::make('jan')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('feb')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('mar')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('apr')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('may')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jun')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jul')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('aug')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('sep')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('oct')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('nov')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('dec')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year'] as $entry) {
-    //                                                                 $this->total_quantity = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty', $this->total_quantity);
-    //                                                             $set('../../estimated_budget', number_format($this->total_quantity * $this->supply_cost, 2));
-    //                                                     }),
-    //                                                 ])->hideLabels()
-    //                                                 ->disableItemCreation()
-    //                                                 ->disableItemDeletion()
-    //                                                 ->disableItemMovement()
-    //                                                 ->columnSpan('full'),
-    //                     ]),
-    //                     Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         Toggle::make('is_ppmp')
-    //                         ->label('PPMP')
-    //                         ->default(true)
-    //                         ->disabled()
-    //                         ->reactive(),
-    //                     ]),
-    //                     Forms\Components\Grid::make(4)
-    //                     ->schema([
-    //                         Forms\Components\TextInput::make('total_qty')
-    //                         ->label('Quantity')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-    //                         Forms\Components\Select::make('uom')
-    //                         ->label('UOM')
-    //                         ->required()
-    //                         // ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                         ->options([
-    //                             'pcs' => 'pcs',
-    //                             'box' => 'box',
-    //                             'pax' => 'pax',
-    //                             'lot' => 'lot',
-    //                             'van' => 'van',
-    //                         ]),
-    //                         Forms\Components\TextInput::make('cost_per_unit')
-    //                         ->label('Cost per Unit')
-    //                         ->reactive()
-    //                         ->required()
-    //                         ->disabled(fn ($get) => $get('is_ppmp') === true)
-    //                         ->afterStateUpdated(function ($state, $set){
-    //                             $quantity = $this->data['total_qty'];
-    //                             $total = $quantity * $state;
-    //                             $set('estimated_budget', number_format($total, 2));
-    //                         })
-    //                         ->default(0),
-    //                         Forms\Components\TextInput::make('estimated_budget')
-    //                         ->label('Estimated Budget')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-
-    //                     ])
-    //                 ]),
-    //             Wizard\Step::make('MOOE')
-    //                 ->schema([
-    //                     Forms\Components\Grid::make(4)
-    //                 ->schema([
-    //                     Forms\Components\Select::make('particulars2')
-    //                     ->label('Particulars')
-    //                     ->reactive()
-    //                     ->options(fn ($get) => Supply::whereHas('categoryItems', function ($query) use ($get) {
-    //                         $query->where('budget_category_id', 2);
-    //                     })->pluck('particulars', 'id'))
-    //                     ->reactive()
-    //                     ->afterStateUpdated(function ($state, $set, $get){
-    //                                 $uacs_code = Supply::find($state)->categoryItems->uacs_code;
-    //                                 $category_group = Supply::find($state)->categoryGroups->id;
-    //                                 $account_title = Supply::find($state)->categoryItems->id;
-    //                                 $ppmp = Supply::find($state)->is_ppmp;
-    //                                 $this->supply_cost2 = Supply::find($state)->unit_cost;
-
-    //                                 $set('uacs_code2', $uacs_code);
-    //                                 $set('title_group2', $category_group);
-    //                                 $set('account_title2', $account_title);
-    //                                 $set('is_ppmp2', $ppmp ? true : false);
-    //                                 $set('cost_per_unit2', $ppmp ? number_format($this->supply_cost2, 2) : 0);
-    //                     })
-    //                     ->searchable()
-    //                     ->required(),
-    //                     Forms\Components\TextInput::make('uacs_code2')
-    //                     ->label('UACS CODE')->disabled()->required(),
-    //                     Forms\Components\Select::make('title_group2')
-    //                     ->label('Title Group')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryGroup::all()->pluck('name', 'id'))
-    //                     ->required(),
-    //                     Forms\Components\Select::make('account_title2')
-    //                     ->label('Account Title')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                     ->required()
-    //                 ]),
-    //                 Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         TableRepeater::make('quantity_year2')
-    //                             ->label('')
-    //                             ->schema([
-    //                                 Forms\Components\TextInput::make('jan2')->numeric()->default(0)
-    //                                                         ->label('Jan')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('feb2')->numeric()->default(0)
-    //                                                         ->label('Feb')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('mar2')->numeric()->default(0)
-    //                                                         ->label('Mar')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('apr2')->numeric()->default(0)
-    //                                                         ->label('Apr')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('may2')->numeric()->default(0)
-    //                                                         ->label('May')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jun2')->numeric()->default(0)
-    //                                                         ->label('Jun')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jul2')->numeric()->default(0)
-    //                                                         ->label('Jul')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('aug2')->numeric()->default(0)
-    //                                                         ->label('Aug')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('sep2')->numeric()->default(0)
-    //                                                         ->label('Sep')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('oct2')->numeric()->default(0)
-    //                                                         ->label('Oct')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('nov2')->numeric()->default(0)
-    //                                                         ->label('Nov')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('dec2')->numeric()->default(0)
-    //                                                         ->label('Dec')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year2'] as $entry) {
-    //                                                                 $this->total_quantity2 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty2', $this->total_quantity2);
-    //                                                             $set('../../estimated_budget2', number_format($this->total_quantity2 * $this->supply_cost2, 2));
-    //                                                     }),
-    //                                                 ])->hideLabels()
-    //                                                 ->disableItemCreation()
-    //                                                 ->disableItemDeletion()
-    //                                                 ->disableItemMovement()
-    //                                                 ->columnSpan('full'),
-    //                     ]),
-    //                     Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         Toggle::make('is_ppmp2')
-    //                         ->label('PPMP')
-    //                         ->default(true)
-    //                         ->disabled()
-    //                         ->reactive(),
-    //                     ]),
-    //                     Forms\Components\Grid::make(4)
-    //                     ->schema([
-    //                         Forms\Components\TextInput::make('total_qty2')
-    //                         ->label('Quantity')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-    //                         Forms\Components\Select::make('uom2')
-    //                         ->label('UOM')
-    //                         ->required()
-    //                         // ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                         ->options([
-    //                             'pcs' => 'pcs',
-    //                             'box' => 'box',
-    //                             'pax' => 'pax',
-    //                             'lot' => 'lot',
-    //                             'van' => 'van',
-    //                         ]),
-    //                         Forms\Components\TextInput::make('cost_per_unit2')
-    //                         ->label('Cost per Unit')
-    //                         ->required()
-    //                         ->disabled(fn ($get) => $get('is_ppmp2') === true)
-    //                         ->afterStateUpdated(function ($state, $set){
-    //                             $quantity = $this->data['total_qty2'];
-    //                             $total = $quantity * $state;
-    //                             $set('estimated_budget2', number_format($total, 2));
-    //                         })
-    //                         ->default(0),
-    //                         Forms\Components\TextInput::make('estimated_budget2')
-    //                         ->label('Estimated Budget')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-
-    //                     ])
-    //                 ]),
-    //             Wizard\Step::make('Trainings')
-    //                 ->schema([
-    //                     Forms\Components\Grid::make(4)
-    //                 ->schema([
-    //                     Forms\Components\Select::make('particulars3')
-    //                     ->label('Particulars')
-    //                     ->reactive()
-    //                     ->options(fn ($get) => Supply::whereHas('categoryItems', function ($query) use ($get) {
-    //                         $query->where('budget_category_id', 3);
-    //                     })->pluck('particulars', 'id'))
-    //                     ->reactive()
-    //                     ->afterStateUpdated(function ($state, $set, $get){
-    //                                 $uacs_code = Supply::find($state)->categoryItems->uacs_code;
-    //                                 $category_group = Supply::find($state)->categoryGroups->id;
-    //                                 $account_title = Supply::find($state)->categoryItems->id;
-    //                                 $ppmp = Supply::find($state)->is_ppmp;
-    //                                 $this->supply_cost3 = Supply::find($state)->unit_cost;
-
-    //                                 $set('uacs_code3', $uacs_code);
-    //                                 $set('title_group3', $category_group);
-    //                                 $set('account_title3', $account_title);
-    //                                 $set('is_ppmp3', $ppmp ? true : false);
-
-    //                                 $set('cost_per_unit3', $ppmp ? number_format($this->supply_cost3, 2) : 0);
-    //                     })
-    //                     ->searchable()
-    //                     ->required(),
-    //                     Forms\Components\TextInput::make('uacs_code3')
-    //                     ->label('UACS CODE')
-    //                     ->disabled()->required(),
-    //                     Forms\Components\Select::make('title_group3')
-    //                     ->label('Title Group')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryGroup::all()->pluck('name', 'id'))
-    //                     ->required(),
-    //                     Forms\Components\Select::make('account_title3')
-    //                     ->label('Account Title')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                     ->required()
-    //                 ]),
-    //                 Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         TableRepeater::make('quantity_year3')
-    //                             ->label('')
-    //                             ->schema([
-    //                                 Forms\Components\TextInput::make('jan3')->numeric()->default(0)
-    //                                                         ->label('Jan')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('feb3')->numeric()->default(0)
-    //                                                         ->label('Feb')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('mar3')->numeric()->default(0)
-    //                                                         ->label('Mar')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('apr3')->numeric()->default(0)
-    //                                                         ->label('Apr')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('may3')->numeric()->default(0)
-    //                                                         ->label('May')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jun3')->numeric()->default(0)
-    //                                                         ->label('Jun')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jul3')->numeric()->default(0)
-    //                                                         ->label('Jul')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('aug3')->numeric()->default(0)
-    //                                                         ->label('Aug')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('sep3')->numeric()->default(0)
-    //                                                         ->label('Sep')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('oct3')->numeric()->default(0)
-    //                                                         ->label('Oct')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('nov3')->numeric()->default(0)
-    //                                                         ->label('Nov')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('dec3')->numeric()->default(0)
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year3'] as $entry) {
-    //                                                                 $this->total_quantity3 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty3', $this->total_quantity3);
-    //                                                             $set('../../estimated_budget3', number_format($this->total_quantity3 * $this->supply_cost3, 2));
-    //                                                     }),
-    //                                                 ])->hideLabels()
-    //                                                 ->disableItemCreation()
-    //                                                 ->disableItemDeletion()
-    //                                                 ->disableItemMovement()
-    //                                                 ->columnSpan('full'),
-    //                     ]),
-    //                     Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         Toggle::make('is_ppmp3')
-    //                         ->label('PPMP')
-    //                         ->default(true)
-    //                         ->disabled()
-    //                         ->reactive(),
-    //                     ]),
-    //                     Forms\Components\Grid::make(4)
-    //                     ->schema([
-    //                         Forms\Components\TextInput::make('total_qty3')
-    //                         ->label('Quantity')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-    //                         Forms\Components\Select::make('uom3')
-    //                         ->label('UOM')
-    //                         ->required()
-    //                         // ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                         ->options([
-    //                             'pcs' => 'pcs',
-    //                             'box' => 'box',
-    //                             'pax' => 'pax',
-    //                             'lot' => 'lot',
-    //                             'van' => 'van',
-    //                         ]),
-    //                         Forms\Components\TextInput::make('cost_per_unit3')
-    //                         ->label('Cost per Unit')
-    //                         ->required()
-    //                         ->reactive()
-    //                         ->afterStateUpdated(function ($state, $set){
-    //                         $quantity = $this->data['total_qty3'];
-    //                         $total = $quantity * $state;
-    //                         $set('estimated_budget3', number_format($total, 2));
-    //                         })
-    //                         ->disabled(fn ($get) => $get('is_ppmp3') === true)
-    //                         ->default(0),
-    //                         Forms\Components\TextInput::make('estimated_budget3')
-    //                         ->label('Estimated Budget')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-
-    //                     ])
-    //                 ]),
-    //             Wizard\Step::make('Machine & Equipment / Furniture & Fixtures / Bio / Vehicles')
-    //                 ->schema([
-    //                     Forms\Components\Grid::make(4)
-    //                 ->schema([
-    //                     Forms\Components\Select::make('particulars4')
-    //                     ->label('Particulars')
-    //                     ->reactive()
-    //                     ->afterStateUpdated(function ($state, $set){
-    //                         $cost = Supply::find($state)->unit_cost;
-    //                         $set('cost_per_unit4', $cost);
-    //                     })
-    //                     ->options(fn ($get) => Supply::whereHas('categoryItems', function ($query) use ($get) {
-    //                         $query->where('budget_category_id', 4);
-    //                     })->pluck('particulars', 'id'))
-    //                     ->reactive()
-    //                     ->afterStateUpdated(function ($state, $set, $get){
-    //                                 $uacs_code = Supply::find($state)->categoryItems->uacs_code;
-    //                                 $category_group = Supply::find($state)->categoryGroups->id;
-    //                                 $account_title = Supply::find($state)->categoryItems->id;
-    //                                 $ppmp = Supply::find($state)->is_ppmp;
-    //                                 $this->supply_cost4 = Supply::find($state)->unit_cost;
-
-    //                                 $set('uacs_code4', $uacs_code);
-    //                                 $set('title_group4', $category_group);
-    //                                 $set('account_title4', $account_title);
-    //                                 $set('is_ppmp4', $ppmp ? true : false);
-    //                                 $set('cost_per_unit4', $ppmp ? number_format($this->supply_cost4, 2) : 0);
-    //                     })
-    //                     ->searchable()
-    //                     ->required(),
-    //                     Forms\Components\TextInput::make('uacs_code4')
-    //                     ->label('UACS CODE')->disabled()->required(),
-    //                     Forms\Components\Select::make('title_group4')
-    //                     ->label('Title Group')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryGroup::all()->pluck('name', 'id'))
-    //                     ->required(),
-    //                     Forms\Components\Select::make('account_title4')
-    //                     ->label('Account Title')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                     ->required()
-    //                 ]),
-    //                 Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         TableRepeater::make('quantity_year4')
-    //                             ->label('')
-    //                             ->schema([
-    //                                 Forms\Components\TextInput::make('jan4')->numeric()->default(0)
-    //                                                         ->label('Jan')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('feb4')->numeric()->default(0)
-    //                                                         ->label('Feb')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('mar4')->numeric()->default(0)
-    //                                                         ->label('Mar')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('apr4')->numeric()->default(0)
-    //                                                         ->label('Apr')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('may4')->numeric()->default(0)
-    //                                                         ->label('May')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jun4')->numeric()->default(0)
-    //                                                         ->label('Jun')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jul4')->numeric()->default(0)
-    //                                                         ->label('Jul')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('aug4')->numeric()->default(0)
-    //                                                         ->label('Aug')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('sep4')->numeric()->default(0)
-    //                                                         ->label('Sep')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('oct4')->numeric()->default(0)
-    //                                                         ->label('Oct')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('nov4')->numeric()->default(0)
-    //                                                         ->label('Nov')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('dec4')->numeric()->default(0)
-    //                                                         ->label('Dec')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year4'] as $entry) {
-    //                                                                 $this->total_quantity4 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty4', $this->total_quantity4);
-    //                                                             $set('../../estimated_budget4', number_format($this->total_quantity4 * $this->supply_cost4, 2));
-    //                                                     }),
-    //                                                 ])->hideLabels()
-    //                                                 ->disableItemCreation()
-    //                                                 ->disableItemDeletion()
-    //                                                 ->disableItemMovement()
-    //                                                 ->columnSpan('full'),
-    //                     ]),
-    //                     Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         Toggle::make('is_ppmp4')
-    //                         ->label('PPMP')
-    //                         ->default(true)
-    //                         ->disabled()
-    //                         ->reactive(),
-    //                     ]),
-    //                     Forms\Components\Grid::make(4)
-    //                     ->schema([
-    //                         Forms\Components\TextInput::make('total_qty4')
-    //                         ->label('Quantity')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-    //                         Forms\Components\Select::make('uom4')
-    //                         ->label('UOM')
-    //                         ->required()
-    //                         // ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                         ->options([
-    //                             'pcs' => 'pcs',
-    //                             'box' => 'box',
-    //                             'pax' => 'pax',
-    //                             'lot' => 'lot',
-    //                             'van' => 'van',
-    //                         ]),
-    //                         Forms\Components\TextInput::make('cost_per_unit4')
-    //                         ->label('Cost per Unit')
-    //                         ->required()
-    //                         ->afterStateUpdated(function ($state, $set){
-    //                             $quantity = $this->data['total_qty4'];
-    //                             $total = $quantity * $state;
-    //                             $set('estimated_budget4', number_format($total, 2));
-    //                         })
-    //                         ->disabled(fn ($get) => $get('is_ppmp4') === true)
-    //                         ->default(0),
-    //                         Forms\Components\TextInput::make('estimated_budget4')
-    //                         ->label('Estimated Budget')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-
-    //                     ])
-    //                 ]),
-    //             Wizard\Step::make('Building & Infrastructure')
-    //                 ->schema([
-    //                     Forms\Components\Grid::make(4)
-    //                 ->schema([
-    //                     Forms\Components\Select::make('particulars5')
-    //                     ->label('Particulars')
-    //                     ->reactive()
-    //                     ->afterStateUpdated(function ($state, $set){
-    //                         $cost = Supply::find($state)->unit_cost;
-    //                         $set('cost_per_unit5', $cost);
-    //                     })
-    //                     ->options(fn ($get) => Supply::whereHas('categoryItems', function ($query) use ($get) {
-    //                         $query->where('budget_category_id', 5);
-    //                     })->pluck('particulars', 'id'))
-    //                     ->reactive()
-    //                     ->afterStateUpdated(function ($state, $set, $get){
-    //                                 $uacs_code = Supply::find($state)->categoryItems->uacs_code;
-    //                                 $category_group = Supply::find($state)->categoryGroups->id;
-    //                                 $account_title = Supply::find($state)->categoryItems->id;
-    //                                 $ppmp = Supply::find($state)->is_ppmp;
-    //                                 $this->supply_cost5 = Supply::find($state)->unit_cost;
-
-    //                                 $set('uacs_code5', $uacs_code);
-    //                                 $set('title_group5', $category_group);
-    //                                 $set('account_title5', $account_title);
-    //                                 $set('is_ppmp5', $ppmp ? true : false);
-    //                                 $set('cost_per_unit5', $ppmp ? number_format($this->supply_cost5, 2) : 0);
-    //                     })
-    //                     ->searchable()
-    //                     ->required(),
-    //                     Forms\Components\TextInput::make('uacs_code5')
-    //                     ->label('UACS CODE')
-    //                     ->disabled()->required(),
-    //                     Forms\Components\Select::make('title_group5')
-    //                     ->label('Title Group')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryGroup::all()->pluck('name', 'id'))
-    //                     ->required(),
-    //                     Forms\Components\Select::make('account_title5')
-    //                     ->label('Account Title')
-    //                     ->disabled()
-    //                     ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                     ->required()
-    //                 ]),
-    //                 Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         TableRepeater::make('quantity_year5')
-    //                             ->label('')
-    //                             ->schema([
-    //                                 Forms\Components\TextInput::make('jan5')->numeric()->default(0)
-    //                                                         ->label('Jan')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('feb5')->numeric()->default(0)
-    //                                                         ->label('Feb')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('mar5')->numeric()->default(0)
-    //                                                         ->label('Mar')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('apr5')->numeric()->default(0)
-    //                                                         ->label('Apr')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('may5')->numeric()->default(0)
-    //                                                         ->label('May')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jun5')->numeric()->default(0)
-    //                                                         ->label('Jun')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('jul5')->numeric()->default(0)
-    //                                                         ->label('Jul')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('aug5')->numeric()->default(0)
-    //                                                         ->label('Aug')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('sep5')->numeric()->default(0)
-    //                                                         ->label('Sep')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('oct5')->numeric()->default(0)
-    //                                                         ->label('Oct')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('nov5')->numeric()->default(0)
-    //                                                         ->label('Nov')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                         Forms\Components\TextInput::make('dec5')->numeric()->default(0)
-    //                                                         ->label('Dec')
-    //                                                         ->reactive()
-    //                                                          ->afterStateUpdated(function ($state, $set){
-    //                                                             foreach ($this->data['quantity_year5'] as $entry) {
-    //                                                                 $this->total_quantity5 = array_sum(array_slice($entry, 0, 12));
-    //                                                             }
-    //                                                             $set('../../total_qty5', $this->total_quantity5);
-    //                                                             $set('../../estimated_budget5', number_format($this->total_quantity5 * $this->supply_cost5, 2));
-    //                                                     }),
-    //                                                 ])->hideLabels()
-    //                                                 ->disableItemCreation()
-    //                                                 ->disableItemDeletion()
-    //                                                 ->disableItemMovement()
-    //                                                 ->columnSpan('full'),
-    //                     ]),
-    //                     Forms\Components\Grid::make(1)
-    //                     ->schema([
-    //                         Toggle::make('is_ppmp5')
-    //                         ->label('PPMP')
-    //                         ->default(true)
-    //                         ->disabled()
-    //                         ->reactive(),
-    //                     ]),
-    //                     Forms\Components\Grid::make(4)
-    //                     ->schema([
-    //                         Forms\Components\TextInput::make('total_qty5')
-    //                         ->label('Quantity')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-    //                         Forms\Components\Select::make('uom5')
-    //                         ->label('UOM')
-    //                         ->required()
-    //                         // ->options(fn ($get) => CategoryItems::all()->pluck('name', 'id'))
-    //                         ->options([
-    //                             'pcs' => 'pcs',
-    //                             'box' => 'box',
-    //                             'pax' => 'pax',
-    //                             'lot' => 'lot',
-    //                             'van' => 'van',
-    //                         ]),
-    //                         Forms\Components\TextInput::make('cost_per_unit5')
-    //                         ->label('Cost per Unit')
-    //                         ->required()
-    //                         ->disabled(fn ($get) => $get('is_ppmp5') === true)
-    //                         ->afterStateUpdated(function ($state, $set){
-    //                             $quantity = $this->data['total_qty5'];
-    //                             $total = $quantity * $state;
-    //                             $set('estimated_budget5', number_format($total, 2));
-    //                         })
-    //                         ->default(0),
-    //                         Forms\Components\TextInput::make('estimated_budget5')
-    //                         ->label('Estimated Budget')
-    //                         ->required()
-    //                         ->disabled()
-    //                         ->default(0),
-
-    //                     ])
-    //                 ]),
-    //         ])
-    //         ->nextAction(function($action){
-    //             return $this->hellow('s');
-    //         })
-    //         ->skippable()
-    //         ->submitAction(new HtmlString(view('components.forms.save-button')->render()))
-    //     ];
-    // }
 
     public function submit()
     {
@@ -2035,38 +1087,113 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function deleteSupply($index)
     {
-        $budget = $this->supplies[$index]['estimated_budget'];
-        $this->current_balance[$this->supplies[$index]['budget_category_id'] - 1]['current_total'] -= $budget;
-        unset($this->supplies[$index]);
+        if (isset($this->supplies[$index])) {
+            $budget = $this->supplies[$index]['estimated_budget'];
+            $title_group = $this->supplies[$index]['title_group'];
+
+            foreach ($this->current_balance as $key => $item) {
+                if ($item['category_group_id'] === $title_group) {
+                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                        $this->current_balance[$key]['current_total'] -= $budget;
+                        $this->current_balance[$key]['balance'] += $budget;
+                    }
+                    break;
+                }
+            }
+            // Remove the supply at the given index
+            unset($this->supplies[$index]);
+            // Reset the array indices to avoid undefined index issues
+            $this->supplies = array_values($this->supplies);
+        }
 
     }
 
     public function deleteMooe($index)
     {
-        $budget = $this->mooe[$index]['estimated_budget'];
-        $this->current_balance[$this->mooe[$index]['budget_category_id'] - 1]['current_total'] -= $budget;
-        unset($this->mooe[$index]);
+        if (isset($this->mooe[$index])) {
+            $budget = $this->mooe[$index]['estimated_budget'];
+            $title_group = $this->mooe[$index]['title_group'];
+
+            foreach ($this->current_balance as $key => $item) {
+                if ($item['category_group_id'] === $title_group) {
+                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                        $this->current_balance[$key]['current_total'] -= $budget;
+                        $this->current_balance[$key]['balance'] += $budget;
+                    }
+                    break;
+                }
+            }
+            // Remove the supply at the given index
+            unset($this->mooe[$index]);
+            // Reset the array indices to avoid undefined index issues
+            $this->mooe = array_values($this->mooe);
+        }
     }
 
     public function deleteTraining($index)
     {
-        $budget = $this->trainings[$index]['estimated_budget'];
-        $this->current_balance[$this->trainings[$index]['budget_category_id'] - 1]['current_total'] -= $budget;
-        unset($this->trainings[$index]);
+        if (isset($this->trainings[$index])) {
+            $budget = $this->trainings[$index]['estimated_budget'];
+            $title_group = $this->trainings[$index]['title_group'];
+
+            foreach ($this->current_balance as $key => $item) {
+                if ($item['category_group_id'] === $title_group) {
+                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                        $this->current_balance[$key]['current_total'] -= $budget;
+                        $this->current_balance[$key]['balance'] += $budget;
+                    }
+                    break;
+                }
+            }
+            // Remove the supply at the given index
+            unset($this->trainings[$index]);
+            // Reset the array indices to avoid undefined index issues
+            $this->trainings = array_values($this->trainings);
+        }
     }
 
     public function deleteMachine($index)
     {
-        $budget = $this->machines[$index]['estimated_budget'];
-        $this->current_balance[$this->machines[$index]['budget_category_id'] - 1]['current_total'] -= $budget;
-        unset($this->machines[$index]);
+        if (isset($this->machines[$index])) {
+            $budget = $this->machines[$index]['estimated_budget'];
+            $title_group = $this->machines[$index]['title_group'];
+
+            foreach ($this->current_balance as $key => $item) {
+                if ($item['category_group_id'] === $title_group) {
+                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                        $this->current_balance[$key]['current_total'] -= $budget;
+                        $this->current_balance[$key]['balance'] += $budget;
+                    }
+                    break;
+                }
+            }
+            // Remove the supply at the given index
+            unset($this->machines[$index]);
+            // Reset the array indices to avoid undefined index issues
+            $this->machines = array_values($this->machines);
+        }
     }
 
     public function deleteBuilding($index)
     {
-        $budget = $this->buildings[$index]['estimated_budget'];
-        $this->current_balance[$this->buildings[$index]['budget_category_id'] - 1]['current_total'] -= $budget;
-        unset($this->buildings[$index]);
+        if (isset($this->buildings[$index])) {
+            $budget = $this->buildings[$index]['estimated_budget'];
+            $title_group = $this->buildings[$index]['title_group'];
+
+            foreach ($this->current_balance as $key => $item) {
+                if ($item['category_group_id'] === $title_group) {
+                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                        $this->current_balance[$key]['current_total'] -= $budget;
+                        $this->current_balance[$key]['balance'] += $budget;
+                    }
+                    break;
+                }
+            }
+            // Remove the supply at the given index
+            unset($this->buildings[$index]);
+            // Reset the array indices to avoid undefined index issues
+            $this->buildings = array_values($this->buildings);
+        }
     }
 
 

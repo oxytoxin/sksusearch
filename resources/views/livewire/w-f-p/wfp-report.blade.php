@@ -91,8 +91,8 @@
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
-                          <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
-                          <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
+                          <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
+                          <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
                           @foreach (json_decode($item->quantity_year) as $quantity)
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-x border-gray-400">{{$quantity}}</td>
                           @endforeach
@@ -192,6 +192,27 @@
                       @endforelse
                   </tbody>
                 </table>
+                <div class="grid grid-cols-3 space-x-3 mt-5">
+                    <div class="col-span-1 text-gray-800 font-semibold">
+
+                    </div>
+                    <div class="col-span-1 text-gray-800 font-semibold">
+
+                    </div>
+                    <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
+                        <div>
+                            <div class="flex justify-between space-x-3">
+                                <span>Allocated Fund: </span><span>₱ {{number_format($sumAllocated, 2)}}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Program: </span><span>₱ {{number_format($sumTotal, 2)}}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Balance: </span><span>₱ {{number_format($sumBalance, 2)}}</span>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
               </div>
             </div>
           </div>

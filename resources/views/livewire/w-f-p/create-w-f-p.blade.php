@@ -75,7 +75,7 @@
                                 <tr>
                                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3">Title Group</th>
                                     <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Allocated Fund</th>
-                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th>
+                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Program</th>
                                     <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Balance</th>
                                     {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
                                         <span class="sr-only">Edit</span>
@@ -85,9 +85,9 @@
                                 @forelse ($current_balance as $item)
                                 <tr class="border-t border-gray-300">
                                     <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['category_group']}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">₱ {{number_format($item['initial_amount'], 2)}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['current_total'], 2)}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['balance'], 2)}}</td>
+                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium text-gray-900 sm:pl-3">₱ {{number_format($item['initial_amount'], 2)}}</td>
+                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['current_total'], 2)}}</td>
+                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['balance'], 2)}}</td>
                                     {{-- <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
                                         <a href="#" class="text-green-800 hover:text-green-700">View<span class="sr-only">, Lindsay Walton</span></a>
                                       </td> --}}
@@ -111,9 +111,9 @@
                                 @endphp
                                 <tr class="border-t border-gray-300">
                                     <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">Total</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumTotal, 2)}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumBalance, 2)}}</td>
+                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
+                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumTotal, 2)}}</td>
+                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumBalance, 2)}}</td>
                                 </tr>
                             </tbody>
                             </thead>
@@ -125,7 +125,7 @@
                                 <tr>
                                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3">Title Group</th>
                                     <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50"></th>
-                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th>
+                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Program</th>
                                     <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50"></th>
                                     {{-- <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th> --}}
                                     {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
@@ -138,7 +138,7 @@
                                 <tr class="border-t border-gray-300">
                                     <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$current_balance[$key]['category_group']}}</td>
                                     <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3"></td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">₱ {{number_format($current_balance[$key]['current_total'], 2)}}</td>
+                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-medium text-gray-900 sm:pl-3">₱ {{number_format($current_balance[$key]['current_total'], 2)}}</td>
                                     <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3"></td>
                                     {{-- <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['current_total'], 2)}}</td> --}}
                                     {{-- <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
@@ -154,7 +154,7 @@
                                     <tr>
                                         <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3"></th>
                                         <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Allocated Fund</th>
-                                        <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th>
+                                        <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Program</th>
                                         <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Balance</th>
                                         {{-- <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th> --}}
                                         {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
@@ -173,9 +173,9 @@
                                     <tbody class="bg-white">
                                         <tr class="border-t border-gray-300">
                                             <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">Total</td>
-                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
-                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold {{$sumAllocated > $sumTotal ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($sumTotal, 2)}}</td>
-                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold {{$sumAllocated > $sumTotal ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($sumBalance, 2) }}</td>
+                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
+                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold {{$sumAllocated > $sumTotal ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($sumTotal, 2)}}</td>
+                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold {{$sumAllocated > $sumTotal ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($sumBalance, 2) }}</td>
                                         </tr>
                                     </tbody>
 
@@ -440,8 +440,8 @@
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Particulars</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Qty</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UOM</th>
-                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Unit Cost</th>
-                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Estimated Budget</th>
+                                            <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Unit Cost</th>
+                                            <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Estimated Budget</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jan</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Feb</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Mar</th>
@@ -454,7 +454,7 @@
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Oct</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Nov</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Dec</th>
-                                            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-3">
+                                            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-3 bg-gray-200">
                                               <span class="sr-only">Edit</span>
                                             </th>
                                           </tr>
@@ -471,8 +471,8 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">₱ {{number_format($item['estimated_budget'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
@@ -506,8 +506,8 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">₱ {{number_format($item['estimated_budget'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
@@ -540,8 +540,8 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right ">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right ">₱ {{number_format($item['estimated_budget'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
@@ -574,8 +574,8 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">₱ {{number_format($item['estimated_budget'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
@@ -608,8 +608,8 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">₱ {{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">₱ {{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">₱ {{number_format($item['estimated_budget'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
@@ -633,6 +633,27 @@
                                             @endforelse
                                         </tbody>
                                       </table>
+                                      <div class="grid grid-cols-3 space-x-3 mt-5">
+                                        <div class="col-span-1 text-gray-800 font-semibold">
+
+                                        </div>
+                                        <div class="col-span-1 text-gray-800 font-semibold">
+
+                                        </div>
+                                        <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
+                                            <div>
+                                                <div class="flex justify-between space-x-3">
+                                                    <span>Allocated Fund: </span><span>₱ {{number_format($sumAllocated, 2)}}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span>Program: </span><span>₱ {{number_format($sumTotal, 2)}}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span>Balance: </span><span>₱ {{number_format($sumBalance, 2)}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
