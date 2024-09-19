@@ -256,7 +256,7 @@
                     WFP Submissions
                 </a>
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.generate-ppmp') }}">
-                    Generate PPMP
+                    Generate PRE
                 </a>
                 @endif
                 @if ($isOfficeHead && $costCenterExist)

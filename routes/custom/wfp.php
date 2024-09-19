@@ -8,6 +8,7 @@ use App\Http\Livewire\WFP\SelectWfpType;
 use App\Http\Livewire\WFP\FundAllocation;
 use App\Http\Livewire\WFP\GeneratePpmp;
 use App\Http\Livewire\WFP\WFPHistory;
+use App\Http\Livewire\WFP\WfpPpmp;
 use App\Http\Livewire\WFP\WfpReport;
 use App\Http\Livewire\WFP\WfpSubmissions;
 use App\Http\Livewire\WFP\WFPTypes;
@@ -28,4 +29,5 @@ Route::middleware([
     Route::get('/print-wfp/{record}', WfpReport::class)->name('print-wfp');
     Route::get('/wfp-submissions', WfpSubmissions::class)->name('wfp-submissions');
     Route::get('/wfp-ppmp', GeneratePpmp::class)->name('generate-ppmp');
+    Route::get('/print-ppmp/{record}', WfpPpmp::class)->name('print-ppmp');
 });

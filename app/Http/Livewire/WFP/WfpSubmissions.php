@@ -58,7 +58,11 @@ class WfpSubmissions extends Component implements HasTable
             Action::make('view wfp')
             ->button()
             ->icon('heroicon-o-eye')
-            ->url(fn ($record): string => route('wfp.print-wfp', $record))
+            ->url(fn ($record): string => route('wfp.print-wfp', $record)),
+            Action::make('view ppmp')
+            ->button()
+            ->icon('heroicon-o-eye')
+            ->url(fn ($record): string => route('wfp.print-ppmp', $record))
         ];
     }
 

@@ -30,13 +30,13 @@
         @if($is_active)
         <div class="flex justify-end p-4">
             <button onclick="printDiv('printarea')" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
-                Print PPMP
+                Print PRE
              </button>
         </div>
         <div id="printarea" class="w-full bg-gray-50 px-2 py-4 rounded-md">
             <div class="text-center">
                 <p class="text-2xl font-medium">
-                    PPMP 164MF
+                    PRE 164MF
                 </p>
                 <p class="text-md font-normal">{{$title}}</p>
             </div>

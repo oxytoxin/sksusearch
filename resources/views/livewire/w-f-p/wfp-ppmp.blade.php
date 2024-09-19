@@ -1,6 +1,6 @@
 <div class="space-y-2">
     <div class="flex justify-between items-center">
-        <h2 class="font-light capitalize text-primary-600">Wfp Report</h2>
+        <h2 class="font-light capitalize text-primary-600">PPMP Report</h2>
         <div class="flex space-x-3">
             <button onclick="printDiv('printarea')" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                Print
@@ -16,7 +16,7 @@
     <div id="printarea" class="w-full bg-gray-50 px-2 py-4 rounded-md">
         <div class="text-center">
             <p class="text-2xl font-medium">
-                Work & Financial Plan
+                PPMP
             </p>
             <p class="text-md font-normal">{{$record->wfpType->description}}</p>
         </div>
@@ -84,7 +84,7 @@
                           <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                           text-left text-sm font-semibold text-gray-900 sm:pl-3">Supplies & Semi-Expendables</th>
                         </tr>
-                        @forelse ($record->wfpDetails->where('budget_category_id', 1) as $item)
+                        @forelse ($wfpDetails->where('budget_category_id', 1) as $item)
                         <tr class="border-t border-gray-300">
                           <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
@@ -106,7 +106,7 @@
                           <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                           text-left text-sm font-semibold text-gray-900 sm:pl-3">MOOE</th>
                         </tr>
-                        @forelse ($record->wfpDetails->where('budget_category_id', 2) as $item)
+                        @forelse ($wfpDetails->where('budget_category_id', 2) as $item)
                         <tr class="border-t border-gray-300">
                             <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
@@ -128,7 +128,7 @@
                           <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                           text-left text-sm font-semibold text-gray-900 sm:pl-3">Trainings</th>
                         </tr>
-                        @forelse ($record->wfpDetails->where('budget_category_id', 3) as $item)
+                        @forelse ($wfpDetails->where('budget_category_id', 3) as $item)
                         <tr class="border-t border-gray-300">
                             <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
@@ -150,7 +150,7 @@
                           <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                           text-left text-sm font-semibold text-gray-900 sm:pl-3">Machine & Equipment / Furniture & Fixtures / Bio / Vehicles</th>
                         </tr>
-                        @forelse ($record->wfpDetails->where('budget_category_id', 4) as $item)
+                        @forelse ($wfpDetails->where('budget_category_id', 4) as $item)
                         <tr class="border-t border-gray-300">
                             <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
@@ -172,7 +172,7 @@
                           <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                           text-left text-sm font-semibold text-gray-900 sm:pl-3">Building & Infrastructure</th>
                         </tr>
-                        @forelse ($record->wfpDetails->where('budget_category_id', 5) as $item)
+                        @forelse ($wfpDetails->where('budget_category_id', 5) as $item)
                         <tr class="border-t border-gray-300">
                             <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
@@ -205,10 +205,10 @@
                                 <span>Allocated Fund: </span><span>₱ {{number_format($record->total_allocated_fund, 2)}}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Program: </span><span>₱ {{number_format($record->program_allocated, 2)}}</span>
+                                <span>Program: </span><span>₱ {{number_format($program, 2)}}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Balance: </span><span>₱ {{number_format($record->balance, 2)}}</span>
+                                <span>Balance: </span><span>₱ {{number_format($balance, 2)}}</span>
                             </div>
                         </div>
                     </div>
