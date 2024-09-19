@@ -967,6 +967,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         DB::beginTransaction();
         if(!$is_not_valid)
         {
+            $sumAllocated = $this->record->fundAllocations->sum('initial_amount');
+            $sumTotal = array_sum(array_column($this->current_balance, 'current_total'));
+            $sumBalance = $sumAllocated - $sumTotal;
             $wfp = Wfp::create([
                 'cost_center_id' => $this->record->id,
                 'wpf_type_id' => $this->wfp_type->id,
@@ -976,6 +979,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'source_fund' => $this->source_fund,
                 'confirm_fund_source' => $this->confirm_fund_source ?? null,
                 'specify_fund_source' =>$this->specify_fund_source,
+                'balance' => $sumBalance,
+                'program_allocated' => $sumTotal,
+                'total_allocated_fund' => $sumAllocated,
             ]);
 
             foreach ($this->supplies as $item)

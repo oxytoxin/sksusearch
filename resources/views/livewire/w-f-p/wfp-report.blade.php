@@ -202,13 +202,13 @@
                     <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                         <div>
                             <div class="flex justify-between space-x-3">
-                                <span>Allocated Fund: </span><span>₱ {{number_format($sumAllocated, 2)}}</span>
+                                <span>Allocated Fund: </span><span>₱ {{number_format($record->total_allocated_fund, 2)}}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Program: </span><span>₱ {{number_format($sumTotal, 2)}}</span>
+                                <span>Program: </span><span>₱ {{number_format($record->program_allocated, 2)}}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Balance: </span><span>₱ {{number_format($sumBalance, 2)}}</span>
+                                <span>Balance: </span><span>₱ {{number_format($record->balance, 2)}}</span>
                             </div>
                         </div>
                     </div>
