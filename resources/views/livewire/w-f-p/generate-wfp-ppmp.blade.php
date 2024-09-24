@@ -1,10 +1,13 @@
 <div class="space-y-2">
     <div class="flex justify-between items-center">
-        <h2 class="font-light capitalize text-primary-600">Generate PRE</h2>
+        <h2 class="font-light capitalize text-primary-600">Generate PPMP</h2>
+        {{-- <a href="{{ route('requisitioner.motorpool.create') }}"
+            class="hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">New
+            Request</a> --}}
     </div>
     <div>
         {{-- @if ($wfp_type > 0) --}}
-        <div x-cloak x-data="{ selectedTab: '101' , showPrintable: false}">
+        <div x-data="{ selectedTab: '101' , showPrintable: false }">
 
             <!-- Dropdown for small screens -->
             <div class="sm:hidden">
@@ -86,43 +89,42 @@
             <!-- Content for each tab -->
             <div x-cloak class="mt-4">
                 <div x-show="selectedTab === '101'">
-                    @include('fund-views.101') <!-- Include the view for tab 101 -->
+                    @include('fund-views-ppmp.101')
                     <div class="flex justify-center mt-10">
                         <div wire:loading class="loader">
                         </div>
                     </div>
-
                 </div>
                 <div x-show="selectedTab === '161'">
-                    @include('fund-views.161') <!-- Include the view for tab 161 -->
+                    @include('fund-views-ppmp.161')
                     <div class="flex justify-center mt-10">
                         <div wire:loading class="loader">
                         </div>
                     </div>
                 </div>
                 <div x-show="selectedTab === '163'">
-                    @include('fund-views.163') <!-- Include the view for tab 163 -->
+                    @include('fund-views-ppmp.163')
                     <div class="flex justify-center mt-10">
                         <div wire:loading class="loader">
                         </div>
                     </div>
                 </div>
                 <div x-show="selectedTab === '164T'">
-                    @include('fund-views.164T') <!-- Include the view for tab 164T -->
+                    @include('fund-views-ppmp.164T')
                     <div class="flex justify-center mt-10">
                         <div wire:loading class="loader">
                         </div>
                     </div>
                 </div>
                 <div x-show="selectedTab === '164OSF'">
-                    @include('fund-views.164OSF') <!-- Include the view for tab 164OSF -->
+                    @include('fund-views-ppmp.164OSF')
                     <div class="flex justify-center mt-10">
                         <div wire:loading class="loader">
                         </div>
                     </div>
                 </div>
                 <div x-show="selectedTab === '164MF'">
-                    @include('fund-views.164MF') <!-- Include the view for tab 164MF -->
+                    @include('fund-views-ppmp.164MF')
                     <div class="flex justify-center mt-10">
                         <div wire:loading class="loader">
                         </div>

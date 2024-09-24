@@ -1,8 +1,8 @@
-<div class="space-y-2">
+<div x-data class="space-y-2">
     <div class="flex justify-between items-center">
         <h2 class="font-light capitalize text-primary-600">Wfp Report</h2>
         <div class="flex space-x-3">
-            <button onclick="printDiv('printarea')" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
+            <button @click="printOut($refs.printContainer.outerHTML);" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                Print
             </button>
             <button onclick="window.history.back()" class="flex hover:bg-gray-500 p-2 bg-gray-600 rounded-md font-light capitalize text-white text-sm">
@@ -13,7 +13,7 @@
             </button>
         </div>
     </div>
-    <div id="printarea" class="w-full bg-gray-50 px-2 py-4 rounded-md">
+    <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">
         <div class="text-center">
             <p class="text-2xl font-medium">
                 Work & Financial Plan
@@ -43,7 +43,6 @@
                     <span class="text-center">{{$record->costCenter->office->head_employee?->full_name.' - '.$record->costCenter->office->name}}</span>
                 </div>
                 <div></div>
-
             </div>
         </div>
 
@@ -218,6 +217,22 @@
           </div>
     </div>
     <script>
+         function printOut(data) {
+        var mywindow = window.open('', '', 'height=1000,width=1000');
+        mywindow.document.write('<html><head>');
+        mywindow.document.write('<title></title>');
+        mywindow.document.write(`<link rel="stylesheet" href="{{ Vite::asset('resources/css/app.css') }}" />`);
+        mywindow.document.write('</head><body >');
+        mywindow.document.write(data);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close();
+        mywindow.focus();
+        setTimeout(() => {
+            mywindow.print();
+            return true;
+        }, 1000);
+    }
         function printDiv(divName) {
             var printContents = document.getElementById(divName).innerHTML;
             var originalContents = document.body.innerHTML;

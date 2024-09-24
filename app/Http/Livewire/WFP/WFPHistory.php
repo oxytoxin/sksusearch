@@ -44,13 +44,20 @@ class WFPHistory extends Component implements HasTable
     {
         return [
             Action::make('view wfp')
+            ->label('View WFP')
             ->button()
             ->icon('heroicon-o-eye')
             ->url(fn ($record): string => route('wfp.print-wfp', $record)),
             Action::make('view ppmp')
+            ->label('View PPMP')
             ->button()
             ->icon('heroicon-o-eye')
-            ->url(fn ($record): string => route('wfp.print-ppmp', $record))
+            ->url(fn ($record): string => route('wfp.print-ppmp', $record)),
+            Action::make('view pre')
+            ->label('View PRE')
+            ->button()
+            ->icon('heroicon-o-eye')
+            ->url(fn ($record): string => route('wfp.print-pre', $record))
         ];
     }
 

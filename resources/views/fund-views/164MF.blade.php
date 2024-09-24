@@ -1,39 +1,39 @@
-<div>
+<div x-data>
     <div class="p-4">
         <div class="flex justify-center">
-            <button wire:click="sksuPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+            <button @click="showPrintable = true" wire:click="sksuPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
                 SKSU 164MF
             </button>
         </div>
         <div class="flex justify-center space-x-4 mt-3">
-            <button wire:click="gasPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="gasPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 General Admission and Support Services (GASS)
             </button>
-            <button wire:click="hesPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="hesPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Higher Education Services (HES)
             </button>
-            <button wire:click="aesPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="aesPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Advanced Education Services (AES)
             </button>
-            <button wire:click="rdPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="rdPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Research and Development (RD)
             </button>
-            <button wire:click="extensionPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="extensionPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Extension Services (ES)
             </button>
-            <button wire:click="lfPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="lfPpmp164MF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Local Fund Projects (LFP)
             </button>
         </div>
     </div>
-    <div class="bg-gray-50">
+    <div x-show="showPrintable" class="bg-gray-50">
         @if($is_active)
         <div class="flex justify-end p-4">
-            <button onclick="printDiv('printarea')" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
+            <button @click="printOut($refs.printContainer.outerHTML);" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                 Print PRE
              </button>
         </div>
-        <div id="printarea" class="w-full bg-gray-50 px-2 py-4 rounded-md">
+        <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">
             <div class="text-center">
                 <p class="text-2xl font-medium">
                     PRE 164MF
@@ -66,7 +66,12 @@
                     </tbody>
                     <tr>
                         <td class="border border-black text-left font-semibold p-1" colspan="2">Grand Total</td>
-                        <td class="border border-black text-right font-semibold px-2">₱ {{$total === null ? 0 : number_format($total->total_budget, 2)}}</td>
+                        <td class="border border-black text-right font-semibold px-2">
+                            <div class="flex justify-between">
+                                <span>₱</span>
+                                <span>{{$total === null ? 0 : number_format($total->total_budget, 2)}}</span>
+                            </div>
+                        </td>
                     </tr>
                 </table>
             </div>
@@ -74,6 +79,22 @@
         @endif
     </div>
     <script>
+        function printOut(data) {
+        var mywindow = window.open('', '', 'height=1000,width=1000');
+        mywindow.document.write('<html><head>');
+        mywindow.document.write('<title></title>');
+        mywindow.document.write(`<link rel="stylesheet" href="{{ Vite::asset('resources/css/app.css') }}" />`);
+        mywindow.document.write('</head><body >');
+        mywindow.document.write(data);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close();
+        mywindow.focus();
+        setTimeout(() => {
+            mywindow.print();
+            return true;
+        }, 1000);
+    }
         function printDiv(divName) {
             var printContents = document.getElementById(divName).innerHTML;
             var originalContents = document.body.innerHTML;

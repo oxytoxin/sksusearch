@@ -18,3 +18,41 @@ input[type=number]::-webkit-outer-spin-button {
     font-family: "Script MT Bold";
     src: url("../../public/fonts/SCRIPTBL.woff") format('woff');
 }
+
+.loader {
+    font-size: 10px;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    position: relative;
+    text-indent: -9999em;
+    animation: mulShdSpin 1.1s infinite ease;
+    transform: translateZ(0);
+  }
+@keyframes mulShdSpin {
+    0%,
+    100% {
+      box-shadow: 0em -2.6em 0em 0em #166534, 1.8em -1.8em 0 0em #1f7a3a, 2.5em 0em 0 0em #28a745, 1.75em 1.75em 0 0em #34d058, 0em 2.5em 0 0em #3fbf6b, -1.8em 1.8em 0 0em #4adf7e, -2.6em 0em 0 0em #5aff91, -1.8em -1.8em 0 0em #6affa4;
+    }
+    12.5% {
+      box-shadow: 0em -2.6em 0em 0em #6affa4, 1.8em -1.8em 0 0em #166534, 2.5em 0em 0 0em #1f7a3a, 1.75em 1.75em 0 0em #28a745, 0em 2.5em 0 0em #34d058, -1.8em 1.8em 0 0em #3fbf6b, -2.6em 0em 0 0em #4adf7e, -1.8em -1.8em 0 0em #5aff91;
+    }
+    25% {
+      box-shadow: 0em -2.6em 0em 0em #5aff91, 1.8em -1.8em 0 0em #6affa4, 2.5em 0em 0 0em #166534, 1.75em 1.75em 0 0em #1f7a3a, 0em 2.5em 0 0em #28a745, -1.8em 1.8em 0 0em #34d058, -2.6em 0em 0 0em #3fbf6b, -1.8em -1.8em 0 0em #4adf7e;
+    }
+    37.5% {
+      box-shadow: 0em -2.6em 0em 0em #4adf7e, 1.8em -1.8em 0 0em #5aff91, 2.5em 0em 0 0em #6affa4, 1.75em 1.75em 0 0em #166534, 0em 2.5em 0 0em #1f7a3a, -1.8em 1.8em 0 0em #28a745, -2.6em 0em 0 0em #34d058, -1.8em -1.8em 0 0em #3fbf6b;
+    }
+    50% {
+      box-shadow: 0em -2.6em 0em 0em #3fbf6b, 1.8em -1.8em 0 0em #4adf7e, 2.5em 0em 0 0em #5aff91, 1.75em 1.75em 0 0em #6affa4, 0em 2.5em 0 0em #166534, -1.8em 1.8em 0 0em #1f7a3a, -2.6em 0em 0 0em #28a745, -1.8em -1.8em 0 0em #34d058;
+    }
+    62.5% {
+      box-shadow: 0em -2.6em 0em 0em #34d058, 1.8em -1.8em 0 0em #3fbf6b, 2.5em 0em 0 0em #4adf7e, 1.75em 1.75em 0 0em #5aff91, 0em 2.5em 0 0em #6affa4, -1.8em 1.8em 0 0em #166534, -2.6em 0em 0 0em #1f7a3a, -1.8em -1.8em 0 0em #28a745;
+    }
+    75% {
+      box-shadow: 0em -2.6em 0em 0em #28a745, 1.8em -1.8em 0 0em #34d058, 2.5em 0em 0 0em #3fbf6b, 1.75em 1.75em 0 0em #4adf7e, 0em 2.5em 0 0em #5aff91, -1.8em 1.8em 0 0em #6affa4, -2.6em 0em 0 0em #166534, -1.8em -1.8em 0 0em #1f7a3a;
+    }
+    87.5% {
+      box-shadow: 0em -2.6em 0em 0em #1f7a3a, 1.8em -1.8em 0 0em #28a745, 2.5em 0em 0 0em #34d058, 1.75em 1.75em 0 0em #3fbf6b, 0em 2.5em 0 0em #4adf7e, -1.8em 1.8em 0 0em #5aff91, -2.6em 0em 0 0em #6affa4, -1.8em -1.8em 0 0em #166534;
+    }
+}
