@@ -197,19 +197,19 @@
                       <div class="col-span-1 text-gray-800 font-semibold">
 
                       </div>
-                      {{-- <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
+                      <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                           <div>
-                              <div class="flex justify-between space-x-3">
-                                  <span>Allocated Fund: </span><span>₱ {{number_format($record->total_allocated_fund, 2)}}</span>
-                              </div>
-                              <div class="flex justify-between">
+                            <div class="flex justify-between space-x-3">
+                                <span>Total Program: </span><span>₱ {{number_format($total, 2)}}</span>
+                            </div>
+                              {{-- <div class="flex justify-between">
                                   <span>Program: </span><span>₱ {{number_format($record->program_allocated, 2)}}</span>
                               </div>
                               <div class="flex justify-between">
                                   <span>Balance: </span><span>₱ {{number_format($record->balance, 2)}}</span>
-                              </div>
+                              </div> --}}
                           </div>
-                      </div> --}}
+                      </div>
                     </div>
                 </div>
               </div>

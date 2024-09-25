@@ -82,8 +82,8 @@
                           @forelse ($record->where('budget_category_id', 1) as $item)
                           <tr class="border-t border-gray-300">
                             <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
-                            <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
-                            <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
+                            <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
+                            <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
@@ -104,8 +104,8 @@
                           @forelse ($record->where('budget_category_id', 2) as $item)
                           <tr class="border-t border-gray-300">
                               <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
-                              <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
-                              <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
@@ -126,8 +126,8 @@
                           @forelse ($record->where('budget_category_id', 3) as $item)
                           <tr class="border-t border-gray-300">
                               <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
-                              <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
-                              <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
@@ -148,8 +148,8 @@
                           @forelse ($record->where('budget_category_id', 4) as $item)
                           <tr class="border-t border-gray-300">
                               <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
-                              <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
-                              <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
@@ -170,8 +170,8 @@
                           @forelse ($record->where('budget_category_id', 5) as $item)
                           <tr class="border-t border-gray-300">
                               <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->uacs_code}}</td>
-                              <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
-                              <td class="break-words whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->categoryItem->name}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
@@ -194,19 +194,19 @@
                       <div class="col-span-1 text-gray-800 font-semibold">
 
                       </div>
-                      {{-- <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
+                      <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                           <div>
                               <div class="flex justify-between space-x-3">
-                                  <span>Allocated Fund: </span><span>₱ {{number_format($record->total_allocated_fund, 2)}}</span>
+                                  <span>Total Program: </span><span>₱ {{number_format($total, 2)}}</span>
                               </div>
-                              <div class="flex justify-between">
+                              {{-- <div class="flex justify-between">
                                   <span>Program: </span><span>₱ {{number_format($record->program_allocated, 2)}}</span>
                               </div>
                               <div class="flex justify-between">
                                   <span>Balance: </span><span>₱ {{number_format($record->balance, 2)}}</span>
-                              </div>
+                              </div> --}}
                           </div>
-                      </div> --}}
+                      </div>
                     </div>
                 </div>
               </div>

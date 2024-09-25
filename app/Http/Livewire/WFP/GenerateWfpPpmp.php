@@ -20,14 +20,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+         $this->record = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1);
-        })
-        ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
-        ->get();
-
+         })
+         ->with(['supply', 'categoryItem'])  // Load both relationships
+         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+         ->get();
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -56,7 +56,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -85,7 +85,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -114,7 +114,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -143,7 +143,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -172,7 +172,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -201,7 +201,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -229,7 +229,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -257,7 +257,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -288,7 +288,7 @@ class GenerateWfpPpmp extends Component
        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
        ->get();
-
+       $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -319,7 +319,7 @@ class GenerateWfpPpmp extends Component
        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
        ->get();
-
+       $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -350,7 +350,7 @@ class GenerateWfpPpmp extends Component
        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
        ->get();
-
+       $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -381,7 +381,7 @@ class GenerateWfpPpmp extends Component
        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
        ->get();
-
+       $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -412,7 +412,7 @@ class GenerateWfpPpmp extends Component
        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
        ->get();
-
+       $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -443,7 +443,7 @@ class GenerateWfpPpmp extends Component
        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
        ->get();
-
+       $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -474,7 +474,7 @@ class GenerateWfpPpmp extends Component
        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
        ->get();
-
+       $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -502,7 +502,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -531,7 +531,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -560,7 +560,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -589,7 +589,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -618,7 +618,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -647,7 +647,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -677,7 +677,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -705,7 +705,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -734,7 +734,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -763,7 +763,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -792,7 +792,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -821,7 +821,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -850,7 +850,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -879,7 +879,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -907,7 +907,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -936,7 +936,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -965,7 +965,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -994,7 +994,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -1023,7 +1023,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -1052,7 +1052,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 
@@ -1081,7 +1081,7 @@ class GenerateWfpPpmp extends Component
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
         ->get();
-
+        $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
             $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
 

@@ -1086,7 +1086,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $description = 'WFP has been successfully created',
             );
 
-            return redirect()->route('wfp.print-wfp', $wfp->id);
+            return redirect()->route('wfp.wfp-history');
         }else{
             $this->dialog()->error(
                 $title = 'Operation Failed',

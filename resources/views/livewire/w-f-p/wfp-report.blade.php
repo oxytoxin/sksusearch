@@ -217,7 +217,7 @@
           </div>
     </div>
     <script>
-         function printOut(data) {
+        function printOut(data) {
         var mywindow = window.open('', '', 'height=1000,width=1000');
         mywindow.document.write('<html><head>');
         mywindow.document.write('<title></title>');
