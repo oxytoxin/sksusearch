@@ -1,27 +1,27 @@
 <div x-data>
     <div class="p-4">
         <div class="flex justify-center">
-            <button @click="showPrintable = true" wire:click="sksuPpmp164OSF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
-                SKSU 164OSF
+            <button @click="showPrintable = true" wire:click="sksuPpmp164TN" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                SKSU 164T / Non-FHE
             </button>
         </div>
         <div class="flex justify-center space-x-4 mt-3">
-            <button @click="showPrintable = true" wire:click="gasPpmp164OSF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="gasPpmp164TN" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 General Admission and Support Services (GASS)
             </button>
-            <button @click="showPrintable = true" wire:click="hesPpmp164OSF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="hesPpmp164TN" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Higher Education Services (HES)
             </button>
-            <button @click="showPrintable = true" wire:click="aesPpmp164OSF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="aesPpmp164TN" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Advanced Education Services (AES)
             </button>
-            <button @click="showPrintable = true" wire:click="rdPpmp164OSF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="rdPpmp164TN" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Research and Development (RD)
             </button>
-            <button @click="showPrintable = true" wire:click="extensionPpmp164OSF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="extensionPpmp164TN" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Extension Services (ES)
             </button>
-            <button @click="showPrintable = true" wire:click="lfPpmp164OSF" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button @click="showPrintable = true" wire:click="lfPpmp164TN" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Local Fund Projects (LFP)
             </button>
         </div>
@@ -39,7 +39,7 @@
                     Program of Receipts & Expenditures
                 </p>
                 <p class="text-xl font-medium">
-                    Fund 164OSF
+                    Fund 164T / Non-FHE
                 </p>
                 <p class="text-md font-normal">{{$title}}</p>
             </div>

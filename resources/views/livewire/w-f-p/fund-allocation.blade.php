@@ -16,7 +16,8 @@
                         <option>101</option>
                         <option>161</option>
                         <option>163</option>
-                        <option>164T</option>
+                        <option>164T / FHE</option>
+                        <option>164T / Non-FHE</option>
                         <option>164OSF</option>
                         <option>164MF</option>
                     </select>
@@ -59,11 +60,21 @@
                         <a wire:click="filter(4)" href="#"
                            class="rounded-md px-3 py-2 text-sm font-medium"
                            :class="{
-                               'bg-green-500 text-white': selectedTab === '164T',
-                               'text-gray-800 hover:text-green-700': selectedTab !== '164T'
+                               'bg-green-500 text-white': selectedTab === '164T / FHE',
+                               'text-gray-800 hover:text-green-700': selectedTab !== '164T / FHE'
                            }"
-                           @click.prevent="selectedTab = '164T'">
+                           @click.prevent="selectedTab = '164T / FHE'">
                            Fund {{$fund->where('id', 4)->first()->name}}
+                        </a>
+
+                        <a wire:click="filter(7)" href="#"
+                        class="rounded-md px-3 py-2 text-sm font-medium"
+                        :class="{
+                            'bg-green-500 text-white': selectedTab === '164T / Non-FHE',
+                            'text-gray-800 hover:text-green-700': selectedTab !== '164T / Non-FHE'
+                        }"
+                        @click.prevent="selectedTab = '164T / Non-FHE'">
+                        Fund {{$fund->where('id', 7)->first()->name}}
                         </a>
 
                         <a wire:click="filter(5)" href="#"

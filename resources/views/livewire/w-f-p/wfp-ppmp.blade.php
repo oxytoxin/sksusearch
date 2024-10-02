@@ -1,6 +1,6 @@
 <div x-data class="space-y-2">
     <div class="flex justify-between items-center">
-        <h2 class="font-light capitalize text-primary-600">PPMP Report</h2>
+        <h2 class="font-light capitalize text-primary-600">Project Procurement Management Plan</h2>
         <div class="flex space-x-3">
             <button @click="printOut($refs.printContainer.outerHTML);" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                Print

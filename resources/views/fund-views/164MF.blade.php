@@ -36,7 +36,10 @@
         <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">
             <div class="text-center">
                 <p class="text-2xl font-medium">
-                    PRE 164MF
+                    Program of Receipts & Expenditures
+                </p>
+                <p class="text-xl font-medium">
+                    Fund 164MF
                 </p>
                 <p class="text-md font-normal">{{$title}}</p>
             </div>

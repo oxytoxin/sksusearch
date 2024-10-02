@@ -2,7 +2,7 @@
     <div class="p-4">
         <div class="flex justify-center">
             <button @click="showPrintable = true" wire:click="sksuPpmp164T" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
-                SKSU 164T
+                SKSU 164T / FHE
             </button>
         </div>
         <div class="flex justify-center space-x-4 mt-3">
@@ -36,7 +36,10 @@
         <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">
             <div class="text-center">
                 <p class="text-2xl font-medium">
-                    PRE 164T
+                    Program of Receipts & Expenditures
+                </p>
+                <p class="text-xl font-medium">
+                    Fund 164T / FHE
                 </p>
                 <p class="text-md font-normal">{{$title}}</p>
             </div>

@@ -14,7 +14,8 @@
                     <option>101</option>
                     <option>161</option>
                     <option>163</option>
-                    <option>164T</option>
+                    <option>164T / FHE</option>
+                    <option>164T / Non-FHE</option>
                     <option>164OSF</option>
                     <option>164MF</option>
                 </select>
@@ -56,11 +57,20 @@
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
                        :class="{
-                           'bg-green-500 text-white': selectedTab === '164T',
-                           'text-gray-800 hover:text-green-700': selectedTab !== '164T'
+                           'bg-green-500 text-white': selectedTab === '164T / FHE',
+                           'text-gray-800 hover:text-green-700': selectedTab !== '164T / FHE'
                        }"
-                       @click.prevent="selectedTab = '164T'; showPrintable = false">
+                       @click.prevent="selectedTab = '164T / FHE'; showPrintable = false">
                        Fund {{$fund->where('id', 4)->first()->name}}
+                    </a>
+
+                    <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
+                    :class="{
+                        'bg-green-500 text-white': selectedTab === '164T / Non-FHE',
+                        'text-gray-800 hover:text-green-700': selectedTab !== '164T / Non-FHE'
+                    }"
+                    @click.prevent="selectedTab = '164T / Non-FHE'; showPrintable = false">
+                    Fund {{$fund->where('id', 7)->first()->name}}
                     </a>
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
@@ -107,8 +117,15 @@
                         </div>
                     </div>
                 </div>
-                <div x-show="selectedTab === '164T'">
+                <div x-show="selectedTab === '164T / FHE'">
                     @include('fund-views.164T') <!-- Include the view for tab 164T -->
+                    <div class="flex justify-center mt-10">
+                        <div wire:loading class="loader">
+                        </div>
+                    </div>
+                </div>
+                <div x-show="selectedTab === '164T / Non-FHE'">
+                    @include('fund-views.164TNonFHE') <!-- Include the view for tab 164T -->
                     <div class="flex justify-center mt-10">
                         <div wire:loading class="loader">
                         </div>

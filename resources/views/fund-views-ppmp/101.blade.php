@@ -36,7 +36,10 @@
         <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">
             <div class="text-center">
                 <p class="text-2xl font-medium">
-                    PPMP 101
+                    Project Procurement Management Plan
+                </p>
+                <p class="text-xl font-medium">
+                    Fund 101
                 </p>
                 <p class="text-md font-normal">
                     {{$title}}
@@ -53,25 +56,25 @@
                     </thead>
                     <thead class="bg-white">
                       <tr>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UACS Code</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Account Title</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Particulars</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Qty</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UOM</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Unit Cost</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Estimated Budget</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jan</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Feb</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Mar</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Apr</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">May</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jun</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jul</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Aug</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Sep</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Oct</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Nov</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Dec</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">UACS Code</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">Account Title</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">Particulars</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">Qty</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">UOM</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">Unit Cost</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">Estimated Budget</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jan</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Feb</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Mar</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Apr</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">May</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jun</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jul</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Aug</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Sep</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Oct</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Nov</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Dec</th>
                       </tr>
                     </thead>
                     <tbody class="bg-white">
@@ -111,7 +114,7 @@
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
                               @foreach ($item->merged_quantities as $quantity)
-                              <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-x border-gray-400">{{$quantity}}</td>
+                              <td class="whitespace-nowrap px-1 py-2 text-sm text-gray-500 border-x border-gray-400">{{$quantity}}</td>
                               @endforeach
                             </tr>
                         @empty
