@@ -5,26 +5,26 @@
                 SKSU 161
             </button>
         </div>
-        {{-- <div class="flex justify-center space-x-4 mt-3">
-            <button wire:click="gasPpmp" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+        <div class="flex justify-center space-x-4 mt-3">
+            <button wire:click="gasPpmp161" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 General Admission and Support Services (GASS)
             </button>
-            <button wire:click="hesPpmp" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button wire:click="hesPpmp161" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Higher Education Services (HES)
             </button>
-            <button wire:click="aesPpmp" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button wire:click="aesPpmp161" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Advanced Education Services (AES)
             </button>
-            <button wire:click="rdPpmp" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button wire:click="rdPpmp161" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Research and Development (RD)
             </button>
-            <button wire:click="extensionPpmp" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button wire:click="extensionPpmp161" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Extension Services (ES)
             </button>
-            <button wire:click="lfPpmp" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
+            <button wire:click="lfPpmp161" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                 Local Fund Projects (LFP)
             </button>
-        </div> --}}
+        </div>
     </div>
     <div x-show="showPrintable" class="bg-gray-50">
         @if($is_active)

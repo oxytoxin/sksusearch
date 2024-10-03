@@ -244,6 +244,180 @@ class GenerateWfpPpmp extends Component
         }
      }
 
+     public function gasPpmp161()
+     {
+         $this->is_active = false;
+         $this->is_active = true;
+         $this->title = 'General Admission and Support Services';
+        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 1);
+                });
+        })
+        ->with(['supply', 'categoryItem'])  // Load both relationships
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->get();
+        $this->total = $this->record->sum('estimated_budget');
+        foreach ($this->record as $record) {
+            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
+
+            foreach (json_decode($record->merged_quantities) as $quantities) {
+
+                $quantitiesArray = json_decode(json_encode($quantities), true);
+                foreach ($quantitiesArray as $monthIndex => $value) {
+                    $mergedQuantities[$monthIndex] += (int) $value;
+                }
+            }
+            $record->merged_quantities = $mergedQuantities;
+        }
+     }
+
+     public function hesPpmp161()
+     {
+         $this->is_active = false;
+         $this->is_active = true;
+         $this->title = 'Higher Education Services';
+        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 2);
+                });
+        })
+        ->with(['supply', 'categoryItem'])  // Load both relationships
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->get();
+        $this->total = $this->record->sum('estimated_budget');
+        foreach ($this->record as $record) {
+            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
+
+            foreach (json_decode($record->merged_quantities) as $quantities) {
+
+                $quantitiesArray = json_decode(json_encode($quantities), true);
+                foreach ($quantitiesArray as $monthIndex => $value) {
+                    $mergedQuantities[$monthIndex] += (int) $value;
+                }
+            }
+            $record->merged_quantities = $mergedQuantities;
+        }
+     }
+
+     public function aesPpmp161()
+     {
+         $this->is_active = false;
+         $this->is_active = true;
+         $this->title = 'Advanced Education Services';
+        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 3);
+                });
+        })
+        ->with(['supply', 'categoryItem'])  // Load both relationships
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->get();
+        $this->total = $this->record->sum('estimated_budget');
+        foreach ($this->record as $record) {
+            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
+
+            foreach (json_decode($record->merged_quantities) as $quantities) {
+
+                $quantitiesArray = json_decode(json_encode($quantities), true);
+                foreach ($quantitiesArray as $monthIndex => $value) {
+                    $mergedQuantities[$monthIndex] += (int) $value;
+                }
+            }
+            $record->merged_quantities = $mergedQuantities;
+        }
+     }
+
+     public function rdPpmp161()
+     {
+         $this->is_active = false;
+         $this->is_active = true;
+         $this->title = 'Research and Development';
+        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 4);
+                });
+        })
+        ->with(['supply', 'categoryItem'])  // Load both relationships
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->get();
+        $this->total = $this->record->sum('estimated_budget');
+        foreach ($this->record as $record) {
+            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
+
+            foreach (json_decode($record->merged_quantities) as $quantities) {
+
+                $quantitiesArray = json_decode(json_encode($quantities), true);
+                foreach ($quantitiesArray as $monthIndex => $value) {
+                    $mergedQuantities[$monthIndex] += (int) $value;
+                }
+            }
+            $record->merged_quantities = $mergedQuantities;
+        }
+     }
+
+     public function extensionPpmp161()
+     {
+         $this->is_active = false;
+         $this->is_active = true;
+         $this->title = 'Extension Services';
+        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 5);
+                });
+        })
+        ->with(['supply', 'categoryItem'])  // Load both relationships
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->get();
+        $this->total = $this->record->sum('estimated_budget');
+        foreach ($this->record as $record) {
+            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
+
+            foreach (json_decode($record->merged_quantities) as $quantities) {
+
+                $quantitiesArray = json_decode(json_encode($quantities), true);
+                foreach ($quantitiesArray as $monthIndex => $value) {
+                    $mergedQuantities[$monthIndex] += (int) $value;
+                }
+            }
+            $record->merged_quantities = $mergedQuantities;
+        }
+     }
+
+     public function lfPpmp161()
+     {
+         $this->is_active = false;
+         $this->is_active = true;
+         $this->title = 'Local Fund Projects';
+        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 6);
+                });
+        })
+        ->with(['supply', 'categoryItem'])  // Load both relationships
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->get();
+        $this->total = $this->record->sum('estimated_budget');
+        foreach ($this->record as $record) {
+            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
+
+            foreach (json_decode($record->merged_quantities) as $quantities) {
+
+                $quantitiesArray = json_decode(json_encode($quantities), true);
+                foreach ($quantitiesArray as $monthIndex => $value) {
+                    $mergedQuantities[$monthIndex] += (int) $value;
+                }
+            }
+            $record->merged_quantities = $mergedQuantities;
+        }
+     }
+
      //163
      public function sksuPpmp163()
      {

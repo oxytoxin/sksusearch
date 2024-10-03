@@ -165,6 +165,126 @@ class GeneratePpmp extends Component
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
     }
 
+    public function gasPpmp161()
+    {
+        $this->is_active = false;
+        $this->is_active = true;
+        $this->title = 'General Admission and Support Services';
+         // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->whereHas('costCenter', function($query) {
+        //         $query->where('m_f_o_s_id', 1);
+        //     });
+        // })->get();
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 1);
+            });
+        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        ->groupBy('category_item_id')
+        ->get();
+        $this->total = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 1);
+            });
+        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+
+    }
+
+    public function hesPpmp161()
+    {
+        $this->is_active = false;
+        $this->is_active = true;
+        $this->title = 'Higher Education Services';
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 2);
+            });
+        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        ->groupBy('category_item_id')
+        ->get();
+        $this->total = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 2);
+            });
+        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+    }
+
+    public function aesPpmp161()
+    {
+        $this->is_active = false;
+        $this->is_active = true;
+        $this->title = 'Advanced Education Services';
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 3);
+            });
+        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        ->groupBy('category_item_id')
+        ->get();
+        $this->total = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 3);
+            });
+        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+    }
+
+    public function rdPpmp161()
+    {
+        $this->is_active = false;
+        $this->is_active = true;
+        $this->title = 'Research and Development';
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 4);
+            });
+        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        ->groupBy('category_item_id')
+        ->get();
+        $this->total = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 4);
+            });
+        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+    }
+
+    public function extensionPpmp161()
+    {
+        $this->is_active = false;
+        $this->is_active = true;
+        $this->title = 'Extension Services';
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 5);
+            });
+        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        ->groupBy('category_item_id')
+        ->get();
+        $this->total = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 5);
+            });
+        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+    }
+
+    public function lfPpmp161()
+    {
+        $this->is_active = false;
+        $this->is_active = true;
+        $this->title = 'Local Fund Projects';
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 6);
+            });
+        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        ->groupBy('category_item_id')
+        ->get();
+        $this->total = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('m_f_o_s_id', 6);
+            });
+        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+    }
+
     //163
     public function sksuPpmp163()
     {
