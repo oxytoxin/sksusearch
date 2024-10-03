@@ -20,12 +20,12 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
-         $this->record = WfpDetail::whereHas('wfp', function ($query) {
+         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1);
          })
          ->with(['supply', 'categoryItem'])  // Load both relationships
-         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+         ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
          ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -47,14 +47,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'General Admission and Support Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -76,14 +76,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Higher Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -105,14 +105,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Advanced Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -134,14 +134,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Research and Development';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -163,14 +163,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Extension Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -192,14 +192,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Local Fund Projects';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -222,12 +222,12 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 2);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -249,14 +249,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'General Admission and Support Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -278,14 +278,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Higher Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -307,14 +307,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Advanced Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -336,14 +336,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Research and Development';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -365,14 +365,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Extension Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -394,14 +394,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Local Fund Projects';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -424,12 +424,12 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -451,7 +451,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = false;
         $this->is_active = true;
         $this->title = 'ACCESS Campus';
-       $this->record = WfpDetail::whereHas('wfp', function ($query) {
+       $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 1);
@@ -459,8 +459,8 @@ class GenerateWfpPpmp extends Component
             });
        })
        ->with(['supply', 'categoryItem'])  // Load both relationships
-       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
        ->get();
        $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
@@ -482,7 +482,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = false;
         $this->is_active = true;
         $this->title = 'Tacurong Campus';
-       $this->record = WfpDetail::whereHas('wfp', function ($query) {
+       $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 2);
@@ -490,8 +490,8 @@ class GenerateWfpPpmp extends Component
             });
        })
        ->with(['supply', 'categoryItem'])  // Load both relationships
-       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
        ->get();
        $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
@@ -513,7 +513,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = false;
         $this->is_active = true;
         $this->title = 'Isulan Campus';
-       $this->record = WfpDetail::whereHas('wfp', function ($query) {
+       $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 3);
@@ -521,8 +521,8 @@ class GenerateWfpPpmp extends Component
             });
        })
        ->with(['supply', 'categoryItem'])  // Load both relationships
-       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
        ->get();
        $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
@@ -544,7 +544,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = false;
         $this->is_active = true;
         $this->title = 'Kalamansig Campus';
-       $this->record = WfpDetail::whereHas('wfp', function ($query) {
+       $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 4);
@@ -552,8 +552,8 @@ class GenerateWfpPpmp extends Component
             });
        })
        ->with(['supply', 'categoryItem'])  // Load both relationships
-       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
        ->get();
        $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
@@ -575,7 +575,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = false;
         $this->is_active = true;
         $this->title = 'Lutayan Campus';
-       $this->record = WfpDetail::whereHas('wfp', function ($query) {
+       $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 5);
@@ -583,8 +583,8 @@ class GenerateWfpPpmp extends Component
             });
        })
        ->with(['supply', 'categoryItem'])  // Load both relationships
-       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
        ->get();
        $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
@@ -606,7 +606,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = false;
         $this->is_active = true;
         $this->title = 'Palimbang Campus';
-       $this->record = WfpDetail::whereHas('wfp', function ($query) {
+       $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 6);
@@ -614,8 +614,8 @@ class GenerateWfpPpmp extends Component
             });
        })
        ->with(['supply', 'categoryItem'])  // Load both relationships
-       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
        ->get();
        $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
@@ -637,7 +637,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = false;
         $this->is_active = true;
         $this->title = 'Bagumbayan Campus';
-       $this->record = WfpDetail::whereHas('wfp', function ($query) {
+       $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 7);
@@ -645,8 +645,8 @@ class GenerateWfpPpmp extends Component
             });
        })
        ->with(['supply', 'categoryItem'])  // Load both relationships
-       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+       ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+       ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
        ->get();
        $this->total = $this->record->sum('estimated_budget');
        foreach ($this->record as $record) {
@@ -669,12 +669,12 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 4);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -696,14 +696,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'General Admission and Support Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -725,14 +725,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Higher Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -754,14 +754,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Advanced Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -783,14 +783,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Research and Development';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -812,14 +812,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Extension Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -842,14 +842,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Local Fund Projects';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -872,12 +872,12 @@ class GenerateWfpPpmp extends Component
               $this->is_active = false;
               $this->is_active = true;
               $this->title = 'Sultan Kudarat State University';
-             $this->record = WfpDetail::whereHas('wfp', function ($query) {
+             $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('fund_cluster_w_f_p_s_id', 7);
              })
              ->with(['supply', 'categoryItem'])  // Load both relationships
-             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
              ->get();
              $this->total = $this->record->sum('estimated_budget');
              foreach ($this->record as $record) {
@@ -899,14 +899,14 @@ class GenerateWfpPpmp extends Component
               $this->is_active = false;
               $this->is_active = true;
               $this->title = 'General Admission and Support Services';
-             $this->record = WfpDetail::whereHas('wfp', function ($query) {
+             $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 1);
                      });
              })
              ->with(['supply', 'categoryItem'])  // Load both relationships
-             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
              ->get();
              $this->total = $this->record->sum('estimated_budget');
              foreach ($this->record as $record) {
@@ -928,14 +928,14 @@ class GenerateWfpPpmp extends Component
               $this->is_active = false;
               $this->is_active = true;
               $this->title = 'Higher Education Services';
-             $this->record = WfpDetail::whereHas('wfp', function ($query) {
+             $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 2);
                      });
              })
              ->with(['supply', 'categoryItem'])  // Load both relationships
-             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
              ->get();
              $this->total = $this->record->sum('estimated_budget');
              foreach ($this->record as $record) {
@@ -957,14 +957,14 @@ class GenerateWfpPpmp extends Component
               $this->is_active = false;
               $this->is_active = true;
               $this->title = 'Advanced Education Services';
-             $this->record = WfpDetail::whereHas('wfp', function ($query) {
+             $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 3);
                      });
              })
              ->with(['supply', 'categoryItem'])  // Load both relationships
-             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
              ->get();
              $this->total = $this->record->sum('estimated_budget');
              foreach ($this->record as $record) {
@@ -986,14 +986,14 @@ class GenerateWfpPpmp extends Component
               $this->is_active = false;
               $this->is_active = true;
               $this->title = 'Research and Development';
-             $this->record = WfpDetail::whereHas('wfp', function ($query) {
+             $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 4);
                      });
              })
              ->with(['supply', 'categoryItem'])  // Load both relationships
-             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
              ->get();
              $this->total = $this->record->sum('estimated_budget');
              foreach ($this->record as $record) {
@@ -1015,14 +1015,14 @@ class GenerateWfpPpmp extends Component
               $this->is_active = false;
               $this->is_active = true;
               $this->title = 'Extension Services';
-             $this->record = WfpDetail::whereHas('wfp', function ($query) {
+             $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 5);
                      });
              })
              ->with(['supply', 'categoryItem'])  // Load both relationships
-             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
              ->get();
              $this->total = $this->record->sum('estimated_budget');
              foreach ($this->record as $record) {
@@ -1045,14 +1045,14 @@ class GenerateWfpPpmp extends Component
               $this->is_active = false;
               $this->is_active = true;
               $this->title = 'Local Fund Projects';
-             $this->record = WfpDetail::whereHas('wfp', function ($query) {
+             $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 6);
                      });
              })
              ->with(['supply', 'categoryItem'])  // Load both relationships
-             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+             ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+             ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
              ->get();
              $this->total = $this->record->sum('estimated_budget');
              foreach ($this->record as $record) {
@@ -1075,12 +1075,12 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 5);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1102,14 +1102,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'General Admission and Support Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1131,14 +1131,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Higher Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1160,14 +1160,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Advanced Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1189,14 +1189,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Research and Development';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1218,14 +1218,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Extension Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1247,14 +1247,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Local Fund Projects';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1277,12 +1277,12 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 6);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1304,14 +1304,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'General Admission and Support Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1333,14 +1333,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Higher Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1362,14 +1362,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Advanced Education Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1391,14 +1391,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Research and Development';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1420,14 +1420,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Extension Services';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
@@ -1449,14 +1449,14 @@ class GenerateWfpPpmp extends Component
          $this->is_active = false;
          $this->is_active = true;
          $this->title = 'Local Fund Projects';
-        $this->record = WfpDetail::whereHas('wfp', function ($query) {
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
-        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
-        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'budget_category_id')
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
         ->get();
         $this->total = $this->record->sum('estimated_budget');
         foreach ($this->record as $record) {
