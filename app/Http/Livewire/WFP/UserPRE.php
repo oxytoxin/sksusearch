@@ -12,6 +12,7 @@ use App\Models\FundClusterWFP;
 class UserPRE extends Component
 {
     public $record;
+    public $cost_center;
     public $ppmp_details;
     public $total;
     public $title;
@@ -19,6 +20,7 @@ class UserPRE extends Component
     public function mount($record)
     {
         $this->record = Wfp::find($record);
+        $this->cost_center = $this->record->costCenter;
         $this->title = FundClusterWFP::find($this->record->fund_cluster_w_f_p_s_id)->name;
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
             $query->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);

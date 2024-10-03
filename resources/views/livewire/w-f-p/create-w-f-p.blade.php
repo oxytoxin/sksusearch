@@ -430,7 +430,7 @@
                                       <table class="min-w-full">
                                         <thead class="bg-gray-400">
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-green-700 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3 h-10"></th>
+                                                <th colspan="22" scope="colgroup" class="bg-green-700 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3 h-10"></th>
                                               </tr>
                                         </thead>
                                         <thead class="bg-white">
@@ -455,13 +455,16 @@
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Nov</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Dec</th>
                                             <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-3 bg-gray-200">
-                                              <span class="sr-only">Edit</span>
+                                              <span class="sr-only">View</span>
                                             </th>
+                                            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-3 bg-gray-200">
+                                                <span class="sr-only">Delete</span>
+                                              </th>
                                           </tr>
                                         </thead>
                                         <tbody class="bg-white">
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">Supplies & Semi-Expendables</th>
                                               </tr>
                                               @forelse ($supplies as $item)
@@ -486,17 +489,21 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][10]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][11]}}</td>
                                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                                                  <button wire:click="deleteSupply({{$loop->index}})" class="text-red-600 hover:text-red-900">Delete</button>
+                                                    @if($item['remarks'] != null)
+                                                    <button wire:click="viewRemarks({{$loop->index}}, 1)" class="text-blue-600 hover:text-blue-900">View Remarks</button>
+                                                    @endif
                                                 </td>
+                                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                  <button wire:click="deleteSupply({{$loop->index}})" class="text-red-600 hover:text-red-900">Delete</button>
                                                 </td>
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">MOOE</th>
                                               </tr>
                                               @forelse ($mooe as $item)
@@ -521,16 +528,21 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][10]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][11]}}</td>
                                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                    @if($item['remarks'] != null)
+                                                    <button wire:click="viewRemarks({{$loop->index}}, 2)" class="text-blue-600 hover:text-blue-900">View Remarks</button>
+                                                    @endif
+                                                </td>
+                                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
                                                     <button wire:click="deleteMooe({{$loop->index}})" class="text-red-600 hover:text-red-900">Delete</button>
                                                 </td>
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">Trainings</th>
                                               </tr>
                                               @forelse ($trainings as $item)
@@ -555,16 +567,21 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][10]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][11]}}</td>
                                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                    @if($item['remarks'] != null)
+                                                    <button wire:click="viewRemarks({{$loop->index}}, 3)" class="text-blue-600 hover:text-blue-900">View Remarks</button>
+                                                    @endif
+                                                </td>
+                                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
                                                     <button wire:click="deleteTraining({{$loop->index}})" class="text-red-600 hover:text-red-900">Delete</button>
                                                 </td>
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">Machine & Equipment / Furniture & Fixtures / Bio / Vehicles</th>
                                               </tr>
                                               @forelse ($machines as $item)
@@ -589,16 +606,21 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][10]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][11]}}</td>
                                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                    @if($item['remarks'] != null)
+                                                    <button wire:click="viewRemarks({{$loop->index}}, 4)" class="text-blue-600 hover:text-blue-900">View Remarks</button>
+                                                    @endif
+                                                </td>
+                                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
                                                     <button wire:click="deleteMachine({{$loop->index}})" class="text-red-600 hover:text-red-900">Delete</button>
                                                 </td>
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">Building & Infrastructure</th>
                                               </tr>
                                               @forelse ($buildings as $item)
@@ -623,12 +645,17 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][10]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][11]}}</td>
                                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                    @if($item['remarks'] != null)
+                                                    <button wire:click="viewRemarks({{$loop->index}}, 5)" class="text-blue-600 hover:text-blue-900">View Remarks</button>
+                                                    @endif
+                                                </td>
+                                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
                                                     <button wire:click="deleteBuilding({{$loop->index}})" class="text-red-600 hover:text-red-900">Delete</button>
                                                 </td>
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="20" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                         </tbody>
@@ -675,6 +702,47 @@
                                 </div>
                             </div>
                         </x-slot>
+                    </x-modal.card>
+                </div>
+                {{-- remarks modal  --}}
+                <div>
+                    <x-modal.card title="Remarks" blur wire:model.defer="remarksModal">
+                        <div>
+                            <span>{{$remarks_modal_title}}</span>
+                            <div class="mt-2 w-full">
+                                @switch($remarks_modal_title)
+                                    @case('Supplies & Semi-Expendables')
+                                        <textarea id="about" disabled wire:model="supplies_remarks_details" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                                        @break
+                                    @case('MOOE')
+                                        <textarea id="about" disabled wire:model="mooe_remarks_details" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                                        @break
+                                    @case('Trainings')
+                                        <textarea id="about" disabled wire:model="training_remarks_details" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                                        @break
+                                    @case('Machine & Equipment / Furniture & Fixtures / Bio / Vehicles')
+                                        <textarea id="about" disabled wire:model="machine_remarks_details" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                                        @break
+                                    @case('Building & Infrastructure')
+                                        <textarea id="about" disabled wire:model="building_remarks_details" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                                        @break
+                                    @default
+                                @endswitch
+
+                                {{-- <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p> --}}
+                            </div>
+                        </div>
+
+                        {{-- <x-slot name="footer">
+                            <div class="flex justify-between gap-x-4">
+                                <x-button flat negative label="Delete" wire:click="delete" />
+
+                                <div class="flex">
+                                    <x-button flat label="Cancel" x-on:click="close" />
+                                    <x-button primary label="Save" wire:click="save" />
+                                </div>
+                            </div>
+                        </x-slot> --}}
                     </x-modal.card>
                 </div>
 

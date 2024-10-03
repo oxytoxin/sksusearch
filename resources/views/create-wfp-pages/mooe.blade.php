@@ -14,20 +14,41 @@
 
 
     <div class="mt-4 space-y-4 bg-white p-3 rounded-lg">
-        <div class="sm:col-span-1 mt-4">
-            <label for="mooe_particulars" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
-            <div class="mt-2">
-            <select wire:model="mooe_particular_id" id="mooe_particular_id" name="mooe_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
-                <option value="">Select One</option>
-                @foreach ($mooe_particulars as $item)
-                <option value="{{$item->id}}">{{$item->particulars}}</option>
-                @endforeach
-            </select>
+        <div>
+            <div class="flex items center">
+                <input wire:model="mooe_is_remarks" id="mooe_is_remarks" name="mooe_is_remarks" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                <label for="mooe_is_remarks" class="ml-2 block text-sm font-medium text-gray-900">Add Remarks</label>
             </div>
-            @error('mooe_particular_id')
-            <p class="mt-2 text-sm text-red-600" id="email-error">{{ $message }}</p>
-            @enderror
-          </div>
+            @if ($mooe_is_remarks)
+            <div class="mt-2 w-full">
+                <textarea id="about" wire:model="mooe_remarks" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                {{-- <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p> --}}
+            </div>
+            @endif
+        </div>
+        <div class="grid grid-cols-3 space-x-4">
+            <div class="sm:col-span-2">
+                <label for="mooe_particulars" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
+                <div class="mt-2">
+                <select wire:model="mooe_particular_id" id="mooe_particular_id" name="mooe_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
+                    <option value="">Select One</option>
+                    @foreach ($mooe_particulars as $item)
+                    <option value="{{$item->id}}">{{$item->particulars}}</option>
+                    @endforeach
+                </select>
+                </div>
+                @error('mooe_particular_id')
+                <p class="mt-2 text-sm text-red-600" id="email-error">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="sm:col-span-1">
+                <label for="mooe_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
+                <div class="mt-2">
+                  <input wire:model.defer="mooe_code" disabled id="mooe_code" name="mooe_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+            </div>
+        </div>
+
           <div class="grid grid-cols-3 space-x-4 justify-center">
             <div class="sm:col-span-1">
                 <label for="mooe_uacs" class="block text-sm font-medium leading-6 text-gray-900">UACS Code</label>

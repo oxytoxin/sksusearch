@@ -1,4 +1,4 @@
-<div class="bg-gray-100 px-2 py-4 rounded-lg">
+<div wire:ignore.self class="bg-gray-100 px-2 py-4 rounded-lg">
     <div class="flex justify-between">
         <div class="text-2xl text-gray-800">
             Supplies & Semi-Expendables
@@ -13,22 +13,42 @@
     </div>
 
 
-<div class="bg-gray-100 px-2 py-4 rounded-lg">
-    <div  class="mt-4 space-y-4 bg-white p-3 rounded-lg">
-        <div class="sm:col-span-1 mt-4">
-            <label for="supplies_particulars" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
-            <div class="mt-2">
-            <select wire:model="supplies_particular_id" id="source_fund" name="supplies_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
-                <option value="">Select One</option>
-                @foreach ($supplies_particulars as $item)
-                <option value="{{$item->id}}">{{$item->particulars}}</option>
-                @endforeach
-            </select>
+    <div class="mt-4 space-y-4 bg-white p-3 rounded-lg">
+        <div>
+            <div class="flex items center">
+                <input wire:model="supplies_is_remarks" id="supplies_is_remarks" name="supplies_is_remarks" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                <label for="supplies_is_remarks" class="ml-2 block text-sm font-medium text-gray-900">Add Remarks</label>
             </div>
-            @error('supplies_particular_id')
-            <p class="mt-2 text-sm text-red-600" id="email-error">{{ $message }}</p>
-            @enderror
-          </div>
+            @if ($supplies_is_remarks)
+            <div class="mt-2 w-full">
+                <textarea id="about" wire:model="supplies_remarks" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                {{-- <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p> --}}
+            </div>
+            @endif
+        </div>
+        <div class="grid grid-cols-3 space-x-4">
+            <div class="sm:col-span-2">
+                <label for="supplies_particulars" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
+                <div class="mt-2">
+                <select wire:model="supplies_particular_id" id="source_fund" name="supplies_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
+                    <option value="">Select One</option>
+                    @foreach ($supplies_particulars as $item)
+                    <option value="{{$item->id}}">{{$item->particulars}}</option>
+                    @endforeach
+                </select>
+                </div>
+                @error('supplies_particular_id')
+                <p class="mt-2 text-sm text-red-600" id="email-error">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="sm:col-span-1">
+                <label for="supplies_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
+                <div class="mt-2">
+                  <input wire:model.defer="supplies_code" disabled id="supplies_code" name="supplies_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+            </div>
+        </div>
+
           <div class="grid grid-cols-3 space-x-4 justify-center">
             <div class="sm:col-span-1">
                 <label for="supplies_uacs" class="block text-sm font-medium leading-6 text-gray-900">UACS Code</label>
@@ -137,6 +157,7 @@
           </div>
     </div>
 </div>
+
 {{-- add button --}}
     <div class="mt-3 w-full">
         <x-button wire:click="addSupplies" full emerald label="Add" />

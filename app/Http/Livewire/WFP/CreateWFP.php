@@ -58,6 +58,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public $fund_allocations;
     public $current_balance;
+    public $remarks_modal_title;
     //step 1
     public $fund_description;
     public $source_fund;
@@ -65,8 +66,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public $specify_fund_source;
     public $is_misc = false;
     //step 2
+    public $supplies_is_remarks;
+    public $supplies_remarks;
+    public $supplies_remarks_details;
     public $supplies_particulars;
     public $supplies_particular_id;
+    public $supplies_code;
     public $supplies_category_attr;
     public $supplies_uacs;
     public $supplies_title_group;
@@ -78,8 +83,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public $supplies_cost_per_unit;
     public $supplies_estimated_budget;
     //step 3
+     public $mooe_is_remarks;
+     public $mooe_remarks;
+     public $mooe_remarks_details;
      public $mooe_particulars;
      public $mooe_particular_id;
+     public $mooe_code;
      public $mooe_category_attr;
      public $mooe_uacs;
      public $mooe_title_group;
@@ -91,8 +100,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $mooe_cost_per_unit;
      public $mooe_estimated_budget;
      //step 4
+     public $training_is_remarks;
+     public $training_remarks;
+     public $training_remarks_details;
      public $training_particulars;
      public $training_particular_id;
+     public $training_code;
      public $training_category_attr;
      public $training_uacs;
      public $training_title_group;
@@ -104,8 +117,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $training_cost_per_unit;
      public $training_estimated_budget;
     //step 5
+    public $machine_is_remarks;
+    public $machine_remarks;
+    public $machine_remarks_details;
     public $machine_particulars;
     public $machine_particular_id;
+    public $machine_code;
     public $machine_category_attr;
     public $machine_uacs;
     public $machine_title_group;
@@ -117,8 +134,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public $machine_cost_per_unit;
     public $machine_estimated_budget;
     //step 6
+     public $building_is_remarks;
+     public $building_remarks;
+     public $building_remarks_details;
      public $building_particulars;
      public $building_particular_id;
+     public $building_code;
      public $building_category_attr;
      public $building_uacs;
      public $building_title_group;
@@ -131,15 +152,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $building_estimated_budget;
 
      //modals
+     public $remarksModal = false;
      public $suppliesDetailModal = false;
      public $mooeDetailModal = false;
      public $trainingDetailModal = false;
      public $machineDetailModal = false;
      public $buildingDetailModal = false;
-
-
-
-
 
 
     public function mount($record)
@@ -149,6 +167,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         // dd($this->record->where('office_id', auth()->user()->employee_information->office_id)->get());
         $this->wfp_type = $this->record->fundAllocations->first()->wpfType;
         $this->wfp_fund = $this->record->fundAllocations->first()->fundClusterWFP;
+        $this->fund_description = $this->wfp_fund->fund_source;
         $this->form->fill();
         $this->global_index = 1;
         $this->fund_allocations = $this->record->fundAllocations;
@@ -215,6 +234,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->supplies_particular_id != null)
         {
             $this->supplies_category_attr = Supply::find($this->supplies_particular_id);
+            $this->supplies_code = $this->supplies_category_attr->supply_code;
             $this->supplies_uacs = $this->supplies_category_attr->categoryItems->uacs_code;
             $this->supplies_title_group = $this->supplies_category_attr->categoryGroups->name;
             $this->supplies_account_title = $this->supplies_category_attr->categoryItems->name;
@@ -225,6 +245,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->supplies_category_attr = null;
+            $this->supplies_code = null;
             $this->supplies_uacs = null;
             $this->supplies_title_group = null;
             $this->supplies_account_title = null;
@@ -255,6 +276,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
     }
 
+    public function updatedSuppliesIsRemarks()
+    {
+        if($this->supplies_is_remarks === false)
+        {
+            $this->supplies_remarks = null;
+        }
+    }
+
     public function addSupplies()
     {
         //validate all step 2
@@ -270,25 +299,60 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'supplies_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->supplies_estimated_budget);
-        //add to supplies array
-        $this->supplies[] = [
-            'budget_category_id' => 1,
-            'budget_category' => 'Supplies & Semi-Expendables',
-            'particular_id' => $this->supplies_particular_id,
-            'particular' => $this->supplies_category_attr->particulars,
-            'uacs' => $this->supplies_uacs,
-            'title_group' => $this->supplies_category_attr->categoryGroups->id,
-            'account_title_id' => $this->supplies_category_attr->categoryItems->id,
-            'account_title' => $this->supplies_category_attr->categoryItems->name,
-            'ppmp' => $this->supplies_ppmp,
-            'cost_per_unit' => $this->supplies_cost_per_unit,
-            'quantity' => $this->supplies_quantity,
-            'total_quantity' => $this->supplies_total_quantity,
-            'uom' => $this->supplies_uom,
-            'estimated_budget' => $intEstimatedBudget,
-        ];
+        if($this->supplies != null)
+        {
+            foreach($this->supplies as $key => $supply)
+            {
+                if($supply['particular_id'] == $this->supplies_particular_id && $supply['uom'] == $this->supplies_uom)
+                {
+                    $this->supplies[$key]['quantity'] = $this->supplies[$key]['quantity'] += $this->supplies_quantity;
+                    $this->supplies[$key]['total_quantity'] = $this->supplies[$key]['total_quantity'] += $this->supplies_total_quantity;
+                    $this->supplies[$key]['estimated_budget'] = $this->supplies[$key]['estimated_budget'] += $intEstimatedBudget;
+                    $this->supplies[$key]['quantity'] = array_map(function($a, $b) {
+                        return $a + $b;
+                    }, $this->supplies[$key]['quantity'], $this->supplies_quantity);
+                    break;
+                }else{
+                    $this->supplies[] = [
+                        'budget_category_id' => 1,
+                        'budget_category' => 'Supplies & Semi-Expendables',
+                        'particular_id' => $this->supplies_particular_id,
+                        'particular' => $this->supplies_category_attr->particulars,
+                        'uacs' => $this->supplies_uacs,
+                        'title_group' => $this->supplies_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->supplies_category_attr->categoryItems->id,
+                        'account_title' => $this->supplies_category_attr->categoryItems->name,
+                        'ppmp' => $this->supplies_ppmp,
+                        'cost_per_unit' => $this->supplies_cost_per_unit,
+                        'quantity' => $this->supplies_quantity,
+                        'total_quantity' => $this->supplies_total_quantity,
+                        'uom' => $this->supplies_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->supplies_remarks,
+                    ];
+                }
+            }
+        }else{
+            $this->supplies[] = [
+                'budget_category_id' => 1,
+                'budget_category' => 'Supplies & Semi-Expendables',
+                'particular_id' => $this->supplies_particular_id,
+                'particular' => $this->supplies_category_attr->particulars,
+                'uacs' => $this->supplies_uacs,
+                'title_group' => $this->supplies_category_attr->categoryGroups->id,
+                'account_title_id' => $this->supplies_category_attr->categoryItems->id,
+                'account_title' => $this->supplies_category_attr->categoryItems->name,
+                'ppmp' => $this->supplies_ppmp,
+                'cost_per_unit' => $this->supplies_cost_per_unit,
+                'quantity' => $this->supplies_quantity,
+                'total_quantity' => $this->supplies_total_quantity,
+                'uom' => $this->supplies_uom,
+                'estimated_budget' => $intEstimatedBudget,
+                'remarks' => $this->supplies_remarks,
+            ];
+        }
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6)
+        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->supplies_category_attr->categoryGroups->id;
             $found = false;
@@ -333,6 +397,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function clearSupplies()
     {
         $this->supplies_particular_id = null;
+        $this->supplies_code = null;
         $this->supplies_category_attr = null;
         $this->supplies_uacs = null;
         $this->supplies_title_group = null;
@@ -343,6 +408,8 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->supplies_estimated_budget = 0;
         $this->supplies_uom = null;
         $this->supplies_quantity = array_fill(0, 12, 0);
+        $this->supplies_is_remarks = false;
+        $this->supplies_remarks = null;
     }
 
 
@@ -351,6 +418,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->mooe_particular_id != null)
         {
             $this->mooe_category_attr = Supply::find($this->mooe_particular_id);
+            $this->mooe_code = $this->mooe_category_attr->supply_code;
             $this->mooe_uacs = $this->mooe_category_attr->categoryItems->uacs_code;
             $this->mooe_title_group = $this->mooe_category_attr->categoryGroups->name;
             $this->mooe_account_title = $this->mooe_category_attr->categoryItems->name;
@@ -361,6 +429,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->mooe_category_attr = null;
+            $this->mooe_code = null;
             $this->mooe_uacs = null;
             $this->mooe_title_group = null;
             $this->mooe_account_title = null;
@@ -391,6 +460,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
     }
 
+    public function updatedMooeIsRemarks()
+    {
+        if($this->mooe_is_remarks === false)
+        {
+            $this->mooe_remarks = null;
+        }
+    }
+
     public function addMooe()
     {
         //validate all step 2
@@ -406,25 +483,60 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'mooe_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->mooe_estimated_budget);
-        //add to supplies array
-        $this->mooe[] = [
-            'budget_category_id' => 2,
-            'budget_category' => 'MOOE',
-            'particular_id' => $this->mooe_particular_id,
-            'particular' => $this->mooe_category_attr->particulars,
-            'uacs' => $this->mooe_uacs,
-            'title_group' => $this->mooe_category_attr->categoryGroups->id,
-            'account_title_id' => $this->mooe_category_attr->categoryItems->id,
-            'account_title' => $this->mooe_category_attr->categoryItems->name,
-            'ppmp' => $this->mooe_ppmp,
-            'cost_per_unit' => $this->mooe_cost_per_unit,
-            'quantity' => $this->mooe_quantity,
-            'total_quantity' => $this->mooe_total_quantity,
-            'uom' => $this->mooe_uom,
-            'estimated_budget' => $intEstimatedBudget,
-        ];
+        if($this->mooe != null)
+        {
+            foreach($this->mooe as $key => $mooe)
+            {
+                if($mooe['particular_id'] == $this->mooe_particular_id && $mooe['uom'] == $this->mooe_uom)
+                {
+                    $this->mooe[$key]['quantity'] = $this->mooe[$key]['quantity'] += $this->mooe_quantity;
+                    $this->mooe[$key]['total_quantity'] = $this->mooe[$key]['total_quantity'] += $this->mooe_total_quantity;
+                    $this->mooe[$key]['estimated_budget'] = $this->mooe[$key]['estimated_budget'] += $intEstimatedBudget;
+                    $this->mooe[$key]['quantity'] = array_map(function($a, $b) {
+                        return $a + $b;
+                    }, $this->mooe[$key]['quantity'], $this->mooe_quantity);
+                    break;
+                }else{
+                    $this->mooe[] = [
+                        'budget_category_id' => 2,
+                        'budget_category' => 'MOOE',
+                        'particular_id' => $this->mooe_particular_id,
+                        'particular' => $this->mooe_category_attr->particulars,
+                        'uacs' => $this->mooe_uacs,
+                        'title_group' => $this->mooe_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->mooe_category_attr->categoryItems->id,
+                        'account_title' => $this->mooe_category_attr->categoryItems->name,
+                        'ppmp' => $this->mooe_ppmp,
+                        'cost_per_unit' => $this->mooe_cost_per_unit,
+                        'quantity' => $this->mooe_quantity,
+                        'total_quantity' => $this->mooe_total_quantity,
+                        'uom' => $this->mooe_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->mooe_remarks,
+                    ];
+                }
+            }
+        }else{
+            $this->mooe[] = [
+                'budget_category_id' => 2,
+                'budget_category' => 'MOOE',
+                'particular_id' => $this->mooe_particular_id,
+                'particular' => $this->mooe_category_attr->particulars,
+                'uacs' => $this->mooe_uacs,
+                'title_group' => $this->mooe_category_attr->categoryGroups->id,
+                'account_title_id' => $this->mooe_category_attr->categoryItems->id,
+                'account_title' => $this->mooe_category_attr->categoryItems->name,
+                'ppmp' => $this->mooe_ppmp,
+                'cost_per_unit' => $this->mooe_cost_per_unit,
+                'quantity' => $this->mooe_quantity,
+                'total_quantity' => $this->mooe_total_quantity,
+                'uom' => $this->mooe_uom,
+                'estimated_budget' => $intEstimatedBudget,
+                'remarks' => $this->mooe_remarks,
+            ];
+        }
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6)
+        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->mooe_category_attr->categoryGroups->id;
             $found = false;
@@ -478,6 +590,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function clearMooe()
     {
         $this->mooe_particular_id = null;
+        $this->mooe_code = null;
         $this->mooe_category_attr = null;
         $this->mooe_uacs = null;
         $this->mooe_title_group = null;
@@ -488,6 +601,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->mooe_estimated_budget = 0;
         $this->mooe_uom = null;
         $this->mooe_quantity = array_fill(0, 12, 0);
+        $this->mooe_is_remarks = false;
     }
 
     public function updatedTrainingParticularId()
@@ -495,6 +609,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->training_particular_id != null)
         {
             $this->training_category_attr = Supply::find($this->training_particular_id);
+            $this->training_code = $this->training_category_attr->supply_code;
             $this->training_uacs = $this->training_category_attr->categoryItems->uacs_code;
             $this->training_title_group = $this->training_category_attr->categoryGroups->name;
             $this->training_account_title = $this->training_category_attr->categoryItems->name;
@@ -505,6 +620,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->training_category_attr = null;
+            $this->training_code = null;
             $this->training_uacs = null;
             $this->training_title_group = null;
             $this->training_account_title = null;
@@ -535,6 +651,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
     }
 
+    public function updatedTrainingIsRemarks()
+    {
+        if($this->training_is_remarks === false)
+        {
+            $this->training_remarks = null;
+        }
+    }
+
     public function addTraining()
     {
         //validate all step 2
@@ -550,25 +674,60 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'training_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->training_estimated_budget);
-        //add to supplies array
-        $this->trainings[] = [
-            'budget_category_id' => 3,
-            'budget_category' => 'Trainings',
-            'particular_id' => $this->training_particular_id,
-            'particular' => $this->training_category_attr->particulars,
-            'uacs' => $this->training_uacs,
-            'title_group' => $this->training_category_attr->categoryGroups->id,
-            'account_title_id' => $this->training_category_attr->categoryItems->id,
-            'account_title' => $this->training_category_attr->categoryItems->name,
-            'ppmp' => $this->training_ppmp,
-            'cost_per_unit' => $this->training_cost_per_unit,
-            'quantity' => $this->training_quantity,
-            'total_quantity' => $this->training_total_quantity,
-            'uom' => $this->training_uom,
-            'estimated_budget' => $intEstimatedBudget,
-        ];
+        if($this->trainings != null)
+        {
+            foreach($this->trainings as $key => $training)
+            {
+                if($training['particular_id'] == $this->training_particular_id && $training['uom'] == $this->training_uom)
+                {
+                    $this->trainings[$key]['quantity'] = $this->trainings[$key]['quantity'] += $this->training_quantity;
+                    $this->trainings[$key]['total_quantity'] = $this->trainings[$key]['total_quantity'] += $this->training_total_quantity;
+                    $this->trainings[$key]['estimated_budget'] = $this->trainings[$key]['estimated_budget'] += $intEstimatedBudget;
+                    $this->trainings[$key]['quantity'] = array_map(function($a, $b) {
+                        return $a + $b;
+                    }, $this->trainings[$key]['quantity'], $this->training_quantity);
+                    break;
+                }else{
+                    $this->trainings[] = [
+                        'budget_category_id' => 3,
+                        'budget_category' => 'Trainings',
+                        'particular_id' => $this->training_particular_id,
+                        'particular' => $this->training_category_attr->particulars,
+                        'uacs' => $this->training_uacs,
+                        'title_group' => $this->training_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->training_category_attr->categoryItems->id,
+                        'account_title' => $this->training_category_attr->categoryItems->name,
+                        'ppmp' => $this->training_ppmp,
+                        'cost_per_unit' => $this->training_cost_per_unit,
+                        'quantity' => $this->training_quantity,
+                        'total_quantity' => $this->training_total_quantity,
+                        'uom' => $this->training_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->training_remarks,
+                    ];
+                }
+            }
+        }else{
+            $this->trainings[] = [
+                'budget_category_id' => 3,
+                'budget_category' => 'Trainings',
+                'particular_id' => $this->training_particular_id,
+                'particular' => $this->training_category_attr->particulars,
+                'uacs' => $this->training_uacs,
+                'title_group' => $this->training_category_attr->categoryGroups->id,
+                'account_title_id' => $this->training_category_attr->categoryItems->id,
+                'account_title' => $this->training_category_attr->categoryItems->name,
+                'ppmp' => $this->training_ppmp,
+                'cost_per_unit' => $this->training_cost_per_unit,
+                'quantity' => $this->training_quantity,
+                'total_quantity' => $this->training_total_quantity,
+                'uom' => $this->training_uom,
+                'estimated_budget' => $intEstimatedBudget,
+                'remarks' => $this->training_remarks,
+            ];
+        }
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6)
+        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->training_category_attr->categoryGroups->id;
             $found = false;
@@ -622,6 +781,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function clearTrainings()
     {
         $this->training_particular_id = null;
+        $this->training_code = null;
         $this->training_category_attr = null;
         $this->training_uacs = null;
         $this->training_title_group = null;
@@ -632,6 +792,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->training_estimated_budget = 0;
         $this->training_uom = null;
         $this->training_quantity = array_fill(0, 12, 0);
+        $this->training_is_remarks = false;
     }
 
     public function updatedMachineParticularId()
@@ -639,6 +800,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->machine_particular_id != null)
         {
             $this->machine_category_attr = Supply::find($this->machine_particular_id);
+            $this->machine_code = $this->machine_category_attr->supply_code;
             $this->machine_uacs = $this->machine_category_attr->categoryItems->uacs_code;
             $this->machine_title_group = $this->machine_category_attr->categoryGroups->name;
             $this->machine_account_title = $this->machine_category_attr->categoryItems->name;
@@ -649,6 +811,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->machine_category_attr = null;
+            $this->machine_code = null;
             $this->machine_uacs = null;
             $this->machine_title_group = null;
             $this->machine_account_title = null;
@@ -679,6 +842,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
     }
 
+    public function updatedMachineIsRemarks()
+    {
+        if($this->machine_is_remarks === false)
+        {
+            $this->machine_remarks = null;
+        }
+    }
+
     public function addMachine()
     {
         //validate all step 2
@@ -694,27 +865,62 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'machine_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->machine_estimated_budget);
-        //add to supplies array
 
-        $this->machines[] = [
-            'budget_category_id' => 4,
-            'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
-            'particular_id' => $this->machine_particular_id,
-            'particular' => $this->machine_category_attr->particulars,
-            'uacs' => $this->machine_uacs,
-            'title_group' => $this->machine_category_attr->categoryGroups->id,
-            'account_title_id' => $this->machine_category_attr->categoryItems->id,
-            'account_title' => $this->machine_category_attr->categoryItems->name,
-            'ppmp' => $this->machine_ppmp,
-            'cost_per_unit' => $this->machine_cost_per_unit,
-            'quantity' => $this->machine_quantity,
-            'total_quantity' => $this->machine_total_quantity,
-            'uom' => $this->machine_uom,
-            'estimated_budget' => $intEstimatedBudget,
-        ];
+        if($this->machines != null)
+        {
+            foreach($this->machines as $key => $machine)
+            {
+                if($machine['particular_id'] == $this->machine_particular_id && $machine['uom'] == $this->machine_uom)
+                {
+                    $this->machines[$key]['quantity'] = $this->machines[$key]['quantity'] += $this->machine_quantity;
+                    $this->machines[$key]['total_quantity'] = $this->machines[$key]['total_quantity'] += $this->machine_total_quantity;
+                    $this->machines[$key]['estimated_budget'] = $this->machines[$key]['estimated_budget'] += $intEstimatedBudget;
+                    $this->machines[$key]['quantity'] = array_map(function($a, $b) {
+                        return $a + $b;
+                    }, $this->machines[$key]['quantity'], $this->machine_quantity);
+                    break;
+                }else{
+                    $this->machines[] = [
+                        'budget_category_id' => 4,
+                        'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
+                        'particular_id' => $this->machine_particular_id,
+                        'particular' => $this->machine_category_attr->particulars,
+                        'uacs' => $this->machine_uacs,
+                        'title_group' => $this->machine_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->machine_category_attr->categoryItems->id,
+                        'account_title' => $this->machine_category_attr->categoryItems->name,
+                        'ppmp' => $this->machine_ppmp,
+                        'cost_per_unit' => $this->machine_cost_per_unit,
+                        'quantity' => $this->machine_quantity,
+                        'total_quantity' => $this->machine_total_quantity,
+                        'uom' => $this->machine_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->machine_remarks,
+                    ];
+                }
+            }
+        }else{
+            $this->machines[] = [
+                'budget_category_id' => 4,
+                'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
+                'particular_id' => $this->machine_particular_id,
+                'particular' => $this->machine_category_attr->particulars,
+                'uacs' => $this->machine_uacs,
+                'title_group' => $this->machine_category_attr->categoryGroups->id,
+                'account_title_id' => $this->machine_category_attr->categoryItems->id,
+                'account_title' => $this->machine_category_attr->categoryItems->name,
+                'ppmp' => $this->machine_ppmp,
+                'cost_per_unit' => $this->machine_cost_per_unit,
+                'quantity' => $this->machine_quantity,
+                'total_quantity' => $this->machine_total_quantity,
+                'uom' => $this->machine_uom,
+                'estimated_budget' => $intEstimatedBudget,
+                'remarks' => $this->machine_remarks,
+            ];
+        }
 
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6)
+        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->machine_category_attr->categoryGroups->id;
             $found = false;
@@ -769,6 +975,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function clearMachine()
     {
         $this->machine_particular_id = null;
+        $this->machine_code = null;
         $this->machine_category_attr = null;
         $this->machine_uacs = null;
         $this->machine_title_group = null;
@@ -779,6 +986,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->machine_estimated_budget = 0;
         $this->machine_uom = null;
         $this->machine_quantity = array_fill(0, 12, 0);
+        $this->machine_is_remarks = false;
     }
 
     public function updatedBuildingParticularId()
@@ -786,6 +994,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->building_particular_id != null)
         {
             $this->building_category_attr = Supply::find($this->building_particular_id);
+            $this->building_code = $this->building_category_attr->supply_code;
             $this->building_uacs = $this->building_category_attr->categoryItems->uacs_code;
             $this->building_title_group = $this->building_category_attr->categoryGroups->name;
             $this->building_account_title = $this->building_category_attr->categoryItems->name;
@@ -796,6 +1005,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->building_category_attr = null;
+            $this->building_code = null;
             $this->building_uacs = null;
             $this->building_title_group = null;
             $this->building_account_title = null;
@@ -826,6 +1036,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
     }
 
+    public function updatedBuildingIsRemarks()
+    {
+        if($this->building_is_remarks === false)
+        {
+            $this->building_remarks = null;
+        }
+    }
+
     public function addBuilding()
     {
         //validate all step 2
@@ -841,26 +1059,61 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'building_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->building_estimated_budget);
-        //add to supplies array
-        $this->buildings[] = [
-            'budget_category_id' => 5,
-            'budget_category' => 'Building & Infrastructure',
-            'particular_id' => $this->building_particular_id,
-            'particular' => $this->building_category_attr->particulars,
-            'uacs' => $this->building_uacs,
-            'title_group' => $this->building_category_attr->categoryGroups->id,
-            'account_title_id' => $this->building_category_attr->categoryItems->id,
-            'account_title' => $this->building_category_attr->categoryItems->name,
-            'ppmp' => $this->building_ppmp,
-            'cost_per_unit' => $this->building_cost_per_unit,
-            'quantity' => $this->building_quantity,
-            'total_quantity' => $this->building_total_quantity,
-            'uom' => $this->building_uom,
-            'estimated_budget' => $intEstimatedBudget,
-        ];
 
+        if($this->buildings != null)
+        {
+            foreach($this->buildings as $key => $building)
+            {
+                if($building['particular_id'] == $this->building_particular_id && $building['uom'] == $this->building_uom)
+                {
+                    $this->buildings[$key]['quantity'] = $this->buildings[$key]['quantity'] += $this->building_quantity;
+                    $this->buildings[$key]['total_quantity'] = $this->buildings[$key]['total_quantity'] += $this->building_total_quantity;
+                    $this->buildings[$key]['estimated_budget'] = $this->buildings[$key]['estimated_budget'] += $intEstimatedBudget;
+                    $this->buildings[$key]['quantity'] = array_map(function($a, $b) {
+                        return $a + $b;
+                    }, $this->buildings[$key]['quantity'], $this->building_quantity);
+                    break;
+                }else{
+                    $this->buildings[] = [
+                        'budget_category_id' => 5,
+                        'budget_category' => 'Building & Infrastructure',
+                        'particular_id' => $this->building_particular_id,
+                        'particular' => $this->building_category_attr->particulars,
+                        'uacs' => $this->building_uacs,
+                        'title_group' => $this->building_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->building_category_attr->categoryItems->id,
+                        'account_title' => $this->building_category_attr->categoryItems->name,
+                        'ppmp' => $this->building_ppmp,
+                        'cost_per_unit' => $this->building_cost_per_unit,
+                        'quantity' => $this->building_quantity,
+                        'total_quantity' => $this->building_total_quantity,
+                        'uom' => $this->building_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->building_remarks,
+                    ];
+                }
+            }
+        }else{
+            $this->buildings[] = [
+                'budget_category_id' => 5,
+                'budget_category' => 'Building & Infrastructure',
+                'particular_id' => $this->building_particular_id,
+                'particular' => $this->building_category_attr->particulars,
+                'uacs' => $this->building_uacs,
+                'title_group' => $this->building_category_attr->categoryGroups->id,
+                'account_title_id' => $this->building_category_attr->categoryItems->id,
+                'account_title' => $this->building_category_attr->categoryItems->name,
+                'ppmp' => $this->building_ppmp,
+                'cost_per_unit' => $this->building_cost_per_unit,
+                'quantity' => $this->building_quantity,
+                'total_quantity' => $this->building_total_quantity,
+                'uom' => $this->building_uom,
+                'estimated_budget' => $intEstimatedBudget,
+                'remarks' => $this->building_remarks,
+            ];
+        }
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6)
+        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->building_category_attr->categoryGroups->id;
             $found = false;
@@ -916,6 +1169,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function clearBuilding()
     {
         $this->building_particular_id = null;
+        $this->building_code = null;
         $this->building_category_attr = null;
         $this->building_uacs = null;
         $this->building_title_group = null;
@@ -926,6 +1180,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->building_estimated_budget = 0;
         $this->building_uom = null;
         $this->building_quantity = array_fill(0, 12, 0);
+        $this->building_is_remarks = false;
     }
 
     public function decreaseStep()
@@ -1004,6 +1259,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'total_quantity' => $item['total_quantity'],
                     'uom' => $item['uom'],
                     'estimated_budget' => $item['estimated_budget'],
+                    'remarks' => $item['remarks'],
                 ]);
             }
 
@@ -1022,6 +1278,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'total_quantity' => $item['total_quantity'],
                     'uom' => $item['uom'],
                     'estimated_budget' => $item['estimated_budget'],
+                    'remarks' => $item['remarks'],
                 ]);
             }
 
@@ -1040,6 +1297,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'total_quantity' => $item['total_quantity'],
                     'uom' => $item['uom'],
                     'estimated_budget' => $item['estimated_budget'],
+                    'remarks' => $item['remarks'],
                 ]);
             }
 
@@ -1058,6 +1316,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'total_quantity' => $item['total_quantity'],
                     'uom' => $item['uom'],
                     'estimated_budget' => $item['estimated_budget'],
+                    'remarks' => $item['remarks'],
                 ]);
             }
 
@@ -1076,6 +1335,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'total_quantity' => $item['total_quantity'],
                     'uom' => $item['uom'],
                     'estimated_budget' => $item['estimated_budget'],
+                    'remarks' => $item['remarks'],
                 ]);
             }
 
@@ -1094,6 +1354,38 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             );
             $this->suppliesDetailModal = false;
         }
+    }
+
+    public function viewRemarks($index, $type)
+    {
+        $this->remarksModal = true;
+
+        switch($type)
+        {
+            case 1:
+                $this->supplies_remarks_details = $this->supplies[$index]['remarks'];
+                $this->remarks_modal_title = 'Supplies & Semi-Expendables';
+                break;
+            case 2:
+                $this->mooe_remarks_details = $this->mooe[$index]['remarks'];
+                $this->remarks_modal_title = 'MOOE';
+                break;
+            case 3:
+                $this->training_remarks_details = $this->trainings[$index]['remarks'];
+                $this->remarks_modal_title = 'Trainings';
+                break;
+            case 4:
+                $this->machine_remarks_details = $this->machines[$index]['remarks'];
+                $this->remarks_modal_title = 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles';
+                break;
+            case 5:
+                $this->building_remarks_details = $this->buildings[$index]['remarks'];
+                $this->remarks_modal_title = 'Building & Infrastructure';
+                break;
+            default:
+                $this->remarks_modal_title = 'Remarks';
+        }
+
     }
 
     public function deleteSupply($index)

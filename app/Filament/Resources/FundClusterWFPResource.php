@@ -34,6 +34,7 @@ class FundClusterWFPResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')->required(),
+                TextInput::make('fund_source')->required(),
             ]);
     }
 
@@ -42,6 +43,7 @@ class FundClusterWFPResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('fund_source')->searchable()->sortable(),
             ])
             ->filters([
                 //

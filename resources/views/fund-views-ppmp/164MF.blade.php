@@ -36,7 +36,7 @@
         <div id="printarea" class="w-full bg-gray-50 px-2 py-4 rounded-md">
             <div class="text-center">
                 <p class="text-2xl font-medium">
-                    Project Procurement Management Plan
+                    Project Procurement Management Plan (PPMP)
                 </p>
                 <p class="text-xl font-medium">
                     Fund 164MF

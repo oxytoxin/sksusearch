@@ -16,8 +16,9 @@
     <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">
             <div class="text-center">
                 <p class="text-2xl font-medium">
-                    PRE
+                    Program of Receipts and Expenditures (PRE)
                 </p>
+                <p class="text-md font-normal">{{$cost_center->office->name}} - {{$cost_center->name}}</p>
                 <p class="text-md font-normal">{{$title}} - {{$record->fund_description}}</p>
             </div>
             <div>
