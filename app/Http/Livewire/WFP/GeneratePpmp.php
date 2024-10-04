@@ -167,7 +167,7 @@ class GeneratePpmp extends Component
 
     public function gasPpmp161()
     {
-        $this->is_active = false;
+        // $this->is_active = false;
         $this->is_active = true;
         $this->title = 'General Admission and Support Services';
          // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
@@ -192,7 +192,7 @@ class GeneratePpmp extends Component
 
     public function hesPpmp161()
     {
-        $this->is_active = false;
+        // $this->is_active = false;
         $this->is_active = true;
         $this->title = 'Higher Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
@@ -211,7 +211,7 @@ class GeneratePpmp extends Component
 
     public function aesPpmp161()
     {
-        $this->is_active = false;
+        // $this->is_active = false;
         $this->is_active = true;
         $this->title = 'Advanced Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
