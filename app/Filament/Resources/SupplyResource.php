@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\SupplyResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SupplyResource\RelationManagers;
+use Filament\Forms\Components\Grid;
 
 class SupplyResource extends Resource
 {
@@ -35,12 +36,22 @@ class SupplyResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('category_item_id')
-                ->relationship('categoryItems', 'name')
-                ->searchable()
-                ->preload()
-                ->required(),
-                TextInput::make('supply_code')->required(),
+                Grid::make(3)->schema([
+                    Select::make('category_item_id')
+                    ->relationship('categoryItems', 'name')
+                    ->label('Account Title')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                    Select::make('category_group_id')
+                    ->relationship('categoryGroups', 'name')
+                    ->label('Category Group')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                    TextInput::make('supply_code')->required(),
+                ]),
+
                 TextInput::make('particulars')->required(),
                 TextInput::make('unit_cost')
                   ->mask(fn (TextInput\Mask $mask) => $mask
@@ -60,7 +71,8 @@ class SupplyResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('categoryItems.name')->label('Category Items')->searchable(),
+                TextColumn::make('categoryItems.name')->label('Account Title')->searchable(),
+                TextColumn::make('categoryGroups.name')->label('Category Group')->searchable(),
                 TextColumn::make('supply_code')->searchable()->sortable(),
                 TextColumn::make('particulars')->searchable()->sortable(),
                 TextColumn::make('unit_cost')->searchable()

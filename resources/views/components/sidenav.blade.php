@@ -271,6 +271,9 @@
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.select-wfp') }}">
                     Create WFP
                 </a>
+                <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.request-supply') }}">
+                    Request Supply
+                </a>
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.wfp-history') }}">
                     WFP History
                 </a>

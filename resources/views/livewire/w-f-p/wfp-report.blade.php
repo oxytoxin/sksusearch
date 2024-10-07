@@ -26,14 +26,16 @@
                   <span class="text-left font-semibold">Fund:</span>
                   <span class="text-center">{{$record->fundClusterWfp->name}} - {{$record->fund_description}}</span>
               </div>
-                <div class="py-2">
-                    <span class="text-left font-semibold">Souce of Fund: </span>
-                    <span class="text-center">{{$record->source_fund}}</span>
-                </div>
-                <div class="py-2">
-                    <span class="text-left font-semibold">if miscellaneous/fiduciary fee, please specify: </span>
-                    <span class="text-center">{{$record->confirm_fund_source ?? 'N/A'}}</span>
-                </div>
+              @if ($record->fundClusterWfp->id > 3)
+              <div class="py-2">
+                <span class="text-left font-semibold">Souce of Fund: </span>
+                <span class="text-center">{{$record->source_fund}}</span>
+            </div>
+            <div class="py-2">
+                <span class="text-left font-semibold">if miscellaneous/fiduciary fee, please specify: </span>
+                <span class="text-center">{{$record->confirm_fund_source ?? 'N/A'}}</span>
+            </div>
+              @endif
                 <div class="py-2">
                     <span class="text-left font-semibold">Cost Center: </span>
                     <span class="text-center">{{$record->costCenter->name}}</span>
@@ -46,9 +48,9 @@
             </div>
         </div>
 
-        <div class="mt-6 flow-root">
+        <div class="mt-2 flow-root">
             <div class="my-2 overflow-x-auto sm:-mx-6 lg:-mx-2">
-              <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-2">
+              <div class=" min-w-full py-2 align-middle sm:px-6 lg:px-2">
                 <table class="min-w-full">
                   <thead class="bg-gray-400">
                       <tr class="border-t border-gray-200">
@@ -57,26 +59,26 @@
                   </thead>
                   <thead class="bg-white">
                     <tr>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UACS Code</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Account Title</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Particulars</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Qty</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UOM</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Unit Cost</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Estimated Budget</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jan</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Feb</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Mar</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Apr</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">May</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jun</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jul</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Aug</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Sep</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Oct</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Nov</th>
-                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Dec</th>
-                    </tr>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">UACS Code</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">Account Title</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">Particulars</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">Qty</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900">UOM</th>
+                        <th scope="col" class="px-1 py-1 text-right text-sm font-semibold text-gray-900">Unit Cost</th>
+                        <th scope="col" class="px-1 py-1 text-right text-sm font-semibold text-gray-900">Estimated Budget</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jan</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Feb</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Mar</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Apr</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">May</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jun</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jul</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Aug</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Sep</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Oct</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Nov</th>
+                        <th scope="col" class="px-1 py-1 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-l border-gray-400">Dec</th>
+                      </tr>
                   </thead>
                   <tbody class="bg-white">
                       <tr class="border-t border-gray-200">
@@ -93,7 +95,7 @@
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
                           @foreach (json_decode($item->quantity_year) as $quantity)
-                          <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-x border-gray-400">{{$quantity}}</td>
+                          <td class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                           @endforeach
                         </tr>
                       @empty
@@ -115,7 +117,7 @@
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
                             @foreach (json_decode($item->quantity_year) as $quantity)
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-x border-gray-400">{{$quantity}}</td>
+                            <td class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
                           </tr>
                       @empty
@@ -137,7 +139,7 @@
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
                             @foreach (json_decode($item->quantity_year) as $quantity)
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-x border-gray-400">{{$quantity}}</td>
+                            <td class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
                           </tr>
                       @empty
@@ -159,7 +161,7 @@
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
                             @foreach (json_decode($item->quantity_year) as $quantity)
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-x border-gray-400">{{$quantity}}</td>
+                            <td class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
                           </tr>
                       @empty
@@ -181,7 +183,7 @@
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
                             @foreach (json_decode($item->quantity_year) as $quantity)
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-x border-gray-400">{{$quantity}}</td>
+                            <td class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
                           </tr>
                       @empty
@@ -212,6 +214,61 @@
                         </div>
                     </div>
                   </div>
+                  {{-- signatories --}}
+                  @php
+                  $president = App\Models\EmployeeInformation::where('position_id', 34)->where('office_id', 51)->first();
+                  $vp_finance = App\Models\EmployeeInformation::where('position_id', 29)->where('office_id', 8)->first();
+                  $budget = App\Models\EmployeeInformation::where('position_id', 10)->where('office_id', 2)->first();
+                  @endphp
+                  <div class="flex justify-center mt-5">
+                    Approved by:
+                  </div>
+                  <div class="flex justify-center underline font-semibold">
+                    {{$president->full_name}}
+                  </div>
+                  <div class="flex justify-center">
+                    University President
+                  </div>
+                    <div class="grid grid-cols-3 space-x-3 mt-5">
+                        <div class="col-span-1">
+                            <div class="">
+                                <div class="flex justify-center mt-5">
+                                    Prepared by:
+                                  </div>
+                                  <div class="flex justify-center underline font-semibold">
+                                    {{$record->costCenter->office->head_employee?->full_name}}
+                                  </div>
+                                  <div class="flex justify-center">
+                                    Cost Center Manager
+                                  </div>
+                            </div>
+                        </div>
+                        <div class="col-span-1">
+                            <div class="">
+                                <div class="flex justify-center mt-5">
+                                    Received by:
+                                  </div>
+                                  <div class="flex justify-center underline font-semibold">
+                                    {{$vp_finance->full_name}}
+                                  </div>
+                                  <div class="flex justify-center">
+                                    VP Finance
+                                  </div>
+                            </div>
+                        </div>
+                        <div class="col-span-1">
+                            <div class="">
+                                <div class="flex justify-center mt-5">
+                                    Received by:
+                                  </div>
+                                  <div class="flex justify-center underline font-semibold">
+                                    {{$budget->full_name}}
+                                  </div>
+                                  <div class="flex justify-center">
+                                    Budget Officer
+                                  </div>
+                            </div>
+                        </div>
               </div>
             </div>
           </div>
