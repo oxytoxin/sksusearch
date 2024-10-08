@@ -9,6 +9,7 @@ use App\Http\Livewire\WFP\FundAllocation;
 use App\Http\Livewire\WFP\GeneratePpmp;
 use App\Http\Livewire\WFP\GenerateWfpPpmp;
 use App\Http\Livewire\WFP\RequestSupply;
+use App\Http\Livewire\WFP\SupplyRequestList;
 use App\Http\Livewire\WFP\UserPRE;
 use App\Http\Livewire\WFP\WFPHistory;
 use App\Http\Livewire\WFP\WfpPpmp;
@@ -35,5 +36,6 @@ Route::middleware([
     Route::get('/wfp-ppmp', GenerateWfpPpmp::class)->name('generate-wfp-ppmp');
     Route::get('/print-ppmp/{record}', WfpPpmp::class)->name('print-ppmp');
     Route::get('/print-pre/{record}', UserPRE::class)->name('print-pre');
-    Route::get('/request-supply', RequestSupply::class)->name('request-supply');
+    Route::get('/request-new-supply', RequestSupply::class)->name('request-supply');
+    Route::get('/request-supply-list', SupplyRequestList::class)->name('request-supply-list');
 });

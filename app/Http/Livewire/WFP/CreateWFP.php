@@ -19,6 +19,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Actions\Action;
 use Awcodes\FilamentTableRepeater\Components\TableRepeater;
+use Filament\Forms\Components\Select;
 
 class CreateWFP extends Component implements Forms\Contracts\HasForms
 {
@@ -71,6 +72,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public $supplies_remarks_details;
     public $supplies_particulars;
     public $supplies_particular_id;
+    public $supplies_specs;
     public $supplies_code;
     public $supplies_category_attr;
     public $supplies_uacs;
@@ -88,6 +90,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $mooe_remarks_details;
      public $mooe_particulars;
      public $mooe_particular_id;
+     public $mooe_specs;
      public $mooe_code;
      public $mooe_category_attr;
      public $mooe_uacs;
@@ -105,6 +108,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $training_remarks_details;
      public $training_particulars;
      public $training_particular_id;
+     public $training_specs;
      public $training_code;
      public $training_category_attr;
      public $training_uacs;
@@ -122,6 +126,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public $machine_remarks_details;
     public $machine_particulars;
     public $machine_particular_id;
+    public $machine_specs;
     public $machine_code;
     public $machine_category_attr;
     public $machine_uacs;
@@ -139,6 +144,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $building_remarks_details;
      public $building_particulars;
      public $building_particular_id;
+     public $building_specs;
      public $building_code;
      public $building_category_attr;
      public $building_uacs;
@@ -217,8 +223,238 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         })->get();
         $this->building_total_quantity = 0;
         $this->building_quantity = array_fill(0, 12, 0);
+    }
 
+    protected function getFormSchema(): array
+    {
+        return [
+            Select::make('supplies_particular')
+            ->label('')
+            ->searchable()
+            ->placeholder('Search for a particular')
+            ->preload()
+            ->options(function () {
+                switch($this->global_index)
+                {
+                    case 2:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 1);
+                        })->limit(50)->pluck('particulars', 'id');
+                        break;
+                    case 3:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 2);
+                        })->limit(50)->pluck('particulars', 'id');
+                        break;
+                    case 4:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 3);
+                        })->limit(50)->pluck('particulars', 'id');
+                        break;
+                    case 5:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 4);
+                        })->limit(50)->pluck('particulars', 'id');
+                        break;
+                    case 6:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 5);
+                        })->limit(50)->pluck('particulars', 'id');
+                        break;
+                }
 
+            })
+            // ->getSearchResultsUsing(function (string $search){
+            //     switch($this->global_index)
+            //     {
+            //         case 2:
+            //             return Supply::whereHas('categoryItems', function ($query) {
+            //                 $query->where('budget_category_id', 1);
+            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             break;
+            //         case 3:
+            //             return Supply::whereHas('categoryItems', function ($query) {
+            //                 $query->where('budget_category_id', 2);
+            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             break;
+            //         case 4:
+            //             return Supply::whereHas('categoryItems', function ($query) {
+            //                 $query->where('budget_category_id', 3);
+            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             break;
+            //         case 5:
+            //             return Supply::whereHas('categoryItems', function ($query) {
+            //                 $query->where('budget_category_id', 4);
+            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             break;
+            //         case 6:
+            //             return Supply::whereHas('categoryItems', function ($query) {
+            //                 $query->where('budget_category_id', 5);
+            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             break;
+            //         default:
+            //             return Supply::where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             break;
+            //     }
+            // })
+            ->reactive()
+            ->afterStateUpdated(function () {
+                switch($this->global_index)
+                {
+                    case 2:
+                        if($this->data['supplies_particular'] != null)
+                        {
+                            $this->supplies_particular_id = $this->data['supplies_particular'];
+                            $this->supplies_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->supplies_specs = $this->supplies_category_attr->specifications;
+                            $this->supplies_code = $this->supplies_category_attr->supply_code;
+                            $this->supplies_uacs = $this->supplies_category_attr->categoryItems->uacs_code;
+                            $this->supplies_title_group = $this->supplies_category_attr->categoryGroups->name;
+                            $this->supplies_account_title = $this->supplies_category_attr->categoryItems->name;
+                            $this->supplies_ppmp = $this->supplies_category_attr->is_ppmp;
+                            $this->supplies_cost_per_unit = $this->supplies_category_attr->unit_cost;
+                            $this->supplies_quantity = array_fill(0, 12, 0);
+                            $this->calculateSuppliesTotalQuantity();
+
+                        }else{
+                            $this->supplies_particular_id = null;
+                            $this->supplies_category_attr = null;
+                            $this->supplies_specs = null;
+                            $this->supplies_code = null;
+                            $this->supplies_uacs = null;
+                            $this->supplies_title_group = null;
+                            $this->supplies_account_title = null;
+                            $this->supplies_ppmp = false;
+                            $this->supplies_cost_per_unit = 0;
+                            $this->supplies_total_quantity = 0;
+                            $this->supplies_estimated_budget = 0;
+                            $this->supplies_uom = null;
+                            $this->supplies_quantity = array_fill(0, 12, 0);
+                        }
+                        break;
+                    case 3:
+                        if($this->data['supplies_particular'] != null)
+                        {
+                            $this->mooe_particular_id = $this->data['supplies_particular'];
+                            $this->mooe_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->mooe_specs = $this->mooe_category_attr->specifications;
+                            $this->mooe_code = $this->mooe_category_attr->supply_code;
+                            $this->mooe_uacs = $this->mooe_category_attr->categoryItems->uacs_code;
+                            $this->mooe_title_group = $this->mooe_category_attr->categoryGroups->name;
+                            $this->mooe_account_title = $this->mooe_category_attr->categoryItems->name;
+                            $this->mooe_ppmp = $this->mooe_category_attr->is_ppmp;
+                            $this->mooe_cost_per_unit = $this->mooe_category_attr->unit_cost;
+                            $this->mooe_quantity = array_fill(0, 12, 0);
+                            $this->calculateMooeTotalQuantity();
+
+                        }else{
+                            $this->mooe_category_attr = null;
+                            $this->mooe_specs = null;
+                            $this->mooe_code = null;
+                            $this->mooe_uacs = null;
+                            $this->mooe_title_group = null;
+                            $this->mooe_account_title = null;
+                            $this->mooe_ppmp = false;
+                            $this->mooe_cost_per_unit = 0;
+                            $this->mooe_total_quantity = 0;
+                            $this->mooe_estimated_budget = 0;
+                            $this->mooe_uom = null;
+                            $this->mooe_quantity = array_fill(0, 12, 0);
+                        }
+                        break;
+                    case 4:
+                        if($this->data['supplies_particular'] != null)
+                        {
+                            $this->training_particular_id = $this->data['supplies_particular'];
+                            $this->training_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->training_specs = $this->training_category_attr->specifications;
+                            $this->training_code = $this->training_category_attr->supply_code;
+                            $this->training_uacs = $this->training_category_attr->categoryItems->uacs_code;
+                            $this->training_title_group = $this->training_category_attr->categoryGroups->name;
+                            $this->training_account_title = $this->training_category_attr->categoryItems->name;
+                            $this->training_ppmp = $this->training_category_attr->is_ppmp;
+                            $this->training_cost_per_unit = $this->training_category_attr->unit_cost;
+                            $this->training_quantity = array_fill(0, 12, 0);
+                            $this->calculateTrainingTotalQuantity();
+
+                        }else{
+                            $this->training_category_attr = null;
+                            $this->training_specs = null;
+                            $this->training_code = null;
+                            $this->training_uacs = null;
+                            $this->training_title_group = null;
+                            $this->training_account_title = null;
+                            $this->training_ppmp = false;
+                            $this->training_cost_per_unit = 0;
+                            $this->training_total_quantity = 0;
+                            $this->training_estimated_budget = 0;
+                            $this->training_uom = null;
+                            $this->training_quantity = array_fill(0, 12, 0);
+                        }
+                        break;
+                    case 5:
+                        if($this->data['supplies_particular'] != null)
+                        {
+                            $this->machine_particular_id = $this->data['supplies_particular'];
+                            $this->machine_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->machine_specs = $this->machine_category_attr->specifications;
+                            $this->machine_code = $this->machine_category_attr->supply_code;
+                            $this->machine_uacs = $this->machine_category_attr->categoryItems->uacs_code;
+                            $this->machine_title_group = $this->machine_category_attr->categoryGroups->name;
+                            $this->machine_account_title = $this->machine_category_attr->categoryItems->name;
+                            $this->machine_ppmp = $this->machine_category_attr->is_ppmp;
+                            $this->machine_cost_per_unit = $this->machine_category_attr->unit_cost;
+                            $this->machine_quantity = array_fill(0, 12, 0);
+                            $this->calculateMachineTotalQuantity();
+
+                        }else{
+                            $this->machine_category_attr = null;
+                            $this->machine_specs = null;
+                            $this->machine_code = null;
+                            $this->machine_uacs = null;
+                            $this->machine_title_group = null;
+                            $this->machine_account_title = null;
+                            $this->machine_ppmp = false;
+                            $this->machine_cost_per_unit = 0;
+                            $this->machine_total_quantity = 0;
+                            $this->machine_estimated_budget = 0;
+                            $this->machine_uom = null;
+                            $this->machine_quantity = array_fill(0, 12, 0);
+                        }
+                        break;
+                    case 6:
+                        if($this->data['supplies_particular'] != null)
+                        {
+                            $this->building_particular_id = $this->data['supplies_particular'];
+                            $this->building_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->building_specs = $this->building_category_attr->specifications;
+                            $this->building_code = $this->building_category_attr->supply_code;
+                            $this->building_uacs = $this->building_category_attr->categoryItems->uacs_code;
+                            $this->building_title_group = $this->building_category_attr->categoryGroups->name;
+                            $this->building_account_title = $this->building_category_attr->categoryItems->name;
+                            $this->building_ppmp = $this->building_category_attr->is_ppmp;
+                            $this->building_cost_per_unit = $this->building_category_attr->unit_cost;
+                            $this->building_quantity = array_fill(0, 12, 0);
+                            $this->calculateBuildingTotalQuantity();
+
+                        }else{
+                            $this->building_category_attr = null;
+                            $this->building_specs = null;
+                            $this->building_code = null;
+                            $this->building_uacs = null;
+                            $this->building_title_group = null;
+                            $this->building_account_title = null;
+                            $this->building_ppmp = false;
+                            $this->building_cost_per_unit = 0;
+                            $this->building_total_quantity = 0;
+                            $this->building_estimated_budget = 0;
+                            $this->building_uom = null;
+                            $this->building_quantity = array_fill(0, 12, 0);
+                        }
+                        break;
+                }
+            })
+        ];
     }
 
     public function updatedSourceFund()
@@ -234,6 +470,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->supplies_particular_id != null)
         {
             $this->supplies_category_attr = Supply::find($this->supplies_particular_id);
+            $this->supplies_specs = $this->supplies_category_attr->specifications;
             $this->supplies_code = $this->supplies_category_attr->supply_code;
             $this->supplies_uacs = $this->supplies_category_attr->categoryItems->uacs_code;
             $this->supplies_title_group = $this->supplies_category_attr->categoryGroups->name;
@@ -245,6 +482,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->supplies_category_attr = null;
+            $this->supplies_specs = null;
             $this->supplies_code = null;
             $this->supplies_uacs = null;
             $this->supplies_title_group = null;
@@ -318,6 +556,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'Supplies & Semi-Expendables',
                         'particular_id' => $this->supplies_particular_id,
                         'particular' => $this->supplies_category_attr->particulars,
+                        'specifications' => $this->supplies_category_attr->specifications,
                         'uacs' => $this->supplies_uacs,
                         'title_group' => $this->supplies_category_attr->categoryGroups->id,
                         'account_title_id' => $this->supplies_category_attr->categoryItems->id,
@@ -338,6 +577,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'Supplies & Semi-Expendables',
                 'particular_id' => $this->supplies_particular_id,
                 'particular' => $this->supplies_category_attr->particulars,
+                'specifications' => $this->supplies_category_attr->specifications,
                 'uacs' => $this->supplies_uacs,
                 'title_group' => $this->supplies_category_attr->categoryGroups->id,
                 'account_title_id' => $this->supplies_category_attr->categoryItems->id,
@@ -396,7 +636,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearSupplies()
     {
+        $this->data['supplies_particular'] = null;
         $this->supplies_particular_id = null;
+        $this->supplies_specs = null;
         $this->supplies_code = null;
         $this->supplies_category_attr = null;
         $this->supplies_uacs = null;
@@ -418,6 +660,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->mooe_particular_id != null)
         {
             $this->mooe_category_attr = Supply::find($this->mooe_particular_id);
+            $this->mooe_specs = $this->mooe_category_attr->specifications;
             $this->mooe_code = $this->mooe_category_attr->supply_code;
             $this->mooe_uacs = $this->mooe_category_attr->categoryItems->uacs_code;
             $this->mooe_title_group = $this->mooe_category_attr->categoryGroups->name;
@@ -429,6 +672,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->mooe_category_attr = null;
+            $this->mooe_specs = null;
             $this->mooe_code = null;
             $this->mooe_uacs = null;
             $this->mooe_title_group = null;
@@ -502,6 +746,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'MOOE',
                         'particular_id' => $this->mooe_particular_id,
                         'particular' => $this->mooe_category_attr->particulars,
+                        'specifications' => $this->mooe_category_attr->specifications,
                         'uacs' => $this->mooe_uacs,
                         'title_group' => $this->mooe_category_attr->categoryGroups->id,
                         'account_title_id' => $this->mooe_category_attr->categoryItems->id,
@@ -522,6 +767,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'MOOE',
                 'particular_id' => $this->mooe_particular_id,
                 'particular' => $this->mooe_category_attr->particulars,
+                'specifications' => $this->mooe_category_attr->specifications,
                 'uacs' => $this->mooe_uacs,
                 'title_group' => $this->mooe_category_attr->categoryGroups->id,
                 'account_title_id' => $this->mooe_category_attr->categoryItems->id,
@@ -589,7 +835,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearMooe()
     {
+        $this->data['supplies_particular'] = null;
         $this->mooe_particular_id = null;
+        $this->mooe_specs = null;
         $this->mooe_code = null;
         $this->mooe_category_attr = null;
         $this->mooe_uacs = null;
@@ -609,6 +857,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->training_particular_id != null)
         {
             $this->training_category_attr = Supply::find($this->training_particular_id);
+            $this->training_specs = $this->training_category_attr->specifications;
             $this->training_code = $this->training_category_attr->supply_code;
             $this->training_uacs = $this->training_category_attr->categoryItems->uacs_code;
             $this->training_title_group = $this->training_category_attr->categoryGroups->name;
@@ -620,6 +869,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->training_category_attr = null;
+            $this->training_specs = null;
             $this->training_code = null;
             $this->training_uacs = null;
             $this->training_title_group = null;
@@ -693,6 +943,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'Trainings',
                         'particular_id' => $this->training_particular_id,
                         'particular' => $this->training_category_attr->particulars,
+                        'specifications' => $this->training_category_attr->specifications,
                         'uacs' => $this->training_uacs,
                         'title_group' => $this->training_category_attr->categoryGroups->id,
                         'account_title_id' => $this->training_category_attr->categoryItems->id,
@@ -713,6 +964,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'Trainings',
                 'particular_id' => $this->training_particular_id,
                 'particular' => $this->training_category_attr->particulars,
+                'specifications' => $this->training_category_attr->specifications,
                 'uacs' => $this->training_uacs,
                 'title_group' => $this->training_category_attr->categoryGroups->id,
                 'account_title_id' => $this->training_category_attr->categoryItems->id,
@@ -780,7 +1032,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearTrainings()
     {
+        $this->data['supplies_particular'] = null;
         $this->training_particular_id = null;
+        $this->training_specs = null;
         $this->training_code = null;
         $this->training_category_attr = null;
         $this->training_uacs = null;
@@ -800,6 +1054,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->machine_particular_id != null)
         {
             $this->machine_category_attr = Supply::find($this->machine_particular_id);
+            $this->machine_specs = $this->machine_category_attr->specifications;
             $this->machine_code = $this->machine_category_attr->supply_code;
             $this->machine_uacs = $this->machine_category_attr->categoryItems->uacs_code;
             $this->machine_title_group = $this->machine_category_attr->categoryGroups->name;
@@ -811,6 +1066,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->machine_category_attr = null;
+            $this->machine_specs = null;
             $this->machine_code = null;
             $this->machine_uacs = null;
             $this->machine_title_group = null;
@@ -885,6 +1141,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                         'particular_id' => $this->machine_particular_id,
                         'particular' => $this->machine_category_attr->particulars,
+                        'specifications' => $this->machine_category_attr->specifications,
                         'uacs' => $this->machine_uacs,
                         'title_group' => $this->machine_category_attr->categoryGroups->id,
                         'account_title_id' => $this->machine_category_attr->categoryItems->id,
@@ -905,6 +1162,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                 'particular_id' => $this->machine_particular_id,
                 'particular' => $this->machine_category_attr->particulars,
+                'specifications' => $this->machine_category_attr->specifications,
                 'uacs' => $this->machine_uacs,
                 'title_group' => $this->machine_category_attr->categoryGroups->id,
                 'account_title_id' => $this->machine_category_attr->categoryItems->id,
@@ -974,7 +1232,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearMachine()
     {
+        $this->data['supplies_particular'] = null;
         $this->machine_particular_id = null;
+        $this->machine_specs = null;
         $this->machine_code = null;
         $this->machine_category_attr = null;
         $this->machine_uacs = null;
@@ -994,6 +1254,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if($this->building_particular_id != null)
         {
             $this->building_category_attr = Supply::find($this->building_particular_id);
+            $this->building_specs = $this->building_category_attr->specifications;
             $this->building_code = $this->building_category_attr->supply_code;
             $this->building_uacs = $this->building_category_attr->categoryItems->uacs_code;
             $this->building_title_group = $this->building_category_attr->categoryGroups->name;
@@ -1005,6 +1266,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }else{
             $this->building_category_attr = null;
+            $this->building_specs = null;
             $this->building_code = null;
             $this->building_uacs = null;
             $this->building_title_group = null;
@@ -1079,6 +1341,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'Building & Infrastructure',
                         'particular_id' => $this->building_particular_id,
                         'particular' => $this->building_category_attr->particulars,
+                        'specifications' => $this->building_category_attr->specifications,
                         'uacs' => $this->building_uacs,
                         'title_group' => $this->building_category_attr->categoryGroups->id,
                         'account_title_id' => $this->building_category_attr->categoryItems->id,
@@ -1099,6 +1362,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'Building & Infrastructure',
                 'particular_id' => $this->building_particular_id,
                 'particular' => $this->building_category_attr->particulars,
+                'specifications' => $this->building_category_attr->specifications,
                 'uacs' => $this->building_uacs,
                 'title_group' => $this->building_category_attr->categoryGroups->id,
                 'account_title_id' => $this->building_category_attr->categoryItems->id,
@@ -1168,7 +1432,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearBuilding()
     {
+        $this->data['supplies_particular'] = null;
         $this->building_particular_id = null;
+        $this->building_specs = null;
         $this->building_code = null;
         $this->building_category_attr = null;
         $this->building_uacs = null;
@@ -1186,11 +1452,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function decreaseStep()
     {
         $this->global_index--;
+        $this->data['supplies_particular'] = null;
     }
 
     public function increaseStep()
     {
         $this->global_index++;
+        $this->data['supplies_particular'] = null;
     }
 
 

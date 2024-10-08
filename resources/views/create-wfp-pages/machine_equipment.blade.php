@@ -1,36 +1,28 @@
 <div wire:ignore.self class="bg-gray-100 px-2 py-4 rounded-lg">
-    <div class="flex justify-between">
-        <div class="text-2xl text-gray-800">
+    <div class="grid grid-cols-2">
+        <div class="col-span-1 text-sm text-gray-800">
             Machine & Equipment / Furniture & Fixtures / Bio / Vehicles
         </div>
-        <div>
-            @if ($machines)
-            {{-- <button wire:click="showMachineDetails" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
+        <div class="col-span-1">
+            {{$this->form}}
+            {{-- @if ($machines)
+            <button wire:click="showMachineDetails" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                 Show Details
-            </button> --}}
-            @endif
+            </button>
+            @endif --}}
         </div>
     </div>
 
 
     <div class="mt-4 space-y-4 bg-white p-3 rounded-lg">
-        <div>
-            <div class="flex items center">
-                <input wire:model="machine_is_remarks" id="machine_is_remarks" name="machine_is_remarks" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                <label for="machine_is_remarks" class="ml-2 block text-sm font-medium text-gray-900">Add Remarks</label>
-            </div>
-            @if ($machine_is_remarks)
-            <div class="mt-2 w-full">
-                <textarea id="about" wire:model="machine_remarks" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
-                {{-- <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p> --}}
-            </div>
-            @endif
-        </div>
         <div class="grid grid-cols-3 space-x-4">
             <div class="sm:col-span-2">
-                <label for="machine_particulars" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
+                <div class="flex justify-between">
+                    <label for="machine_particulars" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
+                    <label class="block text-xs font-medium leading-4 text-green-900 underline cursor-pointer"><a href="{{route('wfp.request-supply')}}">Request Supply</a></label>
+                </div>
                 <div class="mt-2">
-                <select wire:model="machine_particular_id" id="machine_particular_id" name="machine_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
+                <select wire:model="machine_particular_id" disabled id="machine_particular_id" name="machine_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
                     <option value="">Select One</option>
                     @foreach ($machine_particulars as $item)
                     <option value="{{$item->id}}">{{$item->particulars}}</option>
@@ -42,33 +34,57 @@
                 @enderror
               </div>
               <div class="sm:col-span-1">
-                <label for="machine_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
+                <div class="flex justify-between">
+                    <label for="machine_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
+                    <div class="flex items center">
+                        <input {{$machine_ppmp ? 'checked' : ''}} disabled wire:model="machine_ppmp" id="machine_ppmp" name="machine_ppmp" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="machine_ppmp" class="ml-2 block text-sm font-medium text-gray-900">PPMP</label>
+                    </div>
+                </div>
                 <div class="mt-2">
-                  <input wire:model.defer="machine_code" disabled id="machine_code" name="machine_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model.defer="machine_code" disabled id="machine_code" name="machine_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
         </div>
-
+        {{-- specifications --}}
+        <div class="sm:col-span-1">
+            <label for="machine_specs" class="block text-sm font-medium leading-6 text-gray-900">Specifications</label>
+            <div class="mt-2">
+            <input wire:model.defer="machine_specs" disabled id="machine_specs" name="machine_specs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+        </div>
           <div class="grid grid-cols-3 space-x-4 justify-center">
             <div class="sm:col-span-1">
                 <label for="machine_uacs" class="block text-sm font-medium leading-6 text-gray-900">UACS Code</label>
                 <div class="mt-2">
-                  <input wire:model.defer="machine_uacs" disabled id="machine_uacs" name="machine_uacs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                </div>
-            </div>
-            <div class="sm:col-span-1">
-                <label for="machine_title_group" class="block text-sm font-medium leading-6 text-gray-900">Title Group</label>
-                <div class="mt-2">
-                  <input wire:model.defer="machine_title_group" disabled id="machine_title_group" name="machine_title_group" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model.defer="machine_uacs" disabled id="machine_uacs" name="machine_uacs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
             <div class="sm:col-span-1">
                 <label for="machine_account_title" class="block text-sm font-medium leading-6 text-gray-900">Account Title</label>
                 <div class="mt-2">
-                  <input wire:model.defer="machine_account_title" disabled id="machine_account_title" name="machine_account_title" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model.defer="machine_account_title" disabled id="machine_account_title" name="machine_account_title" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+            </div>
+            <div class="sm:col-span-1">
+                <label for="machine_title_group" class="block text-sm font-medium leading-6 text-gray-900">Title Group</label>
+                <div class="mt-2">
+                  <input wire:model.defer="machine_title_group" disabled id="machine_title_group" name="machine_title_group" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
           </div>
+          <div>
+            <div class="flex items center">
+                <input wire:model="machine_is_remarks" id="machine_is_remarks" name="machine_is_remarks" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                <label for="machine_is_remarks" class="ml-2 block text-sm font-medium text-gray-900">Add Remarks</label>
+            </div>
+            @if ($machine_is_remarks)
+            <div class="mt-2 w-full">
+                <textarea id="about" wire:model="machine_remarks" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                {{-- <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p> --}}
+            </div>
+            @endif
+        </div>
           {{-- quantity table --}}
           <div>
             <div class="px-1 sm:px-6 lg:px-2">
@@ -110,12 +126,12 @@
           {{-- end quantity table --}}
           <div>
             {{-- checkbox input --}}
-            <div class="mt-4">
+            {{-- <div class="mt-4">
                 <div class="flex items center">
                     <input {{$machine_ppmp ? 'checked' : ''}} disabled wire:model="machine_ppmp" id="machine_ppmp" name="machine_ppmp" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                     <label for="machine_ppmp" class="ml-2 block text-sm font-medium text-gray-900">PPMP</label>
                 </div>
-          </div>
+          </div> --}}
           <div class="mt-3 grid grid-cols-4 space-x-4 justify-center">
             <div class="sm:col-span-1">
                 <label for="machine_total_quantity" class="block text-sm font-medium leading-6 text-gray-900">Total Quantity</label>

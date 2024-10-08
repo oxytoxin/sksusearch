@@ -1,36 +1,28 @@
 <div wire:ignore.self class="bg-gray-100 px-2 py-4 rounded-lg">
-    <div class="flex justify-between">
-        <div class="text-2xl text-gray-800">
+    <div class="grid grid-cols-2">
+        <div class="col-span-1 text-2xl text-gray-800">
             Trainings
         </div>
-        <div>
-            @if ($trainings)
-            {{-- <button wire:ignore wire:click="$set('trainingDetailModal',true)" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
+        <div class="col-span-1">
+            {{$this->form}}
+            {{-- @if ($trainings)
+            <button wire:ignore wire:click="$set('trainingDetailModal',true)" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                 Show Details
-            </button> --}}
-            @endif
+            </button>
+            @endif --}}
         </div>
     </div>
 
 
     <div class="mt-4 space-y-4 bg-white p-3 rounded-lg">
-        <div>
-            <div class="flex items center">
-                <input wire:model="training_is_remarks" id="training_is_remarks" name="training_is_remarks" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                <label for="training_is_remarks" class="ml-2 block text-sm font-medium text-gray-900">Add Remarks</label>
-            </div>
-            @if ($training_is_remarks)
-            <div class="mt-2 w-full">
-                <textarea id="about" wire:model="training_remarks" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
-                {{-- <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p> --}}
-            </div>
-            @endif
-        </div>
         <div class="grid grid-cols-3 space-x-4">
             <div class="sm:col-span-2">
-                <label for="training_particulars" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
+                <div class="flex justify-between">
+                    <label for="training_particulars" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
+                    <label class="block text-xs font-medium leading-4 text-green-900 underline cursor-pointer"><a href="{{route('wfp.request-supply')}}">Request Supply</a></label>
+                </div>
                 <div class="mt-2">
-                <select wire:model="training_particular_id" id="training_particular_id" name="training_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
+                <select wire:model="training_particular_id" disabled id="training_particular_id" name="training_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
                     <option value="">Select One</option>
                     @foreach ($training_particulars as $item)
                     <option value="{{$item->id}}">{{$item->particulars}}</option>
@@ -42,37 +34,61 @@
                 @enderror
               </div>
               <div class="sm:col-span-1">
-                <label for="training_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
+                <div class="flex justify-between">
+                    <label for="training_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
+                    <div class="flex items center">
+                        <input {{$training_ppmp ? 'checked' : ''}} disabled wire:model="training_ppmp" id="training_ppmp" name="training_ppmp" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="training_ppmp" class="ml-2 block text-sm font-medium text-gray-900">PPMP</label>
+                    </div>
+                </div>
                 <div class="mt-2">
-                  <input wire:model.defer="training_code" disabled id="training_code" name="training_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model.defer="training_code" disabled id="training_code" name="training_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
         </div>
-
+            {{-- specifications --}}
+            <div class="sm:col-span-1">
+                <label for="training_specs" class="block text-sm font-medium leading-6 text-gray-900">Specifications</label>
+                <div class="mt-2">
+                <input wire:model.defer="training_specs" disabled id="training_specs" name="training_specs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+            </div>
           <div class="grid grid-cols-3 space-x-4 justify-center">
             <div class="sm:col-span-1">
                 <label for="training_uacs" class="block text-sm font-medium leading-6 text-gray-900">UACS Code</label>
                 <div class="mt-2">
-                  <input wire:model.defer="training_uacs" disabled id="training_uacs" name="training_uacs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                </div>
-            </div>
-            <div class="sm:col-span-1">
-                <label for="training_title_group" class="block text-sm font-medium leading-6 text-gray-900">Title Group</label>
-                <div class="mt-2">
-                  <input wire:model.defer="training_title_group" disabled id="training_title_group" name="training_title_group" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model.defer="training_uacs" disabled id="training_uacs" name="training_uacs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
             <div class="sm:col-span-1">
                 <label for="training_account_title" class="block text-sm font-medium leading-6 text-gray-900">Account Title</label>
                 <div class="mt-2">
-                  <input wire:model.defer="training_account_title" disabled id="training_account_title" name="training_account_title" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model.defer="training_account_title" disabled id="training_account_title" name="training_account_title" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+            </div>
+            <div class="sm:col-span-1">
+                <label for="training_title_group" class="block text-sm font-medium leading-6 text-gray-900">Title Group</label>
+                <div class="mt-2">
+                  <input wire:model.defer="training_title_group" disabled id="training_title_group" name="training_title_group" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
           </div>
+          <div>
+            <div class="flex items center">
+                <input wire:model="training_is_remarks" id="training_is_remarks" name="training_is_remarks" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                <label for="training_is_remarks" class="ml-2 block text-sm font-medium text-gray-900">Add Remarks</label>
+            </div>
+            @if ($training_is_remarks)
+            <div class="mt-2 w-full">
+                <textarea id="about" wire:model="training_remarks" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                {{-- <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p> --}}
+            </div>
+            @endif
+        </div>
           {{-- quantity table --}}
           <div>
             <div class="px-1 sm:px-6 lg:px-2">
-                <div class="mt-2 flow-root">
+                <div class="flow-root">
                   <div class=" -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                       <table class="min-w-full divide-y divide-gray-300">
@@ -110,12 +126,12 @@
           {{-- end quantity table --}}
           <div>
             {{-- checkbox input --}}
-            <div class="mt-4">
+            {{-- <div class="mt-4">
                 <div class="flex items center">
                     <input {{$training_ppmp ? 'checked' : ''}} disabled wire:model="training_ppmp" id="training_ppmp" name="training_ppmp" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                     <label for="training_ppmp" class="ml-2 block text-sm font-medium text-gray-900">PPMP</label>
                 </div>
-          </div>
+          </div> --}}
           <div class="mt-3 grid grid-cols-4 space-x-4 justify-center">
             <div class="sm:col-span-1">
                 <label for="training_total_quantity" class="block text-sm font-medium leading-6 text-gray-900">Total Quantity</label>

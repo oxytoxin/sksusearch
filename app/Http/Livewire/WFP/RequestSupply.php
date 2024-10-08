@@ -17,7 +17,7 @@ class RequestSupply extends Component implements HasForms
     {
         return [
             Grid::make(2)->schema([
-                TextInput::make('particulars')->required(),
+                TextInput::make('particulars')->label('Particular')->required(),
                 TextInput::make('unit_cost')
                   ->mask(fn (TextInput\Mask $mask) => $mask
                     ->numeric()

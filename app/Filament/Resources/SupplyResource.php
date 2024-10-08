@@ -17,6 +17,7 @@ use App\Filament\Resources\SupplyResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SupplyResource\RelationManagers;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Textarea;
 
 class SupplyResource extends Resource
 {
@@ -58,6 +59,9 @@ class SupplyResource extends Resource
                     ->numeric()
                     ->thousandsSeparator(','))
                   ->required(),
+                  Grid::make(1)->schema([
+                      Textarea::make('specifications')->nullable(),
+                  ]),
                   Radio::make('is_ppmp')
                   ->label('Is this PPMP?')
                   ->options([
@@ -75,6 +79,7 @@ class SupplyResource extends Resource
                 TextColumn::make('categoryGroups.name')->label('Category Group')->searchable(),
                 TextColumn::make('supply_code')->searchable()->sortable(),
                 TextColumn::make('particulars')->searchable()->sortable(),
+                TextColumn::make('specifications')->searchable()->wrap()->sortable(),
                 TextColumn::make('unit_cost')->searchable()
                 ->formatStateUsing(fn ($record) => '₱ '.number_format($record->unit_cost, 2))->sortable(),
                 TextColumn::make('is_ppmp')
