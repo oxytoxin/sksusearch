@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\WFP;
 
+use Faker\Provider\ar_EG\Text;
 use Filament\Forms\Components\Grid;
 use Livewire\Component;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -18,12 +19,17 @@ class RequestSupply extends Component implements HasForms
         return [
             Grid::make(2)->schema([
                 TextInput::make('particulars')->label('Particular')->required(),
+                TextInput::make('specification')
+                ->required(),
+                TextInput::make('uom')
+                ->label('UOM')
+                ->required(),
                 TextInput::make('unit_cost')
                   ->mask(fn (TextInput\Mask $mask) => $mask
                     ->numeric()
                     ->thousandsSeparator(','))
                   ->required(),
-                  Radio::make('is_ppmp')
+                Radio::make('is_ppmp')
                   ->label('Is this PPMP?')
                   ->options([
                       1 => 'Yes',
