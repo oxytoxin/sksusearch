@@ -12,7 +12,7 @@ class MfoFee extends Model
 
     public function mfo()
     {
-        return $this->belongsTo(Mfo::class, 'm_f_o_s_id');
+        return $this->belongsTo(MFO::class, 'm_f_o_s_id');
     }
 
     public function fundClusterWFP()
