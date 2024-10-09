@@ -2,22 +2,34 @@
 
 namespace App\Http\Livewire\WFP;
 
+use App\Models\WfpRequestedSupply;
 use Livewire\Component;
 use WireUi\Traits\Actions;
-use Faker\Provider\ar_EG\Text;
-use App\Models\WfpRequestedSupply;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 
-class RequestSupply extends Component implements HasForms
+class RequestSupplyEdit extends Component implements HasForms
 {
     use InteractsWithForms;
     use Actions;
 
     public $data;
+    public $record;
+
+    public function mount($record)
+    {
+        $this->record = WfpRequestedSupply::find($record);
+        $this->form->fill([
+            'particulars' => $this->record->particulars,
+            'specification' => $this->record->specification,
+            'uom' => $this->record->uom,
+            'unit_cost' => $this->record->unit_cost,
+            'is_ppmp' => $this->record->is_ppmp,
+        ]);
+    }
 
     protected function getFormSchema(): array
     {
@@ -54,19 +66,18 @@ class RequestSupply extends Component implements HasForms
     {
         $this->dialog()->confirm([
             'title'       => 'Are you Sure?',
-            'description' => 'Save the request?',
-            'acceptLabel' => 'Yes, save it',
-            'method'      => 'saveRequestSupply',
-            'params'      => 'Saved',
+            'description' => 'Update the request?',
+            'acceptLabel' => 'Yes, update it',
+            'method'      => 'updateRequestSupply',
+            'params'      => 'Updated',
         ]);
     }
 
-    public function saveRequestSupply()
+    public function updateRequestSupply()
     {
-        // $this->validate();
+        $this->validate();
 
-        WfpRequestedSupply::create([
-            'user_id' => auth()->id(),
+        $this->record->update([
             'particulars' => $this->data['particulars'],
             'specification' => $this->data['specification'],
             'uom' => $this->data['uom'],
@@ -76,7 +87,7 @@ class RequestSupply extends Component implements HasForms
 
         $this->dialog()->success(
             $title = 'Operation Successful',
-            $description = 'WFP request has been successfully created',
+            $description = 'WFP request has been successfully updated',
         );
 
         return redirect()->route('wfp.request-supply-list');
@@ -84,6 +95,6 @@ class RequestSupply extends Component implements HasForms
 
     public function render()
     {
-        return view('livewire.w-f-p.request-supply');
+        return view('livewire.w-f-p.request-supply-edit');
     }
 }
