@@ -4,49 +4,44 @@
             <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 lg:rounded-none lg:rounded-tl-lg">
                 <div class="flex flex-wrap items-center justify-between -mt-4 -ml-4 sm:flex-nowrap">
                     <div class="w-full mt-4 ml-4">
-                        <h3 class="text-lg font-medium leading-6 text-primary-900">Vehicle Request Details</h3>
-                        <p class="mt-4 text-sm text-primary-500">Requisitioner: </p>
-                        <p class="mt-1 text-sm text-primary-500">Travel Order : </p>
-
-
-                        <p class="mt-1 text-sm text-primary-500">Date :
-
-
-                        <p class="mt-1 text-sm text-primary-500">Date :
-                            to
+                        <h3 class="text-lg font-medium leading-6 text-primary-900">Request Supply Details</h3>
+                        <p class="mt-4 text-sm text-primary-500">Particular: {{$record->particulars}}</p>
+                        <p class="mt-1 text-sm text-primary-500">Specifications: {{$record->specification}}</p>
+                        <p class="mt-1 text-sm text-primary-500">Unit Cost : &#8369; {{ number_format($record->unit_cost, 2) }}</p>
+                        <p class="mt-1 text-sm text-primary-500">PPMP : {{$record->is_ppmp ? 'Yes' : 'No'}}</p>
 
                             {{-- @if ($is_motorpool_head)
                                 <button class="italic underline ml-2" wire:click="$set('modifyDates',true)">(Click to modify)</button>
-                            @endif --}}
+                            @endif
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Vehicle :
 
-                            {{-- @if (($is_president || $is_motorpool_head) && $request->vehicle_id == null)
+                            @if (($is_president || $is_motorpool_head) && $request->vehicle_id == null)
                             <button class="italic underline ml-2" wire:click="$set('assignVehicleModal',true)">(Assign Vehicle)</button>
                             @elseif(($is_president || $is_motorpool_head) && $request->vehicle_id != null)
                             <button class="italic underline ml-2" wire:click="$set('modifyVehicleModal',true)">(Click to Modify)</button>
-                            @endif --}}
+                            @endif
                         </p>
 
                         <p class="mt-1 text-sm text-primary-500">Destination :
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Driver :
 
-                            {{-- @if ($is_motorpool_head && $request->driver_id != null)
+                            @if ($is_motorpool_head && $request->driver_id != null)
                             <button class="italic underline ml-2" wire:click="$set('modifyDriverModal',true)">(Click to modify)</button>
-                            @endif --}}
+                            @endif
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Passengers :
-                            {{-- @foreach ($request->applicants()->get() as $index => $applicant)
+                            @foreach ($request->applicants()->get() as $index => $applicant)
                                 {{ $applicant->employee_information->full_name }}
                                 @if ($index < count($request->applicants()->get()) - 1)
                                     ,
                                 @endif
-                            @endforeach --}}
+                            @endforeach
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Purpose : </p>
                         <p class="mt-1 text-sm whitespace-pre-line text-primary-500"></p>
-                        {{-- @if ($is_president && $request->status == 'Pending')
+                        @if ($is_president && $request->status == 'Pending')
                             <div class="flex justify-between w-full mt-10">
                                 <span>&nbsp;</span>
                                 <div class="flex space-x-3">
