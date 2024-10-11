@@ -9,6 +9,13 @@
                         <p class="mt-1 text-sm text-primary-500">Specifications: {{$record->specification}}</p>
                         <p class="mt-1 text-sm text-primary-500">Unit Cost : &#8369; {{ number_format($record->unit_cost, 2) }}</p>
                         <p class="mt-1 text-sm text-primary-500">PPMP : {{$record->is_ppmp ? 'Yes' : 'No'}}</p>
+                        <p class="mt-1 text-sm text-primary-500">Date Requested : {{Carbon\Carbon::parse($record->created_at)->format('F d, Y h:i A')}}</p>
+                        <p class="mt-4 text-sm text-primary-500 ">Supply Code : <span class="italic underline ml-2 text-red-600">To be added by supply</span></p>
+                        <p class="mt-1 text-sm text-primary-500 ">Date Added : <span class="italic underline ml-2 text-red-600">To be added by supply</span></p>
+                        <p class="mt-4 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
+                        <p class="mt-1 text-sm text-primary-500 ">Account Title : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
+                        <p class="mt-1 text-sm text-primary-500 ">Title Group : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
+                        <p class="mt-1 text-sm text-primary-500 ">Date Added : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
 
                             {{-- @if ($is_motorpool_head)
                                 <button class="italic underline ml-2" wire:click="$set('modifyDates',true)">(Click to modify)</button>
@@ -123,8 +130,6 @@
 
                             </p>
                         @endif --}}
-
-
 
                     </div>
                 </div>
