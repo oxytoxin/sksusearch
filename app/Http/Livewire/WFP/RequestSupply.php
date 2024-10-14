@@ -2,14 +2,19 @@
 
 namespace App\Http\Livewire\WFP;
 
+use App\Models\Wfp;
 use Livewire\Component;
 use WireUi\Traits\Actions;
 use Faker\Provider\ar_EG\Text;
 use App\Models\WfpRequestedSupply;
+use App\Models\WfpRequestTimeline;
+use DB;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
 
 class RequestSupply extends Component implements HasForms
@@ -19,27 +24,47 @@ class RequestSupply extends Component implements HasForms
 
     public $data;
 
+    public function mount()
+    {
+       $this->form->fill();
+    }
+
     protected function getFormSchema(): array
     {
         return [
             Grid::make(2)->schema([
-                TextInput::make('particulars')->label('Particular')->required(),
-                TextInput::make('specification')
-                ->required(),
-                TextInput::make('uom')
-                ->label('UOM')
-                ->required(),
-                TextInput::make('unit_cost')
-                  ->label('Unit Cost')
-                  ->numeric()
-                  ->required(),
+                Grid::make(3)
+                ->schema([
+                    TextInput::make('particulars')->label('Particular')->required(),
+                    TextInput::make('uom')
+                    ->label('UOM')
+                    ->required(),
+                    TextInput::make('unit_cost')
+                      ->label('Unit Cost')
+                      ->numeric()
+                      ->required(fn ($get) => $get('is_ppmp') == 1),
+                ]),
+                Grid::make(1)
+                ->schema([
+                    RichEditor::make('specification')
+                    ->required()
+                    ->toolbarButtons([
+                        'bold',
+                        'bulletList',
+                        'edit',
+                        'italic',
+                        'orderedList',
+                        'preview',
+                    ])
+                    // TextInput::make('specification')
+                    // ->required(),
+                ]),
                 Radio::make('is_ppmp')
-                  ->required()
-                  ->label('Is this PPMP?')
-                  ->options([
-                      1 => 'Yes',
-                      0 => 'No',
-                  ])->inline(),
+                ->required()
+                ->reactive()
+                ->label('Is this PPMP?')
+                ->boolean()
+                ->default(true)->inline(),
             ]),
 
         ];
@@ -64,8 +89,8 @@ class RequestSupply extends Component implements HasForms
     public function saveRequestSupply()
     {
         // $this->validate();
-
-        WfpRequestedSupply::create([
+        DB::beginTransaction();
+        $request = WfpRequestedSupply::create([
             'user_id' => auth()->id(),
             'particulars' => $this->data['particulars'],
             'specification' => $this->data['specification'],
@@ -73,6 +98,14 @@ class RequestSupply extends Component implements HasForms
             'unit_cost' => $this->data['unit_cost'],
             'is_ppmp' => $this->data['is_ppmp'],
         ]);
+
+        WfpRequestTimeline::create([
+            'wfp_request_id' => $request->id,
+            'user_id' => auth()->id(),
+            'activity' => 'Pending',
+            'remarks' => 'Forwarded to Supply',
+        ]);
+        DB::commit();
 
         $this->dialog()->success(
             $title = 'Operation Successful',

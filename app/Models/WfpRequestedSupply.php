@@ -24,4 +24,9 @@ class WfpRequestedSupply extends Model
     {
         return $this->belongsTo(CategoryGroup::class, 'category_group_id');
     }
+
+    public function wfpRequestTimeline()
+    {
+        return $this->hasMany(WfpRequestTimeline::class, 'wfp_request_id');
+    }
 }

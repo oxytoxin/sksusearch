@@ -31,7 +31,7 @@ class SupplyRequestList extends Component implements HasTable
     {
         return [
             Tables\Columns\TextColumn::make('particulars')->label('Particular')->searchable(),
-            Tables\Columns\TextColumn::make('specification')->searchable(),
+            Tables\Columns\TextColumn::make('specification')->html()->searchable(),
             Tables\Columns\TextColumn::make('unit_cost')
             ->formatStateUsing(fn ($record) => '₱ '.number_format($record->unit_cost, 2))
             ->label('Unit Cost')->searchable(),
@@ -63,38 +63,25 @@ class SupplyRequestList extends Component implements HasTable
                 ->icon('heroicon-o-pencil')
                 ->label('Edit')
                 ->visible(fn ($record) => $record->status === 'Pending'),
-                Action::make('forward_supply')
-                ->label('Forward to Supply')
-                ->button()
-                ->icon('heroicon-o-arrow-right')
-                ->action(function ($record) {
-                    $this->dialog()->confirm([
-                        'title'       => 'Are you Sure?',
-                        'description' => 'Forward this request to supply?',
-                        'acceptLabel' => 'Yes, forward it',
-                        'method'      => 'forwardRequestSupply',
-                        'params'      => $record->id,
-                    ]);
-                })->visible(fn ($record) => $record->status === 'Pending'),
+                // Action::make('forward_supply')
+                // ->label('Forward to Supply')
+                // ->button()
+                // ->icon('heroicon-o-arrow-right')
+                // ->action(function ($record) {
+                //     $this->dialog()->confirm([
+                //         'title'       => 'Are you Sure?',
+                //         'description' => 'Forward this request to supply?',
+                //         'acceptLabel' => 'Yes, forward it',
+                //         'method'      => 'forwardRequestSupply',
+                //         'params'      => $record->id,
+                //     ]);
+                // })->visible(fn ($record) => $record->status === 'Pending'),
                 Action::make('view')
                 ->url(fn (WfpRequestedSupply $record): string => route('wfp.request-supply-view', [$record]))
                 ->label('View Details')
                 ->button()
                 ->icon('heroicon-o-eye')
                 ->color('primary')
-                // Action::make('forward_accounting')
-                // ->label('Forward to Accounting')
-                // ->button()
-                // ->icon('heroicon-o-arrow-right')
-                // ->action(function ($record) {
-                //     $this->dialog()->confirm([
-                //         'title'       => 'Are you Sure?',
-                //         'description' => 'Forward this request to accounting?',
-                //         'acceptLabel' => 'Yes, forward it',
-                //         'method'      => 'forwardRequestAccounting',
-                //         'params'      => $record->id,
-                //     ]);
-                // }),
             ];
     }
 

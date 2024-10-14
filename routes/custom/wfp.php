@@ -10,6 +10,7 @@ use App\Http\Livewire\WFP\GeneratePpmp;
 use App\Http\Livewire\WFP\GenerateWfpPpmp;
 use App\Http\Livewire\WFP\RequestSupply;
 use App\Http\Livewire\WFP\RequestSupplyEdit;
+use App\Http\Livewire\WFP\SupplyRequestedSupplies;
 use App\Http\Livewire\WFP\SupplyRequestList;
 use App\Http\Livewire\WFP\UserPRE;
 use App\Http\Livewire\WFP\ViewSupplyRequest;
@@ -42,4 +43,5 @@ Route::middleware([
     Route::get('/edit-supply-request/{record}', RequestSupplyEdit::class)->name('request-supply-edit');
     Route::get('/view-supply-request/{record}', ViewSupplyRequest::class)->name('request-supply-view');
     Route::get('/request-supply-list', SupplyRequestList::class)->name('request-supply-list');
+    Route::get('/supply-requested-supplies', SupplyRequestedSupplies::class)->name('supply-requested-suppluies');
 });

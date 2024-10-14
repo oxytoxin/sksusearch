@@ -9,6 +9,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
 
 class RequestSupplyEdit extends Component implements HasForms
@@ -35,23 +36,39 @@ class RequestSupplyEdit extends Component implements HasForms
     {
         return [
             Grid::make(2)->schema([
-                TextInput::make('particulars')->label('Particular')->required(),
-                TextInput::make('specification')
-                ->required(),
-                TextInput::make('uom')
-                ->label('UOM')
-                ->required(),
-                TextInput::make('unit_cost')
-                  ->label('Unit Cost')
-                  ->numeric()
-                  ->required(),
+                Grid::make(3)
+                ->schema([
+                    TextInput::make('particulars')->label('Particular')->required(),
+                    TextInput::make('uom')
+                    ->label('UOM')
+                    ->required(),
+                    TextInput::make('unit_cost')
+                      ->label('Unit Cost')
+                      ->numeric()
+                      ->required(fn ($get) => $get('is_ppmp') == 1),
+                ]),
+                Grid::make(1)
+                ->schema([
+                    RichEditor::make('specification')
+                    ->required()
+                    ->toolbarButtons([
+                        'bold',
+                        'bulletList',
+                        'edit',
+                        'italic',
+                        'orderedList',
+                        'preview',
+                    ])
+                    // TextInput::make('specification')
+                    // ->required(),
+                ]),
                 Radio::make('is_ppmp')
-                  ->required()
-                  ->label('Is this PPMP?')
-                  ->options([
-                      1 => 'Yes',
-                      0 => 'No',
-                  ])->inline(),
+                ->required()
+                ->reactive()
+                ->label('Is this PPMP?')
+                ->boolean()
+                ->default(true)->inline(),
+
             ]),
 
         ];

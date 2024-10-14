@@ -66,54 +66,54 @@
             $budget = App\Models\EmployeeInformation::where('position_id', 10)->where('office_id', 2)->first();
             @endphp
             <div class="flex justify-center mt-5">
-              Approved by:
+                Prepared by:
             </div>
             <div class="flex justify-center underline font-semibold">
-              {{$president->full_name}}
+                {{$record->costCenter->office->head_employee?->full_name}}
             </div>
             <div class="flex justify-center">
-              University President
+                Cost Center Manager
             </div>
               <div class="grid grid-cols-3 space-x-3 mt-5">
-                  <div class="col-span-1">
-                      <div class="">
-                          <div class="flex justify-center mt-5">
-                              Prepared by:
-                            </div>
-                            <div class="flex justify-center underline font-semibold">
-                              {{$record->costCenter->office->head_employee?->full_name}}
-                            </div>
-                            <div class="flex justify-center">
-                              Cost Center Manager
-                            </div>
-                      </div>
-                  </div>
-                  <div class="col-span-1">
-                      <div class="">
-                          <div class="flex justify-center mt-5">
-                              Received by:
-                            </div>
-                            <div class="flex justify-center underline font-semibold">
-                              {{$vp_finance->full_name}}
-                            </div>
-                            <div class="flex justify-center">
-                              VP Finance
-                            </div>
-                      </div>
-                  </div>
-                  <div class="col-span-1">
-                      <div class="">
-                          <div class="flex justify-center mt-5">
-                              Received by:
-                            </div>
-                            <div class="flex justify-center underline font-semibold">
-                              {{$budget->full_name}}
-                            </div>
-                            <div class="flex justify-center">
-                              Budget Officer
-                            </div>
-                      </div>
-                  </div>
+                <div class="col-span-1">
+                    <div class="">
+                        <div class="flex justify-center mt-5">
+                            Noted by:
+                          </div>
+                          <div class="flex justify-center underline font-semibold">
+                            {{$budget->full_name}}
+                          </div>
+                          <div class="flex justify-center">
+                            Budget Officer
+                          </div>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="">
+                        <div class="flex justify-center mt-5">
+                            Recommending Approval:
+                          </div>
+                          <div class="flex justify-center underline font-semibold">
+                            {{$vp_finance->full_name}}
+                          </div>
+                          <div class="flex justify-center">
+                            VP Finance
+                          </div>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="">
+                        <div class="flex justify-center mt-5">
+                            Approved by:
+                          </div>
+                          <div class="flex justify-center underline font-semibold">
+                            {{$president->full_name}}
+                          </div>
+                          <div class="flex justify-center">
+                            University President
+                          </div>
+                    </div>
+                </div>
         </div>
     </div>
     <script>
