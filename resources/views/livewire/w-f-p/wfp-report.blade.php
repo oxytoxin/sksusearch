@@ -218,7 +218,7 @@
                   @php
                   $president = App\Models\EmployeeInformation::where('position_id', 34)->where('office_id', 51)->first();
                   $vp_finance = App\Models\EmployeeInformation::where('position_id', 29)->where('office_id', 8)->first();
-                  $budget = App\Models\EmployeeInformation::where('position_id', 10)->where('office_id', 2)->first();
+                  $budget = App\Models\EmployeeInformation::where('position_id', 15)->where('office_id', 2)->first();
                   @endphp
                   <div class="flex justify-center mt-5">
                     Prepared by:
