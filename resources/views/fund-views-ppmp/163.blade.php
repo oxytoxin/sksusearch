@@ -205,15 +205,56 @@
                             <div class="flex justify-between space-x-3">
                                 <span>Total Program: </span><span>₱ {{number_format($total, 2)}}</span>
                             </div>
-                              {{-- <div class="flex justify-between">
-                                  <span>Program: </span><span>₱ {{number_format($record->program_allocated, 2)}}</span>
-                              </div>
-                              <div class="flex justify-between">
-                                  <span>Balance: </span><span>₱ {{number_format($record->balance, 2)}}</span>
-                              </div> --}}
                           </div>
                       </div>
                     </div>
+                     {{-- signatories --}}
+                     @php
+                     $president = App\Models\EmployeeInformation::where('position_id', 34)->where('office_id', 51)->first();
+                     $vp_finance = App\Models\EmployeeInformation::where('position_id', 29)->where('office_id', 8)->first();
+                     $budget = App\Models\EmployeeInformation::where('position_id', 10)->where('office_id', 2)->first();
+                     @endphp
+                      <div class="grid grid-cols-3 space-x-3 mt-5">
+                         <div class="col-span-1">
+                             <div class="">
+                                 <div class="flex justify-center mt-5">
+                                     Noted by:
+                                   </div>
+                                   <div class="flex justify-center underline font-semibold">
+                                     {{$budget->full_name}}
+                                   </div>
+                                   <div class="flex justify-center">
+                                     Budget Officer
+                                   </div>
+                             </div>
+                         </div>
+                         <div class="col-span-1">
+                             <div class="">
+                                 <div class="flex justify-center mt-5">
+                                     Recommending Approval:
+                                   </div>
+                                   <div class="flex justify-center underline font-semibold">
+                                     {{$vp_finance->full_name}}
+                                   </div>
+                                   <div class="flex justify-center">
+                                     VP Finance
+                                   </div>
+                             </div>
+                         </div>
+                         <div class="col-span-1">
+                             <div class="">
+                                 <div class="flex justify-center mt-5">
+                                     Approved by:
+                                   </div>
+                                   <div class="flex justify-center underline font-semibold">
+                                     {{$president->full_name}}
+                                   </div>
+                                   <div class="flex justify-center">
+                                     University President
+                                   </div>
+                             </div>
+                         </div>
+               </div>
                 </div>
               </div>
         </div>
