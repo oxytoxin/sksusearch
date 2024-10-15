@@ -61,8 +61,8 @@
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Particulars</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Qty</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UOM</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Unit Cost</th>
-                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Estimated Budget</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Unit Cost (₱)</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Estimated Budget (₱)</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Jan</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Feb</th>
                         <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900  bg-gray-200 border-x border-gray-400">Mar</th>
@@ -89,8 +89,8 @@
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
+                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
+                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
                             @foreach ($item->merged_quantities as $quantity)
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
@@ -111,8 +111,8 @@
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
-                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
-                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
                               @foreach ($item->merged_quantities as $quantity)
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                               @endforeach
@@ -133,8 +133,8 @@
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
-                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
-                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
                               @foreach ($item->merged_quantities as $quantity)
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                               @endforeach
@@ -155,8 +155,8 @@
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
-                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
-                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
                               @foreach ($item->merged_quantities as $quantity)
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                               @endforeach
@@ -177,8 +177,8 @@
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
-                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->cost_per_unit, 2)}}</td>
-                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">₱ {{number_format($item->estimated_budget, 2)}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
+                              <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
                               @foreach ($item->merged_quantities as $quantity)
                               <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                               @endforeach
