@@ -430,7 +430,7 @@
                                       <table class="min-w-full">
                                         <thead class="bg-gray-400">
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="22" scope="colgroup" class="bg-green-700 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3 h-10"></th>
+                                                <th colspan="23" scope="colgroup" class="bg-green-700 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3 h-10"></th>
                                               </tr>
                                         </thead>
                                         <thead class="bg-white">
@@ -438,6 +438,7 @@
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UACS Code</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Account Title</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Particulars</th>
+                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Supply Code</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Qty</th>
                                             <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">UOM</th>
                                             <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Unit Cost (₱)</th>
@@ -464,7 +465,7 @@
                                         </thead>
                                         <tbody class="bg-white">
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="22" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">Supplies & Semi-Expendables</th>
                                               </tr>
                                               @forelse ($supplies as $item)
@@ -472,6 +473,7 @@
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
@@ -499,11 +501,11 @@
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="22" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="22" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">MOOE</th>
                                               </tr>
                                               @forelse ($mooe as $item)
@@ -511,6 +513,7 @@
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
@@ -538,11 +541,11 @@
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="22" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="22" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">Trainings</th>
                                               </tr>
                                               @forelse ($trainings as $item)
@@ -550,6 +553,7 @@
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right ">{{number_format($item['cost_per_unit'], 2)}}</td>
@@ -577,11 +581,11 @@
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="22" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="22" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">Machine & Equipment / Furniture & Fixtures / Bio / Vehicles</th>
                                               </tr>
                                               @forelse ($machines as $item)
@@ -589,6 +593,7 @@
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
@@ -616,11 +621,11 @@
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="22" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                <th colspan="22" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">Building & Infrastructure</th>
                                               </tr>
                                               @forelse ($buildings as $item)
@@ -628,6 +633,7 @@
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
@@ -655,7 +661,7 @@
                                               </tr>
                                             @empty
                                             <tr class="border-t border-gray-200">
-                                                <th colspan="21" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                                <th colspan="22" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
                                         </tbody>

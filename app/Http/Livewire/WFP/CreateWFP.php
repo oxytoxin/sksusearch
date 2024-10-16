@@ -20,6 +20,7 @@ use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Actions\Action;
 use Awcodes\FilamentTableRepeater\Components\TableRepeater;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 
 class CreateWFP extends Component implements Forms\Contracts\HasForms
 {
@@ -223,6 +224,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         })->get();
         $this->building_total_quantity = 0;
         $this->building_quantity = array_fill(0, 12, 0);
+
+        //source of fund
+        if($this->wfp_fund->id > 3)
+        {
+            $this->source_fund = 'TUITION FEE - RESEARCH FUND';
+        }
     }
 
     protected function getFormSchema(): array
@@ -233,70 +240,82 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             ->searchable()
             ->placeholder('Search for a particular')
             ->preload()
-            ->options(function () {
-                switch($this->global_index)
-                {
-                    case 2:
-                        return Supply::whereHas('categoryItems', function ($query) {
-                            $query->where('budget_category_id', 1);
-                        })->limit(50)->pluck('particulars', 'id');
-                        break;
-                    case 3:
-                        return Supply::whereHas('categoryItems', function ($query) {
-                            $query->where('budget_category_id', 2);
-                        })->limit(50)->pluck('particulars', 'id');
-                        break;
-                    case 4:
-                        return Supply::whereHas('categoryItems', function ($query) {
-                            $query->where('budget_category_id', 3);
-                        })->limit(50)->pluck('particulars', 'id');
-                        break;
-                    case 5:
-                        return Supply::whereHas('categoryItems', function ($query) {
-                            $query->where('budget_category_id', 4);
-                        })->limit(50)->pluck('particulars', 'id');
-                        break;
-                    case 6:
-                        return Supply::whereHas('categoryItems', function ($query) {
-                            $query->where('budget_category_id', 5);
-                        })->limit(50)->pluck('particulars', 'id');
-                        break;
-                }
-
-            })
-            // ->getSearchResultsUsing(function (string $search){
+            // ->options(function () {
             //     switch($this->global_index)
             //     {
             //         case 2:
             //             return Supply::whereHas('categoryItems', function ($query) {
             //                 $query->where('budget_category_id', 1);
-            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             })->limit(50)->pluck('particulars', 'id');
             //             break;
             //         case 3:
             //             return Supply::whereHas('categoryItems', function ($query) {
             //                 $query->where('budget_category_id', 2);
-            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             })->limit(50)->pluck('particulars', 'id');
             //             break;
             //         case 4:
             //             return Supply::whereHas('categoryItems', function ($query) {
             //                 $query->where('budget_category_id', 3);
-            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             })->limit(50)->pluck('particulars', 'id');
             //             break;
             //         case 5:
             //             return Supply::whereHas('categoryItems', function ($query) {
             //                 $query->where('budget_category_id', 4);
-            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             })->limit(50)->pluck('particulars', 'id');
             //             break;
             //         case 6:
             //             return Supply::whereHas('categoryItems', function ($query) {
             //                 $query->where('budget_category_id', 5);
-            //             })->where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
-            //             break;
-            //         default:
-            //             return Supply::where('particulars', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id');
+            //             })->limit(50)->pluck('particulars', 'id');
             //             break;
             //     }
+
             // })
+            ->getSearchResultsUsing(function (string $search){
+                switch($this->global_index)
+                {
+                    case 2:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 1);
+                        })->where('particulars', 'like', "%{$search}%")
+                          ->orWhere('specifications', 'like', "%{$search}%")
+                          ->limit(50)->pluck('particulars', 'id');
+                        break;
+                    case 3:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 2);
+                        })->where('particulars', 'like', "%{$search}%")
+                        ->orWhere('specifications', 'like', "%{$search}%")
+                        ->limit(50)->pluck('particulars', 'id');
+                        break;
+                    case 4:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 3);
+                        })->where('particulars', 'like', "%{$search}%")
+                        ->orWhere('specifications', 'like', "%{$search}%")
+                        ->limit(50)->pluck('particulars', 'id');
+                        break;
+                    case 5:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 4);
+                        })->where('particulars', 'like', "%{$search}%")
+                        ->orWhere('specifications', 'like', "%{$search}%")
+                        ->limit(50)->pluck('particulars', 'id');
+                        break;
+                    case 6:
+                        return Supply::whereHas('categoryItems', function ($query) {
+                            $query->where('budget_category_id', 5);
+                        })->where('particulars', 'like', "%{$search}%")
+                        ->orWhere('specifications', 'like', "%{$search}%")
+                        ->limit(50)->pluck('particulars', 'id');
+                        break;
+                    default:
+                        return Supply::where('particulars', 'like', "%{$search}%")
+                        ->orWhere('specifications', 'like', "%{$search}%")
+                        ->limit(50)->pluck('particulars', 'id');
+                        break;
+                }
+            })
             ->reactive()
             ->afterStateUpdated(function () {
                 switch($this->global_index)
@@ -529,14 +548,17 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'supplies_particular_id' => 'required',
             'supplies_uom' => 'required',
             'supplies_cost_per_unit' => 'required|gt:0',
+            'supplies_total_quantity' => 'gt:0',
         ],
         [
             'supplies_particular_id.required' => 'Particulars is required',
             'supplies_uom.required' => 'UOM is required',
             'supplies_cost_per_unit.required' => 'Cost per unit is required',
             'supplies_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            'supplies_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->supplies_estimated_budget);
+
         if($this->supplies != null)
         {
             foreach($this->supplies as $key => $supply)
@@ -556,6 +578,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'Supplies & Semi-Expendables',
                         'particular_id' => $this->supplies_particular_id,
                         'particular' => $this->supplies_category_attr->particulars,
+                        'supply_code' => $this->supplies_category_attr->supply_code,
                         'specifications' => $this->supplies_category_attr->specifications,
                         'uacs' => $this->supplies_uacs,
                         'title_group' => $this->supplies_category_attr->categoryGroups->id,
@@ -577,6 +600,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'Supplies & Semi-Expendables',
                 'particular_id' => $this->supplies_particular_id,
                 'particular' => $this->supplies_category_attr->particulars,
+                'supply_code' => $this->supplies_category_attr->supply_code,
                 'specifications' => $this->supplies_category_attr->specifications,
                 'uacs' => $this->supplies_uacs,
                 'title_group' => $this->supplies_category_attr->categoryGroups->id,
@@ -719,12 +743,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'mooe_particular_id' => 'required',
             'mooe_uom' => 'required',
             'mooe_cost_per_unit' => 'required|gt:0',
+            'mooe_total_quantity' => 'gt:0',
         ],
         [
             'mooe_particular_id.required' => 'Particulars is required',
             'mooe_uom.required' => 'UOM is required',
             'mooe_cost_per_unit.required' => 'Cost per unit is required',
             'mooe_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            'mooe_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->mooe_estimated_budget);
         if($this->mooe != null)
@@ -746,6 +772,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'MOOE',
                         'particular_id' => $this->mooe_particular_id,
                         'particular' => $this->mooe_category_attr->particulars,
+                        'supply_code' => $this->mooe_category_attr->supply_code,
                         'specifications' => $this->mooe_category_attr->specifications,
                         'uacs' => $this->mooe_uacs,
                         'title_group' => $this->mooe_category_attr->categoryGroups->id,
@@ -767,6 +794,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'MOOE',
                 'particular_id' => $this->mooe_particular_id,
                 'particular' => $this->mooe_category_attr->particulars,
+                'supply_code' => $this->mooe_category_attr->supply_code,
                 'specifications' => $this->mooe_category_attr->specifications,
                 'uacs' => $this->mooe_uacs,
                 'title_group' => $this->mooe_category_attr->categoryGroups->id,
@@ -916,12 +944,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'training_particular_id' => 'required',
             'training_uom' => 'required',
             'training_cost_per_unit' => 'required|gt:0',
+            'training_total_quantity' => 'gt:0',
         ],
         [
             'training_particular_id.required' => 'Particulars is required',
             'training_uom.required' => 'UOM is required',
             'training_cost_per_unit.required' => 'Cost per unit is required',
             'training_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            'training_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->training_estimated_budget);
         if($this->trainings != null)
@@ -943,6 +973,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'Trainings',
                         'particular_id' => $this->training_particular_id,
                         'particular' => $this->training_category_attr->particulars,
+                        'supply_code' => $this->training_category_attr->supply_code,
                         'specifications' => $this->training_category_attr->specifications,
                         'uacs' => $this->training_uacs,
                         'title_group' => $this->training_category_attr->categoryGroups->id,
@@ -964,6 +995,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'Trainings',
                 'particular_id' => $this->training_particular_id,
                 'particular' => $this->training_category_attr->particulars,
+                'supply_code' => $this->training_category_attr->supply_code,
                 'specifications' => $this->training_category_attr->specifications,
                 'uacs' => $this->training_uacs,
                 'title_group' => $this->training_category_attr->categoryGroups->id,
@@ -1113,12 +1145,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'machine_particular_id' => 'required',
             'machine_uom' => 'required',
             'machine_cost_per_unit' => 'required|gt:0',
+            'machine_total_quantity' => 'gt:0',
         ],
         [
             'machine_particular_id.required' => 'Particulars is required',
             'machine_uom.required' => 'UOM is required',
             'machine_cost_per_unit.required' => 'Cost per unit is required',
             'machine_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            'machine_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->machine_estimated_budget);
 
@@ -1141,6 +1175,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                         'particular_id' => $this->machine_particular_id,
                         'particular' => $this->machine_category_attr->particulars,
+                        'supply_code' => $this->machine_category_attr->supply_code,
                         'specifications' => $this->machine_category_attr->specifications,
                         'uacs' => $this->machine_uacs,
                         'title_group' => $this->machine_category_attr->categoryGroups->id,
@@ -1162,6 +1197,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                 'particular_id' => $this->machine_particular_id,
                 'particular' => $this->machine_category_attr->particulars,
+                'supply_code' => $this->machine_category_attr->supply_code,
                 'specifications' => $this->machine_category_attr->specifications,
                 'uacs' => $this->machine_uacs,
                 'title_group' => $this->machine_category_attr->categoryGroups->id,
@@ -1313,12 +1349,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'building_particular_id' => 'required',
             'building_uom' => 'required',
             'building_cost_per_unit' => 'required|gt:0',
+            'building_total_quantity' => 'gt:0',
         ],
         [
             'building_particular_id.required' => 'Particulars is required',
             'building_uom.required' => 'UOM is required',
             'building_cost_per_unit.required' => 'Cost per unit is required',
             'building_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            'building_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->building_estimated_budget);
 
@@ -1341,6 +1379,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'budget_category' => 'Building & Infrastructure',
                         'particular_id' => $this->building_particular_id,
                         'particular' => $this->building_category_attr->particulars,
+                        'supply_code' => $this->building_category_attr->supply_code,
                         'specifications' => $this->building_category_attr->specifications,
                         'uacs' => $this->building_uacs,
                         'title_group' => $this->building_category_attr->categoryGroups->id,
@@ -1362,6 +1401,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'budget_category' => 'Building & Infrastructure',
                 'particular_id' => $this->building_particular_id,
                 'particular' => $this->building_category_attr->particulars,
+                'supply_code' => $this->building_category_attr->supply_code,
                 'specifications' => $this->building_category_attr->specifications,
                 'uacs' => $this->building_uacs,
                 'title_group' => $this->building_category_attr->categoryGroups->id,

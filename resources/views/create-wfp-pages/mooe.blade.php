@@ -20,7 +20,7 @@
                 <select wire:model="mooe_particular_id" disabled id="mooe_particular_id" name="mooe_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
                     <option value="">Select One</option>
                     @foreach ($mooe_particulars as $item)
-                    <option value="{{$item->id}}">{{$item->particulars}}</option>
+                    <option value="{{$item->id}}">{{ Str::limit($item->particulars, 50, '...') }}</option>
                     @endforeach
                 </select>
                 </div>
@@ -133,6 +133,9 @@
                 <div class="mt-2">
                   <input disabled wire:model="mooe_total_quantity" disabled id="mooe_total_quantity" name="mooe_total_quantity" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
+                @error('mooe_total_quantity')
+                <p class="mt-2 text-sm text-red-600" id="email-error">{{ $message }}</p>
+                @enderror
             </div>
             <div class="sm:col-span-1">
                 <label for="mooe_uom" class="block text-sm font-medium leading-6 text-gray-900">UOM</label>
