@@ -30,8 +30,8 @@ class SupplyRequestList extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            Tables\Columns\TextColumn::make('particulars')->label('Particular')->searchable(),
-            Tables\Columns\TextColumn::make('specification')->html()->searchable(),
+            Tables\Columns\TextColumn::make('particulars')->html()->wrap()->label('Particular')->searchable(),
+            Tables\Columns\TextColumn::make('specification')->searchable(),
             Tables\Columns\TextColumn::make('unit_cost')
             ->formatStateUsing(fn ($record) => '₱ '.number_format($record->unit_cost, 2))
             ->label('Unit Cost')->searchable(),
@@ -62,7 +62,7 @@ class SupplyRequestList extends Component implements HasTable
                 ->color('warning')
                 ->icon('heroicon-o-pencil')
                 ->label('Edit')
-                ->visible(fn ($record) => $record->status === 'Pending'),
+                ->visible(fn ($record) => $record->status === 'Pending' || $record->status === 'Request Modification'),
                 // Action::make('forward_supply')
                 // ->label('Forward to Supply')
                 // ->button()

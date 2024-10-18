@@ -13,7 +13,12 @@ class ViewSupplyRequest extends Component
 {
     public $record;
     public $assignSupplyCode = false;
+    public $modifyRequestModal = false;
+    public $modify_request_remarks;
+    public $rejectRequestModal = false;
+    public $reject_request_remarks;
     public $supply_code;
+
     use Actions;
 
     public function mount($record)
@@ -43,9 +48,24 @@ class ViewSupplyRequest extends Component
         ]);
     }
 
-    public function forwardRequestAccounting()
+    public function forwardRequestAccounting($record)
     {
+        $this->record = WfpRequestedSupply::find($record);
+        DB::beginTransaction();
+        $this->record->update([
+         'status' => 'Forwarded to Accounting',
+         ]);
 
+         WfpRequestTimeline::create([
+             'wfp_request_id' => $this->record->id,
+             'user_id' => auth()->id(),
+             'activity' => 'Forwarded to Accounting',
+             'remarks' => 'Forwarded to Accounting',
+         ]);
+         DB::commit();
+
+         Notification::make()->title('Operation Success')->body('Request has been forwarded to accounting and to be validated')->success()->send();
+         return redirect()->route('wfp.supply-requested-suppluies', $record);
     }
 
     public function forwardRequestSupply($record)
@@ -54,7 +74,6 @@ class ViewSupplyRequest extends Component
        DB::beginTransaction();
        $this->record->update([
         'status' => 'Forwarded to Supply',
-        'is_approved_supply' => 1,
         ]);
 
         WfpRequestTimeline::create([
@@ -65,7 +84,7 @@ class ViewSupplyRequest extends Component
         ]);
         DB::commit();
 
-        Notification::make()->title('Operation Success')->body('Request has been forwarder to supply and to be validated')->success()->send();
+        Notification::make()->title('Operation Success')->body('Request has been forwarded to supply and to be validated')->success()->send();
         return redirect()->route('wfp.request-supply-view', $record);
     }
 
@@ -77,6 +96,8 @@ class ViewSupplyRequest extends Component
         DB::beginTransaction();
         $this->record->update([
             'supply_code' => $this->supply_code,
+            'status' => 'Supply Code Assigned',
+            'is_approved_supply' => 1,
         ]);
         $this->record->wfpRequestTimeline()->create([
             'user_id' => auth()->id(),
@@ -92,6 +113,52 @@ class ViewSupplyRequest extends Component
         );
 
         return redirect()->route('wfp.request-supply-view', $this->record->id);
+    }
+
+    public function modifyRequest()
+    {
+        $this->modifyRequestModal = true;
+    }
+
+    public function modifyRequestSupply($record)
+    {
+        $this->record = WfpRequestedSupply::find($record);
+        $this->record->update([
+            'status' => 'Request Modification',
+        ]);
+
+        WfpRequestTimeline::create([
+            'wfp_request_id' => $this->record->id,
+            'user_id' => auth()->id(),
+            'activity' => 'Request Modification',
+            'remarks' => $this->modify_request_remarks,
+        ]);
+
+        Notification::make()->title('Operation Success')->body('Request has been forwarded to user be modified')->success()->send();
+        return redirect()->route('wfp.supply-requested-suppluies', $record);
+    }
+
+    public function rejectRequest()
+    {
+        $this->rejectRequestModal = true;
+    }
+
+    public function rejectRequestSupply($record)
+    {
+        $this->record = WfpRequestedSupply::find($record);
+        $this->record->update([
+            'status' => 'Request Rejected by Supply',
+        ]);
+
+        WfpRequestTimeline::create([
+            'wfp_request_id' => $this->record->id,
+            'user_id' => auth()->id(),
+            'activity' => 'Request Rejected by Supply',
+            'remarks' => $this->reject_request_remarks,
+        ]);
+
+        Notification::make()->title('Operation Success')->body('Request has been rejected')->success()->send();
+        return redirect()->route('wfp.supply-requested-suppluies', $record);
     }
 
     public function render()

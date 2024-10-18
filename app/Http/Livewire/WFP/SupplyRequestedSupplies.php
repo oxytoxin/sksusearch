@@ -26,15 +26,15 @@ class SupplyRequestedSupplies extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return WfpRequestedSupply::query()->where('status', 'Forwarded to Supply');
+        return WfpRequestedSupply::query()->whereIn('status', ['Forwarded to Supply', 'Supply Code Assigned']);
     }
 
     protected function getTableColumns()
     {
         return [
             Tables\Columns\TextColumn::make('user.name')->label('Requested By')->searchable(),
-            Tables\Columns\TextColumn::make('particulars')->label('Particular')->searchable(),
-            Tables\Columns\TextColumn::make('specification')->html()->searchable(),
+            Tables\Columns\TextColumn::make('particulars')->html()->wrap()->label('Particular')->searchable(),
+            Tables\Columns\TextColumn::make('specification')->searchable(),
             Tables\Columns\TextColumn::make('unit_cost')
             ->formatStateUsing(fn ($record) => '₱ '.number_format($record->unit_cost, 2))
             ->label('Unit Cost')->searchable(),

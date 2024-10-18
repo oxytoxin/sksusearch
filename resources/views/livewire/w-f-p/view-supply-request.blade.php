@@ -5,11 +5,16 @@
                 <div class="flex flex-wrap items-center justify-between -mt-4 -ml-4 sm:flex-nowrap">
                     <div class="w-full mt-4 ml-4">
                         <h3 class="text-lg font-medium leading-6 text-primary-900">Request Supply Details</h3>
-                        <p class="mt-4 text-sm text-primary-500">Particular: {{$record->particulars}}</p>
-                        <p class="mt-1 text-sm text-primary-500">Specifications: </p>
-                        <div class="text-sm text-primary-500 italic ml-5">
+                        <p class="mt-4 text-sm text-primary-500"> Particular:
+                            <div class="text-sm text-primary-500 italic ml-5">
+                             {!! $record->particulars !!}
+                            </div>
+                        </p>
+                        <p class="mt-1 text-sm text-primary-500">Specifications: {{$record->specification}}</p>
+                        <p class="mt-1 text-sm text-primary-500">UOM: {{$record->uom}}</p>
+                        {{-- <div class="text-sm text-primary-500 italic ml-5">
                             {!! $record->specification !!}
-                        </div>
+                        </div> --}}
                         @php
                              $isAccountant = auth()->user()->employee_information->position_id == 15 && auth()->user()->employee_information->office_id == 3;
                              $isSupplyChief = auth()->user()->employee_information->office_id == 49 && auth()->user()->employee_information->position_id == 15;
@@ -20,14 +25,13 @@
                         <p class="mt-1 text-sm text-primary-500">PPMP : {{$record->is_ppmp ? 'Yes' : 'No'}}</p>
                         <p class="mt-1 text-sm text-primary-500">Date Requested : {{Carbon\Carbon::parse($record->created_at)->format('F d, Y h:i A')}}</p>
                         <p class="mt-4 text-sm text-primary-500 ">Supply Code :
-                            <span class="mt-1 text-sm text-primary-500">{{$record->supply_code}}</span>
-                            {{-- @if ($record->status == 'Pending' || $record->status == 'Forwarded to Supply' && $record->supply_code == null)
+                            @if (($record->status == 'Pending' || $record->status == 'Forwarded to Supply' || $record->status == 'Request Modification' || $record->status == 'Request Rejected by Supply') && !$isSupplyChief && $record->supply_code == null)
                             <span class="italic underline ml-2 text-red-600">To be added by supply</span>
-                            @elseif($isSupplyChief && $record->supply_code == null)
+                            @elseif(($record->status == 'Pending' || $record->status == 'Forwarded to Supply') && $isSupplyChief && $record->supply_code == null)
                             <button class="italic underline ml-2 font-semibold" wire:click="$set('assignSupplyCode',true)">(Assign Supply Code)</button>
                             @else
                             <span class="mt-1 text-sm text-primary-500">{{$record->supply_code}}</span>
-                            @endif --}}
+                            @endif
                         </p>
                         {{-- <p class="mt-1 text-sm text-primary-500 ">Date Added :
                             @if ($record->status == 'Pending')
@@ -178,7 +182,7 @@
                                         @endif
                                       <div class="relative flex items-start space-x-3">
                                         <div class="relative">
-                                          <img class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}">
+                                          <img class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white" src="{{ $timeline->user->profile_photo_url }}" alt="{{ $timeline->user->name }}">
                                           </span>
                                         </div>
                                         <div class="min-w-0 flex-1">
@@ -231,7 +235,7 @@
                                         @endif
                                       <div class="relative flex items-start space-x-3">
                                         <div class="relative">
-                                          <img class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}">
+                                          <img class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white" src="{{ $timeline->user->profile_photo_url }}" alt="{{ $timeline->user->name }}">
                                           </span>
                                         </div>
                                         <div class="min-w-0 flex-1">
@@ -243,6 +247,95 @@
                                           </div>
                                           <div class="mt-2 text-sm text-gray-700">
                                             <p class="italic">Supply code has been assigned and to be forwarded to accounting for verification</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </li>
+                                  @elseif($timeline->activity === 'Request Modification')
+                                  <li>
+                                    <div class="relative pb-8">
+                                        @if (!$loop->last)
+                                            <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                        @endif
+                                      <div class="relative flex items-start space-x-3">
+                                        <div>
+                                            <div class="relative px-1">
+                                              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 ring-8 ring-white">
+                                                    <svg class="h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                      </svg>
+
+                                              </div>
+                                            </div>
+                                          </div>
+                                        <div class="min-w-0 flex-1">
+                                          <div>
+                                            <div class="text-sm">
+                                              <a href="#" class="font-medium text-gray-900">{{$timeline->activity}} by {{$timeline->user->employee_information->full_name}}</a>
+                                            </div>
+                                            <p class="mt-0.5 text-sm text-gray-500">Forwarded: {{Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A')}}</p>
+                                          </div>
+                                          <div class="mt-2 text-sm text-gray-700">
+                                            <p class="italic">Note: {{$timeline->remarks}}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </li>
+                                  @elseif($timeline->activity === 'Request Rejected by Supply')
+                                  <li>
+                                    <div class="relative pb-8">
+                                        @if (!$loop->last)
+                                            <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                        @endif
+                                      <div class="relative flex items-start space-x-3">
+                                        <div>
+                                            <div class="relative px-1">
+                                              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 ring-8 ring-white">
+                                                      <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                      </svg>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        <div class="min-w-0 flex-1">
+                                          <div>
+                                            <div class="text-sm">
+                                              <a href="#" class="font-medium text-gray-900">Request Rejected by {{$timeline->user->employee_information->full_name}}</a>
+                                            </div>
+                                            <p class="mt-0.5 text-sm text-gray-500">Forwarded: {{Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A')}}</p>
+                                          </div>
+                                          <div class="mt-2 text-sm text-gray-700">
+                                            <p class="italic">Note: {{$timeline->remarks}}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </li>
+                                  @elseif($timeline->activity === 'Forwarded to Accounting')
+                                  <li>
+                                    <div class="relative pb-8">
+                                        @if (!$loop->last)
+                                        <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                    @endif
+                                      <div class="relative flex items-start space-x-3">
+                                        <div>
+                                          <div class="relative px-1">
+                                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 ring-8 ring-white">
+                                                <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z" />
+                                                  </svg>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="min-w-0 flex-1 py-1.5">
+                                          <div class="text-sm text-gray-500">
+                                            <a href="#" class="font-medium text-gray-900">Forwarded to Accounting</a>
+                                            <p class="mt-0.5 text-sm text-gray-500">Forwarded: {{Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A')}}</p>
+                                            <div class="mt-2 text-sm text-gray-700">
+                                                <p class="italic">To be assigned with UACS Code, Account Title, Title Group</p>
+                                              </div>
                                           </div>
                                         </div>
                                       </div>
@@ -345,19 +438,21 @@
             </ul>
         </div>
     </div>
-    <div class="flex justify-end">
-        @if ($record->status == 'Pending')
+    <div class="flex justify-end space-x-3 mt-5 ">
+        @if ($record->status == 'Pending' || $record->status == 'Request Modification')
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToSupply" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Supply</button>
-        @elseif($record->status == 'Forwarded to Supply' && !$isSupplyChief)
+        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Request Rejected by Supply' || $record->status == 'Forwarded to Accounting') && !$isSupplyChief)
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @elseif($isSupplyChief && $record->supply_code == null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
-        <button class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Modify Request</button>
-        <button class="mr-1 px-3 py-2.5  bg-red-600 rounded-md font-normal capitalize text-white text-sm">Reject Request</button>
-        @elseif($isSupplyChief && $record->supply_code != null)
+        <button wire:click="modifyRequest" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Modify Request</button>
+        <button wire:click="rejectRequest" class="mr-1 px-3 py-2.5  bg-red-600 rounded-md font-normal capitalize text-white text-sm">Reject Request</button>
+        @elseif(($record->status == 'Forwarded to Supply') && $isSupplyChief && $record->supply_code != null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToAccounting" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Accounting</button>
+        @elseif(($record->status == 'Forwarded to Accounting') && $isSupplyChief && $record->supply_code != null)
+        <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @endif
     </div>
 
@@ -381,6 +476,59 @@
             </div>
         </x-slot>
     </x-modal.card>
+    {{-- Request Modification --}}
+    <x-modal.card title="Modify Request" align="center" blur wire:model.defer="modifyRequestModal">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="col-span-full">
+                <label for="modify_request_remarks" class="block text-sm font-medium leading-6 text-gray-900">Remarks</label>
+                <div class="mt-2">
+                  <textarea id="modify_request_remarks" wire:model="modify_request_remarks" name="modify_request_remarks" rows="3" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                </div>
+              </div>
+        </div>
+        <x-slot name="footer">
+            <div class="flex justify-end gap-x-4">
+                <div class="flex">
+                    <x-button flat label="Cancel" x-on:click="close" />
+                    <x-button primary label="Save" spinner="modifyRequestSupply"
+                    x-on:confirm="{
+                        title: 'Are you sure you want to save this data?',
+                        icon: 'warning',
+                        method: 'modifyRequestSupply',
+                        params: {{$record->id}}
+                    }" />
+                </div>
+            </div>
+        </x-slot>
+    </x-modal.card>
+    {{-- End Request Modification --}}
+
+    {{-- Request Rejection --}}
+    <x-modal.card title="Reject Request" align="center" blur wire:model.defer="rejectRequestModal">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="col-span-full">
+                <label for="reject_request_remarks" class="block text-sm font-medium leading-6 text-gray-900">Remarks</label>
+                <div class="mt-2">
+                  <textarea id="reject_request_remarks" wire:model="reject_request_remarks" name="reject_request_remarks" rows="3" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                </div>
+              </div>
+        </div>
+        <x-slot name="footer">
+            <div class="flex justify-end gap-x-4">
+                <div class="flex">
+                    <x-button flat label="Cancel" x-on:click="close" />
+                    <x-button primary label="Save" spinner="rejectRequestSupply"
+                    x-on:confirm="{
+                        title: 'Are you sure you want to reject this request?',
+                        icon: 'error',
+                        method: 'rejectRequestSupply',
+                        params: {{$record->id}}
+                    }" />
+                </div>
+            </div>
+        </x-slot>
+    </x-modal.card>
+    {{-- End Request Rejection --}}
 
 </div>
 

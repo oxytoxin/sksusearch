@@ -33,20 +33,9 @@ class RequestSupply extends Component implements HasForms
     {
         return [
             Grid::make(2)->schema([
-                Grid::make(3)
-                ->schema([
-                    TextInput::make('particulars')->label('Particular')->required(),
-                    TextInput::make('uom')
-                    ->label('UOM')
-                    ->required(),
-                    TextInput::make('unit_cost')
-                      ->label('Unit Cost')
-                      ->numeric()
-                      ->required(fn ($get) => $get('is_ppmp') == 1),
-                ]),
                 Grid::make(1)
                 ->schema([
-                    RichEditor::make('specification')
+                    RichEditor::make('particulars')
                     ->required()
                     ->toolbarButtons([
                         'bold',
@@ -56,8 +45,17 @@ class RequestSupply extends Component implements HasForms
                         'orderedList',
                         'preview',
                     ])
-                    // TextInput::make('specification')
-                    // ->required(),
+                ]),
+                Grid::make(3)
+                ->schema([
+                    TextInput::make('specification')->required(),
+                    TextInput::make('uom')
+                    ->label('UOM')
+                    ->required(),
+                    TextInput::make('unit_cost')
+                      ->label('Unit Cost')
+                      ->numeric()
+                      ->required(fn ($get) => $get('is_ppmp') == 1),
                 ]),
                 Radio::make('is_ppmp')
                 ->required()
