@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\WFP;
 
+use App\Models\CategoryGroup;
+use App\Models\CategoryItems;
 use DB;
 use Livewire\Component;
 use WireUi\Traits\Actions;
@@ -17,13 +19,20 @@ class ViewSupplyRequest extends Component
     public $modify_request_remarks;
     public $rejectRequestModal = false;
     public $reject_request_remarks;
+    public $accountingAssignModal = false;
     public $supply_code;
+    public $account_titles;
+    public $title_groups;
+    public $requested_account_title;
+    public $requested_category_group;
 
     use Actions;
 
     public function mount($record)
     {
         $this->record = WfpRequestedSupply::find($record);
+        $this->account_titles = CategoryItems::all();
+        $this->title_groups = CategoryGroup::all();
     }
 
     public function forwardToSupply()
@@ -159,6 +168,11 @@ class ViewSupplyRequest extends Component
 
         Notification::make()->title('Operation Success')->body('Request has been rejected')->success()->send();
         return redirect()->route('wfp.supply-requested-suppluies', $record);
+    }
+
+    public function accountingAssign()
+    {
+        $this->accountingAssignModal = true;
     }
 
     public function render()

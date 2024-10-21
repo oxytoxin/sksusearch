@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Livewire\WFP\AccountingRequestedSupplies;
 use App\Http\Livewire\WFP\AllocateFunds;
 use App\Http\Livewire\WFP\EditAllocateFunds;
 use App\Http\Livewire\WFP\AssignPersonnel;
@@ -44,4 +45,5 @@ Route::middleware([
     Route::get('/view-supply-request/{record}', ViewSupplyRequest::class)->name('request-supply-view');
     Route::get('/request-supply-list', SupplyRequestList::class)->name('request-supply-list');
     Route::get('/supply-requested-supplies', SupplyRequestedSupplies::class)->name('supply-requested-suppluies');
+    Route::get('/accounting-requested-supplies', AccountingRequestedSupplies::class)->name('accounting-requested-suppluies');
 });
