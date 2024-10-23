@@ -2,8 +2,10 @@
 
 namespace App\Http\Livewire\WFP;
 
+use App\Models\BudgetCategory;
 use App\Models\CategoryGroup;
 use App\Models\CategoryItems;
+use App\Models\Supply;
 use DB;
 use Livewire\Component;
 use WireUi\Traits\Actions;
@@ -21,8 +23,11 @@ class ViewSupplyRequest extends Component
     public $reject_request_remarks;
     public $accountingAssignModal = false;
     public $supply_code;
+    public $uacs_code;
     public $account_titles;
     public $title_groups;
+    public $budget_categories;
+    public $requested_budget_category;
     public $requested_account_title;
     public $requested_category_group;
 
@@ -31,9 +36,32 @@ class ViewSupplyRequest extends Component
     public function mount($record)
     {
         $this->record = WfpRequestedSupply::find($record);
-        $this->account_titles = CategoryItems::all();
+        $this->budget_categories = BudgetCategory::all();
+        $this->account_titles = CategoryItems::where('budget_category_id', $this->requested_budget_category)->get();
         $this->title_groups = CategoryGroup::all();
     }
+
+    public function updatedRequestedBudgetCategory($value)
+    {
+        if($value == null)
+        {
+            $this->account_titles = null;
+        }else{
+            $this->account_titles = CategoryItems::where('budget_category_id', $value)->get();
+        }
+    }
+
+    public function updatedRequestedAccountTitle($value)
+    {
+        if($value == null)
+        {
+            $this->uacs_code = null;
+        }else{
+            $this->uacs_code = CategoryItems::find($value)->uacs_code;
+        }
+    }
+
+
 
     public function forwardToSupply()
     {
@@ -173,6 +201,54 @@ class ViewSupplyRequest extends Component
     public function accountingAssign()
     {
         $this->accountingAssignModal = true;
+    }
+
+    public function updateAccountingAssign()
+    {
+        $this->validate([
+            'requested_budget_category' => 'required',
+            'requested_account_title' => 'required',
+            'requested_category_group' => 'required',
+        ],
+        [
+            'requested_budget_category.required' => 'The Budget Category field is required',
+            'requested_account_title.required' => 'The Account Title field is required',
+            'requested_category_group.required' => 'The Category Group field is required',
+        ]);
+
+        DB::beginTransaction();
+        $this->record->update([
+            'category_item_id' => $this->requested_account_title,
+            'category_group_id' => $this->requested_category_group,
+            'status' => 'Accounting Assigned Data',
+            'is_approved_finance' => 1,
+        ]);
+
+        WfpRequestTimeline::create([
+            'wfp_request_id' => $this->record->id,
+            'user_id' => auth()->id(),
+            'activity' => 'Accounting Assigned Data',
+            'remarks' => 'Accounting Assigned Data',
+        ]);
+
+        Supply::create([
+            'category_item_id' => $this->record->category_item_id,
+            'category_group_id' => $this->record->category_group_id,
+            'supply_code' => $this->record->supply_code,
+            'particulars' => $this->record->particulars,
+            'specifications' => $this->record->specifications,
+            'unit_cost' => $this->record->unit_cost,
+            'is_ppmp' => $this->record->is_ppmp,
+        ]);
+
+        DB::commit();
+
+        $this->dialog()->success(
+            $title = 'Operation Successful',
+            $description = 'Accounting has been successfully assigned the data and the supply is added to the database',
+        );
+
+        return redirect()->route('wfp.supply-requested-suppluies');
     }
 
     public function render()

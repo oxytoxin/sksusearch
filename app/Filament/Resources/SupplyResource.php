@@ -52,16 +52,15 @@ class SupplyResource extends Resource
                     ->required(),
                     TextInput::make('supply_code')->required(),
                 ]),
-
-                TextInput::make('particulars')->required(),
+                Grid::make(1)->schema([
+                    Textarea::make('particulars')->required(),
+                ]),
+                TextInput::make('specifications'),
                 TextInput::make('unit_cost')
                   ->mask(fn (TextInput\Mask $mask) => $mask
                     ->numeric()
                     ->thousandsSeparator(','))
                   ->required(),
-                  Grid::make(1)->schema([
-                      Textarea::make('specifications')->nullable(),
-                  ]),
                   Radio::make('is_ppmp')
                   ->label('Is this PPMP?')
                   ->options([

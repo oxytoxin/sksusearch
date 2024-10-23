@@ -33,17 +33,24 @@
                             <span class="mt-1 text-sm text-primary-500">{{$record->supply_code}}</span>
                             @endif
                         </p>
-                        @if (($record->status == 'Forwarded to Accounting') && !$isAccountant && $record->category_id == null)
+                        @if (($record->status == 'Forwarded to Accounting') && !$isAccountant && $record->category_item_id == null)
+                        <p class="mt-4 text-sm text-primary-500 ">Budget Category : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-4 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-1 text-sm text-primary-500 ">Account Title : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-1 text-sm text-primary-500 ">Title Group : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
-                        @elseif(($record->status == 'Forwarded to Accounting') && $isAccountant && $record->category_id == null)
+                        @elseif(($record->status == 'Forwarded to Accounting') && $isAccountant && $record->category_item_id == null)
+                        <p class="mt-4 text-sm text-primary-500 ">Budget Category : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
                         <p class="mt-4 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
                         <p class="mt-1 text-sm text-primary-500 ">Account Title : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
                         <p class="mt-1 text-sm text-primary-500 ">Title Group : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
                         <div class="flex justify-end">
                             <button class="px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-md hover:bg-primary-500" wire:click="accountingAssign">Assign</button>
                         </div>
+                        @elseif(($record->status == 'Accounting Assigned Data') && $isAccountant && $record->category_item_id != null)
+                            <p class="mt-4 text-sm text-primary-500 ">Budget Category : {{$record->categoryItems->budgetCategory->name}}</p>
+                            <p class="mt-1 text-sm text-primary-500 ">UACS Code : {{$record->categoryItems->uacs_code}}</p>
+                            <p class="mt-1 text-sm text-primary-500 ">Account Title : {{$record->categoryItems->name}}</p>
+                            <p class="mt-1 text-sm text-primary-500 ">Title Group : {{$record->categoryGroups->name}}</p>
                         @endif
                         {{-- <p class="mt-1 text-sm text-primary-500 ">Date Added : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p> --}}
 
@@ -345,6 +352,31 @@
                                       </div>
                                     </div>
                                   </li>
+                                  @elseif($timeline->activity === 'Accounting Assigned Data')
+                                  <li>
+                                    <div class="relative pb-8">
+                                        @if (!$loop->last)
+                                            <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                        @endif
+                                      <div class="relative flex items-start space-x-3">
+                                        <div class="relative">
+                                          <img class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white" src="{{ $timeline->user->profile_photo_url }}" alt="{{ $timeline->user->name }}">
+                                          </span>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                          <div>
+                                            <div class="text-sm">
+                                              <a href="#" class="font-medium text-gray-900">{{$timeline->user->employee_information->full_name}}</a>
+                                            </div>
+                                            <p class="mt-0.5 text-sm text-gray-500">Assigned: {{Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A')}}</p>
+                                          </div>
+                                          <div class="mt-2 text-sm text-gray-700">
+                                            <p class="italic">UACS Code, Budget Category, Account Title and Title Group is assigned by accounting and can be added to WFP creation.</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </li>
                                   @endif
                                 @empty
                                 <h3 class="flex justify-between text-sm font-semibold text-primary-800"> Nothing to show</h3>
@@ -446,7 +478,7 @@
         @if ($record->status == 'Pending' || $record->status == 'Request Modification')
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToSupply" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Supply</button>
-        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Request Rejected by Supply' || $record->status == 'Forwarded to Accounting') && !$isSupplyChief)
+        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Request Rejected by Supply' || $record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Assigned Data') && !$isSupplyChief && !$isAccountant)
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @elseif($isSupplyChief && $record->supply_code == null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
@@ -456,6 +488,8 @@
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToAccounting" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Accounting</button>
         @elseif(($record->status == 'Forwarded to Accounting') && $isSupplyChief && $record->supply_code != null)
+        <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
+        @elseif(($record->status == 'Accounting Assigned Data') && $isAccountant)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @endif
     </div>
@@ -538,50 +572,74 @@
     <x-modal.card title="Assign" align="center" blur wire:model.defer="accountingAssignModal">
         <div class="grid grid-cols-1 sm:grid-cols-1 mb-1">
             <div class="col-span-1">
-                <label for="requested_account_title" class="block text-sm font-medium leading-6 text-gray-900">Account Title</label>
-                <div class="mt-2">
-                  <select id="requested_account_title" wire:model="requested_account_title" name="requested_account_title" autocomplete="country-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                    <option>Select One</option>
-                    @foreach ($account_titles as $item)
-                        <option value="{{$item->id}}">{{$item->name}}</option>
-                    @endforeach
-                  </select>
+                <div class="flex justify-between">
+                    <label for="uacs_code" class="block text-sm font-medium leading-6 text-gray-900">UACS Code</label>
+                    <label for="uacs_code" class="block text-xs font-medium leading-6 text-red-900">*Automatically filled when selecting account title</label>
                 </div>
-              </div>
+                <div class="mt-2">
+                  <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 w-full">
+                    <input type="text" wire:model="uacs_code" name="uacs_code" disabled id="uacs_code" autocomplete="uacs_code" class="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="">
+                  </div>
+                </div>
+            </div>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-2 gap-4 mb-4">
-              <div class="col-span-1">
+        <div class="grid grid-cols-1 sm:grid-cols-1 mb-1">
+            <div class="col-span-1">
+            <label for="requested_budget_category" class="block text-sm font-medium leading-6 text-gray-900">Budget Category</label>
+                <div class="mt-2">
+                    <select id="requested_budget_category" wire:model="requested_budget_category" name="requested_budget_category" autocomplete="country-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        <option>Select One</option>
+                        @foreach ($budget_categories as $item)
+                        <option value="{{$item->id}}">{{$item->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @error('requested_budget_category')
+                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-1 mb-1">
+            <div class="col-span-1">
+            <label for="requested_account_title" class="block text-sm font-medium leading-6 text-gray-900">Account Title</label>
+                <div class="mt-2">
+                    <select id="requested_account_title" wire:model="requested_account_title" name="requested_account_title" autocomplete="country-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        <option>Select One</option>
+                        @foreach ($account_titles as $item)
+                        <option value="{{$item->id}}">{{$item->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @error('requested_account_title')
+                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-1 mb-1">
+            <div class="col-span-1">
                 <label for="requested_category_group" class="block text-sm font-medium leading-6 text-gray-900">Title Group</label>
                 <div class="mt-2">
-                  <select id="requested_category_group" wire:model="requested_category_group" name="requested_category_group" autocomplete="country-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
-                    <option>United States</option>
-                    <option>Canada</option>
-                    <option>Mexico</option>
+                  <select id="requested_category_group" wire:model="requested_category_group" name="requested_category_group" autocomplete="country-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                    <option>Select One</option>
+                        @foreach ($title_groups as $item)
+                        <option value="{{$item->id}}">{{$item->name}}</option>
+                        @endforeach
                   </select>
                 </div>
-              </div>
-              <div  class="col-span-1">
-                <div class="">
-                    <div class="">
-                      <label for="username" class="block text-sm font-medium leading-6 text-gray-900">UACS Code</label>
-                      <div class="mt-2">
-                        <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                          <input type="text" name="username" disabled id="username" autocomplete="username" class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="">
-                        </div>
-                      </div>
-                    </div>
-                </div>
-              </div>
+                @error('requested_category_group')
+                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
         <x-slot name="footer">
             <div class="flex justify-end gap-x-4">
                 <div class="flex">
                     <x-button flat label="Cancel" x-on:click="close" />
-                    <x-button primary label="Save" spinner="rejectRequestSupply"
+                    <x-button primary label="Save" spinner="updateAccountingAssign"
                     x-on:confirm="{
-                        title: 'Are you sure you want to reject this request?',
-                        icon: 'error',
-                        method: 'rejectRequestSupply',
+                        title: 'Are you sure you want to assign this data?',
+                        icon: 'info',
+                        method: 'updateAccountingAssign',
                         params: {{$record->id}}
                     }" />
                 </div>
