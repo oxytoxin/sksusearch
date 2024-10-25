@@ -251,6 +251,16 @@ class ViewSupplyRequest extends Component
         return redirect()->route('wfp.supply-requested-suppluies');
     }
 
+    public function modifyRequestAccounting()
+    {
+        dd('modify request accounting');
+    }
+
+    public function rejectRequestAccounting()
+    {
+        dd('reject request accounting');
+    }
+
     public function render()
     {
         return view('livewire.w-f-p.view-supply-request');

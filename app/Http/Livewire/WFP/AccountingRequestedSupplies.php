@@ -24,7 +24,7 @@ class AccountingRequestedSupplies extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return WfpRequestedSupply::query()->whereIn('status', ['Forwarded to Accounting']);
+        return WfpRequestedSupply::query()->whereIn('status', ['Forwarded to Accounting', 'Accounting Assigned Data']);
     }
 
     protected function getTableColumns()

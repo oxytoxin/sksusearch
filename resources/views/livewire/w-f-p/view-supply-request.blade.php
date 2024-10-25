@@ -33,7 +33,7 @@
                             <span class="mt-1 text-sm text-primary-500">{{$record->supply_code}}</span>
                             @endif
                         </p>
-                        @if (($record->status == 'Forwarded to Accounting') && !$isAccountant && $record->category_item_id == null)
+                        @if (($record->status == 'Forwarded to Accounting' || $record->status == 'Pending' || $record->status == 'Forwarded to Supply' || $record->status == 'Request Modification') && !$isAccountant && $record->category_item_id == null)
                         <p class="mt-4 text-sm text-primary-500 ">Budget Category : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-4 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-1 text-sm text-primary-500 ">Account Title : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
@@ -484,13 +484,16 @@
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="modifyRequest" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Modify Request</button>
         <button wire:click="rejectRequest" class="mr-1 px-3 py-2.5  bg-red-600 rounded-md font-normal capitalize text-white text-sm">Reject Request</button>
-        @elseif(($record->status == 'Forwarded to Supply') && $isSupplyChief && $record->supply_code != null)
+        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Supply Code Assigned') && $isSupplyChief && $record->supply_code != null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToAccounting" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Accounting</button>
         @elseif(($record->status == 'Forwarded to Accounting') && $isSupplyChief && $record->supply_code != null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
+        @elseif(($record->status == 'Forwarded to Accounting') && $isAccountant)
+        <button wire:click="modifyRequestAccounting" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Forward Request to Supply</button>
+        <button wire:click="rejectRequestAccounting" class="mr-1 px-3 py-2.5  bg-red-600 rounded-md font-normal capitalize text-white text-sm">Reject Request</button>
         @elseif(($record->status == 'Accounting Assigned Data') && $isAccountant)
-        <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
+        <a href="{{route('wfp.accounting-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @endif
     </div>
 
