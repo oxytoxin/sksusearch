@@ -22,7 +22,13 @@ class ViewSupplyRequest extends Component
     public $rejectRequestModal = false;
     public $reject_request_remarks;
     public $accountingAssignModal = false;
+    public $forwardRequestToSupply = false;
+    public $modifySupplyCode = false;
+    public $accountingRejectRequestModal = false;
+    public $accounting_reject_request_remarks;
+    public $accounting_modify_request_remarks;
     public $supply_code;
+    public $modify_supply_code;
     public $uacs_code;
     public $account_titles;
     public $title_groups;
@@ -92,7 +98,7 @@ class ViewSupplyRequest extends Component
         $this->record->update([
          'status' => 'Forwarded to Accounting',
          ]);
-
+         $this->record->save();
          WfpRequestTimeline::create([
              'wfp_request_id' => $this->record->id,
              'user_id' => auth()->id(),
@@ -112,7 +118,7 @@ class ViewSupplyRequest extends Component
        $this->record->update([
         'status' => 'Forwarded to Supply',
         ]);
-
+        $this->record->save();
         WfpRequestTimeline::create([
             'wfp_request_id' => $this->record->id,
             'user_id' => auth()->id(),
@@ -141,14 +147,33 @@ class ViewSupplyRequest extends Component
             'activity' => 'Forward to Accounting',
             'remarks' => 'Supply Code Assigned',
         ]);
+        $this->record->save();
         DB::commit();
 
+        Notification::make()->title('Operation Successful')->body('Supply code has been successfully updated')->success()->send();
+        return redirect()->route('wfp.request-supply-view', $this->record->id);
+    }
 
-        $this->dialog()->success(
-            $title = 'Operation Successful',
-            $description = 'Supply code has been successfully updated',
-        );
+    public function modifySupplyCodeX()
+    {
+        $this->validate([
+            'modify_supply_code' => 'required',
+        ]);
+        DB::beginTransaction();
+        $this->record->update([
+            'supply_code' => $this->modify_supply_code,
+            'status' => 'Supply Code Assigned',
+            'is_approved_supply' => 1,
+        ]);
+        $this->record->wfpRequestTimeline()->create([
+            'user_id' => auth()->id(),
+            'activity' => 'Forward to Accounting',
+            'remarks' => 'Supply Code Assigned',
+        ]);
+        $this->record->save();
+        DB::commit();
 
+        Notification::make()->title('Operation Successful')->body('Supply code has been successfully updated')->success()->send();
         return redirect()->route('wfp.request-supply-view', $this->record->id);
     }
 
@@ -157,13 +182,19 @@ class ViewSupplyRequest extends Component
         $this->modifyRequestModal = true;
     }
 
+    public function openModifySupplyCodeModal()
+    {
+        $this->modifySupplyCode = true;
+        $this->modify_supply_code = $this->record->supply_code;
+    }
+
     public function modifyRequestSupply($record)
     {
         $this->record = WfpRequestedSupply::find($record);
         $this->record->update([
             'status' => 'Request Modification',
         ]);
-
+        $this->record->save();
         WfpRequestTimeline::create([
             'wfp_request_id' => $this->record->id,
             'user_id' => auth()->id(),
@@ -183,10 +214,8 @@ class ViewSupplyRequest extends Component
     public function rejectRequestSupply($record)
     {
         $this->record = WfpRequestedSupply::find($record);
-        $this->record->update([
-            'status' => 'Request Rejected by Supply',
-        ]);
-
+        $this->record->status = 'Request Rejected by Supply';
+        $this->record->save();
         WfpRequestTimeline::create([
             'wfp_request_id' => $this->record->id,
             'user_id' => auth()->id(),
@@ -223,7 +252,7 @@ class ViewSupplyRequest extends Component
             'status' => 'Accounting Assigned Data',
             'is_approved_finance' => 1,
         ]);
-
+        $this->record->save();
         WfpRequestTimeline::create([
             'wfp_request_id' => $this->record->id,
             'user_id' => auth()->id(),
@@ -251,14 +280,53 @@ class ViewSupplyRequest extends Component
         return redirect()->route('wfp.supply-requested-suppluies');
     }
 
-    public function modifyRequestAccounting()
+    public function accountingModifyRequestSupply($record)
     {
-        dd('modify request accounting');
+        $this->validate([
+            'accounting_modify_request_remarks' => 'required',
+        ],
+        [
+            'accounting_modify_request_remarks.required' => 'The Remarks field is required',
+        ]);
+
+        DB::beginTransaction();
+        $this->record = WfpRequestedSupply::find($record);
+        $this->record->update([
+            'status' => 'Accounting Request Modification',
+        ]);
+        $this->record->save();
+        WfpRequestTimeline::create([
+            'wfp_request_id' => $this->record->id,
+            'user_id' => auth()->id(),
+            'activity' => 'Accounting Request Modification',
+            'remarks' => $this->accounting_modify_request_remarks,
+        ]);
+        DB::commit();
+        Notification::make()->title('Operation Success')->body('Request has been forwarded to supply to be modified')->success()->send();
+        return redirect()->route('wfp.accounting-requested-suppluies', $record);
     }
 
-    public function rejectRequestAccounting()
+    public function rejectRequestAccountingModal()
     {
-        dd('reject request accounting');
+        $this->accountingRejectRequestModal = true;
+    }
+
+
+    public function rejectRequestAccounting($record)
+    {
+        $this->record = WfpRequestedSupply::find($record);
+        $this->record->status = 'Request Rejected by Accounting';
+        $this->record->save();
+
+        WfpRequestTimeline::create([
+            'wfp_request_id' => $this->record->id,
+            'user_id' => auth()->id(),
+            'activity' => 'Request Rejected by Accounting',
+            'remarks' => $this->accounting_reject_request_remarks,
+        ]);
+
+        Notification::make()->title('Operation Success')->body('Request has been rejected')->success()->send();
+        return redirect()->route('wfp.accounting-requested-suppluies', $record);
     }
 
     public function render()

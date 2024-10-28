@@ -31,16 +31,19 @@
                             <button class="italic underline ml-2 font-semibold" wire:click="$set('assignSupplyCode',true)">(Assign Supply Code)</button>
                             @else
                             <span class="mt-1 text-sm text-primary-500">{{$record->supply_code}}</span>
+                            @if ($isSupplyChief && $record->status == 'Accounting Request Modification')
+                            <button class="italic underline ml-2" wire:click="openModifySupplyCodeModal">(Click to modify)</button>
+                            @endif
                             @endif
                         </p>
-                        @if (($record->status == 'Forwarded to Accounting' || $record->status == 'Pending' || $record->status == 'Forwarded to Supply' || $record->status == 'Request Modification') && !$isAccountant && $record->category_item_id == null)
+                        @if (($record->status == 'Forwarded to Accounting' || $record->status == 'Pending' || $record->status == 'Forwarded to Supply' || $record->status == 'Request Modification' || $record->status == 'Accounting Request Modification' || $record->status = 'Supply Code Assigned') && !$isAccountant && $record->category_item_id == null)
                         <p class="mt-4 text-sm text-primary-500 ">Budget Category : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
-                        <p class="mt-4 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
+                        <p class="mt-1 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-1 text-sm text-primary-500 ">Account Title : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-1 text-sm text-primary-500 ">Title Group : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         @elseif(($record->status == 'Forwarded to Accounting') && $isAccountant && $record->category_item_id == null)
                         <p class="mt-4 text-sm text-primary-500 ">Budget Category : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
-                        <p class="mt-4 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
+                        <p class="mt-1 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
                         <p class="mt-1 text-sm text-primary-500 ">Account Title : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
                         <p class="mt-1 text-sm text-primary-500 ">Title Group : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
                         <div class="flex justify-end">
@@ -329,7 +332,7 @@
                                     <div class="relative pb-8">
                                         @if (!$loop->last)
                                         <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                                    @endif
+                                        @endif
                                       <div class="relative flex items-start space-x-3">
                                         <div>
                                           <div class="relative px-1">
@@ -372,6 +375,67 @@
                                           </div>
                                           <div class="mt-2 text-sm text-gray-700">
                                             <p class="italic">UACS Code, Budget Category, Account Title and Title Group is assigned by accounting and can be added to WFP creation.</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </li>
+                                  @elseif($timeline->activity === 'Accounting Request Modification')
+                                  <li>
+                                    <div class="relative pb-8">
+                                        @if (!$loop->last)
+                                            <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                        @endif
+                                      <div class="relative flex items-start space-x-3">
+                                        <div>
+                                            <div class="relative px-1">
+                                              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 ring-8 ring-white">
+                                                    <svg class="h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                      </svg>
+
+                                              </div>
+                                            </div>
+                                          </div>
+                                        <div class="min-w-0 flex-1">
+                                          <div>
+                                            <div class="text-sm">
+                                              <a href="#" class="font-medium text-gray-900">Request Modification by {{$timeline->user->employee_information->full_name}}</a>
+                                            </div>
+                                            <p class="mt-0.5 text-sm text-gray-500">Forwarded: {{Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A')}}</p>
+                                          </div>
+                                          <div class="mt-2 text-sm text-gray-700">
+                                            <p class="italic">Note: {{$timeline->remarks}}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </li>
+                                  @elseif($timeline->activity === 'Request Rejected by Accounting')
+                                  <li>
+                                    <div class="relative pb-8">
+                                        @if (!$loop->last)
+                                            <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                        @endif
+                                      <div class="relative flex items-start space-x-3">
+                                        <div>
+                                            <div class="relative px-1">
+                                              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 ring-8 ring-white">
+                                                      <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                      </svg>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        <div class="min-w-0 flex-1">
+                                          <div>
+                                            <div class="text-sm">
+                                              <a href="#" class="font-medium text-gray-900">Request Rejected by {{$timeline->user->employee_information->full_name}}</a>
+                                            </div>
+                                            <p class="mt-0.5 text-sm text-gray-500">Forwarded: {{Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A')}}</p>
+                                          </div>
+                                          <div class="mt-2 text-sm text-gray-700">
+                                            <p class="italic">Note: {{$timeline->remarks}}</p>
                                           </div>
                                         </div>
                                       </div>
@@ -478,7 +542,7 @@
         @if ($record->status == 'Pending' || $record->status == 'Request Modification')
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToSupply" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Supply</button>
-        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Request Rejected by Supply' || $record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Assigned Data') && !$isSupplyChief && !$isAccountant)
+        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Request Rejected by Supply' || $record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Assigned Data' || $record->status == 'Accounting Request Modification' || $record->status == 'Request Rejected by Accounting' || $record->status == 'Supply Code Assigned') && !$isSupplyChief && !$isAccountant)
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @elseif($isSupplyChief && $record->supply_code == null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
@@ -487,11 +551,11 @@
         @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Supply Code Assigned') && $isSupplyChief && $record->supply_code != null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToAccounting" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Accounting</button>
-        @elseif(($record->status == 'Forwarded to Accounting') && $isSupplyChief && $record->supply_code != null)
+        @elseif(($record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Request Modification') && $isSupplyChief && $record->supply_code != null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @elseif(($record->status == 'Forwarded to Accounting') && $isAccountant)
-        <button wire:click="modifyRequestAccounting" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Forward Request to Supply</button>
-        <button wire:click="rejectRequestAccounting" class="mr-1 px-3 py-2.5  bg-red-600 rounded-md font-normal capitalize text-white text-sm">Reject Request</button>
+        <button wire:click="$set('forwardRequestToSupply', true)" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Forward Request to Supply</button>
+        <button wire:click="rejectRequestAccountingModal" class="mr-1 px-3 py-2.5  bg-red-600 rounded-md font-normal capitalize text-white text-sm">Reject Request</button>
         @elseif(($record->status == 'Accounting Assigned Data') && $isAccountant)
         <a href="{{route('wfp.accounting-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @endif
@@ -499,10 +563,10 @@
 
 
 
-    <x-modal.card title="Asssign Supply Code" align="center" blur wire:model.defer="assignSupplyCode">
+    <x-modal.card title="Assign Supply Code" align="center" blur wire:model.defer="assignSupplyCode">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-            <div class="col-span-1 px-8 sm:col-span-2">
+            <div class="col-span-1 px-2 sm:col-span-2">
                 <label for="supply_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
                 <input wire:model="supply_code" id="supply_code" name="supply_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             </div>
@@ -543,6 +607,27 @@
         </x-slot>
     </x-modal.card>
     {{-- End Request Modification --}}
+
+     {{-- Modify Supply Code --}}
+     <x-modal.card title="Modify Supply Code" align="center" blur wire:model.defer="modifySupplyCode">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div class="col-span-1 px-2 sm:col-span-2">
+                <label for="modify_supply_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
+                <input wire:model="modify_supply_code" id="modify_supply_code" name="modify_supply_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+        </div>
+
+        <x-slot name="footer">
+            <div class="flex justify-end gap-x-4">
+                <div class="flex">
+                    <x-button flat label="Cancel" x-on:click="close" />
+                    <x-button primary label="Save" spinner="modifySupplyCodeX" wire:click="modifySupplyCodeX" />
+                </div>
+            </div>
+        </x-slot>
+    </x-modal.card>
+    {{-- End Modify Supply Code --}}
 
     {{-- Request Rejection --}}
     <x-modal.card title="Reject Request" align="center" blur wire:model.defer="rejectRequestModal">
@@ -650,6 +735,64 @@
         </x-slot>
     </x-modal.card>
     {{-- End Accounting Assignment --}}
+
+        {{-- Accounting Request Modification --}}
+        <x-modal.card title="Forward Request to Supply" align="center" blur wire:model.defer="forwardRequestToSupply">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="col-span-full">
+                    <label for="accounting_modify_request_remarks" class="block text-sm font-medium leading-6 text-gray-900">Remarks</label>
+                    <div class="mt-2">
+                      <textarea id="accounting_modify_request_remarks" wire:model="accounting_modify_request_remarks" name="accounting_modify_request_remarks" rows="3" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                    </div>
+                  </div>
+                  @error('accounting_modify_request_remarks')
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                  @enderror
+            </div>
+            <x-slot name="footer">
+                <div class="flex justify-end gap-x-4">
+                    <div class="flex">
+                        <x-button flat label="Cancel" x-on:click="close" />
+                        <x-button primary label="Save" spinner="accountingModifyRequestSupply"
+                        x-on:confirm="{
+                            title: 'Are you sure you want to forward this to supply?',
+                            icon: 'warning',
+                            method: 'accountingModifyRequestSupply',
+                            params: {{$record->id}}
+                        }" />
+                    </div>
+                </div>
+            </x-slot>
+        </x-modal.card>
+        {{-- End Request Modification --}}
+
+        {{-- Accounting Request Rejection --}}
+    <x-modal.card title="Reject Request" align="center" blur wire:model.defer="accountingRejectRequestModal">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="col-span-full">
+                <label for="accounting_reject_request_remarks" class="block text-sm font-medium leading-6 text-gray-900">Remarks</label>
+                <div class="mt-2">
+                  <textarea id="accounting_reject_request_remarks" wire:model="accounting_reject_request_remarks" name="accounting_reject_request_remarks" rows="3" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                </div>
+              </div>
+        </div>
+        <x-slot name="footer">
+            <div class="flex justify-end gap-x-4">
+                <div class="flex">
+                    <x-button flat label="Cancel" x-on:click="close" />
+                    <x-button primary label="Save" spinner="rejectRequestAccounting"
+                    x-on:confirm="{
+                        title: 'Are you sure you want to reject this request?',
+                        icon: 'error',
+                        method: 'rejectRequestAccounting',
+                        params: {{$record->id}}
+                    }" />
+                </div>
+            </div>
+        </x-slot>
+    </x-modal.card>
+    {{-- End Accounting Request Rejection --}}
+
 
 </div>
 
