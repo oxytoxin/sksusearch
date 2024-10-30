@@ -2,6 +2,9 @@
     <div class="flex justify-between items-center">
         <h2 class="font-light capitalize text-primary-600">Create Work & Financial Plan</h2>
         <div class="flex space-x-3">
+            <a href="{{route('wfp.request-supply')}}"  class="flex hover:bg-green-500 p-2 bg-green-600 rounded-md font-light capitalize text-white text-sm">
+                Request Supply
+            </a>
             <button wire:click="$set('suppliesDetailModal',true)" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                 Preview WFP
             </button>

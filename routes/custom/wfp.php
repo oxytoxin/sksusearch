@@ -9,6 +9,7 @@ use App\Http\Livewire\WFP\SelectWfpType;
 use App\Http\Livewire\WFP\FundAllocation;
 use App\Http\Livewire\WFP\GeneratePpmp;
 use App\Http\Livewire\WFP\GenerateWfpPpmp;
+use App\Http\Livewire\WFP\ReportSupply;
 use App\Http\Livewire\WFP\RequestSupply;
 use App\Http\Livewire\WFP\RequestSupplyEdit;
 use App\Http\Livewire\WFP\SupplyRequestedSupplies;
@@ -43,6 +44,7 @@ Route::middleware([
     Route::get('/request-new-supply', RequestSupply::class)->name('request-supply');
     Route::get('/edit-supply-request/{record}', RequestSupplyEdit::class)->name('request-supply-edit');
     Route::get('/view-supply-request/{record}', ViewSupplyRequest::class)->name('request-supply-view');
+    Route::get('/report-supply/{record?}', ReportSupply::class)->name('report-supply');
     Route::get('/request-supply-list', SupplyRequestList::class)->name('request-supply-list');
     Route::get('/supply-requested-supplies', SupplyRequestedSupplies::class)->name('supply-requested-suppluies');
     Route::get('/accounting-requested-supplies', AccountingRequestedSupplies::class)->name('accounting-requested-suppluies');

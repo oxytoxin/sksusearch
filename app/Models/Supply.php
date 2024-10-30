@@ -24,4 +24,9 @@ class Supply extends Model
     {
         return $this->hasMany(WfpDetail::class);
     }
+
+    public function reportedSupplies()
+    {
+        return $this->hasMany(ReportedSupply::class, 'supply_id');
+    }
 }
