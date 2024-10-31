@@ -52,6 +52,23 @@ class ReportSupply extends Component implements HasForms
         }
     }
 
+    public function fillForm($id)
+    {
+        $this->record = Supply::find($id);
+        $this->form->fill([
+            'supply_id' => $this->record->id,
+            'particulars' => $this->record->particulars,
+            'specification' => $this->record->specifications,
+            'supply_code' => $this->record->supply_code,
+            'uacs_code' => $this->record->categoryItems->uacs_code,
+            'account_title' => $this->record->categoryItems->name,
+            'title_group' => $this->record->categoryGroups->name,
+            'uom' => $this->record->uom,
+            'unit_cost' => $this->record->unit_cost,
+            'is_ppmp' => $this->record->is_ppmp,
+        ]);
+    }
+
     protected function getFormSchema(): array
     {
         return [
@@ -63,32 +80,34 @@ class ReportSupply extends Component implements HasForms
                 ->required()
                 ->reactive()
                 ->afterStateUpdated(function ($record) {
-                    $this->record = Supply::find($this->data['supply_id']);
-                    $this->data['particulars'] = $this->record->particulars;
-                    $this->data['specification'] = $this->record->specifications;
-                    $this->data['supply_code'] = $this->record->supply_code;
-                    $this->data['uacs_code'] = $this->record->categoryItems->uacs_code;
-                    $this->data['account_title'] = $this->record->categoryItems->name;
-                    $this->data['title_group'] = $this->record->categoryGroups->name;
-                    $this->data['uom'] = $this->record->uom;
-                    $this->data['unit_cost'] = $this->record->unit_cost;
-                    $this->data['is_ppmp'] = $this->record->is_ppmp;
+                    $this->fillForm($this->data['supply_id']);
+                    // $this->record = Supply::find($this->data['supply_id']);
+                    // $this->data['particulars'] = $this->record->particulars;
+                    // $this->data['specification'] = $this->record->specifications;
+                    // $this->data['supply_code'] = $this->record->supply_code;
+                    // $this->data['uacs_code'] = $this->record->categoryItems->uacs_code;
+                    // $this->data['account_title'] = $this->record->categoryItems->name;
+                    // $this->data['title_group'] = $this->record->categoryGroups->name;
+                    // $this->data['uom'] = $this->record->uom;
+                    // $this->data['unit_cost'] = $this->record->unit_cost;
+                    // $this->data['is_ppmp'] = $this->record->is_ppmp;
                 }),
             ]),
 
             Section::make('Supply Details')
             ->schema([
-                RichEditor::make('particulars')
-                    ->required()
-                    ->disabled()
-                    ->toolbarButtons([
-                        'bold',
-                        'bulletList',
-                        'edit',
-                        'italic',
-                        'orderedList',
-                        'preview',
-                    ]),
+                Textarea::make('particulars')->disabled(),
+                // RichEditor::make('particulars')
+                //     ->required()
+                //     ->disabled()
+                //     ->toolbarButtons([
+                //         'bold',
+                //         'bulletList',
+                //         'edit',
+                //         'italic',
+                //         'orderedList',
+                //         'preview',
+                //     ]),
                 Grid::make(3)
                 ->schema([
                     TextInput::make('specification')->required()->disabled(),
@@ -156,6 +175,7 @@ class ReportSupply extends Component implements HasForms
 
         DB::beginTransaction();
         $record = ReportedSupply::create([
+            'user_id' => auth()->id(),
             'supply_id' => $this->data['supply_id'],
             'error_query_id' => $this->data['error_query'],
             'note' => $this->data['note'],
@@ -163,7 +183,7 @@ class ReportSupply extends Component implements HasForms
         DB::commit();
 
         Notification::make()->title('Operation Success')->body('Reported supply query is submitted for verification.')->success()->send();
-        // return redirect()->route('wfp.report-supply');
+        return redirect()->route('wfp.report-supply');
     }
 
 

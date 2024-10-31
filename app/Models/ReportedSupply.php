@@ -19,4 +19,9 @@ class ReportedSupply extends Model
     {
         return $this->belongsTo(Supply::class, 'supply_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
