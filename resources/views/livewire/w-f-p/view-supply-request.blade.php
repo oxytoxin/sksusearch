@@ -16,8 +16,7 @@
                             {!! $record->specification !!}
                         </div> --}}
                         @php
-                             $isFinance = auth()->user()->employee_information->position_id == 15 && auth()->user()->employee_information->office_id == 8;
-                             $isAccountant = auth()->user()->employee_information->position_id == 15 && auth()->user()->employee_information->office_id == 3;
+                             $isFinance = auth()->user()->employee_information->office_id == 25 && auth()->user()->employee_information->position_id == 12;                             $isAccountant = auth()->user()->employee_information->position_id == 15 && auth()->user()->employee_information->office_id == 3;
                              $isSupplyChief = auth()->user()->employee_information->office_id == 49 && auth()->user()->employee_information->position_id == 15;
                              $supplyChief = App\Models\EmployeeInformation::where('office_id', 49)->where('position_id', 15)->first();
                              $accountant = App\Models\EmployeeInformation::where('office_id', 3)->where('position_id', 15)->first();

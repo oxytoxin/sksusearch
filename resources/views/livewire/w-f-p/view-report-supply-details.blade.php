@@ -23,8 +23,7 @@
                 </div>
                 @php
                 $isAccountant = auth()->user()->employee_information->position_id == 15 && auth()->user()->employee_information->office_id == 3;
-                $isFinance = auth()->user()->employee_information->position_id == 15 && auth()->user()->employee_information->office_id == 8;
-                @endphp
+                $isFinance = auth()->user()->employee_information->office_id == 25 && auth()->user()->employee_information->position_id == 12;                @endphp
                 @if ($isFinance && $record->status == 'Pending')
                 <div class="flex justify-end">
                     <button type="button" wire:click="modifySupply" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Modify</button>
