@@ -23,8 +23,9 @@
                 </div>
                 @php
                 $isAccountant = auth()->user()->employee_information->position_id == 15 && auth()->user()->employee_information->office_id == 3;
+                $isFinance = auth()->user()->employee_information->position_id == 15 && auth()->user()->employee_information->office_id == 8;
                 @endphp
-                @if ($isAccountant && $record->status == 'Pending')
+                @if ($isFinance && $record->status == 'Pending')
                 <div class="flex justify-end">
                     <button type="button" wire:click="modifySupply" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Modify</button>
                 </div>
@@ -70,7 +71,7 @@
                                     </div>
                                     @endforeach
                             </div>
-                            @if ($isAccountant && $record->status == 'Pending')
+                            @if ($isFinance && $record->status == 'Pending')
                             <div class="mt-4">
                                 <textarea wire:model="newReply" class="w-full p-2 border rounded-md" placeholder="Add a reply..."></textarea>
                                 @error('newReply')
@@ -97,7 +98,7 @@
         </div>
         <div class="flex justify-end space-x-3 mt-5 ">
             <a href="{{route('wfp.reported-supply-list')}}" class="mr-1 px-3 py-2.5  bg-gray-200 rounded-md font-normal capitalize text-primary-600 text-sm">Back</a>
-            @if ($isAccountant && $record->status == 'Pending')
+            @if ($isFinance && $record->status == 'Pending')
             <button wire:click="resolveReport" type="button" class="mr-1 px-3 py-2.5  bg-green-500 rounded-md font-normal capitalize text-white text-sm">Resolve this report</button>
             @endif
         </div>
