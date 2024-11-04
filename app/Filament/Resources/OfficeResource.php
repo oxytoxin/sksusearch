@@ -32,7 +32,6 @@ class OfficeResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('id')->label('ID')->required(),
                 TextInput::make('name')->required(),
                 TextInput::make('code')->label(__('Code'))->minLength(4)->maxLength(8)->required(),
                 Select::make('campus_id')
@@ -60,6 +59,7 @@ class OfficeResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')->label('ID')->searchable(),
                 TextColumn::make('name')->searchable()->limit(20)
                     ->tooltip(fn ($record) => $record->name)
                     ->sortable(),
