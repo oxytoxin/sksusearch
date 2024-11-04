@@ -47,11 +47,11 @@ Route::middleware([
     Route::get('/request-new-supply', RequestSupply::class)->name('request-supply');
     Route::get('/edit-supply-request/{record}', RequestSupplyEdit::class)->name('request-supply-edit');
     Route::get('/view-supply-request/{record}', ViewSupplyRequest::class)->name('request-supply-view');
-    Route::get('/view-supply-report/{record}', ViewReportedSupply::class)->name('report-supply-view');
     Route::get('/view-supply-report-details/{record}', ViewReportSupplyDetails::class)->name('report-supply-view-details');
     Route::get('/report-supply/{record?}', ReportSupply::class)->name('report-supply');
     Route::get('/request-supply-list', SupplyRequestList::class)->name('request-supply-list');
     Route::get('/report-supply-list', SupplyReportList::class)->name('report-supply-list');
+    Route::get('/reported-supply-list', ViewReportedSupply::class)->name('reported-supply-list');
     Route::get('/supply-requested-supplies', SupplyRequestedSupplies::class)->name('supply-requested-suppluies');
     Route::get('/accounting-requested-supplies', AccountingRequestedSupplies::class)->name('accounting-requested-suppluies');
 });

@@ -39,6 +39,7 @@ class SupplyReportList extends Component implements HasTable
             Tables\Columns\TextColumn::make('supply.specifications')->searchable(),
             Tables\Columns\TextColumn::make('errorQuery.description')->label('Error Query')->searchable(),
             Tables\Columns\TextColumn::make('note')->html()->wrap(),
+            Tables\Columns\TextColumn::make('status'),
         ];
     }
 
