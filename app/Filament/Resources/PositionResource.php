@@ -48,6 +48,7 @@ class PositionResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')->label('ID')->searchable()->sortable(),
                 TextColumn::make('code')->searchable()->sortable(),
                 TextColumn::make('description')->searchable()->sortable(),
             ])
