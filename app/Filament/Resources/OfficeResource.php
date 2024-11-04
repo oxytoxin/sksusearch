@@ -32,6 +32,7 @@ class OfficeResource extends Resource
     {
         return $form
             ->schema([
+                TextInput::make('id')->label('ID')->required(),
                 TextInput::make('name')->required(),
                 TextInput::make('code')->label(__('Code'))->minLength(4)->maxLength(8)->required(),
                 Select::make('campus_id')
