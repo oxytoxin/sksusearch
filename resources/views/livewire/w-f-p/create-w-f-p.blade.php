@@ -162,13 +162,13 @@
                                         <tr class="border-t border-gray-300">
                                             <td colspan="4" class="text-left italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">
                                                 <button @click="opens = !opens" class="text-sm font-semibold text-gray-500">
-                                                    <span x-show="opens">
+                                                    <span x-show="!opens">
 
                                                           <svg class="w-4 h-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5" />
                                                           </svg>
                                                     </span>
-                                                    <span x-show="!opens">
+                                                    <span x-show="opens">
                                                         <svg class="w-4 h-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 18.75 7.5-7.5 7.5 7.5" />
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 7.5-7.5 7.5 7.5" />
