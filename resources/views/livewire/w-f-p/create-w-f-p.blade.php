@@ -73,119 +73,163 @@
                 <div class="grid grid-cols-3 space-x-24 min-w-full py-1 align-middle sm:px-6 lg:px-8">
                     <div class="col-span-1">
                         @if($wfp_fund->id === 1 || $wfp_fund->id === 2)
-                        <table class="min-w-full">
-                            <thead class="bg-green-800">
-                                <tr>
-                                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3">Title Group</th>
-                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Allocated Fund</th>
-                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Program</th>
-                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Balance</th>
-                                    {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
-                                        <span class="sr-only">Edit</span>
-                                      </th> --}}
-                                </tr>
-                                <tbody class="bg-white">
-                                @forelse ($current_balance as $item)
-                                <tr class="border-t border-gray-300">
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['category_group']}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium text-gray-900 sm:pl-3">₱ {{number_format($item['initial_amount'], 2)}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['current_total'], 2)}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['balance'], 2)}}</td>
-                                    {{-- <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                                        <a href="#" class="text-green-800 hover:text-green-700">View<span class="sr-only">, Lindsay Walton</span></a>
-                                      </td> --}}
-                                </tr>
-                                @empty
-                                <tr class="border-t border-gray-300">
-                                    <td class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
-                                    <td class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
-                                    <td class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
-                                    <td class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
-                                </tr>
-                                @endforelse
-                                @php
-                                    $sumAllocated = 0;
-                                    $sumTotal = 0;
-                                    $sumBalance = 0;
-
-                                    $sumAllocated = array_sum(array_column($current_balance, 'initial_amount'));
-                                    $sumTotal = array_sum(array_column($current_balance, 'current_total'));
-                                    $sumBalance = array_sum(array_column($current_balance, 'balance'));
-                                @endphp
-                                <tr class="border-t border-gray-300">
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">Total</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumTotal, 2)}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumBalance, 2)}}</td>
-                                </tr>
-                            </tbody>
-                            </thead>
-                        </table>
-
-                        @elseif($wfp_fund->id === 3 || $wfp_fund->id === 4 || $wfp_fund->id === 5 || $wfp_fund->id === 6)
-                        <table class="min-w-full">
-                            <thead class="bg-green-800">
-                                <tr>
-                                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3">Title Group</th>
-                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50"></th>
-                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Program</th>
-                                    <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50"></th>
-                                    {{-- <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th> --}}
-                                    {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
-                                        <span class="sr-only">Edit</span>
-                                      </th> --}}
-                                </tr>
-                                <tbody class="bg-white">
-                                @forelse ($current_balance as $key => $item)
-                                {{-- @dump($current_balance[$key]['current_total']) --}}
-                                <tr class="border-t border-gray-300">
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$current_balance[$key]['category_group']}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3"></td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-medium text-gray-900 sm:pl-3">₱ {{number_format($current_balance[$key]['current_total'], 2)}}</td>
-                                    <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3"></td>
-                                    {{-- <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['current_total'], 2)}}</td> --}}
-                                    {{-- <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                                        <a href="#" class="text-green-800 hover:text-green-700">View<span class="sr-only">, Lindsay Walton</span></a>
-                                      </td> --}}
-                                </tr>
-                                @empty
-                                <tr class="border-t border-gray-300">
-                                    <td colspan="4" class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
-                                </tr>
-                                @endforelse
+                        <div x-data="{ open: true }" x-cloak>
+                            <table class="min-w-full">
                                 <thead class="bg-green-800">
                                     <tr>
-                                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3"></th>
+                                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3">Title Group</th>
                                         <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Allocated Fund</th>
                                         <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Program</th>
                                         <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Balance</th>
+                                        {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
+                                            <span class="sr-only">Edit</span>
+                                          </th> --}}
+                                    </tr>
+                                    <tbody class="bg-white">
+                                        <tr class="border-t border-gray-300">
+                                            <td colspan="4" class="text-left italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                                <button @click="open = !open" class="text-sm font-semibold text-gray-500">
+                                                    <span x-show="open">
+
+                                                          <svg class="w-4 h-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5" />
+                                                          </svg>
+                                                    </span>
+                                                    <span x-show="!open">
+                                                        <svg class="w-4 h-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 18.75 7.5-7.5 7.5 7.5" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 7.5-7.5 7.5 7.5" />
+                                                          </svg>
+                                                    </span>
+                                                </button>
+
+                                            </td>
+                                        </tr>
+                                    @forelse ($current_balance as $item)
+                                    <tr class="border-t border-gray-300" x-show="!open">
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['category_group']}}</td>
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium text-gray-900 sm:pl-3">₱ {{number_format($item['initial_amount'], 2)}}</td>
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['current_total'], 2)}}</td>
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['balance'], 2)}}</td>
+                                        {{-- <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                            <a href="#" class="text-green-800 hover:text-green-700">View<span class="sr-only">, Lindsay Walton</span></a>
+                                          </td> --}}
+                                    </tr>
+                                    @empty
+                                    <tr class="border-t border-gray-300">
+                                        <td class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
+                                        <td class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
+                                        <td class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
+                                        <td class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
+                                    </tr>
+                                    @endforelse
+                                    @php
+                                        $sumAllocated = 0;
+                                        $sumTotal = 0;
+                                        $sumBalance = 0;
+
+                                        $sumAllocated = array_sum(array_column($current_balance, 'initial_amount'));
+                                        $sumTotal = array_sum(array_column($current_balance, 'current_total'));
+                                        $sumBalance = array_sum(array_column($current_balance, 'balance'));
+                                    @endphp
+                                    <tr class="border-t border-gray-300">
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">Total</td>
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumTotal, 2)}}</td>
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumBalance, 2)}}</td>
+                                    </tr>
+                                </tbody>
+                                </thead>
+                            </table>
+                        </div>
+
+
+                        @elseif($wfp_fund->id === 3 || $wfp_fund->id === 4 || $wfp_fund->id === 5 || $wfp_fund->id === 6)
+                        <div x-data="{ opens: true }" x-cloak>
+                            <table class="min-w-full">
+                                <thead class="bg-green-800">
+                                    <tr>
+                                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3">Title Group</th>
+                                        <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50"></th>
+                                        <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Program</th>
+                                        <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50"></th>
                                         {{-- <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th> --}}
                                         {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
                                             <span class="sr-only">Edit</span>
                                           </th> --}}
                                     </tr>
-                                    @php
-                                    $sumAllocated = 0;
-                                    $sumTotal = 0;
-                                    $sumBalance = 0;
-
-                                    $sumAllocated = $record->fundAllocations->sum('initial_amount');
-                                    $sumTotal = array_sum(array_column($current_balance, 'current_total'));
-                                    $sumBalance = $sumAllocated - $sumTotal;
-                                @endphp
                                     <tbody class="bg-white">
                                         <tr class="border-t border-gray-300">
-                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">Total</td>
-                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
-                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold {{$sumAllocated > $sumTotal ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($sumTotal, 2)}}</td>
-                                            <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold {{$sumAllocated > $sumTotal ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($sumBalance, 2) }}</td>
-                                        </tr>
-                                    </tbody>
+                                            <td colspan="4" class="text-left italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                                <button @click="opens = !opens" class="text-sm font-semibold text-gray-500">
+                                                    <span x-show="opens">
 
+                                                          <svg class="w-4 h-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5" />
+                                                          </svg>
+                                                    </span>
+                                                    <span x-show="!opens">
+                                                        <svg class="w-4 h-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 18.75 7.5-7.5 7.5 7.5" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 7.5-7.5 7.5 7.5" />
+                                                          </svg>
+                                                    </span>
+                                                </button>
+
+                                            </td>
+                                        </tr>
+                                    @forelse ($current_balance as $key => $item)
+                                    {{-- @dump($current_balance[$key]['current_total']) --}}
+                                    <tr class="border-t border-gray-300" x-show="opens">
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$current_balance[$key]['category_group']}}</td>
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3"></td>
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-medium text-gray-900 sm:pl-3">₱ {{number_format($current_balance[$key]['current_total'], 2)}}</td>
+                                        <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3"></td>
+                                        {{-- <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['current_total'], 2)}}</td> --}}
+                                        {{-- <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                            <a href="#" class="text-green-800 hover:text-green-700">View<span class="sr-only">, Lindsay Walton</span></a>
+                                          </td> --}}
+                                    </tr>
+                                    @empty
+                                    <tr class="border-t border-gray-300" x-show="opens">
+                                        <td colspan="4" class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">No Record</td>
+                                    </tr>
+                                    @endforelse
+                                    <thead class="bg-green-800">
+                                        <tr>
+                                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3"></th>
+                                            <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Allocated Fund</th>
+                                            <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Program</th>
+                                            <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Balance</th>
+                                            {{-- <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th> --}}
+                                            {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
+                                                <span class="sr-only">Edit</span>
+                                              </th> --}}
+                                        </tr>
+                                        @php
+                                        $sumAllocated = 0;
+                                        $sumTotal = 0;
+                                        $sumBalance = 0;
+
+                                        $sumAllocated = $record->fundAllocations->sum('initial_amount');
+                                        $sumTotal = array_sum(array_column($current_balance, 'current_total'));
+                                        $sumBalance = $sumAllocated - $sumTotal;
+                                    @endphp
+                                        <tbody class="bg-white">
+                                            <tr class="border-t border-gray-300">
+                                                <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">Total</td>
+                                                <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
+                                                <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold {{$sumAllocated > $sumTotal ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($sumTotal, 2)}}</td>
+                                                <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold {{$sumAllocated > $sumTotal ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($sumBalance, 2) }}</td>
+                                            </tr>
+                                        </tbody>
+
+                                    </thead>
+                                </tbody>
                                 </thead>
-                            </tbody>
-                            </thead>
-                        </table>
+                            </table>
+                        </div>
+
                         @endif
                     </div>
                     <div class="col-span-2">
