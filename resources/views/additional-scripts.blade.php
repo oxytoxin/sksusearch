@@ -10,5 +10,6 @@
                 window.localStorage.setItem(SCROLL_POSITION_KEY, scrollTop);
             });
         });
+        console.log('Testing localStorage access:', window.localStorage);
     });
 </script>
