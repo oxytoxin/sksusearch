@@ -64,7 +64,7 @@ class MfoFeeResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                 ->color('success'),
-                Tables\Actions\DeleteAction::make()
+                // Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 //Tables\Actions\DeleteBulkAction::make(),
