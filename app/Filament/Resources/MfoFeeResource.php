@@ -54,9 +54,9 @@ class MfoFeeResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('mfo.name')->label('MFO')->searchable(),
-                TextColumn::make('fundClusterWFP.name')->label('Fund Cluster')->searchable(),
-                TextColumn::make('name')->label('Name')->searchable(),
+                TextColumn::make('mfo.name')->label('MFO')->sortable()->searchable(),
+                TextColumn::make('fundClusterWFP.name')->sortable()->label('Fund Cluster')->searchable(),
+                TextColumn::make('name')->label('Name')->sortable()->searchable(),
             ])
             ->filters([
                 //
@@ -64,6 +64,7 @@ class MfoFeeResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                 ->color('success'),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 //Tables\Actions\DeleteBulkAction::make(),
