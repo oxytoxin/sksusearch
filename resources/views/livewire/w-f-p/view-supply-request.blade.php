@@ -20,6 +20,7 @@
                              $isSupplyChief = auth()->user()->employee_information->office_id == 49 && auth()->user()->employee_information->position_id == 15;
                              $supplyChief = App\Models\EmployeeInformation::where('office_id', 49)->where('position_id', 15)->first();
                              $accountant = App\Models\EmployeeInformation::where('office_id', 3)->where('position_id', 15)->first();
+                             $finance = App\Models\EmployeeInformation::where('office_id', 25)->where('position_id', 12)->first();
                         @endphp
                         <p class="mt-1 text-sm text-primary-500">Unit Cost : &#8369; {{ number_format($record->unit_cost, 2) }}</p>
                         <p class="mt-1 text-sm text-primary-500">PPMP : {{$record->is_ppmp ? 'Yes' : 'No'}}</p>
@@ -153,7 +154,7 @@
 
                         <p class="mt-4 text-sm text-primary-500">Supply: {{$supplyChief->full_name}}</p>
                         <p class="mt-1 text-sm text-primary-500">Approval Status: {{$record->is_approved_supply ? 'Approved' : 'Pending'}}</p>
-                        <p class="mt-4 text-sm text-primary-500">Accounting: {{$accountant->full_name}}</p>
+                        <p class="mt-4 text-sm text-primary-500">Finance: {{$finance->full_name}}</p>
                         <p class="mt-1 text-sm text-primary-500">Approval Status: {{$record->is_approved_finance ? 'Approved' : 'Pending'}}</p>
                         {{-- @if ($request->status == 'Approved')
                             <p class="mt-1 text-sm text-primary-500">Date Approved:
