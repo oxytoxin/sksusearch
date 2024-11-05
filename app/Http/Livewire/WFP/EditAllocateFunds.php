@@ -21,17 +21,17 @@ class EditAllocateFunds extends Component
     public $fund_description;
     public $amounts = [];
 
-    public function mount($record)
+    public function mount($record, $wfpType)
     {
         $this->record = CostCenter::find($record);
         $this->category_groups = CategoryGroup::all();
         $this->wfp_type = WpfType::all();
-        $this->selectedType = $this->record->fundAllocations->first()->wpf_type_id;
+        $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->wpf_type_id;
         $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->first()->initial_amount;
         $this->fund_description = $this->record->fundAllocations->first()->description;
        // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
 
-        foreach ($this->record->fundAllocations as $allocation) {
+        foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
             $this->amounts[$allocation->category_group_id] = $allocation->initial_amount;
         }
     }

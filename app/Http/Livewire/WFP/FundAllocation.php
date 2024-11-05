@@ -15,6 +15,8 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Concerns\InteractsWithTable;
 
 class FundAllocation extends Component implements HasTable
@@ -25,6 +27,7 @@ class FundAllocation extends Component implements HasTable
     public $wfp_type;
     public $fund_cluster;
     public $group_keys = [];
+    public $data = [];
 
     public function mount()
     {
@@ -62,18 +65,19 @@ class FundAllocation extends Component implements HasTable
             ->label('MFO Fee')->searchable()->sortable()->wrap(),
             Tables\Columns\TextColumn::make('fundAllocations.wpf_type_id')
             ->getStateUsing(function ($record) {
-                return $record->fundAllocations->first()?->wpfType->description;
+                return $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()?->wpfType->description;
+                // return $record->fundAllocations->first()?->wpfType->description;
             })
             ->label('WFP Type'),
             Tables\Columns\TextColumn::make('fundAllocations.amount')
             ->label('Amount')
             ->formatStateUsing(function ($record) {
                 if($record->fundClusterWFP->id === 1 || $record->fundClusterWFP->id === 3) {
-                    $sum = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $record->fundAllocations->first()?->wpf_type_id)->sum('initial_amount');
+                    $sum = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->sum('initial_amount');
                     return '₱ '.number_format($sum, 2);
                 }else
                 {
-                    return '₱ '.number_format($record->fundAllocations->sum('initial_amount'), 2);
+                    return '₱ '.number_format($record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->sum('initial_amount'), 2);
 
                 }
             }),
@@ -111,13 +115,13 @@ class FundAllocation extends Component implements HasTable
 
             // })
             ->requiresConfirmation()
-            ->visible(fn ($record) => !$record->fundAllocations()->exists()),
+            ->visible(fn ($record) => !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists()),
             Action::make('edit_fund')
             ->icon('ri-pencil-line')
             ->label('Edit fund')
             ->button()
             ->color('warning')
-            ->url(fn (CostCenter $record): string => route('wfp.edit-allocate-funds', $record))
+            ->url(fn (CostCenter $record): string => route('wfp.edit-allocate-funds', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
             // ->mountUsing(fn ($record, Forms\ComponentContainer $form) => $form->fill([
             //     'wpf_type_id' => $record->fundAllocations->first()->wpf_type_id,
             //     'amount' => $record->fundAllocations->sum('amount')
@@ -145,7 +149,7 @@ class FundAllocation extends Component implements HasTable
 
             // })
             // ->requiresConfirmation()
-            ->visible(fn ($record) => $record->fundAllocations()->exists() && !$record->fundAllocations()->where('is_locked', true)->exists()),
+            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()),
             Action::make('lock_fund')
             ->icon('ri-lock-line')
             ->label('Lock fund')
@@ -160,7 +164,7 @@ class FundAllocation extends Component implements HasTable
                 Notification::make()->title('Operation Success')->body('Fund Successfully Locked')->success()->send();
 
             })
-            ->visible(fn ($record) => $record->fundAllocations()->exists() && !$record->fundAllocations()->where('is_locked', true)->exists())
+            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists())
         ];
     }
 
@@ -172,6 +176,17 @@ class FundAllocation extends Component implements HasTable
     protected function getTableFilters(): array
     {
         return [
+            Filter::make('wfp_type')
+            ->form([
+                Forms\Components\Select::make('wfp_type')
+                ->options(WpfType::all()->pluck('description', 'id')->toArray())->default(1)
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                $this->data = $data;
+                return $query->whereDoesntHave('wfp', function($query) use ($data) {
+                    $query->where('wpf_type_id', $data['wfp_type']);
+                });
+            }),
             SelectFilter::make('mfo')
             ->label('MFO')
             ->relationship('mfo', 'name')

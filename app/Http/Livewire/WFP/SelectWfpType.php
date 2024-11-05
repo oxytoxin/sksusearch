@@ -32,6 +32,7 @@ class SelectWfpType extends Component implements HasTable
     public $total_amount;
     public $wfp_type;
     public $fund_cluster;
+    public $data = [];
 
     public function mount()
     {
@@ -77,18 +78,18 @@ class SelectWfpType extends Component implements HasTable
             ->label('MFO Fee')->searchable()->sortable(),
             Tables\Columns\TextColumn::make('fundAllocations.wpf_type_id')
             ->getStateUsing(function ($record) {
-                return $record->fundAllocations->first()?->wpfType->description;
+                return $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()->wpfType->description;
             })
             ->label('WFP Type'),
             Tables\Columns\TextColumn::make('fundAllocations.amount')
             ->label('Amount')
             ->formatStateUsing(function ($record) {
                 if($record->fundClusterWFP->id === 1 || $record->fundClusterWFP->id === 3) {
-                    $sum = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $record->fundAllocations->first()?->wpf_type_id)->sum('initial_amount');
+                    $sum = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->sum('initial_amount');
                     return '₱ '.number_format($sum, 2);
                 }else
                 {
-                    return '₱ '.number_format($record->fundAllocations->sum('initial_amount'), 2);
+                    return '₱ '.number_format($record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->sum('initial_amount'), 2);
 
                 }
             }),
@@ -102,7 +103,7 @@ class SelectWfpType extends Component implements HasTable
             ->label('Create WFP')
             ->button()
             ->icon('heroicon-o-plus')
-            ->url(fn ($record): string => route('wfp.create-wfp', $record))
+            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
         ];
     }
 
@@ -120,6 +121,7 @@ class SelectWfpType extends Component implements HasTable
                 ->options(WpfType::all()->pluck('description', 'id')->toArray())->default(1)
             ])
             ->query(function (Builder $query, array $data): Builder {
+                $this->data = $data;
                 return $query->whereDoesntHave('wfp', function($query) use ($data) {
                     $query->where('wpf_type_id', $data['wfp_type']);
                 })->whereHas('fundAllocations', function($query) use ($data) {

@@ -167,21 +167,23 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $buildingDetailModal = false;
 
 
-    public function mount($record)
+    public function mount($record, $wfpType)
     {
-        $this->record = CostCenter::where('id', $record)->first();
+        $this->record = CostCenter::where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
+            $query->where('wpf_type_id', $wfpType);
+        })->first();
         $this->costCenter = $this->record->where('office_id', auth()->user()->employee_information->office_id)->first();
         // dd($this->record->where('office_id', auth()->user()->employee_information->office_id)->get());
-        $this->wfp_type = $this->record->fundAllocations->first()->wpfType;
-        $this->wfp_fund = $this->record->fundAllocations->first()->fundClusterWFP;
+        $this->wfp_type = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->wpfType;
+        $this->wfp_fund = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundClusterWFP;
         $this->fund_description = $this->wfp_fund->fund_source;
         $this->form->fill();
         $this->global_index = 1;
-        $this->fund_allocations = $this->record->fundAllocations;
+        $this->fund_allocations = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
 
         if($this->wfp_fund->id === 1 || $this->wfp_fund->id === 2)
         {
-            $this->current_balance = $this->record->fundAllocations->map(function($allocation) {
+            $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->map(function($allocation) {
                 return [
                 'category_group_id' => $allocation->category_group_id,
                 'category_group' => $allocation->categoryGroup?->name,

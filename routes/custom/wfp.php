@@ -33,11 +33,11 @@ Route::middleware([
     Route::get('/wfp-types', WFPTypes::class)->name('wfp-types');
     Route::get('/fund-allocation', FundAllocation::class)->name('fund-allocation');
     Route::get('/assign-personnel', AssignPersonnel::class)->name('assign-personnel');
-    Route::get('/create-wfp/{record}', CreateWFP::class)->name('create-wfp');
+    Route::get('/create-wfp/{record}/{wfpType}', CreateWFP::class)->name('create-wfp');
     Route::get('/select-wfp', SelectWfpType::class)->name('select-wfp');
     Route::get('/wfp-history', WFPHistory::class)->name('wfp-history');
     Route::get('/allocate-funds/{record}', AllocateFunds::class)->name('allocate-funds');
-    Route::get('/edit-allocate-funds/{record}', EditAllocateFunds::class)->name('edit-allocate-funds');
+    Route::get('/edit-allocate-funds/{record}/{wfpType}', EditAllocateFunds::class)->name('edit-allocate-funds');
     Route::get('/print-wfp/{record}', WfpReport::class)->name('print-wfp');
     Route::get('/wfp-submissions', WfpSubmissions::class)->name('wfp-submissions');
     Route::get('/wfp-pre', GeneratePpmp::class)->name('generate-ppmp');
