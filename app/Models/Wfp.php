@@ -27,7 +27,7 @@ class Wfp extends Model
 
     public function fundClusterWfp()
     {
-        return $this->belongsTo(FundClusterWfp::class, 'fund_cluster_w_f_p_s_id', 'id');
+        return $this->belongsTo(FundClusterWFP::class, 'fund_cluster_w_f_p_s_id', 'id');
     }
 
     public function user()
