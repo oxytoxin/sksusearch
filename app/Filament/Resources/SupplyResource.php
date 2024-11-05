@@ -77,7 +77,7 @@ class SupplyResource extends Resource
                 TextColumn::make('categoryItems.name')->label('Account Title')->searchable(),
                 TextColumn::make('categoryGroups.name')->label('Category Group')->searchable(),
                 TextColumn::make('supply_code')->searchable()->sortable(),
-                TextColumn::make('particulars')->wrap()->html()->searchable()->sortable(),
+                TextColumn::make('particulars')->html()->searchable()->sortable(),
                 TextColumn::make('specifications')->searchable()->wrap()->sortable(),
                 TextColumn::make('unit_cost')->searchable()
                 ->formatStateUsing(fn ($record) => '₱ '.number_format($record->unit_cost, 2))->sortable(),
