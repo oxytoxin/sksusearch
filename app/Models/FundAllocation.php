@@ -29,4 +29,9 @@ class FundAllocation extends Model
     {
         return $this->belongsTo(CategoryGroup::class, 'category_group_id', 'id');
     }
+
+    public function fundDrafts()
+    {
+        return $this->hasMany(FundDraft::class, 'fund_allocation_id');
+    }
 }
