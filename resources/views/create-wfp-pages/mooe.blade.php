@@ -14,7 +14,10 @@
             <div class="sm:col-span-2">
                 <div class="flex justify-between">
                     <label for="mooe_particulars" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
-                    <label class="block text-xs font-medium leading-4 text-green-900 underline cursor-pointer"><a href="{{route('wfp.request-supply')}}">Request Supply</a></label>
+                    @if ($mooe_particular_id)
+                    <label class="block text-xs font-medium leading-4 text-red-900 underline cursor-pointer"><a href="{{route('wfp.report-supply',  ['record' => $mooe_particular_id])}}">Report Supply</a></label>
+                    @endif
+                    {{-- <label class="block text-xs font-medium leading-4 text-green-900 underline cursor-pointer"><a href="{{route('wfp.request-supply')}}">Request Supply</a></label> --}}
                 </div>
                 <div class="mt-2">
                 <select wire:model="mooe_particular_id" disabled id="mooe_particular_id" name="mooe_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">

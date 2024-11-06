@@ -9,7 +9,7 @@
               <input wire:model.defer="fund_description" disabled id="fund_description" name="fund_description" type="text" autocomplete="email" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             </div>
         </div>
-        @if ($wfp_fund->id > 3)
+        {{-- @if ($wfp_fund->id > 3)
         <div class="relative">
             <div class="sm:col-span-3">
                 <label for="source_fund" class="block text-sm font-medium leading-6 text-gray-900">Source Fund</label>
@@ -33,6 +33,6 @@
               <input wire:model="confirm_fund_source" id="confirm_fund_source" name="confirm_fund_source" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             </div>
         </div>
-        @endif
+        @endif --}}
     </div>
 </div>

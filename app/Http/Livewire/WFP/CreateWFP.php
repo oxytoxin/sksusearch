@@ -228,10 +228,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->building_quantity = array_fill(0, 12, 0);
 
         //source of fund
-        if($this->wfp_fund->id > 3)
-        {
-            $this->source_fund = 'TUITION FEE - RESEARCH FUND';
-        }
+        // if($this->wfp_fund->id > 3)
+        // {
+        //     $this->source_fund = 'TUITION FEE - RESEARCH FUND';
+        // }
     }
 
     protected function getFormSchema(): array
