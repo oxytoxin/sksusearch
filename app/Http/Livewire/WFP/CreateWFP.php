@@ -183,14 +183,16 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         if($this->wfp_fund->id === 1 || $this->wfp_fund->id === 2)
         {
-            $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->map(function($allocation) {
-                return [
+            $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->filter(function($allocation) {
+            return $allocation->initial_amount > 0;
+            })->map(function($allocation) {
+            return [
                 'category_group_id' => $allocation->category_group_id,
                 'category_group' => $allocation->categoryGroup?->name,
                 'initial_amount' => $allocation->initial_amount,
                 'current_total' => 0,
                 'balance' => $allocation->initial_amount,
-                ];
+            ];
             })->toArray();
         }else{
             $this->current_balance = [];
