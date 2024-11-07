@@ -23,9 +23,9 @@ class CategoryGroupResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 32;
 
-    protected static ?string $navigationLabel = 'Category Group';
+    protected static ?string $navigationLabel = 'Account Groups';
 
     protected static ?string $navigationGroup = 'Work & Financial Plan';
 

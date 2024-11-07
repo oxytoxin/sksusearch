@@ -10,6 +10,8 @@ class EditCategoryItems extends EditRecord
 {
     protected static string $resource = CategoryItemsResource::class;
 
+    public static ?string $title = 'Edit Account Title';
+
     protected function getActions(): array
     {
         return [

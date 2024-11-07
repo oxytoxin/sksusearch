@@ -10,6 +10,8 @@ class CreateSupply extends CreateRecord
 {
     protected static string $resource = SupplyResource::class;
 
+    public static ?string $title = 'Create Item';
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

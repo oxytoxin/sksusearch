@@ -28,7 +28,7 @@ class CostCenterResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-library';
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 35;
 
     protected static ?string $navigationLabel = 'Cost Centers';
 

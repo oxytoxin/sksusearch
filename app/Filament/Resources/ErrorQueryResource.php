@@ -23,7 +23,7 @@ class ErrorQueryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-x-circle';
 
-    protected static ?int $navigationSort = 34;
+    protected static ?int $navigationSort = 36;
 
     protected static ?string $navigationLabel = 'Error Queries';
 

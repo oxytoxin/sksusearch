@@ -10,11 +10,13 @@ class ListCategoryGroups extends ListRecords
 {
     protected static string $resource = CategoryGroupResource::class;
 
+    public static ?string $title = 'Account Groups';
+
     protected function getActions(): array
     {
         return [
             Actions\CreateAction::make()
-            ->label('New Category Group') 
+            ->label('New Account Group')
             ->color('success'),
         ];
     }

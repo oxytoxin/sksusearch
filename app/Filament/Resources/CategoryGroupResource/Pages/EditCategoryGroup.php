@@ -10,6 +10,8 @@ class EditCategoryGroup extends EditRecord
 {
     protected static string $resource = CategoryGroupResource::class;
 
+    public static ?string $title = 'Edit Account Group';
+
     protected function getActions(): array
     {
         return [

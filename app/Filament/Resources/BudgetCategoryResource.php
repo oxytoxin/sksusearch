@@ -23,7 +23,7 @@ class BudgetCategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-menu';
 
-    protected static ?int $navigationSort = 31;
+    protected static ?int $navigationSort = 29;
 
     protected static ?string $navigationLabel = 'Budget Categories';
 

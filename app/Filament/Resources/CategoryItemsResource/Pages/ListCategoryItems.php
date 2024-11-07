@@ -10,11 +10,13 @@ class ListCategoryItems extends ListRecords
 {
     protected static string $resource = CategoryItemsResource::class;
 
+    public static ?string $title = 'Account Titles';
+
     protected function getActions(): array
     {
         return [
             Actions\CreateAction::make()
-            ->label('New Category Item')
+            ->label('New Account Title')
             ->color('success'),
         ];
     }

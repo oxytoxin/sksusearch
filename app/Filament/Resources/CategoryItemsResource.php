@@ -24,9 +24,9 @@ class CategoryItemsResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-information-circle';
 
-    protected static ?int $navigationSort = 32;
+    protected static ?int $navigationSort = 33;
 
-    protected static ?string $navigationLabel = 'Category Items';
+    protected static ?string $navigationLabel = 'Account Titles';
 
     protected static ?string $navigationGroup = 'Work & Financial Plan';
 

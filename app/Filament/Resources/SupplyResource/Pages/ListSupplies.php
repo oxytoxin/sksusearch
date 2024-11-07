@@ -10,11 +10,13 @@ class ListSupplies extends ListRecords
 {
     protected static string $resource = SupplyResource::class;
 
+    public static ?string $title = 'Account Items';
+
     protected function getActions(): array
     {
         return [
             Actions\CreateAction::make()
-            ->label('Add Supply')
+            ->label('Add Item')
             ->color('success'),
         ];
     }
