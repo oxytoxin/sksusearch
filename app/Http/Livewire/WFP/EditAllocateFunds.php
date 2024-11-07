@@ -97,7 +97,7 @@ class EditAllocateFunds extends Component
                 }
 
                 Notification::make()->title('Successfully Updated')->success()->send();
-                return redirect()->route('wfp.fund-allocation');
+                return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
        }
 
     }
@@ -142,7 +142,7 @@ class EditAllocateFunds extends Component
             }
 
             Notification::make()->title('Successfully Updated')->success()->send();
-            return redirect()->route('wfp.fund-allocation');
+            return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
         }
 
     }

@@ -31,7 +31,7 @@ Route::middleware([
     config('jetstream.auth_session'),
 ])->prefix('wfp')->name('wfp.')->group(function () {
     Route::get('/wfp-types', WFPTypes::class)->name('wfp-types');
-    Route::get('/fund-allocation', FundAllocation::class)->name('fund-allocation');
+    Route::get('/fund-allocation/{filter?}', FundAllocation::class)->name('fund-allocation');
     Route::get('/assign-personnel', AssignPersonnel::class)->name('assign-personnel');
     Route::get('/create-wfp/{record}/{wfpType}', CreateWFP::class)->name('create-wfp');
     Route::get('/select-wfp', SelectWfpType::class)->name('select-wfp');

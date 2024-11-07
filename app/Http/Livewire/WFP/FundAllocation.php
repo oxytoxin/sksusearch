@@ -6,6 +6,7 @@ use App\Models\CategoryGroup;
 use Filament\Tables;
 use Livewire\Component;
 use App\Models\CostCenter;
+use App\Models\FundClusterWFP;
 use App\Models\WpfType;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
@@ -29,9 +30,15 @@ class FundAllocation extends Component implements HasTable
     public $group_keys = [];
     public $data = [];
 
-    public function mount()
+    public function mount($filter)
     {
-        $this->fund_cluster = 1;
+        if($filter)
+        {
+            $this->filter($filter);
+        }else{
+
+            $this->fund_cluster = 1;
+        }
         $this->wfp_type = WpfType::all()->count();
         $group = CategoryGroup::all()->pluck('name', 'id');
 
