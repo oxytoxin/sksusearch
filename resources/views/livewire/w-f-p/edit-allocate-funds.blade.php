@@ -186,8 +186,7 @@
             </div>
               @endif
             </div>
-            @if ($record->fundClusterWFP->id === 2 || $record->fundClusterWFP->id === 4 || $record->fundClusterWFP->id === 5)
-            <div class="flex justify-end mt-2">
+            @if ($record->fundClusterWFP->id === 2 || $record->fundClusterWFP->id === 4 || $record->fundClusterWFP->id === 5 || $record->fundClusterWFP->id === 6 || $record->fundClusterWFP->id === 7)            <div class="flex justify-end mt-2">
                 <button wire:click="confirmAllocation161" class="flex hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-3">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />

@@ -37,6 +37,8 @@ class WFPHistory extends Component implements HasTable
             ->label('Date Created')
             ->formatStateUsing(fn ($record) => Carbon::parse($record->created_at)->format('F d, Y h:i A'))
             ->searchable()->sortable(),
+            Tables\Columns\TextColumn::make('is_approved')
+            ->formatStateUsing(fn ($record) => $record->is_approved ? 'Yes' : 'No')->searchable(),
         ];
     }
 
