@@ -71,19 +71,28 @@ class AllocateFunds extends Component
         Notification::make()->title('Please Select a WFP Type')->danger()->send();
        }else{
                 //save the data
-                foreach($this->amounts as $categoryGroupId => $amount)
-                {
-                    FundAllocation::create([
-                        'cost_center_id' => $this->record->id,
-                        'wpf_type_id' => $this->selectedType,
-                        'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
-                        'category_group_id' => $categoryGroupId,
-                        'initial_amount' => $amount,
-                    ]);
+                if (FundAllocation::where('cost_center_id', $this->record->id)
+                    ->where('wpf_type_id', $this->selectedType)
+                    ->where('fund_cluster_w_f_p_s_id', $this->record->fundClusterWFP->id)
+                    ->exists()) {
+                    Notification::make()->title('Fund Allocation already exists')->danger()->send();
+                    return;
+                }else{
+                    foreach($this->amounts as $categoryGroupId => $amount)
+                    {
+                        FundAllocation::create([
+                            'cost_center_id' => $this->record->id,
+                            'wpf_type_id' => $this->selectedType,
+                            'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
+                            'category_group_id' => $categoryGroupId,
+                            'initial_amount' => $amount,
+                        ]);
+                    }
+
+                    Notification::make()->title('Successfully Saved')->success()->send();
+                    return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
                 }
 
-                Notification::make()->title('Successfully Saved')->success()->send();
-                return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
        }
 
     }
