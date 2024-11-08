@@ -41,6 +41,7 @@ class CategoryGroupResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
             ])
             ->filters([
