@@ -35,5 +35,9 @@ class Wfp extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function wfpApprovalRemarks()
+    {
+        return $this->hasMany(WfpApprovalRemark::class, 'wfps_id');
+    }
 
 }

@@ -21,12 +21,12 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)->where('is_approved', 1);
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)->where('is_approved', 1);
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
     }
 
@@ -41,14 +41,14 @@ class GeneratePpmp extends Component
         //     });
         // })->get();
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -61,14 +61,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Higher Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -80,14 +80,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Advanced Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -99,14 +99,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Research and Development';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -118,14 +118,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Extension Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -137,14 +137,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Local Fund Projects';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -156,12 +156,12 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2);
+            $query->where('fund_cluster_w_f_p_s_id', 2)->where('is_approved', 1);
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2);
+            $query->where('fund_cluster_w_f_p_s_id', 2)->where('is_approved', 1);
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
     }
 
@@ -176,14 +176,14 @@ class GeneratePpmp extends Component
         //     });
         // })->get();
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -196,14 +196,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Higher Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -215,14 +215,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Advanced Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -234,14 +234,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Research and Development';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -253,14 +253,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Extension Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -272,14 +272,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Local Fund Projects';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -291,12 +291,12 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
     }
 
@@ -305,7 +305,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'ACCESS Campus';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 1);
             });
@@ -314,7 +314,7 @@ class GeneratePpmp extends Component
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 1);
             });
@@ -327,7 +327,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Tacurong Campus';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 2);
             });
@@ -336,7 +336,7 @@ class GeneratePpmp extends Component
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 2);
             });
@@ -349,7 +349,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Isulan Campus';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 3);
             });
@@ -358,7 +358,7 @@ class GeneratePpmp extends Component
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 3);
             });
@@ -371,7 +371,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Kalamansig Campus';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 4);
             });
@@ -380,7 +380,7 @@ class GeneratePpmp extends Component
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 4);
             });
@@ -393,7 +393,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Lutayan Campus';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 5);
             });
@@ -402,7 +402,7 @@ class GeneratePpmp extends Component
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 5);
             });
@@ -415,7 +415,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Palimbang Campus';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 6);
             });
@@ -424,7 +424,7 @@ class GeneratePpmp extends Component
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 6);
             });
@@ -437,7 +437,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Bagumbayan Campus';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 7);
             });
@@ -446,7 +446,7 @@ class GeneratePpmp extends Component
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 7);
             });
@@ -460,12 +460,12 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
     }
 
@@ -474,14 +474,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'General Admission and Support Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -493,14 +493,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Higher Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -511,14 +511,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Advanced Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -529,14 +529,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Research and Development';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -547,14 +547,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Extension Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -565,14 +565,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Local Fund Projects';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -584,12 +584,12 @@ class GeneratePpmp extends Component
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
          $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('fund_cluster_w_f_p_s_id', 7)->where('is_approved', 1);
          })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('fund_cluster_w_f_p_s_id', 7)->where('is_approved', 1);
          })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
      }
 
@@ -598,14 +598,14 @@ class GeneratePpmp extends Component
          $this->is_active = true;
          $this->title = 'General Admission and Support Services';
          $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 1);
              });
          })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 1);
              });
          })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -617,14 +617,14 @@ class GeneratePpmp extends Component
          $this->is_active = true;
          $this->title = 'Higher Education Services';
          $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 2);
              });
          })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 2);
              });
          })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -635,14 +635,14 @@ class GeneratePpmp extends Component
          $this->is_active = true;
          $this->title = 'Advanced Education Services';
          $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 3);
              });
          })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 3);
              });
          })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -653,14 +653,14 @@ class GeneratePpmp extends Component
          $this->is_active = true;
          $this->title = 'Research and Development';
          $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 4);
              });
          })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 4);
              });
          })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -671,14 +671,14 @@ class GeneratePpmp extends Component
          $this->is_active = true;
          $this->title = 'Extension Services';
          $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 5);
              });
          })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 5);
              });
          })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -689,14 +689,14 @@ class GeneratePpmp extends Component
          $this->is_active = true;
          $this->title = 'Local Fund Projects';
          $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 6);
              });
          })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 6);
              });
          })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -709,12 +709,12 @@ class GeneratePpmp extends Component
             $this->is_active = true;
             $this->title = 'Sultan Kudarat State University';
             $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('fund_cluster_w_f_p_s_id', 5)->where('is_approved', 1);
             })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('fund_cluster_w_f_p_s_id', 5)->where('is_approved', 1);
             })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
         }
 
@@ -723,14 +723,14 @@ class GeneratePpmp extends Component
             $this->is_active = true;
             $this->title = 'General Admission and Support Services';
             $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
             })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
             })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -742,14 +742,14 @@ class GeneratePpmp extends Component
             $this->is_active = true;
             $this->title = 'Higher Education Services';
             $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
             })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
             })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -760,14 +760,14 @@ class GeneratePpmp extends Component
             $this->is_active = true;
             $this->title = 'Advanced Education Services';
             $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
             })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
             })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -778,14 +778,14 @@ class GeneratePpmp extends Component
             $this->is_active = true;
             $this->title = 'Research and Development';
             $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
             })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
             })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -796,14 +796,14 @@ class GeneratePpmp extends Component
             $this->is_active = true;
             $this->title = 'Extension Services';
             $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
             })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
             })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -814,14 +814,14 @@ class GeneratePpmp extends Component
             $this->is_active = true;
             $this->title = 'Local Fund Projects';
             $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
             })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+                $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
             })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -833,12 +833,12 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('fund_cluster_w_f_p_s_id', 6)->where('is_approved', 1);
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('fund_cluster_w_f_p_s_id', 6)->where('is_approved', 1);
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
     }
 
@@ -847,14 +847,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'General Admission and Support Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -866,14 +866,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Higher Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -884,14 +884,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Advanced Education Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -902,14 +902,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Research and Development';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -920,14 +920,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Extension Services';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
@@ -938,14 +938,14 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->title = 'Local Fund Projects';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();

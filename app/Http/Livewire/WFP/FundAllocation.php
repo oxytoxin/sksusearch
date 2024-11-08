@@ -2,21 +2,23 @@
 
 namespace App\Http\Livewire\WFP;
 
-use App\Models\CategoryGroup;
+use App\Models\MFO;
+use Filament\Forms;
 use Filament\Tables;
+use App\Models\MfoFee;
+use App\Models\WpfType;
 use Livewire\Component;
 use App\Models\CostCenter;
+use App\Models\CategoryGroup;
 use App\Models\FundClusterWFP;
-use App\Models\WpfType;
-use Filament\Forms;
-use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Layout;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Concerns\InteractsWithTable;
 
@@ -194,9 +196,29 @@ class FundAllocation extends Component implements HasTable
                     $query->where('wpf_type_id', $data['wfp_type']);
                 });
             }),
-            SelectFilter::make('mfo')
-            ->label('MFO')
-            ->relationship('mfo', 'name')
+            Filter::make('mfo_id')
+            ->form([
+                Forms\Components\Select::make('mfo')
+                ->options(MFO::all()->pluck('name', 'id')->prepend('All', ''))
+                ->reactive(),
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                if (!empty($data['mfo_id'])) {
+                    return $query->where('m_f_o_s_id', $data['mfo']);
+                }
+                return $query; // Return the original query if "All" is selected
+            }),
+            Filter::make('mfo_fee_id')
+            ->form([
+                Forms\Components\Select::make('mfoFee')
+                ->options(MFO::all()->pluck('name', 'id')->prepend('All', '')),
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                if (!empty($data['mfo_fee_id'])) {
+                    return $query->where('m_f_o_fee_id', $data['mfo_fee_id']);
+                }
+                return $query; // Return the original query if "All" is selected
+            }),
         ];
     }
 

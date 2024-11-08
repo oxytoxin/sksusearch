@@ -189,7 +189,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         if($this->wfp_fund->id === 1 || $this->wfp_fund->id === 2)
         {
-            if($this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts()->first()->draft_amounts()->exists())
+            if($this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts()->first()?->draft_amounts()->exists())
             {
                 $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts->map(function($allocation) {
                     return [
@@ -707,7 +707,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'supplies_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->supplies_estimated_budget);
-        $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
+        if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
+        {
+            $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
+        }
         if($this->supplies != null)
         {
             foreach($this->supplies as $key => $supply)
@@ -752,7 +755,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
                         FundDraftItem::create(
                             [
-                                'fund_draft_id' => $draft_id,
+                                'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
                                 'budget_category_id' => 1,
                                 'budget_category' => 'Supplies & Semi-Expendables',
                                 'particular_id' => $this->supplies_particular_id,
@@ -798,29 +801,59 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             ];
 
 
+            if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
+            {
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $draft_id,
+                        'budget_category_id' => 1,
+                        'budget_category' => 'Supplies & Semi-Expendables',
+                        'particular_id' => $this->supplies_particular_id,
+                        'particular' => $this->supplies_category_attr->particulars,
+                        'supply_code' => $this->supplies_category_attr->supply_code,
+                        'specifications' => $this->supplies_category_attr->specifications,
+                        'uacs' => $this->supplies_uacs,
+                        'title_group' => $this->supplies_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->supplies_category_attr->categoryItems->id,
+                        'account_title' => $this->supplies_category_attr->categoryItems->name,
+                        'ppmp' => $this->supplies_ppmp,
+                        'cost_per_unit' => $this->supplies_cost_per_unit,
+                        'quantity' => json_encode($this->supplies_quantity),
+                        'total_quantity' => $this->supplies_total_quantity,
+                        'uom' => $this->supplies_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->supplies_remarks,
+                    ]
+                    );
+            }else{
+                $draft = FundDraft::create([
+                    'fund_allocation_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->id,
+                ]);
 
-            $draft_items = FundDraftItem::create(
-                [
-                    'fund_draft_id' => $draft_id,
-                    'budget_category_id' => 1,
-                    'budget_category' => 'Supplies & Semi-Expendables',
-                    'particular_id' => $this->supplies_particular_id,
-                    'particular' => $this->supplies_category_attr->particulars,
-                    'supply_code' => $this->supplies_category_attr->supply_code,
-                    'specifications' => $this->supplies_category_attr->specifications,
-                    'uacs' => $this->supplies_uacs,
-                    'title_group' => $this->supplies_category_attr->categoryGroups->id,
-                    'account_title_id' => $this->supplies_category_attr->categoryItems->id,
-                    'account_title' => $this->supplies_category_attr->categoryItems->name,
-                    'ppmp' => $this->supplies_ppmp,
-                    'cost_per_unit' => $this->supplies_cost_per_unit,
-                    'quantity' => json_encode($this->supplies_quantity),
-                    'total_quantity' => $this->supplies_total_quantity,
-                    'uom' => $this->supplies_uom,
-                    'estimated_budget' => $intEstimatedBudget,
-                    'remarks' => $this->supplies_remarks,
-                ]
-                );
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $draft->id,
+                        'budget_category_id' => 1,
+                        'budget_category' => 'Supplies & Semi-Expendables',
+                        'particular_id' => $this->supplies_particular_id,
+                        'particular' => $this->supplies_category_attr->particulars,
+                        'supply_code' => $this->supplies_category_attr->supply_code,
+                        'specifications' => $this->supplies_category_attr->specifications,
+                        'uacs' => $this->supplies_uacs,
+                        'title_group' => $this->supplies_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->supplies_category_attr->categoryItems->id,
+                        'account_title' => $this->supplies_category_attr->categoryItems->name,
+                        'ppmp' => $this->supplies_ppmp,
+                        'cost_per_unit' => $this->supplies_cost_per_unit,
+                        'quantity' => json_encode($this->supplies_quantity),
+                        'total_quantity' => $this->supplies_total_quantity,
+                        'uom' => $this->supplies_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->supplies_remarks,
+                    ]
+                    );
+            }
+
         }
 
         if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
@@ -1014,7 +1047,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'mooe_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->mooe_estimated_budget);
-        $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
+        //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
         if($this->mooe != null)
         {
             foreach($this->mooe as $key => $mooe)
@@ -1104,29 +1137,59 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'estimated_budget' => $intEstimatedBudget,
                 'remarks' => $this->mooe_remarks,
             ];
+            if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
+            {
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
+                        'budget_category_id' => 2,
+                        'budget_category' => 'MOOE',
+                        'particular_id' => $this->mooe_particular_id,
+                        'particular' => $this->mooe_category_attr->particulars,
+                        'supply_code' => $this->mooe_category_attr->supply_code,
+                        'specifications' => $this->mooe_category_attr->specifications,
+                        'uacs' => $this->mooe_uacs,
+                        'title_group' => $this->mooe_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->mooe_category_attr->categoryItems->id,
+                        'account_title' => $this->mooe_category_attr->categoryItems->name,
+                        'ppmp' => $this->mooe_ppmp,
+                        'cost_per_unit' => $this->mooe_cost_per_unit,
+                        'quantity' => json_encode($this->mooe_quantity),
+                        'total_quantity' => $this->mooe_total_quantity,
+                        'uom' => $this->mooe_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->mooe_remarks,
+                    ]
+                    );
+            }else{
+                $draft = FundDraft::create([
+                    'fund_allocation_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->id,
+                ]);
 
-            $draft_items = FundDraftItem::create(
-                [
-                    'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                    'budget_category_id' => 2,
-                    'budget_category' => 'MOOE',
-                    'particular_id' => $this->mooe_particular_id,
-                    'particular' => $this->mooe_category_attr->particulars,
-                    'supply_code' => $this->mooe_category_attr->supply_code,
-                    'specifications' => $this->mooe_category_attr->specifications,
-                    'uacs' => $this->mooe_uacs,
-                    'title_group' => $this->mooe_category_attr->categoryGroups->id,
-                    'account_title_id' => $this->mooe_category_attr->categoryItems->id,
-                    'account_title' => $this->mooe_category_attr->categoryItems->name,
-                    'ppmp' => $this->mooe_ppmp,
-                    'cost_per_unit' => $this->mooe_cost_per_unit,
-                    'quantity' => json_encode($this->mooe_quantity),
-                    'total_quantity' => $this->mooe_total_quantity,
-                    'uom' => $this->mooe_uom,
-                    'estimated_budget' => $intEstimatedBudget,
-                    'remarks' => $this->mooe_remarks,
-                ]
-                );
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $draft->id,
+                        'budget_category_id' => 2,
+                        'budget_category' => 'MOOE',
+                        'particular_id' => $this->mooe_particular_id,
+                        'particular' => $this->mooe_category_attr->particulars,
+                        'supply_code' => $this->mooe_category_attr->supply_code,
+                        'specifications' => $this->mooe_category_attr->specifications,
+                        'uacs' => $this->mooe_uacs,
+                        'title_group' => $this->mooe_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->mooe_category_attr->categoryItems->id,
+                        'account_title' => $this->mooe_category_attr->categoryItems->name,
+                        'ppmp' => $this->mooe_ppmp,
+                        'cost_per_unit' => $this->mooe_cost_per_unit,
+                        'quantity' => json_encode($this->mooe_quantity),
+                        'total_quantity' => $this->mooe_total_quantity,
+                        'uom' => $this->mooe_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->mooe_remarks,
+                    ]
+                    );
+            }
+
         }
 
         if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
@@ -1307,7 +1370,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'training_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->training_estimated_budget);
-        $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
+        //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
         if($this->trainings != null)
         {
             foreach($this->trainings as $key => $training)
@@ -1397,29 +1460,59 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'estimated_budget' => $intEstimatedBudget,
                 'remarks' => $this->training_remarks,
             ];
+            if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
+            {
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
+                        'budget_category_id' => 3,
+                        'budget_category' => 'Trainings',
+                        'particular_id' => $this->training_particular_id,
+                        'particular' => $this->training_category_attr->particulars,
+                        'supply_code' => $this->training_category_attr->supply_code,
+                        'specifications' => $this->training_category_attr->specifications,
+                        'uacs' => $this->training_uacs,
+                        'title_group' => $this->training_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->training_category_attr->categoryItems->id,
+                        'account_title' => $this->training_category_attr->categoryItems->name,
+                        'ppmp' => $this->training_ppmp,
+                        'cost_per_unit' => $this->training_cost_per_unit,
+                        'quantity' => json_encode($this->training_quantity),
+                        'total_quantity' => $this->training_total_quantity,
+                        'uom' => $this->training_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->training_remarks,
+                    ]
+                    );
+            }else{
+                $draft = FundDraft::create([
+                    'fund_allocation_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->id,
+                ]);
 
-            $draft_items = FundDraftItem::create(
-                [
-                    'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                    'budget_category_id' => 3,
-                    'budget_category' => 'Trainings',
-                    'particular_id' => $this->training_particular_id,
-                    'particular' => $this->training_category_attr->particulars,
-                    'supply_code' => $this->training_category_attr->supply_code,
-                    'specifications' => $this->training_category_attr->specifications,
-                    'uacs' => $this->training_uacs,
-                    'title_group' => $this->training_category_attr->categoryGroups->id,
-                    'account_title_id' => $this->training_category_attr->categoryItems->id,
-                    'account_title' => $this->training_category_attr->categoryItems->name,
-                    'ppmp' => $this->training_ppmp,
-                    'cost_per_unit' => $this->training_cost_per_unit,
-                    'quantity' => json_encode($this->training_quantity),
-                    'total_quantity' => $this->training_total_quantity,
-                    'uom' => $this->training_uom,
-                    'estimated_budget' => $intEstimatedBudget,
-                    'remarks' => $this->training_remarks,
-                ]
-                );
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $draft->id,
+                        'budget_category_id' => 3,
+                        'budget_category' => 'Trainings',
+                        'particular_id' => $this->training_particular_id,
+                        'particular' => $this->training_category_attr->particulars,
+                        'supply_code' => $this->training_category_attr->supply_code,
+                        'specifications' => $this->training_category_attr->specifications,
+                        'uacs' => $this->training_uacs,
+                        'title_group' => $this->training_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->training_category_attr->categoryItems->id,
+                        'account_title' => $this->training_category_attr->categoryItems->name,
+                        'ppmp' => $this->training_ppmp,
+                        'cost_per_unit' => $this->training_cost_per_unit,
+                        'quantity' => json_encode($this->training_quantity),
+                        'total_quantity' => $this->training_total_quantity,
+                        'uom' => $this->training_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->training_remarks,
+                    ]
+                    );
+            }
+
         }
 
         if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
@@ -1600,7 +1693,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'machine_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->machine_estimated_budget);
-        $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
+        //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
         if($this->machines != null)
         {
             foreach($this->machines as $key => $machine)
@@ -1690,29 +1783,60 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'estimated_budget' => $intEstimatedBudget,
                 'remarks' => $this->machine_remarks,
             ];
+            if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
+            {
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
+                        'budget_category_id' => 4,
+                        'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
+                        'particular_id' => $this->machine_particular_id,
+                        'particular' => $this->machine_category_attr->particulars,
+                        'supply_code' => $this->machine_category_attr->supply_code,
+                        'specifications' => $this->machine_category_attr->specifications,
+                        'uacs' => $this->machine_uacs,
+                        'title_group' => $this->machine_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->machine_category_attr->categoryItems->id,
+                        'account_title' => $this->machine_category_attr->categoryItems->name,
+                        'ppmp' => $this->machine_ppmp,
+                        'cost_per_unit' => $this->machine_cost_per_unit,
+                        'quantity' => json_encode($this->machine_quantity),
+                        'total_quantity' => $this->machine_total_quantity,
+                        'uom' => $this->machine_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->machine_remarks,
+                    ]
+                    );
+            }else{
+                $draft = FundDraft::create([
+                    'fund_allocation_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->id,
+                ]);
 
-            $draft_items = FundDraftItem::create(
-                [
-                    'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                    'budget_category_id' => 4,
-                    'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
-                    'particular_id' => $this->machine_particular_id,
-                    'particular' => $this->machine_category_attr->particulars,
-                    'supply_code' => $this->machine_category_attr->supply_code,
-                    'specifications' => $this->machine_category_attr->specifications,
-                    'uacs' => $this->machine_uacs,
-                    'title_group' => $this->machine_category_attr->categoryGroups->id,
-                    'account_title_id' => $this->machine_category_attr->categoryItems->id,
-                    'account_title' => $this->machine_category_attr->categoryItems->name,
-                    'ppmp' => $this->machine_ppmp,
-                    'cost_per_unit' => $this->machine_cost_per_unit,
-                    'quantity' => json_encode($this->machine_quantity),
-                    'total_quantity' => $this->machine_total_quantity,
-                    'uom' => $this->machine_uom,
-                    'estimated_budget' => $intEstimatedBudget,
-                    'remarks' => $this->machine_remarks,
-                ]
-                );
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $draft->id,
+                        'budget_category_id' => 4,
+                        'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
+                        'particular_id' => $this->machine_particular_id,
+                        'particular' => $this->machine_category_attr->particulars,
+                        'supply_code' => $this->machine_category_attr->supply_code,
+                        'specifications' => $this->machine_category_attr->specifications,
+                        'uacs' => $this->machine_uacs,
+                        'title_group' => $this->machine_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->machine_category_attr->categoryItems->id,
+                        'account_title' => $this->machine_category_attr->categoryItems->name,
+                        'ppmp' => $this->machine_ppmp,
+                        'cost_per_unit' => $this->machine_cost_per_unit,
+                        'quantity' => json_encode($this->machine_quantity),
+                        'total_quantity' => $this->machine_total_quantity,
+                        'uom' => $this->machine_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->machine_remarks,
+                    ]
+                    );
+
+            }
+
         }
 
 
@@ -1894,7 +2018,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             'building_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->building_estimated_budget);
-        $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
+        //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
         if($this->buildings != null)
         {
             foreach($this->buildings as $key => $building)
@@ -1984,29 +2108,59 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'estimated_budget' => $intEstimatedBudget,
                 'remarks' => $this->building_remarks,
             ];
+            if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
+            {
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
+                        'budget_category_id' => 5,
+                        'budget_category' => 'Building & Infrastructure',
+                        'particular_id' => $this->building_particular_id,
+                        'particular' => $this->building_category_attr->particulars,
+                        'supply_code' => $this->building_category_attr->supply_code,
+                        'specifications' => $this->building_category_attr->specifications,
+                        'uacs' => $this->building_uacs,
+                        'title_group' => $this->building_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->building_category_attr->categoryItems->id,
+                        'account_title' => $this->building_category_attr->categoryItems->name,
+                        'ppmp' => $this->building_ppmp,
+                        'cost_per_unit' => $this->building_cost_per_unit,
+                        'quantity' => json_encode($this->building_quantity),
+                        'total_quantity' => $this->building_total_quantity,
+                        'uom' => $this->building_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->building_remarks,
+                    ]
+                    );
+            }else{
+                $draft = FundDraft::create([
+                    'fund_allocation_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->id,
+                ]);
 
-            $draft_items = FundDraftItem::create(
-                [
-                    'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                    'budget_category_id' => 5,
-                    'budget_category' => 'Building & Infrastructure',
-                    'particular_id' => $this->building_particular_id,
-                    'particular' => $this->building_category_attr->particulars,
-                    'supply_code' => $this->building_category_attr->supply_code,
-                    'specifications' => $this->building_category_attr->specifications,
-                    'uacs' => $this->building_uacs,
-                    'title_group' => $this->building_category_attr->categoryGroups->id,
-                    'account_title_id' => $this->building_category_attr->categoryItems->id,
-                    'account_title' => $this->building_category_attr->categoryItems->name,
-                    'ppmp' => $this->building_ppmp,
-                    'cost_per_unit' => $this->building_cost_per_unit,
-                    'quantity' => json_encode($this->building_quantity),
-                    'total_quantity' => $this->building_total_quantity,
-                    'uom' => $this->building_uom,
-                    'estimated_budget' => $intEstimatedBudget,
-                    'remarks' => $this->building_remarks,
-                ]
-                );
+                $draft_items = FundDraftItem::create(
+                    [
+                        'fund_draft_id' => $draft->id,
+                        'budget_category_id' => 5,
+                        'budget_category' => 'Building & Infrastructure',
+                        'particular_id' => $this->building_particular_id,
+                        'particular' => $this->building_category_attr->particulars,
+                        'supply_code' => $this->building_category_attr->supply_code,
+                        'specifications' => $this->building_category_attr->specifications,
+                        'uacs' => $this->building_uacs,
+                        'title_group' => $this->building_category_attr->categoryGroups->id,
+                        'account_title_id' => $this->building_category_attr->categoryItems->id,
+                        'account_title' => $this->building_category_attr->categoryItems->name,
+                        'ppmp' => $this->building_ppmp,
+                        'cost_per_unit' => $this->building_cost_per_unit,
+                        'quantity' => json_encode($this->building_quantity),
+                        'total_quantity' => $this->building_total_quantity,
+                        'uom' => $this->building_uom,
+                        'estimated_budget' => $intEstimatedBudget,
+                        'remarks' => $this->building_remarks,
+                    ]
+                    );
+            }
+
         }
 
         if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
@@ -2164,121 +2318,250 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $sumAllocated = $this->record->fundAllocations->sum('initial_amount');
             $sumTotal = array_sum(array_column($this->current_balance, 'current_total'));
             $sumBalance = $sumAllocated - $sumTotal;
-            $wfp = Wfp::create([
-                'cost_center_id' => $this->record->id,
-                'wpf_type_id' => $this->wfp_type->id,
-                'fund_cluster_w_f_p_s_id' => $this->wfp_fund->id,
-                'user_id' => auth()->user()->id,
-                'fund_description' => $this->fund_description,
-                'source_fund' => $this->source_fund,
-                'confirm_fund_source' => $this->confirm_fund_source ?? null,
-                'specify_fund_source' =>$this->specify_fund_source,
-                'balance' => $sumBalance,
-                'program_allocated' => $sumTotal,
-                'total_allocated_fund' => $sumAllocated,
-            ]);
 
-            foreach ($this->supplies as $item)
+            //if wfp already exist
+            if($this->record->wfp()->where('wpf_type_id', $this->wfp_type->id)->where('fund_cluster_w_f_p_s_id', $this->wfp_fund->id)->exists())
             {
-                WfpDetail::create([
-                    'wfp_id' => $wfp->id,
-                    'budget_category_id' => $item['budget_category_id'],
-                    'supply_id' => $item['particular_id'],
-                    'category_group_id' => $item['title_group'],
-                    'category_item_id' => $item['account_title_id'],
-                    'uacs_code' => $item['uacs'],
-                    'is_ppmp' => $item['ppmp'],
-                    'quantity_year' => json_encode($item['quantity']),
-                    'cost_per_unit' => $item['cost_per_unit'],
-                    'total_quantity' => $item['total_quantity'],
-                    'uom' => $item['uom'],
-                    'estimated_budget' => $item['estimated_budget'],
-                    'remarks' => $item['remarks'],
+                $wfp = $this->record->wfp()->where('wpf_type_id', $this->wfp_type->id)->where('fund_cluster_w_f_p_s_id', $this->wfp_fund->id)->first();
+                $wfp->update([
+                    'cost_center_id' => $this->record->id,
+                    'wpf_type_id' => $this->wfp_type->id,
+                    'fund_cluster_w_f_p_s_id' => $this->wfp_fund->id,
+                    'user_id' => auth()->user()->id,
+                    'fund_description' => $this->fund_description,
+                    'source_fund' => $this->source_fund,
+                    'confirm_fund_source' => $this->confirm_fund_source ?? null,
+                    'specify_fund_source' =>$this->specify_fund_source,
+                    'balance' => $sumBalance,
+                    'program_allocated' => $sumTotal,
+                    'total_allocated_fund' => $sumAllocated,
                 ]);
+
+                $wfp->wfpDetails()->delete();
+
+                foreach ($this->supplies as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                foreach ($this->mooe as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                foreach ($this->trainings as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                foreach ($this->machines as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                foreach ($this->buildings as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                $this->dialog()->success(
+                    $title = 'Operation Successful',
+                    $description = 'WFP has been successfully updated',
+                );
+
+            }else{
+                $wfp = Wfp::create([
+                    'cost_center_id' => $this->record->id,
+                    'wpf_type_id' => $this->wfp_type->id,
+                    'fund_cluster_w_f_p_s_id' => $this->wfp_fund->id,
+                    'user_id' => auth()->user()->id,
+                    'fund_description' => $this->fund_description,
+                    'source_fund' => $this->source_fund,
+                    'confirm_fund_source' => $this->confirm_fund_source ?? null,
+                    'specify_fund_source' =>$this->specify_fund_source,
+                    'balance' => $sumBalance,
+                    'program_allocated' => $sumTotal,
+                    'total_allocated_fund' => $sumAllocated,
+                ]);
+
+                foreach ($this->supplies as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                foreach ($this->mooe as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                foreach ($this->trainings as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                foreach ($this->machines as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                foreach ($this->buildings as $item)
+                {
+                    WfpDetail::create([
+                        'wfp_id' => $wfp->id,
+                        'budget_category_id' => $item['budget_category_id'],
+                        'supply_id' => $item['particular_id'],
+                        'category_group_id' => $item['title_group'],
+                        'category_item_id' => $item['account_title_id'],
+                        'uacs_code' => $item['uacs'],
+                        'is_ppmp' => $item['ppmp'],
+                        'quantity_year' => json_encode($item['quantity']),
+                        'cost_per_unit' => $item['cost_per_unit'],
+                        'total_quantity' => $item['total_quantity'],
+                        'uom' => $item['uom'],
+                        'estimated_budget' => $item['estimated_budget'],
+                        'remarks' => $item['remarks'],
+                    ]);
+                }
+
+                $this->dialog()->success(
+                    $title = 'Operation Successful',
+                    $description = 'WFP has been successfully created',
+                );
             }
 
-            foreach ($this->mooe as $item)
-            {
-                WfpDetail::create([
-                    'wfp_id' => $wfp->id,
-                    'budget_category_id' => $item['budget_category_id'],
-                    'supply_id' => $item['particular_id'],
-                    'category_group_id' => $item['title_group'],
-                    'category_item_id' => $item['account_title_id'],
-                    'uacs_code' => $item['uacs'],
-                    'is_ppmp' => $item['ppmp'],
-                    'quantity_year' => json_encode($item['quantity']),
-                    'cost_per_unit' => $item['cost_per_unit'],
-                    'total_quantity' => $item['total_quantity'],
-                    'uom' => $item['uom'],
-                    'estimated_budget' => $item['estimated_budget'],
-                    'remarks' => $item['remarks'],
-                ]);
-            }
-
-            foreach ($this->trainings as $item)
-            {
-                WfpDetail::create([
-                    'wfp_id' => $wfp->id,
-                    'budget_category_id' => $item['budget_category_id'],
-                    'supply_id' => $item['particular_id'],
-                    'category_group_id' => $item['title_group'],
-                    'category_item_id' => $item['account_title_id'],
-                    'uacs_code' => $item['uacs'],
-                    'is_ppmp' => $item['ppmp'],
-                    'quantity_year' => json_encode($item['quantity']),
-                    'cost_per_unit' => $item['cost_per_unit'],
-                    'total_quantity' => $item['total_quantity'],
-                    'uom' => $item['uom'],
-                    'estimated_budget' => $item['estimated_budget'],
-                    'remarks' => $item['remarks'],
-                ]);
-            }
-
-            foreach ($this->machines as $item)
-            {
-                WfpDetail::create([
-                    'wfp_id' => $wfp->id,
-                    'budget_category_id' => $item['budget_category_id'],
-                    'supply_id' => $item['particular_id'],
-                    'category_group_id' => $item['title_group'],
-                    'category_item_id' => $item['account_title_id'],
-                    'uacs_code' => $item['uacs'],
-                    'is_ppmp' => $item['ppmp'],
-                    'quantity_year' => json_encode($item['quantity']),
-                    'cost_per_unit' => $item['cost_per_unit'],
-                    'total_quantity' => $item['total_quantity'],
-                    'uom' => $item['uom'],
-                    'estimated_budget' => $item['estimated_budget'],
-                    'remarks' => $item['remarks'],
-                ]);
-            }
-
-            foreach ($this->buildings as $item)
-            {
-                WfpDetail::create([
-                    'wfp_id' => $wfp->id,
-                    'budget_category_id' => $item['budget_category_id'],
-                    'supply_id' => $item['particular_id'],
-                    'category_group_id' => $item['title_group'],
-                    'category_item_id' => $item['account_title_id'],
-                    'uacs_code' => $item['uacs'],
-                    'is_ppmp' => $item['ppmp'],
-                    'quantity_year' => json_encode($item['quantity']),
-                    'cost_per_unit' => $item['cost_per_unit'],
-                    'total_quantity' => $item['total_quantity'],
-                    'uom' => $item['uom'],
-                    'estimated_budget' => $item['estimated_budget'],
-                    'remarks' => $item['remarks'],
-                ]);
-            }
+            $wfp = $this->record->wfp()->where('wpf_type_id', $this->wfp_type->id)->where('fund_cluster_w_f_p_s_id', $this->wfp_fund->id)->first();
+            $wfp->is_approved = 0;
+            $wfp->save();
 
             DB::commit();
 
-            $this->dialog()->success(
-                $title = 'Operation Successful',
-                $description = 'WFP has been successfully created',
-            );
+
 
             return redirect()->route('wfp.wfp-history');
         }else{

@@ -38,28 +38,51 @@ class WFPHistory extends Component implements HasTable
             ->formatStateUsing(fn ($record) => Carbon::parse($record->created_at)->format('F d, Y h:i A'))
             ->searchable()->sortable(),
             Tables\Columns\TextColumn::make('is_approved')
-            ->formatStateUsing(fn ($record) => $record->is_approved ? 'Yes' : 'No')->searchable(),
+            ->label('Status')
+            ->formatStateUsing(function ($record) {
+                if($record->is_approved === 0)
+                {
+                    return 'Pending';
+                }elseif($record->is_approved === 1)
+                {
+                    return 'Approved';
+                }elseif($record->is_approved === 500){
+                    return 'For Modification';
+                }
+            })->searchable(),
         ];
     }
 
     public function getTableActions()
     {
         return [
-            Action::make('view wfp')
-            ->label('View WFP')
+            Tables\Actions\ActionGroup::make([
+                Action::make('view wfp')
+                ->label('View WFP')
+                ->button()
+                ->icon('heroicon-o-eye')
+                ->url(fn ($record): string => route('wfp.print-wfp', $record))
+                ->visible(fn ($record) => $record->is_approved === 0),
+                Action::make('view ppmp')
+                ->label('View PPMP')
+                ->button()
+                ->icon('heroicon-o-eye')
+                ->url(fn ($record): string => route('wfp.print-ppmp', $record))
+                ->visible(fn ($record) => $record->is_approved === 0),
+                Action::make('view pre')
+                ->label('View PRE')
+                ->button()
+                ->icon('heroicon-o-eye')
+                ->url(fn ($record): string => route('wfp.print-pre', $record))
+                ->visible(fn ($record) => $record->is_approved === 0),
+            ]),
+            Action::make('continue_draft')
+            ->label('Modify')
+            ->color('warning')
             ->button()
-            ->icon('heroicon-o-eye')
-            ->url(fn ($record): string => route('wfp.print-wfp', $record)),
-            Action::make('view ppmp')
-            ->label('View PPMP')
-            ->button()
-            ->icon('heroicon-o-eye')
-            ->url(fn ($record): string => route('wfp.print-ppmp', $record)),
-            Action::make('view pre')
-            ->label('View PRE')
-            ->button()
-            ->icon('heroicon-o-eye')
-            ->url(fn ($record): string => route('wfp.print-pre', $record))
+            ->icon('heroicon-o-pencil')
+            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $record->wpf_type_id]))
+            ->visible(fn ($record) => $record->is_approved === 500),
         ];
     }
 
