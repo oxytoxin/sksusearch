@@ -39,13 +39,13 @@ class EditAllocateFunds extends Component
     public function calculateSubTotal($categoryGroupId)
     {
         // Return the amount associated with the given category group ID
-        if($this->amounts[$categoryGroupId] < 0)
-        {
-            $this->amounts[$categoryGroupId] = 0;
-        }else
-        {
-            $this->amounts[$categoryGroupId] = $this->amounts[$categoryGroupId];
-        }
+        // if($this->amounts[$categoryGroupId] < 0)
+        // {
+        //     $this->amounts[$categoryGroupId] = 0;
+        // }else
+        // {
+        //     $this->amounts[$categoryGroupId] = $this->amounts[$categoryGroupId];
+        // }
         return $this->amounts[$categoryGroupId] ?? 0;
     }
 
