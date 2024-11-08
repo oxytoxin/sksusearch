@@ -42,9 +42,9 @@ class CategoryGroupResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->searchable()->sortable(),
+                // TextColumn::make('id')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
-                ToggleColumn::make('is_active')->label('Active')->sortable(),
+                ToggleColumn::make('is_active')->label('Active')->disabled(),
             ])
             ->filters([
                 //
