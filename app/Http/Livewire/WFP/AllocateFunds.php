@@ -24,7 +24,7 @@ class AllocateFunds extends Component
     public function mount($record)
     {
         $this->record = CostCenter::find($record);
-        $this->category_groups = CategoryGroup::all();
+        $this->category_groups = CategoryGroup::where('is_active', 1)->get();
         $this->wfp_type = WpfType::all();
         $this->selectedType = "";
         $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);

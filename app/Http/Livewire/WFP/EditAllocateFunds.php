@@ -24,7 +24,7 @@ class EditAllocateFunds extends Component
     public function mount($record, $wfpType)
     {
         $this->record = CostCenter::find($record);
-        $this->category_groups = CategoryGroup::all();
+        $this->category_groups = CategoryGroup::where('is_active', 1)->get();
         $this->wfp_type = WpfType::all();
         $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->wpf_type_id;
         $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->first()->initial_amount;

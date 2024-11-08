@@ -204,7 +204,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $this->current_balance = $this->record->fundAllocations
                 ->where('wpf_type_id', $wfpType)
                 ->filter(function ($allocation) {
-                    return $allocation->initial_amount > 0;
+                    return $allocation->initial_amount > 0 && $allocation->categoryGroup?->is_active == 1;
                 })
                 ->map(function ($allocation) {
                     return [
