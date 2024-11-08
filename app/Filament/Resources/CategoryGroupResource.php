@@ -51,8 +51,8 @@ class CategoryGroupResource extends Resource
                 ->color('success'),
             ])
             ->bulkActions([
-                //Tables\Actions\DeleteBulkAction::make(),
-            ]);
+                Tables\Actions\DeleteBulkAction::make(),
+            ])->reorderable('sort_id');
     }
 
     public static function getRelations(): array

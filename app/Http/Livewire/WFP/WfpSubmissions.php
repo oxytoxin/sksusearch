@@ -121,6 +121,11 @@ class WfpSubmissions extends Component implements HasTable
                 $record->update([
                     'is_approved' => 500
                 ]);
+
+                //delete drafts (FIX)
+                $record->fundAllocation->fundDraft->draft_amounts()->delete();
+                $record->fundAllocation->fundDraft->draft_items()->delete();
+                $record->fundAllocation->fundDraft->delete();
             })->requiresConfirmation()
             ->visible(fn ($record) => $record->is_approved === 0),
         ];
