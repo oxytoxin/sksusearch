@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CategoryGroupResource\Pages;
 use App\Filament\Resources\CategoryGroupResource\RelationManagers;
+use Filament\Tables\Columns\ToggleColumn;
 
 class CategoryGroupResource extends Resource
 {
@@ -43,6 +44,7 @@ class CategoryGroupResource extends Resource
             ->columns([
                 TextColumn::make('id')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
+                ToggleColumn::make('is_active')->label('Active')->sortable(),
             ])
             ->filters([
                 //
@@ -52,7 +54,7 @@ class CategoryGroupResource extends Resource
                 ->color('success'),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                // Tables\Actions\DeleteBulkAction::make(),
             ])->reorderable('sort_id');
     }
 
