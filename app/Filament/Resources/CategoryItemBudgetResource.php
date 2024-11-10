@@ -46,6 +46,7 @@ class CategoryItemBudgetResource extends Resource
     {
         return $table
             ->columns([
+                // TextColumn::make('id')->label('ID')->searchable()->sortable(),
                 TextColumn::make('budgetCategory.name')->label('Budget Category')->searchable()->sortable(),
                 TextColumn::make('uacs_code')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
