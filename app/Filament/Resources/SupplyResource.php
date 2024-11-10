@@ -27,7 +27,7 @@ class SupplyResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-archive';
 
-    protected static ?int $navigationSort = 34;
+    protected static ?int $navigationSort = 35;
 
     protected static ?string $navigationLabel = 'Items';
 

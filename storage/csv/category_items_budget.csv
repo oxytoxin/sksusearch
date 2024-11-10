@@ -1,0 +1,56 @@
+budget_category_id,name,uacs_code
+1,Other Supplies and Materials Expenses,5020399000
+1,Office Supplies Expenses,5020301000
+1,Accountable Forms Expenses,5020302000
+1,Non-Accountable Forms Expenses,5020303000
+1,Animal/Zoological Supplies Expenses,5020304000
+1,Food Supplies Expenses,5020305000
+1,Drugs and Medicines Expenses,5020307000
+1,"Medical, Dental, and Laboratory Supplies Expenses",5020308000
+1,"Fuel, Oil, and Lubricants Expenses",5020309000
+1,Agricultural and Marine Supplies Expenses,5020310000
+1,Textbooks and Instructional Materials Expenses,5020311000
+1,"Military, Police, and Traffic Supplies Expenses",5020312000
+1,Semi-Expendable Machinery and Equipment Expenses - Machinery,5020321001
+1,Semi-Expendable Machinery and Equipment Expenses - Office Equipment,5020321002
+1,Semi-Expendable Machinery and Equipment Expenses - ICT Equipment,5020321003
+1,Semi-Expendable Machinery and Equipment Expenses - Agricultural and Forestry Equipment,5020321004
+1,Semi-Expendable Machinery and Equipment Expenses - Communications Equipment,5020321007
+1,Semi-Expendable Machinery and Equipment Expenses - Disaster Response and Rescue Equipment,5020321008
+1,"Semi-Expendable Machinery and Equipment Expenses - Military, Police, and Security Equipment",5020321009
+1,"Semi-Expendable Machinery and Equipment Expenses - Military, Police, and Security Equipment",5020321010
+1,Semi-Expendable Machinery and Equipment Expenses - Printing Equipment,5020321011
+1,Semi-Expendable Machinery and Equipment Expenses - Sports Equipment,5020321012
+1,Semi-Expendable Machinery and Equipment Expenses - Technical and Scientific Equipment,5020321013
+1,Semi-Expendable Machinery and Equipment Expenses - Other Machinery and Equipment,5020321099
+1,"Semi-Expendable Furniture, Fixtures, and Books Expenses - Furniture and Fixtures",5020322001
+1,"Semi-Expendable Furniture, Fixtures, and Books Expenses - Books",5020322002
+5,Road Networks,1060301000
+5,Flood Control Systems,1060302000
+5,Sewer Systems,1060303000
+5,Water Supply Systems,1060304000
+5,Power Supply Systems,1060305000
+5,Communication Networks,1060306000
+5,Buildings,1060401000
+5,School Buildings,1060402000
+5,Other Structures,1060499000
+4,Machinery,1060501000
+4,Office Equipment,1060502000
+4,Information and Communications Technology Equipment,1060503000
+4,Agricultural and Forestry Equipment,1060504000
+4,Communication Equipment,1060507000
+4,Construction and Heavy Equipment,1060508000
+4,Disaster Response and Rescue Equipment,1060509000
+4,"Military, Police, and Security Equipment",1060510000
+4,Medical Equipment,1060511000
+4,Printing Equipment,1060512000
+4,Sports Equipment,1060513000
+4,Technical and Scientific Equipment,1060514000
+4,Other Equipment,1060599000
+4,Motor Vehicles,1060601000
+4,Furniture and Fixtures,1060701000
+2,Printing and Publication Expenses,5029902000
+4,Breeding Stocks,1070101000
+4,Livestock,1070102000
+4,Computer Software,1080102000
+4,Patents/Copyrights,1080105000

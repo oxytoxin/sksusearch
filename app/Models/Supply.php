@@ -15,6 +15,11 @@ class Supply extends Model
         return $this->belongsTo(CategoryItems::class, 'category_item_id');
     }
 
+    public function categoryItemsBudget()
+    {
+        return $this->belongsTo(CategoryItemBudget::class, 'category_item_budget_id');
+    }
+
     public function categoryGroups()
     {
         return $this->belongsTo(CategoryGroup::class, 'category_group_id');
