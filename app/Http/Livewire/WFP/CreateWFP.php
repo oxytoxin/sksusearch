@@ -488,6 +488,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $this->supplies_account_title = $this->supplies_category_attr->categoryItems->name;
                             $this->supplies_ppmp = $this->supplies_category_attr->is_ppmp;
                             $this->supplies_cost_per_unit = $this->supplies_category_attr->unit_cost;
+                            $this->supplies_uom = $this->supplies_category_attr->uom;
                             $this->supplies_quantity = array_fill(0, 12, 0);
                             $this->calculateSuppliesTotalQuantity();
 
@@ -519,6 +520,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $this->mooe_account_title = $this->mooe_category_attr->categoryItems->name;
                             $this->mooe_ppmp = $this->mooe_category_attr->is_ppmp;
                             $this->mooe_cost_per_unit = $this->mooe_category_attr->unit_cost;
+                            $this->mooe_uom = $this->mooe_category_attr->uom;
                             $this->mooe_quantity = array_fill(0, 12, 0);
                             $this->calculateMooeTotalQuantity();
 
@@ -549,6 +551,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $this->training_account_title = $this->training_category_attr->categoryItems->name;
                             $this->training_ppmp = $this->training_category_attr->is_ppmp;
                             $this->training_cost_per_unit = $this->training_category_attr->unit_cost;
+                            $this->training_uom = $this->training_category_attr->uom;
                             $this->training_quantity = array_fill(0, 12, 0);
                             $this->calculateTrainingTotalQuantity();
 
@@ -579,6 +582,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $this->machine_account_title = $this->machine_category_attr->categoryItems->name;
                             $this->machine_ppmp = $this->machine_category_attr->is_ppmp;
                             $this->machine_cost_per_unit = $this->machine_category_attr->unit_cost;
+                            $this->machine_uom = $this->machine_category_attr->uom;
                             $this->machine_quantity = array_fill(0, 12, 0);
                             $this->calculateMachineTotalQuantity();
 
@@ -609,6 +613,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $this->building_account_title = $this->building_category_attr->categoryItems->name;
                             $this->building_ppmp = $this->building_category_attr->is_ppmp;
                             $this->building_cost_per_unit = $this->building_category_attr->unit_cost;
+                            $this->building_uom = $this->building_category_attr->uom;
                             $this->building_quantity = array_fill(0, 12, 0);
                             $this->calculateBuildingTotalQuantity();
 

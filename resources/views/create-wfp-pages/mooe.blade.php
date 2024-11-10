@@ -143,6 +143,9 @@
             <div class="sm:col-span-1">
                 <label for="mooe_uom" class="block text-sm font-medium leading-6 text-gray-900">UOM</label>
                 <div class="mt-2">
+                  <input wire:model.defer="mooe_uom" disabled id="mooe_uom" name="mooe_uom" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+                {{-- <div class="mt-2">
                     <select wire:model="mooe_uom" id="mooe_uom" name="mooe_uom" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
                         <option value="">Select One</option>
                         <option value="pcs">pcs</option>
@@ -151,7 +154,7 @@
                         <option value="lot">lot</option>
                         <option value="van">van</option>
                     </select>
-                </div>
+                </div> --}}
                 @error('mooe_uom')
                 <p class="mt-2 text-sm text-red-600" id="email-error">{{ $message }}</p>
                 @enderror

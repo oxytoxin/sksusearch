@@ -60,13 +60,14 @@ class SupplyResource extends Resource
                   ->mask(fn (TextInput\Mask $mask) => $mask
                     ->numeric()
                     ->thousandsSeparator(','))
-                  ->required(),
+                  ->required(fn ($get) => $get('is_ppmp') ? true : false),
                   Radio::make('is_ppmp')
                   ->label('Is this PPMP?')
+                  ->reactive()
                   ->options([
                       1 => 'Yes',
                       0 => 'No',
-                  ])->inline(),
+                  ])->inline()->default(1),
             ]);
     }
 
