@@ -44,7 +44,7 @@
                 <svg class="mx-auto h-24 w-24 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <x-button emerald label="Upload" wire:click="uploadPricesSecond" spinner="uploadPricesSecond" />
+                  {{-- <x-button emerald label="Upload" wire:click="uploadPricesSecond" spinner="uploadPricesSecond" /> --}}
                 <span class="mt-2 block text-2xl font-semibold text-gray-600">Content Coming Soon</span>
             </div>
         </div>
