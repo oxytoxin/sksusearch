@@ -5,11 +5,13 @@ namespace App\Http\Livewire\Requisitioner;
 use Livewire\Component;
 use Spatie\SimpleExcel\SimpleExcelReader;
 use App\Models\CategoryItemBudget;
+use App\Models\Supply;
 use DB;
+use WireUi\Traits\Actions;
 
 class Dashboard extends Component
 {
-
+    use Actions;
     public function test()
     {
         $rows = SimpleExcelReader::create(storage_path('csv/category_items_budget.csv'))->getRows();
@@ -21,6 +23,56 @@ class Dashboard extends Component
                 'uacs_code' => $data['uacs_code'],
             ]);
             DB::commit();
+        });
+    }
+
+    public function uploadPricesFirst()
+    {
+        $rows = SimpleExcelReader::create(storage_path('csv/final_price_list_1.csv'))->getRows();
+        $rows->each(function ($data) {
+            DB::beginTransaction();
+            $budget = Supply::create([
+                'category_item_id' => $data['category_item_id'],
+                'category_item_budget_id' => $data['category_item_budget_id'],
+                'category_group_id' => $data['category_group_id'],
+                'supply_code' => $data['supply_code'],
+                'particulars' => $data['particulars'],
+                'specifications' => $data['specifications'],
+                'unit_cost' => $data['unit_cost'],
+                'is_ppmp' => $data['is_ppmp'] === 'No' ? 0 : 1,
+                'uom' => $data['uom'],
+            ]);
+            DB::commit();
+
+            $this->dialog()->success(
+                $title = 'Operation Success',
+                $description = 'Price List Uploaded!'
+            );   
+        });
+    }
+
+    public function uploadPricesSecond()
+    {
+        $rows = SimpleExcelReader::create(storage_path('csv/final_price_list_2.csv'))->getRows();
+        $rows->each(function ($data) {
+            DB::beginTransaction();
+            $budget = Supply::create([
+                'category_item_id' => $data['category_item_id'],
+                'category_item_budget_id' => $data['category_item_budget_id'],
+                'category_group_id' => $data['category_group_id'],
+                'supply_code' => $data['supply_code'],
+                'particulars' => $data['particulars'],
+                'specifications' => $data['specifications'],
+                'unit_cost' => $data['unit_cost'],
+                'is_ppmp' => $data['is_ppmp'] === 'No' ? 0 : 1,
+                'uom' => $data['uom'],
+            ]);
+            DB::commit();
+
+            $this->dialog()->success(
+                $title = 'Operation Success',
+                $description = 'Price List Uploaded!'
+            );   
         });
     }
 
