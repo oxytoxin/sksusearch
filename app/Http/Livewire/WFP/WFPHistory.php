@@ -62,20 +62,20 @@ class WFPHistory extends Component implements HasTable
                 ->button()
                 ->icon('heroicon-o-eye')
                 ->url(fn ($record): string => route('wfp.print-wfp', $record))
-                ->visible(fn ($record) => $record->is_approved === 0),
+                ->visible(fn ($record) => $record->is_approved === 0 || $record->is_approved === 1),
                 Action::make('view ppmp')
                 ->label('View PPMP')
                 ->button()
                 ->icon('heroicon-o-eye')
                 ->url(fn ($record): string => route('wfp.print-ppmp', $record))
-                ->visible(fn ($record) => $record->is_approved === 0),
+                ->visible(fn ($record) => $record->is_approved === 0 || $record->is_approved === 1),
                 Action::make('view pre')
                 ->label('View PRE')
                 ->button()
                 ->icon('heroicon-o-eye')
                 ->url(fn ($record): string => route('wfp.print-pre', $record))
                 ->visible(fn ($record) => $record->is_approved === 0 || $record->is_approved === 1),
-            ]),
+            ])->visible(fn ($record) => $record->is_approved === 0 || $record->is_approved === 1),
             Action::make('continue_draft')
             ->label('Modify')
             ->color('warning')
