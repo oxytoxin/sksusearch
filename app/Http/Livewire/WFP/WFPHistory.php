@@ -75,7 +75,7 @@ class WFPHistory extends Component implements HasTable
                 ->icon('heroicon-o-eye')
                 ->url(fn ($record): string => route('wfp.print-pre', $record))
                 ->visible(fn ($record) => $record->is_approved === 0 || $record->is_approved === 1),
-            ])->visible(fn ($record) => $record->is_approved === 0 || $record->is_approved === 1),
+            ]),
             Action::make('continue_draft')
             ->label('Modify')
             ->color('warning')
