@@ -172,14 +172,23 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $wfp_param;
 
 
-    public function mount($record, $wfpType)
+    public function mount($record, $wfpType, $isEdit)
     {
         $costCenter_id = Wfp::where('id', $record)->first()->cost_center_id;
-        dd($costCenter_id);
         $this->wfp_param = $wfpType;
-        $this->record = CostCenter::where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
-            $query->where('wpf_type_id', $wfpType);
-        })->first();
+        if($isEdit)
+        {
+            $this->record = CostCenter::where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
+                $query->where('wpf_type_id', $wfpType);
+            })->first();
+        }else{
+            $this->record = CostCenter::where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
+                $query->where('wpf_type_id', $wfpType);
+            })->first();
+        }
+        // $this->record = CostCenter::where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
+        //     $query->where('wpf_type_id', $wfpType);
+        // })->first();
         $this->costCenter = $this->record->where('office_id', auth()->user()->employee_information->office_id)->first();
         // dd($this->record->where('office_id', auth()->user()->employee_information->office_id)->get());
         $this->wfp_type = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->wpfType;
