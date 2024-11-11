@@ -55,12 +55,16 @@ class SupplyResource extends Resource
                 Grid::make(1)->schema([
                     Textarea::make('particulars')->required(),
                 ]),
-                TextInput::make('specifications'),
-                TextInput::make('unit_cost')
-                  ->mask(fn (TextInput\Mask $mask) => $mask
-                    ->numeric()
-                    ->thousandsSeparator(','))
-                  ->required(fn ($get) => $get('is_ppmp') ? true : false),
+                Grid::make(3)->schema([
+                    TextInput::make('specifications'),
+                    TextInput::make('unit_cost')
+                      ->mask(fn (TextInput\Mask $mask) => $mask
+                        ->numeric()
+                        ->thousandsSeparator(','))
+                      ->required(fn ($get) => $get('is_ppmp') ? true : false),
+                      TextInput::make('uom')->required(),
+                ]),
+
                   Radio::make('is_ppmp')
                   ->label('Is this PPMP?')
                   ->reactive()
@@ -82,6 +86,7 @@ class SupplyResource extends Resource
                 TextColumn::make('specifications')->searchable()->wrap()->sortable(),
                 TextColumn::make('unit_cost')->searchable()
                 ->formatStateUsing(fn ($record) => '₱ '.number_format($record->unit_cost, 2))->sortable(),
+                TextColumn::make('uom')->label('UOM')->searchable()->wrap()->sortable(),
                 TextColumn::make('is_ppmp')
                 ->label('PPMP')
                 ->formatStateUsing(fn ($record) => $record->is_ppmp === 1 ? 'Yes' : 'No')->sortable(),
