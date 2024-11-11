@@ -196,29 +196,29 @@ class FundAllocation extends Component implements HasTable
                     $query->where('wpf_type_id', $data['wfp_type']);
                 });
             }),
-            Filter::make('mfo_id')
-            ->form([
-                Forms\Components\Select::make('mfo')
-                ->options(MFO::all()->pluck('name', 'id')->prepend('All', ''))
-                ->reactive(),
-            ])
-            ->query(function (Builder $query, array $data): Builder {
-                if (!empty($data['mfo_id'])) {
-                    return $query->where('m_f_o_s_id', $data['mfo']);
-                }
-                return $query; // Return the original query if "All" is selected
-            }),
-            Filter::make('mfo_fee_id')
-            ->form([
-                Forms\Components\Select::make('mfoFee')
-                ->options(MFO::all()->pluck('name', 'id')->prepend('All', '')),
-            ])
-            ->query(function (Builder $query, array $data): Builder {
-                if (!empty($data['mfo_fee_id'])) {
-                    return $query->where('m_f_o_fee_id', $data['mfo_fee_id']);
-                }
-                return $query; // Return the original query if "All" is selected
-            }),
+            // Filter::make('mfo_id')
+            // ->form([
+            //     Forms\Components\Select::make('mfo')
+            //     ->options(MFO::all()->pluck('name', 'id')->prepend('All', ''))
+            //     ->reactive(),
+            // ])
+            // ->query(function (Builder $query, array $data): Builder {
+            //     if (!empty($data['mfo_id'])) {
+            //         return $query->where('m_f_o_s_id', $data['mfo']);
+            //     }
+            //     return $query;
+            // }),
+            // Filter::make('mfo_fee_id')
+            // ->form([
+            //     Forms\Components\Select::make('mfoFee')
+            //     ->options(MFO::all()->pluck('name', 'id')->prepend('All', '')),
+            // ])
+            // ->query(function (Builder $query, array $data): Builder {
+            //     if (!empty($data['mfo_fee_id'])) {
+            //         return $query->where('m_f_o_fee_id', $data['mfo_fee_id']);
+            //     }
+            //     return $query;
+            // }),
         ];
     }
 
