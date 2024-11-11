@@ -745,9 +745,10 @@
                                 <div></div>
                                 <div class="flex">
                                     <x-button flat label="Cancel" x-on:click="close" />
-                                    <x-button spinner="submit" primary label="Save"
+                                    <x-button spinner="submit" primary label="Submit"
                                     x-on:confirm="{
                                         title: 'Are you sure you want to save this data?',
+                                        body: 'Please review the data before submitting.',
                                         icon: 'warning',
                                         method: 'submit',
                                         params: 1
