@@ -174,7 +174,8 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function mount($record, $wfpType)
     {
-        dd($record);
+        $costCenter_id = Wfp::where('id', $record->id)->first()->cost_center_id;
+        dd($costCenter_id);
         $this->wfp_param = $wfpType;
         $this->record = CostCenter::where('id', $record->id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
             $query->where('wpf_type_id', $wfpType);
