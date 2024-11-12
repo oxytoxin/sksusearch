@@ -39,7 +39,7 @@ class SupplyResource extends Resource
             ->schema([
                 Grid::make(3)->schema([
                     Select::make('category_item_id')
-                    ->relationship('categoryItems', 'name')
+                    ->relationship('categoryItems', 'name', fn (Builder $query) => $query->activeCategoryItems())
                     ->label('Account Title')
                     ->searchable()
                     ->preload()
