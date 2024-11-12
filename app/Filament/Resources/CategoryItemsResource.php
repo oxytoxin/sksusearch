@@ -51,7 +51,7 @@ class CategoryItemsResource extends Resource
                 TextColumn::make('budgetCategory.name')->label('Budget Category')->searchable()->sortable(),
                 TextColumn::make('uacs_code')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
-                ToggleColumn::make('is_active')->label('Active')->disabled(),
+                ToggleColumn::make('is_active')->label('Active'),
             ])
             ->filters([
                 //
