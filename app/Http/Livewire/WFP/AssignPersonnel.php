@@ -36,7 +36,7 @@ class AssignPersonnel extends Component implements HasTable
              ->button()
              ->form([
                 Select::make('user_id')
-                    ->label('User')
+                    ->label('This is all the available users in this campus')
                     ->required()
                     ->multiple()
                     ->searchable()
