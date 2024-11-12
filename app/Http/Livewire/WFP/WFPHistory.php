@@ -81,7 +81,7 @@ class WFPHistory extends Component implements HasTable
             ->color('warning')
             ->button()
             ->icon('heroicon-o-pencil')
-            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $record->wpf_type_id, 'isEdit' => 1]))
+            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record->cost_center_id, 'wfpType' => $record->wpf_type_id, 'isEdit' => 1]))
             ->visible(fn ($record) => $record->is_approved === 500),
         ];
     }
