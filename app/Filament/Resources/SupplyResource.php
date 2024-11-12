@@ -83,8 +83,8 @@ class SupplyResource extends Resource
                 TextColumn::make('categoryItems.id')->label('Account Title ID')->searchable()->sortable(),
                 TextColumn::make('categoryItems.name')->label('Account Title')->searchable(),
                 TextColumn::make('categoryGroups.name')->label('Category Group')->searchable(),
-                TextColumn::make('supply_code')->searchable(isIndividual: true, isGlobal: false)->searchable()->sortable(),
-                TextColumn::make('particulars')->searchable(isIndividual: true, isGlobal: false)->html()->searchable()->sortable(),
+                TextColumn::make('supply_code')->searchable(isIndividual: true, isGlobal: false)->sortable(),
+                TextColumn::make('particulars')->searchable(isIndividual: true, isGlobal: false)->html()->sortable(),
                 TextColumn::make('specifications')->searchable()->wrap()->sortable(),
                 TextColumn::make('unit_cost')->searchable()
                 ->formatStateUsing(fn ($record) => '₱ '.number_format($record->unit_cost, 2))->sortable(),
