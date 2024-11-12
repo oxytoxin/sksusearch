@@ -80,6 +80,7 @@ class SupplyResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('categoryItems.budgetCategory.name')->label('Budget Category')->sortable()->searchable(),
+                TextColumn::make('categoryItems.id')->label('Account Title ID')->searchable()->sortable(),
                 TextColumn::make('categoryItems.name')->label('Account Title')->searchable(),
                 TextColumn::make('categoryGroups.name')->label('Category Group')->searchable(),
                 TextColumn::make('supply_code')->searchable()->sortable(),
