@@ -15,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Columns\ToggleColumn;
 
 class CategoryItemsResource extends Resource
 {
@@ -39,6 +40,7 @@ class CategoryItemsResource extends Resource
                     ->required(),
                 TextInput::make('uacs_code')->required(),
                 TextInput::make('name')->required(),
+                ToggleColumn::make('is_active')->label('Active'),
             ]);
     }
 
