@@ -40,7 +40,6 @@ class CategoryItemsResource extends Resource
                     ->required(),
                 TextInput::make('uacs_code')->required(),
                 TextInput::make('name')->required(),
-                ToggleColumn::make('is_active')->label('Active'),
             ]);
     }
 
@@ -52,6 +51,7 @@ class CategoryItemsResource extends Resource
                 TextColumn::make('budgetCategory.name')->label('Budget Category')->searchable()->sortable(),
                 TextColumn::make('uacs_code')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
+                ToggleColumn::make('is_active')->label('Active'),
             ])
             ->filters([
                 //
