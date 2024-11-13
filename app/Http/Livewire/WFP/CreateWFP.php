@@ -732,14 +732,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'supplies_particular_id' => 'required',
             'supplies_uom' => 'required',
-            'supplies_cost_per_unit' => 'required|gt:0',
+            // 'supplies_cost_per_unit' => 'required|gt:0',
             'supplies_total_quantity' => 'gt:0',
         ],
         [
             'supplies_particular_id.required' => 'Particulars is required',
             'supplies_uom.required' => 'UOM is required',
             'supplies_cost_per_unit.required' => 'Cost per unit is required',
-            'supplies_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            // 'supplies_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'supplies_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->supplies_estimated_budget);
@@ -1072,14 +1072,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'mooe_particular_id' => 'required',
             'mooe_uom' => 'required',
-            'mooe_cost_per_unit' => 'required|gt:0',
+            // 'mooe_cost_per_unit' => 'required|gt:0',
             'mooe_total_quantity' => 'gt:0',
         ],
         [
             'mooe_particular_id.required' => 'Particulars is required',
             'mooe_uom.required' => 'UOM is required',
             'mooe_cost_per_unit.required' => 'Cost per unit is required',
-            'mooe_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            // 'mooe_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'mooe_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->mooe_estimated_budget);
@@ -1395,14 +1395,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'training_particular_id' => 'required',
             'training_uom' => 'required',
-            'training_cost_per_unit' => 'required|gt:0',
+            // 'training_cost_per_unit' => 'required|gt:0',
             'training_total_quantity' => 'gt:0',
         ],
         [
             'training_particular_id.required' => 'Particulars is required',
             'training_uom.required' => 'UOM is required',
             'training_cost_per_unit.required' => 'Cost per unit is required',
-            'training_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            // 'training_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'training_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->training_estimated_budget);
@@ -1718,14 +1718,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'machine_particular_id' => 'required',
             'machine_uom' => 'required',
-            'machine_cost_per_unit' => 'required|gt:0',
+            // 'machine_cost_per_unit' => 'required|gt:0',
             'machine_total_quantity' => 'gt:0',
         ],
         [
             'machine_particular_id.required' => 'Particulars is required',
             'machine_uom.required' => 'UOM is required',
             'machine_cost_per_unit.required' => 'Cost per unit is required',
-            'machine_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            // 'machine_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'machine_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->machine_estimated_budget);
@@ -2043,14 +2043,14 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->validate([
             'building_particular_id' => 'required',
             'building_uom' => 'required',
-            'building_cost_per_unit' => 'required|gt:0',
+            // 'building_cost_per_unit' => 'required|gt:0',
             'building_total_quantity' => 'gt:0',
         ],
         [
             'building_particular_id.required' => 'Particulars is required',
             'building_uom.required' => 'UOM is required',
             'building_cost_per_unit.required' => 'Cost per unit is required',
-            'building_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
+            // 'building_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'building_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
         $intEstimatedBudget = (int)str_replace(',', '', $this->building_estimated_budget);

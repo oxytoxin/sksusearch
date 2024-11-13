@@ -77,6 +77,7 @@ class ReportSupply extends Component implements HasForms
                 Select::make('supply_id')
                 ->label('Supply')
                 ->options(Supply::pluck('particulars', 'id')->toArray())
+                ->preload()
                 ->required()
                 ->reactive()
                 ->afterStateUpdated(function ($record) {
