@@ -306,7 +306,7 @@
             </div>
         </div>
 
-        @if (in_array(auth()->user()->employee_information->position_id, [24, 12, 15]))
+        @if (in_array(auth()->user()->employee_information->position_id, [24, 12, 15, 38]))
             <div class="space-y-1" x-data="{ open: false }">
                 <button class="flex items-center w-full py-2 pr-2 text-sm font-medium text-left rounded-md text-primary-600 group hover:bg-primary-50 hover:text-primary-900 focus:ring-primary-500 focus:outline-none focus:ring-2" type="button" aria-controls="sub-menu-1" aria-expanded="false" x-on:click="open=!open">
                     <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
