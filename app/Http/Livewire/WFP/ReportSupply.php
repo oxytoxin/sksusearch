@@ -49,6 +49,8 @@ class ReportSupply extends Component implements HasForms
                 'unit_cost' => $this->record->unit_cost,
                 'is_ppmp' => $this->record->is_ppmp,
             ]);
+        }else{
+            $this->data['supply_id'] = null;
         }
     }
 
@@ -76,7 +78,9 @@ class ReportSupply extends Component implements HasForms
             ->schema([
                 Select::make('supply_id')
                 ->label('Supply')
-                ->options(Supply::pluck('particulars', 'id')->toArray())
+                ->searchable()
+                ->getSearchResultsUsing(fn (string $search) => Supply::where('particulars', 'like', "%{$search}%")->orWhere('supply_code', 'like', "%{$search}%")->limit(50)->pluck('particulars', 'id'))
+                ->getOptionLabelUsing(fn ($value): ?string => Supply::find($value)?->particulars.' -> '.Supply::find($value)?->supply_code)
                 ->preload()
                 ->required()
                 ->reactive()
