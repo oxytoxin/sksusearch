@@ -9,6 +9,7 @@ use App\Http\Livewire\WFP\SelectWfpType;
 use App\Http\Livewire\WFP\FundAllocation;
 use App\Http\Livewire\WFP\GeneratePpmp;
 use App\Http\Livewire\WFP\GenerateWfpPpmp;
+use App\Http\Livewire\WFP\PriceListDocument;
 use App\Http\Livewire\WFP\ReportSupply;
 use App\Http\Livewire\WFP\RequestSupply;
 use App\Http\Livewire\WFP\RequestSupplyEdit;
@@ -54,4 +55,5 @@ Route::middleware([
     Route::get('/reported-supply-list', ViewReportedSupply::class)->name('reported-supply-list');
     Route::get('/supply-requested-supplies', SupplyRequestedSupplies::class)->name('supply-requested-suppluies');
     Route::get('/accounting-requested-supplies', AccountingRequestedSupplies::class)->name('accounting-requested-suppluies');
+    Route::get('/pricelist-document', PriceListDocument::class)->name('pricelist-document');
 });
