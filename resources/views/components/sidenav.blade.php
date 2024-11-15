@@ -238,8 +238,8 @@
             </button>
             @php
                 $is_motorpool_head = auth()->user()->employee_information->office_id == 32 && auth()->user()->employee_information->position_id == 12;
-                $isOfficeHead = auth()->user()->employee_information->office->head_employee?->id == auth()->user()->employee_information->id;
-                $headOfficeId = auth()->user()->employee_information->office->id;
+                $isOfficeHead = auth()->user()->employee_information->office?->head_employee?->id == auth()->user()->employee_information->id;
+                $headOfficeId = auth()->user()->employee_information->office?->id;
                 $costCenterExist = DB::table('cost_centers')->where('office_id', $headOfficeId)->exists();
                 $isAssignedPersonnel = DB::table('wpf_personnels')->where('user_id', auth()->user()->id)->exists();
                 $isSupplyChief = auth()->user()->employee_information->office_id == 49 && auth()->user()->employee_information->position_id == 15;
