@@ -249,7 +249,7 @@
                                     ];
                                 @endphp
                                 @for ($i = 1; $i <= 6; $i++)
-                                    <div class="flex-1 text-center">
+                                    <div class="flex-1 text-center cursor-pointer" wire:click="setStep({{ $i }})">
                                         <div class="w-full h-1
                                             @if ($global_index == $i) bg-green-700
                                             @elseif ($global_index > $i) bg-gray-400

@@ -2821,6 +2821,11 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         }
     }
 
+    public function setStep($step)
+    {
+        $this->global_index = $step;
+    }
+
 
     protected function getFormStatePath(): string
     {
