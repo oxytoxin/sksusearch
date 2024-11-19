@@ -4,7 +4,7 @@
             <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 lg:rounded-none lg:rounded-tl-lg">
                 <div class="flex flex-wrap items-center justify-between -mt-4 -ml-4 sm:flex-nowrap">
                     <div class="w-full mt-4 ml-4">
-                        <h3 class="text-lg font-medium leading-6 text-primary-900">Reported Supply Details</h3>
+                        <h3 class="text-lg font-medium leading-6 text-primary-900">Reported Item Details</h3>
                         <p class="mt-4 text-sm text-primary-500">Reported By: {{$record->user->employee_information->full_name}}</p>
                         <p class="mt-1 text-sm text-primary-500"> Particular:
                             <div class="text-sm text-primary-500 italic ml-5">

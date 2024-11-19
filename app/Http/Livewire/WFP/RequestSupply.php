@@ -100,7 +100,7 @@ class RequestSupply extends Component implements HasForms
         WfpRequestTimeline::create([
             'wfp_request_id' => $request->id,
             'user_id' => auth()->id(),
-            'activity' => 'Pending',
+            'activity' => 'Forwarded to Supply',
             'remarks' => 'Forwarded to Supply',
         ]);
         DB::commit();

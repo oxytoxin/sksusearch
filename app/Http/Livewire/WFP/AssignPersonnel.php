@@ -24,7 +24,7 @@ class AssignPersonnel extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return WpfPersonnel::query()->where('office_id', auth()->user()->employee_information->office_id);
+        return WpfPersonnel::query();
     }
 
 
@@ -41,7 +41,7 @@ class AssignPersonnel extends Component implements HasTable
                     ->multiple()
                     ->searchable()
                     ->preload()
-                    ->options(fn () => EmployeeInformation::where('office_id', auth()->user()->employee_information->office_id)
+                    ->options(fn () => EmployeeInformation::where('campus_id', auth()->user()->employee_information->campus_id)
                     ->whereNotIn('id', [auth()->user()->employee_information->id])
                     ->whereDoesntHave('user.wfp_personnel')
                     ->pluck('full_name', 'user_id'))
