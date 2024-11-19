@@ -56,11 +56,12 @@ class SupplyResource extends Resource
                     Textarea::make('particulars')->required(),
                 ]),
                 Grid::make(3)->schema([
-                    TextInput::make('specifications'),
+                    TextInput::make('specifications')->required(),
                     TextInput::make('unit_cost')
-                      ->mask(fn (TextInput\Mask $mask) => $mask
-                        ->numeric()
-                        ->thousandsSeparator(','))
+                    ->reactive()
+                    //   ->mask(fn (TextInput\Mask $mask) => $mask
+                    //     ->numeric()
+                    //     ->thousandsSeparator(','))
                       ->required(fn ($get) => $get('is_ppmp') ? true : false),
                       TextInput::make('uom')->required(),
                 ]),
