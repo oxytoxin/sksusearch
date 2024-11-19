@@ -129,6 +129,32 @@ class Dashboard extends Component
         });
     }
 
+    public function uploadPricesFifth()
+    {
+        $rows = SimpleExcelReader::create(storage_path('csv/final_price_list_5.csv'))->getRows();
+        $rows->each(function ($data) {
+            DB::beginTransaction();
+
+            $budget = Supply::create([
+                'category_item_id' => $data['category_item_id'],
+                'category_item_budget_id' => $data['category_item_budget_id'] == '' ? null : $data['category_item_budget_id'],
+                'category_group_id' => $data['category_group_id'] == '' ? null : $data['category_group_id'],
+                'supply_code' => $data['supply_code'],
+                'particulars' => $data['particulars'],
+                'specifications' => $data['specifications'],
+                'unit_cost' => $data['unit_cost'] == '' ? null : $data['unit_cost'],
+                'is_ppmp' => $data['is_ppmp'] === 'No' ? 0 : 1,
+                'uom' => $data['uom'],
+            ]);
+            DB::commit();
+
+            $this->dialog()->success(
+                $title = 'Operation Success',
+                $description = 'Price List Uploaded!'
+            );   
+        });
+    }
+
 
     public function render()
     {

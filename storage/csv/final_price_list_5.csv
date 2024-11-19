@@ -1,0 +1,66 @@
+particulars,uom,unit_cost,supply_code,specifications,category_item_id,category_item_budget_id,category_group_id,is_ppmp
+Electricity bills/expenses,kWh,,ELEC,,69,,7,No
+Water bills/expenses,cubic m.,,WATER,,68,,6,No
+"Fuel (gasoline, diesel)",liter,,FUEL,,8,9,41,No
+Honoraria - lecturers & resource persons,PAX,,HON,5021199000-Other Professional Services 00000-Other Professional Services,83,,14,No
+Honoraria - facilitators,PAX,,HON,5021199000-Other Professional Services 00000-Other Professional Services,83,,14,No
+Honoraria - judges,PAX,,HON,5021199000-Other Professional Services 00000-Other Professional Services,83,,14,No
+Honoraria - officiating & support personnel,PAX,,HON,5021199000-Other Professional Services 00000-Other Professional Services,83,,14,No
+Food & snacks (in boondocks),PAX,,FOOD,,87,,26,No
+Hotel accommodation of guests,PAX,,ACCOM,,87,,26,No
+Labor and wages - student assistants,PAX,,LW-2024,,84,,23,No
+Labor and wages - agriculture and aquaculture workers,PAX,,LW-2024,,84,,23,No
+Labor and wages - repair/maintenance of buildings and infrastructure,PAX,,LW-2024,,84,,23,No
+"Labor and wages - construction of building/infrastructure (undertaken by administration via job order or ""pakyaw"")",PAX,,LW-2024,,84,,23,No
+Labor and wages - repair/maintenance of semi-expendable machinery/equipment,PAX,,LW-2024,,84,,23,No
+Labor and wages - repair/maintenance of office equipment,PAX,,LW-2024,,84,,23,No
+Labor and wages - repair/maintenance of ICT equipment,PAX,,LW-2024,,84,,23,No
+Labor and wages - repair/maintenance of motor vehicles,PAX,,LW-2024,,84,,23,No
+Labor and wages - repair/maintenance of other machinery/equipment,PAX,,LW-2024,,84,,23,No
+Labor and wages - repair/maintenance of furniture,PAX,,LW-2024,,84,,23,No
+Labor and wages - construction of customized furniture,PAX,,LW-2024,,84,,23,No
+Labor and wages - others,PAX,,LW-2024,,84,,23,No
+Professional services - Job Order,PAX,,PF-2024,,38,,14,No
+Professional services - Contract of Service,PAX,,PF-2024,,38,,14,No
+Consultancy services - ISO 9001:2015,PAX,500000,PF-2024,,82,,,Yes
+Consultancy services,PAX,500000,PF-2024,,82,,,Yes
+Photo and video services (outsider),PAX,,PF-2024,,38,,14,No
+Photo and video services (by PRI/ICT),PAX,,PF-2024,,38,,14,No
+Rental - motor vehicle,Unit,,VEH,,89,,44,No
+Rental - lights,Unit,,PCK,,89,,44,No
+Rental - sounds,Unit,,PCK,,89,,44,No
+Rental - lights and sounds,Unit,,PCK,,89,,44,No
+Rental - other equipment and devices,Unit,,PCK,,89,,44,No
+Rental - chairs and tables,Unit,,PCK,,89,,44,No
+Rental - decorations,Unit,,PCK,,89,,44,No
+"Rental - venue (outside of SKSU), 50 pax or fewer",day,4000,PCK,,89,,44,Yes
+"Rental - venue (outside of SKSU), more than 50 pax or fewer than 100 pax",day,8500,PCK,,89,,44,Yes
+"Rental - venue (outside of SKSU), more than 100 pax or fewer than 300 pax",day,15000,PCK,,89,,44,Yes
+"Rental - venue (outside of SKSU), more than 300 pax or fewer than 500 pax",day,25000,PCK,,89,,44,Yes
+Rental - venue (within SKSU),Unit,,HALL,,89,,44,No
+Fidelity Bond Premiums,Unit,,RLF,,176,,21,No
+Insurance - motor vehicles,PAX,,RLF,,177,56,22,No
+Insurance - buildings,PAX,,RLF,,177,56,22,No
+Insurance - students,PAX,,RLF,,177,56,22,No
+"Taxes, Duties, and Licenses",Unit,,TDL,,178,,20,No
+Traveling expenses - local,PAX,,TRV,,65,,,No
+Traveling expenses - foreign,PAX,,TRV,,66,,,No
+Contingency expenses,Unit,,CONT,5029999000-Other Maintenance and Operating Expenses - 99000-Other Maintenance and Operating Expenses,91,,,No
+Scholarship expenses,Unit,,SCH,,179,,42,No
+Postage and courier expenses,Unit,,PCE,,72,,,No
+Delivery expenses,Unit,,DEL,,88,,27,No
+Printing and publication expenses - by SKSU-PRI,copy,,PRPUB,,86,51,25,No
+Awards/Rewards,piece,,AWD,,75,,37,No
+Prizes,piece,,PRZ,,76,,43,No
+Smoke Emission Services/Stencil,Unit,,OTE,,178,,20,No
+Permits and Licenses,Unit,,OTE,,178,,20,No
+Regulatory Fees/Charges,Unit,,OTE,,178,,20,No
+Telephone Expenses - Mobile,Unit,,OTE,,73,,9,No
+Internet Subscription Expenses,Subscription,,OTE,,74,,11,No
+Legal Services,Unit,,OTE,,35,,,No
+Auditing Services,Unit,,OTE,,36,,13,No
+Janitorial Services,Pax,,OTE,,40,,,No
+Membership Dues and Contributions to Organizations,Unit,,OTE,,59,,,No
+Petty Expenses ,Unit,,OTE,5029999000-Other Maintenance and Operating Expenses - 99000-Other Maintenance and Operating Expenses,91,,,No
+Communication Expenses (pursuant to DBM Circular No. 2024-2),Load,,OTE,5029999000-Other Maintenance and Operating Expenses - 99000-Other Maintenance and Operating Expenses,171,58,38,No
+"Communication Expenses (cellular load purchased directly from retail outlets, e.g., 7/11 and third-party applications, e.g. G-Cash and PayMaya)",Load,,OTE,5029999000-Other Maintenance and Operating Expenses - 99000-Other Maintenance and Operating Expenses,171,58,38,No
