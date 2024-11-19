@@ -9,6 +9,7 @@ use Livewire\Component;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Concerns\InteractsWithTable;
 
 class WFPHistory extends Component implements HasTable
@@ -82,6 +83,16 @@ class WFPHistory extends Component implements HasTable
             ->button()
             ->icon('heroicon-o-pencil')
             ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record->cost_center_id, 'wfpType' => $record->wpf_type_id, 'isEdit' => 1]))
+            ->visible(fn ($record) => $record->is_approved === 500),
+            Viewaction::make('view_remarks')
+            ->label('View Remarks')
+            ->color('success')
+            ->button()
+            ->icon('heroicon-o-eye')
+            ->modalHeading('Remarks')
+            ->modalContent(fn ($record) => view('components.wfp.remarks', [
+                'record' => $record,
+            ]))
             ->visible(fn ($record) => $record->is_approved === 500),
         ];
     }
