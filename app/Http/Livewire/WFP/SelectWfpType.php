@@ -42,8 +42,8 @@ class SelectWfpType extends Component implements HasTable
         $this->fund_cluster = 1;
         $this->wfp_type = WpfType::all()->count();
         // dd(Auth::user()->employee_information->full_name);
-        $head_id = WpfPersonnel::where('user_id', Auth::user()->id)->first()->head_id;
-        if($head_id === Auth::user()->id)
+        $head_id = WpfPersonnel::where('user_id', Auth::user()->id)->first()?->head_id;
+        if($head_id === null)
         {
             $this->user_wfp_id = Auth::user()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
             $this->wfp = WpfType::find($this->user_wfp_id);
@@ -51,14 +51,22 @@ class SelectWfpType extends Component implements HasTable
             $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
             $this->office_id = Auth::user()->employee_information->office->id;
         }else{
-            $this->user_wfp_id = User::where('id', $head_id)->first()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
-            $this->wfp = WpfType::find($this->user_wfp_id);
-            $this->cost_center_id = User::where('id', $head_id)->first()->employee_information->office->cost_centers->first()->id;
-            $this->cost_centers = User::where('id', $head_id)->first()->employee_information->office->cost_centers;
-            $this->office_id = User::where('id', $head_id)->first()->employee_information->office->id;
+            if($head_id === Auth::user()->id)
+            {
+                $this->user_wfp_id = Auth::user()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
+                $this->wfp = WpfType::find($this->user_wfp_id);
+                $this->cost_center_id = Auth::user()->employee_information->office->cost_centers->first()->id;
+                $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
+                $this->office_id = Auth::user()->employee_information->office->id;
+            }else{
+                $this->user_wfp_id = User::where('id', $head_id)->first()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
+                $this->wfp = WpfType::find($this->user_wfp_id);
+                $this->cost_center_id = User::where('id', $head_id)->first()->employee_information->office->cost_centers->first()->id;
+                $this->cost_centers = User::where('id', $head_id)->first()->employee_information->office->cost_centers;
+                $this->office_id = User::where('id', $head_id)->first()->employee_information->office->id;
+            }
         }
-        // $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
-        // $this->office_id = Auth::user()->employee_information->office->id;
+
         $this->types = FundClusterWFP::whereHas('costCenters', function($query) {
             $query->where('office_id', $this->office_id)->whereHas('fundAllocations', function($query) {
                 $query->where('wpf_type_id',  $this->user_wfp_id);
