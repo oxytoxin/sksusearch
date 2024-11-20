@@ -51,6 +51,7 @@ class AssignPersonnel extends Component implements HasTable
                     WpfPersonnel::create([
                         'user_id' => $user_id,
                         'office_id' => auth()->user()->employee_information->office_id,
+                        'head_id' => auth()->user()->id
                     ]);
                 }
 
