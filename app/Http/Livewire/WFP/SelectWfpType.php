@@ -77,10 +77,23 @@ class SelectWfpType extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return CostCenter::query()->whereHas('fundAllocations', function ($query) {
-            $query->where('is_locked', 1);
-        })
-        ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->whereIn('id', $this->cost_centers->pluck('id')->toArray());
+        $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
+        if($user === null)
+        {
+            return CostCenter::query()->whereHas('fundAllocations', function ($query) {
+                $query->where('is_locked', 1);
+            })
+            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->whereIn('id', $this->cost_centers->pluck('id')->toArray());
+        }else{
+            return CostCenter::query()->whereHas('fundAllocations', function ($query) {
+                $query->where('is_locked', 1);
+            })
+            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)
+            ->whereHas('wpfPersonnel', function ($query) {
+                $query->where('user_id', Auth::user()->id);
+            })
+            ->whereIn('id', $this->cost_centers->pluck('id')->toArray());
+        }
     }
 
     protected function getTableColumns()

@@ -19,4 +19,9 @@ class WpfPersonnel extends Model
     {
         return $this->hasMany(Office::class);
     }
+
+    public function cost_center()
+    {
+        return $this->belongsTo(CostCenter::class);
+    }
 }

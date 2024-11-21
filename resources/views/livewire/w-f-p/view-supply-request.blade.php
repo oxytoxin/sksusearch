@@ -17,7 +17,8 @@
                         </div> --}}
                         @php
                             $isFinance = auth()->user()->employee_information->office_id == 25 && (auth()->user()->employee_information->position_id == 12 || auth()->user()->employee_information->position_id == 38);
-                             $isSupplyChief = auth()->user()->employee_information->office_id == 49 && auth()->user()->employee_information->position_id == 15;
+                            $isAccountant = auth()->user()->employee_information->office_id == 3 && auth()->user()->employee_information->position_id == 15;
+                            $isSupplyChief = auth()->user()->employee_information->office_id == 49 && auth()->user()->employee_information->position_id == 15;
                              $supplyChief = App\Models\EmployeeInformation::where('office_id', 49)->where('position_id', 15)->first();
                              $accountant = App\Models\EmployeeInformation::where('office_id', 3)->where('position_id', 15)->first();
                              $finance = App\Models\EmployeeInformation::where('office_id', 25)->where('position_id', 12)->first();
@@ -37,12 +38,12 @@
                             @endif
                             @endif
                         </p>
-                        @if (($record->status == 'Forwarded to Accounting' || $record->status == 'Pending' || $record->status == 'Forwarded to Supply' || $record->status == 'Request Modification' || $record->status == 'Accounting Request Modification' || $record->status = 'Supply Code Assigned') && !$accountant && $record->category_item_id == null)
+                        @if (($record->status == 'Forwarded to Accounting' || $record->status == 'Pending' || $record->status == 'Forwarded to Supply' || $record->status == 'Request Modification' || $record->status == 'Accounting Request Modification' || $record->status = 'Supply Code Assigned') && !$isAccountant && $record->category_item_id == null)
                         <p class="mt-4 text-sm text-primary-500 ">Budget Category : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-1 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-1 text-sm text-primary-500 ">Account Title : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
                         <p class="mt-1 text-sm text-primary-500 ">Title Group : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p>
-                        @elseif(($record->status == 'Forwarded to Accounting') && $accountant && $record->category_item_id == null)
+                        @elseif(($record->status == 'Forwarded to Accounting') && $isAccountant && $record->category_item_id == null)
                         <p class="mt-4 text-sm text-primary-500 ">Budget Category : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
                         <p class="mt-1 text-sm text-primary-500 ">UACS Code : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
                         <p class="mt-1 text-sm text-primary-500 ">Account Title : <span class="italic underline ml-2 font-semibold">Not yet assigned</span>
@@ -50,7 +51,7 @@
                         <div class="flex justify-end">
                             <button class="px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-md hover:bg-primary-500" wire:click="accountingAssign">Assign</button>
                         </div>
-                        @elseif(($record->status == 'Accounting Assigned Data') && $accountant && $record->category_item_id != null)
+                        @elseif(($record->status == 'Accounting Assigned Data') && $isAccountant && $record->category_item_id != null)
                             <p class="mt-4 text-sm text-primary-500 ">Budget Category : {{$record->categoryItems->budgetCategory->name}}</p>
                             <p class="mt-1 text-sm text-primary-500 ">UACS Code : {{$record->categoryItems->uacs_code}}</p>
                             <p class="mt-1 text-sm text-primary-500 ">Account Title : {{$record->categoryItems->name}}</p>
@@ -543,7 +544,7 @@
         @if ($record->status == 'Pending' || $record->status == 'Request Modification')
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToSupply" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Supply</button>
-        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Request Rejected by Supply' || $record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Assigned Data' || $record->status == 'Accounting Request Modification' || $record->status == 'Request Rejected by Accounting' || $record->status == 'Supply Code Assigned') && !$isSupplyChief && !$accountant)
+        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Request Rejected by Supply' || $record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Assigned Data' || $record->status == 'Accounting Request Modification' || $record->status == 'Request Rejected by Accounting' || $record->status == 'Supply Code Assigned') && !$isSupplyChief && !$isAccountant)
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @elseif($isSupplyChief && $record->supply_code == null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
@@ -554,10 +555,10 @@
         <button wire:click="forwardToAccounting" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Accounting</button>
         @elseif(($record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Request Modification') && $isSupplyChief && $record->supply_code != null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
-        @elseif(($record->status == 'Forwarded to Accounting') && $accountant)
+        @elseif(($record->status == 'Forwarded to Accounting') && $isAccountant)
         <button wire:click="$set('forwardRequestToSupply', true)" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Forward Request to Supply</button>
         <button wire:click="rejectRequestAccountingModal" class="mr-1 px-3 py-2.5  bg-red-600 rounded-md font-normal capitalize text-white text-sm">Reject Request</button>
-        @elseif(($record->status == 'Accounting Assigned Data') && $accountant)
+        @elseif(($record->status == 'Accounting Assigned Data') && $isAccountant)
         <a href="{{route('wfp.accounting-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @endif
     </div>
