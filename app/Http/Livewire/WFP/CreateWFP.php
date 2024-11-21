@@ -2736,7 +2736,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         {
                             $draft_amount->delete();
                         }
-                        
+
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
                     }
@@ -2771,7 +2771,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         {
                             $draft_amount->delete();
                         }
-                        
+
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
                     }
@@ -2806,7 +2806,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         {
                             $draft_amount->delete();
                         }
-                        
+
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
                     }
