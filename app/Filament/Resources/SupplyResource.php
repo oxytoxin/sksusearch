@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SupplyResource\RelationManagers;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\ToggleColumn;
 
 class SupplyResource extends Resource
 {
@@ -93,6 +94,7 @@ class SupplyResource extends Resource
                 TextColumn::make('is_ppmp')
                 ->label('PPMP')
                 ->formatStateUsing(fn ($record) => $record->is_ppmp === 1 ? 'Yes' : 'No')->sortable(),
+                ToggleColumn::make('is_active')->label('Active'),
             ])
             ->filters([
                 //
