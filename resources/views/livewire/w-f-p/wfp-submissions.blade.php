@@ -1,9 +1,8 @@
 <div class="space-y-2">
     <div class="flex justify-between items-center">
         <h2 class="font-light capitalize text-primary-600">WFP Submissions</h2>
-        {{-- <a href="{{ route('requisitioner.motorpool.create') }}"
-            class="hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">New
-            Request</a> --}}
+        <a href="{{ route('wfp.deactivated-pricelists') }}"
+            class="hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">View Deactivated Pricelists</a>
     </div>
     <div>
         @if ($wfp_type > 0)
