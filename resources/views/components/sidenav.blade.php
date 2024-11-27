@@ -333,10 +333,10 @@
                 </button>
                 <!-- Expandable link section, show/hide based on state. -->
                 <div class="space-y-1" class="origin-top-left" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'>
-                    <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('archiver.view-archives') }}">
-                        Archived Documents
-                    </a>
                     @if (in_array(auth()->user()->employee_information->position_id, [24]) || auth()->user()->id == 19)
+                        <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('archiver.view-archives') }}">
+                            Archived Documents
+                        </a>
                         <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('archiver.archive-doc.create') }}">
                             Upload Documents
                         </a>
