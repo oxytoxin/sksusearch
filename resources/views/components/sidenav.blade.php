@@ -243,6 +243,7 @@
                 $costCenterExist = DB::table('cost_centers')->where('office_id', $headOfficeId)->exists();
                 $isAssignedPersonnel = DB::table('wpf_personnels')->where('user_id', auth()->user()->id)->exists();
                 $isSupplyChief = auth()->user()->employee_information->office_id == 49 && auth()->user()->employee_information->position_id == 15;
+                $isSupply = auth()->user()->employee_information->office_id == 49;
                 $isFinance = auth()->user()->employee_information->office_id == 25 && (auth()->user()->employee_information->position_id == 12 || auth()->user()->employee_information->position_id == 38);
                 $isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
             @endphp
@@ -301,7 +302,7 @@
                     WFP History
                 </a>
                 @endif
-                @if ($isSupplyChief)
+                @if ($isSupply)
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.supply-requested-suppluies') }}">
                     Requested Supplies
                 </a>

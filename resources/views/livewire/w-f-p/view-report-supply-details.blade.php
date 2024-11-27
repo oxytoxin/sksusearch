@@ -39,7 +39,7 @@
                     <div class="mt-4 ml-4">
                         <h3 class="text-lg font-medium leading-6 text-primary-900">Status</h3>
 
-                        <p class="mt-4 text-sm text-primary-500">Pending</p>
+                        <p class="mt-4 text-sm text-primary-500">{{$record->status}}</p>
                     </div>
                 </div>
             </div>
@@ -56,8 +56,8 @@
                     <div class="p-4">
                         <div class="mt-4">
                             <div class="space-y-4">
-                                <p class="text-md font-semibold text-primary-600">{{ $record->note }}</p>
-                                    @foreach ($record->replies as $reply)
+                                <p class="text-md font-semibold text-primary-600">{!! $record->note !!}</p>
+                                @foreach ($record->replies as $reply)
                                     <div class="p-4 bg-gray-100 rounded-md">
                                         <div class="mt-2 space-y-2">
                                             <div class="ml-4 p-2 bg-white rounded-md">

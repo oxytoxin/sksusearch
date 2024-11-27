@@ -19,6 +19,7 @@
                             $isFinance = auth()->user()->employee_information->office_id == 25 && (auth()->user()->employee_information->position_id == 12 || auth()->user()->employee_information->position_id == 38);
                             $isAccountant = auth()->user()->employee_information->office_id == 3 && auth()->user()->employee_information->position_id == 15;
                             $isSupplyChief = auth()->user()->employee_information->office_id == 49 && auth()->user()->employee_information->position_id == 15;
+                            $isSupply = auth()->user()->employee_information->office_id == 49;
                              $supplyChief = App\Models\EmployeeInformation::where('office_id', 49)->where('position_id', 15)->first();
                              $accountant = App\Models\EmployeeInformation::where('office_id', 3)->where('position_id', 15)->first();
                              $finance = App\Models\EmployeeInformation::where('office_id', 25)->where('position_id', 12)->first();
@@ -27,13 +28,13 @@
                         <p class="mt-1 text-sm text-primary-500">PPMP : {{$record->is_ppmp ? 'Yes' : 'No'}}</p>
                         <p class="mt-1 text-sm text-primary-500">Date Requested : {{Carbon\Carbon::parse($record->created_at)->format('F d, Y h:i A')}}</p>
                         <p class="mt-4 text-sm text-primary-500 ">Supply Code :
-                            @if (($record->status == 'Pending' || $record->status == 'Forwarded to Supply' || $record->status == 'Request Modification' || $record->status == 'Request Rejected by Supply') && !$isSupplyChief && $record->supply_code == null)
+                            @if (($record->status == 'Pending' || $record->status == 'Forwarded to Supply' || $record->status == 'Request Modification' || $record->status == 'Request Rejected by Supply') && !$isSupply && $record->supply_code == null)
                             <span class="italic underline ml-2 text-red-600">To be added by supply</span>
-                            @elseif(($record->status == 'Pending' || $record->status == 'Forwarded to Supply') && $isSupplyChief && $record->supply_code == null)
+                            @elseif(($record->status == 'Pending' || $record->status == 'Forwarded to Supply') && $isSupply && $record->supply_code == null)
                             <button class="italic underline ml-2 font-semibold" wire:click="$set('assignSupplyCode',true)">(Assign Supply Code)</button>
                             @else
                             <span class="mt-1 text-sm text-primary-500">{{$record->supply_code}}</span>
-                            @if ($isSupplyChief && $record->status == 'Accounting Request Modification')
+                            @if ($isSupply && $record->status == 'Accounting Request Modification')
                             <button class="italic underline ml-2" wire:click="openModifySupplyCodeModal">(Click to modify)</button>
                             @endif
                             @endif
@@ -544,16 +545,16 @@
         @if ($record->status == 'Pending' || $record->status == 'Request Modification')
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToSupply" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Supply</button>
-        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Request Rejected by Supply' || $record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Assigned Data' || $record->status == 'Accounting Request Modification' || $record->status == 'Request Rejected by Accounting' || $record->status == 'Supply Code Assigned') && !$isSupplyChief && !$isAccountant)
+        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Request Rejected by Supply' || $record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Assigned Data' || $record->status == 'Accounting Request Modification' || $record->status == 'Request Rejected by Accounting' || $record->status == 'Supply Code Assigned') && !$isSupply && !$isAccountant)
         <a href="{{route('wfp.request-supply-list')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
-        @elseif($isSupplyChief && $record->supply_code == null)
+        @elseif($isSupply && $record->supply_code == null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="modifyRequest" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Modify Request</button>
         <button wire:click="rejectRequest" class="mr-1 px-3 py-2.5  bg-red-600 rounded-md font-normal capitalize text-white text-sm">Reject Request</button>
-        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Supply Code Assigned') && $isSupplyChief && $record->supply_code != null)
+        @elseif(($record->status == 'Forwarded to Supply' || $record->status == 'Supply Code Assigned') && $isSupply && $record->supply_code != null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         <button wire:click="forwardToAccounting" class="mr-1 px-3 py-2.5  bg-primary-600 rounded-md font-normal capitalize text-white text-sm">Forward to Accounting</button>
-        @elseif(($record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Request Modification') && $isSupplyChief && $record->supply_code != null)
+        @elseif(($record->status == 'Forwarded to Accounting' || $record->status == 'Accounting Request Modification') && $isSupply && $record->supply_code != null)
         <a href="{{route('wfp.supply-requested-suppluies')}}" class="mr-1 px-3 py-2.5  bg-white rounded-md font-normal capitalize text-primary-600 text-sm">Cancel</a>
         @elseif(($record->status == 'Forwarded to Accounting') && $isAccountant)
         <button wire:click="$set('forwardRequestToSupply', true)" class="mr-1 px-3 py-2.5  bg-yellow-600 rounded-md font-normal capitalize text-white text-sm">Forward Request to Supply</button>
