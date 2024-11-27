@@ -30,10 +30,12 @@ class FundAllocation extends Component implements HasTable
     public $wfp_type;
     public $fund_cluster;
     public $group_keys = [];
+    public $isPresident;
     public $data = [];
 
     public function mount($filter)
     {
+        $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
         if($filter)
         {
             $this->filter($filter);
@@ -124,7 +126,7 @@ class FundAllocation extends Component implements HasTable
 
             // })
             ->requiresConfirmation()
-            ->visible(fn ($record) => !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists()),
+            ->visible(fn ($record) => !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$this->isPresident),
             Action::make('edit_fund')
             ->icon('ri-pencil-line')
             ->label('Edit fund')
@@ -158,7 +160,7 @@ class FundAllocation extends Component implements HasTable
 
             // })
             // ->requiresConfirmation()
-            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()),
+            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()  && !$this->isPresident),
             Action::make('lock_fund')
             ->icon('ri-lock-line')
             ->label('Lock fund')
@@ -173,7 +175,7 @@ class FundAllocation extends Component implements HasTable
                 Notification::make()->title('Operation Success')->body('Fund Successfully Locked')->success()->send();
 
             })
-            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists())
+            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()  && !$this->isPresident)
         ];
     }
 

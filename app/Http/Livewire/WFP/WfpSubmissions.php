@@ -24,9 +24,11 @@ class WfpSubmissions extends Component implements HasTable
 
     public $wfp_type;
     public $fund_cluster;
+    public $isPresident;
 
     public function mount()
     {
+        $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
         $this->fund_cluster = 1;
         $this->wfp_type = WpfType::all()->count();
     }
@@ -93,7 +95,7 @@ class WfpSubmissions extends Component implements HasTable
             ->icon('heroicon-o-check-circle')
             ->action(fn ($record) => $record->update(['is_approved' => 1]))
             ->requiresConfirmation()
-            ->visible(fn ($record) => $record->is_approved === 0),
+            ->visible(fn ($record) => $record->is_approved === 0 && !$this->isPresident),
             Action::make('modify')
             ->label('Request Modification')
             ->color('danger')
@@ -127,7 +129,7 @@ class WfpSubmissions extends Component implements HasTable
                 // $record->fundAllocation->fundDraft->draft_items()->delete();
                 // $record->fundAllocation->fundDraft->delete();
             })->requiresConfirmation()
-            ->visible(fn ($record) => $record->is_approved === 0),
+            ->visible(fn ($record) => $record->is_approved === 0 && !$this->isPresident),
         ];
     }
 
