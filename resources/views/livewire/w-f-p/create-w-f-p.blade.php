@@ -748,6 +748,15 @@
                                         </div>
                                         <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                                             <div>
+                                                @php
+                                                $sumAllocated = 0;
+                                                $sumTotal = 0;
+                                                $sumBalance = 0;
+        
+                                                $sumAllocated = $record->fundAllocations->sum('initial_amount');
+                                                $sumTotal = array_sum(array_column($current_balance, 'current_total'));
+                                                $sumBalance = $sumAllocated - $sumTotal;
+                                                @endphp
                                                 <div class="flex justify-between space-x-3">
                                                     <span>Allocated Fund: </span><span>₱ {{number_format($sumAllocated, 2)}}</span>
                                                 </div>
