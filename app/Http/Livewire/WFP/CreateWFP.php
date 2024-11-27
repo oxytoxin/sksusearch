@@ -457,40 +457,40 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     case 2:
                         return Supply::whereHas('categoryItems', function ($query) {
                             $query->where('budget_category_id', 1);
-                        })->where('particulars', 'like', "%{$search}%")
+                        })->where('is_active', 1)->where('particulars', 'like', "%{$search}%")
                           ->orWhere('specifications', 'like', "%{$search}%")
                           ->limit(50)->pluck('particulars', 'id');
                         break;
                     case 3:
                         return Supply::whereHas('categoryItems', function ($query) {
                             $query->where('budget_category_id', 2);
-                        })->where('particulars', 'like', "%{$search}%")
+                        })->where('is_active', 1)->where('particulars', 'like', "%{$search}%")
                         ->orWhere('specifications', 'like', "%{$search}%")
                         ->limit(50)->pluck('particulars', 'id');
                         break;
                     case 4:
                         return Supply::whereHas('categoryItems', function ($query) {
                             $query->where('budget_category_id', 3);
-                        })->where('particulars', 'like', "%{$search}%")
+                        })->where('is_active', 1)->where('particulars', 'like', "%{$search}%")
                         ->orWhere('specifications', 'like', "%{$search}%")
                         ->limit(50)->pluck('particulars', 'id');
                         break;
                     case 5:
                         return Supply::whereHas('categoryItems', function ($query) {
                             $query->where('budget_category_id', 4);
-                        })->where('particulars', 'like', "%{$search}%")
+                        })->where('is_active', 1)->where('particulars', 'like', "%{$search}%")
                         ->orWhere('specifications', 'like', "%{$search}%")
                         ->limit(50)->pluck('particulars', 'id');
                         break;
                     case 6:
                         return Supply::whereHas('categoryItems', function ($query) {
                             $query->where('budget_category_id', 5);
-                        })->where('particulars', 'like', "%{$search}%")
+                        })->where('is_active', 1)->where('particulars', 'like', "%{$search}%")
                         ->orWhere('specifications', 'like', "%{$search}%")
                         ->limit(50)->pluck('particulars', 'id');
                         break;
                     default:
-                        return Supply::where('particulars', 'like', "%{$search}%")
+                        return Supply::where('is_active', 1)->where('particulars', 'like', "%{$search}%")
                         ->orWhere('specifications', 'like', "%{$search}%")
                         ->limit(50)->pluck('particulars', 'id');
                         break;

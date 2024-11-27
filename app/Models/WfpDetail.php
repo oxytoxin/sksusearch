@@ -12,7 +12,7 @@ class WfpDetail extends Model
 
     public function wfp()
     {
-        return $this->belongsTo(Wfp::class);
+        return $this->belongsTo(Wfp::class, 'wfp_id', 'id');
     }
 
     public function budgetCategory()
