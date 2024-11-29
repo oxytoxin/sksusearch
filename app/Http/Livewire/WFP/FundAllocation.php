@@ -175,7 +175,22 @@ class FundAllocation extends Component implements HasTable
                 Notification::make()->title('Operation Success')->body('Fund Successfully Locked')->success()->send();
 
             })
-            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()  && !$this->isPresident)
+            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()  && !$this->isPresident),
+            Action::make('unlock_fund')
+            ->icon('ri-lock-line')
+            ->label('Unlock fund')
+            ->button()
+            ->color('danger')
+            ->requiresConfirmation()
+            ->action(function($record) {
+                $record->fundAllocations()->update([
+                    'is_locked' => false
+                ]);
+
+                Notification::make()->title('Operation Success')->body('Fund Successfully Unlocked')->success()->send();
+
+            })
+            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident)
         ];
     }
 
