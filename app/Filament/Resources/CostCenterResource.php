@@ -73,6 +73,7 @@ class CostCenterResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')->searchable()->sortable(),
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('office.name')->wrap()->label('Office')->searchable()->sortable(),
                 TextColumn::make('head')
