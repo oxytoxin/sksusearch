@@ -9,7 +9,7 @@
             <div class="mt-8 flow-root">
               <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                  {{-- <table class="min-w-full divide-y divide-gray-500">
+                  <table class="min-w-full divide-y divide-gray-500">
                     <thead>
                       <tr class="divide-x divide-gray-500">
                         <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Cost Center</th>
@@ -44,20 +44,17 @@
                           </tr>
                           @endforelse
                     </tbody>
-                  </table> --}}
-                </div>
-                <div>
-                  <button wire:click="updateAmounts" class="bg-green-600 p-4 text-gray-50 rounded-lg">Update</button>
+                  </table>
                 </div>
                 {{-- <div>
-                  <button wire:click="removeAmounts" class="mt-4 bg-green-600 p-4 text-gray-50 rounded-lg">Remove</button>
+                  <button wire:click="updateAmounts" class="bg-green-600 p-4 text-gray-50 rounded-lg">Update</button>
                 </div> --}}
-                <table class="min-w-full divide-y divide-gray-500 mt-10">
+                
+                {{-- <table class="min-w-full divide-y divide-gray-500 mt-10">
                   <thead>
                     <tr class="divide-x divide-gray-500">
                       <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Cost Center</th>
                       <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Head</th>
-                      {{-- <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Created By</th> --}}
                       <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Fund Cluster</th>
                       <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Fund Allocations</th>
                       <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Fund Item Total</th>
@@ -78,23 +75,14 @@
                         </td>
                         <td class="whitespace-nowrap p-4 text-sm text-gray-500">
                           @foreach ($costCenter->fundAllocations->where('initial_amount', '!=' ,0) as $fundAllocation)
-                              {{-- @foreach ($fundAllocation as $allocation) --}}
                                   <div class="mb-4">
                                       <strong>Allocation ID:</strong> {{ $fundAllocation->id }}
                                       <br>
                                       <strong>Title Group: </strong>{{$fundAllocation->category_group_id}} - {{ $fundAllocation->categoryGroup?->name }}
                                       <br>
                                       <strong>Initial Amount: </strong>{{$fundAllocation->initial_amount}}
-                                      {{-- <ul>
-                                          @foreach ($fundDraft->draft_items as $item)
-                                              <li>
-                                                  Title Group: {{ $item->title_group }} - 
-                                                  Total Budget: {{ number_format($item->total_budget, 2) }}
-                                              </li>
-                                          @endforeach
-                                      </ul> --}}
+                                      
                                   </div>
-                              {{-- @endforeach --}}
                           @endforeach
                       </td>
                         <td class="whitespace-nowrap p-4 text-sm text-gray-500">
@@ -145,9 +133,8 @@
                 
                    
         
-                    <!-- More people... -->
                   </tbody>
-                </table>
+                </table> --}}
 
               </div>
             </div>
