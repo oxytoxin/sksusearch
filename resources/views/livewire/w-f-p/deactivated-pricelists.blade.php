@@ -46,9 +46,9 @@
                     </tbody>
                   </table> --}}
                 </div>
-                {{-- <div>
+                <div>
                   <button wire:click="updateAmounts" class="bg-green-600 p-4 text-gray-50 rounded-lg">Update</button>
-                </div> --}}
+                </div>
                 {{-- <div>
                   <button wire:click="removeAmounts" class="mt-4 bg-green-600 p-4 text-gray-50 rounded-lg">Remove</button>
                 </div> --}}
