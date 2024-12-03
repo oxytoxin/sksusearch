@@ -265,7 +265,7 @@ class ViewSupplyRequest extends Component
             'category_group_id' => $this->record->category_group_id,
             'supply_code' => $this->record->supply_code,
             'particulars' => $this->record->particulars,
-            'specifications' => $this->record->specifications,
+            'specifications' => $this->record->specification,
             'unit_cost' => $this->record->unit_cost,
             'uom' => $this->record->uom,
             'is_ppmp' => $this->record->is_ppmp,
