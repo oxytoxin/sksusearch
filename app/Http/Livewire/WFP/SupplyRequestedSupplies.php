@@ -34,7 +34,7 @@ class SupplyRequestedSupplies extends Component implements HasTable
         return [
             Tables\Columns\TextColumn::make('user.name')->label('Requested By')->searchable(),
             Tables\Columns\TextColumn::make('particulars')->html()->wrap()->label('Particular')->searchable(),
-            Tables\Columns\TextColumn::make('specification')->searchable(),
+            Tables\Columns\TextColumn::make('specification')->wrap()->searchable(),
             Tables\Columns\TextColumn::make('unit_cost')
             ->formatStateUsing(fn ($record) => '₱ '.number_format($record->unit_cost, 2))
             ->label('Unit Cost')->searchable(),
