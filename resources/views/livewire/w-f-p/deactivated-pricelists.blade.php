@@ -46,11 +46,11 @@
                     </tbody>
                   </table>
                 </div>
-                {{-- <div>
+                <div>
                   <button wire:click="updateAmounts" class="bg-green-600 p-4 text-gray-50 rounded-lg">Update</button>
-                </div> --}}
+                </div>
                 
-                {{-- <table class="min-w-full divide-y divide-gray-500 mt-10">
+                <table class="min-w-full divide-y divide-gray-500 mt-10">
                   <thead>
                     <tr class="divide-x divide-gray-500">
                       <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Cost Center</th>
@@ -134,7 +134,7 @@
                    
         
                   </tbody>
-                </table> --}}
+                </table>
 
               </div>
             </div>
