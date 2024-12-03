@@ -9,7 +9,7 @@
             <div class="mt-8 flow-root">
               <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                  <table class="min-w-full divide-y divide-gray-500">
+                  {{-- <table class="min-w-full divide-y divide-gray-500">
                     <thead>
                       <tr class="divide-x divide-gray-500">
                         <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Cost Center</th>
@@ -44,12 +44,14 @@
                           </tr>
                           @endforelse
                     </tbody>
-                  </table>
+                  </table> --}}
                 </div>
                 <div>
                   <button wire:click="updateAmounts" class="bg-green-600 p-4 text-gray-50 rounded-lg">Update</button>
                 </div>
-                
+                {{-- <div>
+                  <button wire:click="removeAmounts" class="mt-4 bg-green-600 p-4 text-gray-50 rounded-lg">Remove</button>
+                </div> --}}
                 <table class="min-w-full divide-y divide-gray-500 mt-10">
                   <thead>
                     <tr class="divide-x divide-gray-500">
