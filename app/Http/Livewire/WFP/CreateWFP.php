@@ -244,6 +244,8 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'balance' => $allocation->balance,
                     ];
                 })->toArray();
+                // dd($this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts);
+               
             }else{
                 $this->current_balance = [];
             }
@@ -2650,31 +2652,38 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->supplies[$index]['particular_id'];
             $uom = $this->supplies[$index]['uom'];
             $remarks = $this->supplies[$index]['remarks'];
+            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->first();
+            $wfp_draft_id = $draft_item->fund_draft_id;
+            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->first();
-                        $draft_amount->current_total -= $budget;
-                        $draft_amount->balance += $budget;
-                        $draft_amount->save();
-
-                        if($draft_amount->current_total <= 0)
-                        {
-                            $draft_amount->delete();
-                        }
-
+                        
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
+                        
+                            $draft_amount->current_total -= $budget;
+                            $draft_amount->balance += $budget;
+                            $draft_amount->save();
+                            
+                            if($draft_amount->current_total <= 0)
+                            {
+                                $draft_amount->delete();
+                            }
+                        
+                        break;
                     }
-                    break;
                 }
             }
-            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->first();
+           
             $draft_item->delete();
+
+           
             // Remove the supply at the given index
             unset($this->supplies[$index]);
-            unset($this->current_balance[$key]);
+            // unset($this->current_balance[$key]);
             // Reset the array indices to avoid undefined index issues
             $this->supplies = array_values($this->supplies);
         }
@@ -2689,10 +2698,18 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->mooe[$index]['particular_id'];
             $uom = $this->mooe[$index]['uom'];
             $remarks = $this->mooe[$index]['remarks'];
+            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->first();
+            $wfp_draft_id = $draft_item->fund_draft_id;
+            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->first();
+                        
+                        $this->current_balance[$key]['current_total'] -= $budget;
+                        $this->current_balance[$key]['balance'] += $budget;
+
                         $draft_amount->current_total -= $budget;
                         $draft_amount->balance += $budget;
                         $draft_amount->save();
@@ -2702,15 +2719,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $draft_amount->delete();
                         }
 
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
+                        break;
                     }
-                    break;
                 }
             }
+          
+            $draft_item->delete();
             // Remove the supply at the given index
             unset($this->mooe[$index]);
-            unset($this->mooe[$index]);
+            // unset($this->current_balance[$index]);
             // Reset the array indices to avoid undefined index issues
             $this->mooe = array_values($this->mooe);
         }
@@ -2721,13 +2738,21 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if (isset($this->trainings[$index])) {
             $budget = $this->trainings[$index]['estimated_budget'];
             $title_group = $this->trainings[$index]['title_group'];
-            $particular_id = $this->supplies[$index]['particular_id'];
-            $uom = $this->supplies[$index]['uom'];
-            $remarks = $this->supplies[$index]['remarks'];
+            $particular_id = $this->trainings[$index]['particular_id'];
+            $uom = $this->trainings[$index]['uom'];
+            $remarks = $this->trainings[$index]['remarks'];
+            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->first();
+            $wfp_draft_id = $draft_item->fund_draft_id;
+            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+            
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->first();
+                        
+                        $this->current_balance[$key]['current_total'] -= $budget;
+                        $this->current_balance[$key]['balance'] += $budget;
+
                         $draft_amount->current_total -= $budget;
                         $draft_amount->balance += $budget;
                         $draft_amount->save();
@@ -2737,15 +2762,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $draft_amount->delete();
                         }
 
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
+                        break;
                     }
-                    break;
                 }
             }
+
+            $draft_item->delete();
             // Remove the supply at the given index
             unset($this->trainings[$index]);
-            unset($this->trainings[$index]);
+            // unset($this->current_balance[$index]);
             // Reset the array indices to avoid undefined index issues
             $this->trainings = array_values($this->trainings);
         }
@@ -2756,13 +2781,21 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if (isset($this->machines[$index])) {
             $budget = $this->machines[$index]['estimated_budget'];
             $title_group = $this->machines[$index]['title_group'];
-            $particular_id = $this->supplies[$index]['particular_id'];
-            $uom = $this->supplies[$index]['uom'];
-            $remarks = $this->supplies[$index]['remarks'];
+            $particular_id = $this->machines[$index]['particular_id'];
+            $uom = $this->machines[$index]['uom'];
+            $remarks = $this->machines[$index]['remarks'];
+            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->first();
+            $wfp_draft_id = $draft_item->fund_draft_id;
+            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+
+            
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->first();
+                        $this->current_balance[$key]['current_total'] -= $budget;
+                        $this->current_balance[$key]['balance'] += $budget;
+
                         $draft_amount->current_total -= $budget;
                         $draft_amount->balance += $budget;
                         $draft_amount->save();
@@ -2772,15 +2805,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $draft_amount->delete();
                         }
 
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
+                        break;
                     }
-                    break;
                 }
             }
+
+            $draft_item->delete();
             // Remove the supply at the given index
-            unset($this->supplies[$index]);
             unset($this->machines[$index]);
+            // unset($this->current_balance[$index]);
             // Reset the array indices to avoid undefined index issues
             $this->machines = array_values($this->machines);
         }
@@ -2791,13 +2824,20 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if (isset($this->buildings[$index])) {
             $budget = $this->buildings[$index]['estimated_budget'];
             $title_group = $this->buildings[$index]['title_group'];
-            $particular_id = $this->supplies[$index]['particular_id'];
-            $uom = $this->supplies[$index]['uom'];
-            $remarks = $this->supplies[$index]['remarks'];
+            $particular_id = $this->buildings[$index]['particular_id'];
+            $uom = $this->buildings[$index]['uom'];
+            $remarks = $this->buildings[$index]['remarks'];
+            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->first();
+            $wfp_draft_id = $draft_item->fund_draft_id;
+            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->first();
+                        $this->current_balance[$key]['current_total'] -= $budget;
+                        $this->current_balance[$key]['balance'] += $budget;
+
                         $draft_amount->current_total -= $budget;
                         $draft_amount->balance += $budget;
                         $draft_amount->save();
@@ -2807,15 +2847,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $draft_amount->delete();
                         }
 
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
+                        break;
                     }
-                    break;
                 }
             }
+
+            $draft_item->delete();
             // Remove the supply at the given index
             unset($this->buildings[$index]);
-            unset($this->buildings[$index]);
+            // unset($this->current_balance[$index]);
             // Reset the array indices to avoid undefined index issues
             $this->buildings = array_values($this->buildings);
         }

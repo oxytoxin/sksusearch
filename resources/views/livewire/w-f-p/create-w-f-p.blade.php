@@ -106,6 +106,7 @@
                                             </td>
                                         </tr>
                                     @forelse ($current_balance as $item)
+
                                     <tr class="border-t border-gray-300" x-show="!open">
                                         <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['category_group']}}</td>
                                         <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium text-gray-900 sm:pl-3">₱ {{number_format($item['initial_amount'], 2)}}</td>
@@ -179,7 +180,6 @@
                                             </td>
                                         </tr>
                                     @forelse ($current_balance as $key => $item)
-                                    {{-- @dump($current_balance[$key]['current_total']) --}}
                                     <tr class="border-t border-gray-300" x-show="opens">
                                         <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$current_balance[$key]['category_group']}}</td>
                                         <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3"></td>
