@@ -26,7 +26,7 @@ class SupplyRequestedSupplies extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return WfpRequestedSupply::query()->whereIn('status', ['Forwarded to Supply', 'Supply Code Assigned', 'Accounting Request Modification']);
+        return WfpRequestedSupply::query();
     }
 
     protected function getTableColumns()

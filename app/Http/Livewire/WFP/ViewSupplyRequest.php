@@ -267,6 +267,7 @@ class ViewSupplyRequest extends Component
             'particulars' => $this->record->particulars,
             'specifications' => $this->record->specifications,
             'unit_cost' => $this->record->unit_cost,
+            'uom' => $this->record->uom,
             'is_ppmp' => $this->record->is_ppmp,
         ]);
 
