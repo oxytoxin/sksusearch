@@ -8,10 +8,16 @@ use Livewire\Component;
 class WfpReport extends Component
 {
     public $record;
+    public $wfpDetails;
+    public $program;
+    public $balance;
 
     public function mount($record)
     {
         $this->record = Wfp::find($record);
+        $this->wfpDetails = $this->record->wfpDetails()->get();
+        $this->program = $this->wfpDetails->sum('estimated_budget');
+        $this->balance = $this->record->total_allocated_fund - $this->program;
     }
 
     public function redirectBack()
