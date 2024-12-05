@@ -519,10 +519,10 @@
                                               @forelse ($supplies as $item)
                                               <tr class="border-t border-gray-300">
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
