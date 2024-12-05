@@ -14,6 +14,7 @@
                       <tr class="divide-x divide-gray-500">
                         <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Cost Center</th>
                         <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Head</th>
+                        <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Fund Cluster</th>
                         <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Created By</th>
                         <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Deactivated Items</th>
                         <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pr-0">Created At</th>
@@ -24,6 +25,7 @@
                         <tr class="divide-x divide-gray-500">
                             <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">{{$item->costCenter->name}}</td>
                             <td class="whitespace-nowrap p-4 text-sm text-gray-500">{{$item->costCenter->office->head_employee->full_name}}</td>
+                            <td class="whitespace-nowrap p-4 text-sm text-gray-500">{{$item->fundClusterWfp->name}}</td>
                             <td class="whitespace-nowrap p-4 text-sm text-gray-500">{{$item->user->employee_information->full_name}}</td>
                             <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm text-gray-500 sm:pr-0">
                                 <ul>
