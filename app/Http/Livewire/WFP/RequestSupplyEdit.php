@@ -8,6 +8,7 @@ use WireUi\Traits\Actions;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -38,16 +39,18 @@ class RequestSupplyEdit extends Component implements HasForms
             Grid::make(2)->schema([
                 Grid::make(1)
                 ->schema([
-                    RichEditor::make('particulars')
-                    ->required()
-                    ->toolbarButtons([
-                        'bold',
-                        'bulletList',
-                        'edit',
-                        'italic',
-                        'orderedList',
-                        'preview',
-                    ])
+                    Textarea::make('particulars')
+                    ->required(),
+                    // RichEditor::make('particulars')
+                    // ->required()
+                    // ->toolbarButtons([
+                    //     'bold',
+                    //     'bulletList',
+                    //     'edit',
+                    //     'italic',
+                    //     'orderedList',
+                    //     'preview',
+                    // ])
                 ]),
                 Grid::make(3)
                 ->schema([

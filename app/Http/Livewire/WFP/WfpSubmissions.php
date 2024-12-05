@@ -102,17 +102,10 @@ class WfpSubmissions extends Component implements HasTable
             ->button()
             ->icon('heroicon-o-pencil-alt')
             ->form([
-                Forms\Components\RichEditor::make('reason')
+                Forms\Components\Textarea::make('reason')
                 ->label('Reason for Modification')
                 ->required()
-                    ->toolbarButtons([
-                        'bold',
-                        'bulletList',
-                        'edit',
-                        'italic',
-                        'orderedList',
-                        'preview',
-                    ])
+   
             ])
             ->action(function ($record, $data) {
                 WfpApprovalRemark::create([

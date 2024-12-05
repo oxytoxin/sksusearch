@@ -36,7 +36,8 @@ class RequestSupply extends Component implements HasForms
             Grid::make(2)->schema([
                 Grid::make(1)
                 ->schema([
-                    Textarea::make('particulars'),
+                    Textarea::make('particulars')
+                    ->required(),
                 //     RichEditor::make('particulars')
                 //     ->required()
                 //     ->toolbarButtons([

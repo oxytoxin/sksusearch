@@ -142,16 +142,18 @@ class ReportSupply extends Component implements HasForms
                     ->label('Error Type')
                     ->options(ErrorQuery::pluck('description', 'id')->toArray())
                     ->required(),
-                    RichEditor::make('note')
-                    ->required()
-                    ->toolbarButtons([
-                        'bold',
-                        'bulletList',
-                        'edit',
-                        'italic',
-                        'orderedList',
-                        'preview',
-                    ]),
+                    Textarea::make('note')
+                    ->required(),
+                    // RichEditor::make('note')
+                    // ->required()
+                    // ->toolbarButtons([
+                    //     'bold',
+                    //     'bulletList',
+                    //     'edit',
+                    //     'italic',
+                    //     'orderedList',
+                    //     'preview',
+                    // ]),
                 ]),
             ])
             ->columns(1)
