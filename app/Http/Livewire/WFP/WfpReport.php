@@ -15,7 +15,7 @@ class WfpReport extends Component
     public function mount($record)
     {
         $this->record = Wfp::find($record);
-        $this->wfpDetails = $this->record->wfpDetails()->get();
+        $this->wfpDetails = $this->record->wfpDetails()->where('is_ppmp', 1)->get();
         $this->program = $this->wfpDetails->sum('estimated_budget');
         $this->balance = $this->record->total_allocated_fund - $this->program;
     }
