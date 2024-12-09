@@ -21,6 +21,7 @@ use Filament\Tables\Actions\DeleteAction;
 
 class AssignPersonnel extends Component implements HasTable
 {
+    public $fund_cluster;
     use InteractsWithTable;
 
     protected function getTableQuery()
@@ -36,23 +37,38 @@ class AssignPersonnel extends Component implements HasTable
              ->icon('heroicon-o-plus-circle')
              ->button()
              ->form([
+                Select::make('fund_cluster_w_f_p_s_id')
+                ->label('Fund Cluster')
+                ->required()
+                ->searchable()
+                ->preload()
+                ->reactive()
+                ->options(fn () => FundClusterWFP::whereIn('id', [1,2,3,4,5,6,7])->pluck('name', 'id')),
                 Select::make('user_id')
                     ->label('This is all the available users in this campus')
                     ->required()
                     ->searchable()
                     ->multiple()
                     ->preload()
-                    ->options(fn () => EmployeeInformation::where('campus_id', auth()->user()->employee_information->campus_id)
-                    ->whereNotIn('id', [auth()->user()->employee_information->id])
-                    ->whereDoesntHave('user.wfp_personnel')
-                    ->pluck('full_name', 'user_id')),
-                    Select::make('fund_cluster_w_f_p_s_id')
-                    ->label('Fund Cluster')
-                    ->required()
-                    ->searchable()
-                    ->preload()
                     ->reactive()
-                    ->options(fn () => FundClusterWFP::whereIn('id', [1,2,3,4,5,6,7])->pluck('name', 'id')),
+                    ->options(function ($get) {
+                        if ($get('fund_cluster_w_f_p_s_id') === '3') {
+                            return EmployeeInformation::where('position_id', 39)
+                            ->whereNotIn('id', [auth()->user()->employee_information->id])
+                            ->whereDoesntHave('user.wfp_personnel')
+                            ->pluck('full_name', 'user_id');
+                        }else{
+
+                            return EmployeeInformation::where('campus_id', auth()->user()->employee_information->campus_id)
+                            ->whereNotIn('id', [auth()->user()->employee_information->id])
+                            ->whereDoesntHave('user.wfp_personnel')
+                            ->pluck('full_name', 'user_id');
+                        }
+                    }),
+                    //  ->options(fn () => EmployeeInformation::where('campus_id', auth()->user()->employee_information->campus_id)
+                    // ->whereNotIn('id', [auth()->user()->employee_information->id])
+                    // ->whereDoesntHave('user.wfp_personnel')
+                    // ->pluck('full_name', 'user_id')),
                     Select::make('cost_center_id')
                     ->label('Cost Center')
                     ->required()
