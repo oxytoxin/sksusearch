@@ -9,7 +9,7 @@
             <div class="mt-8 flow-root">
               <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                  <table class="min-w-full divide-y divide-gray-500">
+                  {{-- <table class="min-w-full divide-y divide-gray-500">
                     <thead>
                       <tr class="divide-x divide-gray-500">
                         <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Cost Center</th>
@@ -42,22 +42,26 @@
                           <tr class="divide-x divide-gray-500">
                             <td colspan="5" class="whitespace-nowrap py-4 pl-4 pr-4 text-md italic text-gray-500 sm:pr-0 text-center">
                             No Record
-                            </td>   
+                            </td>
                           </tr>
                           @endforelse
                     </tbody>
-                  </table>
+                  </table> --}}
                 </div>
-                {{-- <div>
+                <div>
                   <button wire:click="updateAmounts" class="bg-green-600 p-4 text-gray-50 rounded-lg">Update</button>
-                </div> --}}
-                {{-- <div>
+                </div>
+                <div>
                   <button wire:click="removeAmounts" class="mt-4 bg-green-600 p-4 text-gray-50 rounded-lg">Remove</button>
-                </div> --}}
-                {{-- <table class="min-w-full divide-y divide-gray-500 mt-10">
+                </div>
+                <div>
+                    <button wire:click="deleteItems" class="mt-4 bg-green-600 p-4 text-gray-50 rounded-lg">Delete Items</button>
+                  </div>
+                <table class="min-w-full divide-y divide-gray-500 mt-10">
                   <thead>
                     <tr class="divide-x divide-gray-500">
                       <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Cost Center</th>
+                      <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
                       <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Head</th>
                       <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Fund Cluster</th>
                       <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Fund Allocations</th>
@@ -75,6 +79,9 @@
                             {{ $costCenter->office->head_employee?->full_name }}
                         </td>
                         <td class="whitespace-nowrap p-4 text-sm text-gray-500">
+                            {{ $costCenter->office->head_employee?->full_name }}
+                        </td>
+                        <td class="whitespace-nowrap p-4 text-sm text-gray-500">
                           {{ $costCenter->fundAllocations()->first()->fundClusterWFP->name }}
                         </td>
                         <td class="whitespace-nowrap p-4 text-sm text-gray-500">
@@ -84,8 +91,9 @@
                                       <br>
                                       <strong>Title Group: </strong>{{$fundAllocation->category_group_id}} - {{ $fundAllocation->categoryGroup?->name }}
                                       <br>
-                                      <strong>Initial Amount: </strong>{{$fundAllocation->initial_amount}}
-                                      
+                                      <strong>Initial Amount: </strong>{{number_format($fundAllocation->initial_amount, 2)}}
+
+
                                   </div>
                           @endforeach
                       </td>
@@ -97,9 +105,9 @@
                                         <br>
                                         <strong>Draft Items by Title Group:</strong>
                                         <ul>
-                                            @foreach ($fundDraft->draft_items as $item)
+                                            @foreach ($fundDraft->draft_items->sortBy('title_group') as $item)
                                                 <li>
-                                                    Title Group: {{ $item->title_group }} - 
+                                                    Title Group: {{ $item->title_group }} -
                                                     Total Budget: {{ number_format($item->total_budget, 2) }}
                                                 </li>
                                             @endforeach
@@ -117,9 +125,10 @@
                                         <br>
                                         <strong>Draft Amounts by Category Item:</strong>
                                         <ul>
-                                            @foreach ($fundDraft->draft_amounts as $amount)
+                                            @foreach ($fundDraft->draft_amounts->sortBy('category_group_id') as $amount)
+
                                                 <li>
-                                                    Title Group: {{ $amount->category_group_id }} - 
+                                                    Title Group: {{ $amount->category_group_id }} -
                                                     Total Amount: {{ number_format($amount->total_amount, 2) }}
                                                 </li>
                                             @endforeach
@@ -134,15 +143,15 @@
                         <td colspan="3" class="text-center text-gray-500">No cost centers found.</td>
                     </tr>
                 @endforelse
-                
-                   
-        
+
+
+
                   </tbody>
-                </table> --}}
+                </table>
 
               </div>
             </div>
           </div>
-          
+
     </div>
 </div>

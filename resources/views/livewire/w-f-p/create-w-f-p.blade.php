@@ -72,7 +72,7 @@
               <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="grid grid-cols-3 space-x-24 min-w-full py-1 align-middle sm:px-6 lg:px-8">
                     <div class="col-span-1">
-                        @if($wfp_fund->id === 1 || $wfp_fund->id === 2)
+                        @if($wfp_fund->id === 1 || $wfp_fund->id === 3)
                         <div x-data="{ open: true }" x-cloak>
                             <table class="min-w-full">
                                 <thead class="bg-green-800">
@@ -106,7 +106,6 @@
                                             </td>
                                         </tr>
                                     @forelse ($current_balance as $item)
-
                                     <tr class="border-t border-gray-300" x-show="!open">
                                         <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['category_group']}}</td>
                                         <td class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium text-gray-900 sm:pl-3">₱ {{number_format($item['initial_amount'], 2)}}</td>
@@ -131,7 +130,8 @@
 
                                         $sumAllocated = array_sum(array_column($current_balance, 'initial_amount'));
                                         $sumTotal = array_sum(array_column($current_balance, 'current_total'));
-                                        $sumBalance = array_sum(array_column($current_balance, 'balance'));
+                                        $sumBalance = $sumAllocated - $sumTotal;
+                                        // $sumBalance = array_sum(array_column($current_balance, 'balance'));
                                     @endphp
                                     <tr class="border-t border-gray-300">
                                         <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">Total</td>
@@ -145,7 +145,7 @@
                         </div>
 
 
-                        @elseif($wfp_fund->id === 3 || $wfp_fund->id === 4 || $wfp_fund->id === 5 || $wfp_fund->id === 6)
+                        @elseif($wfp_fund->id === 2 || $wfp_fund->id === 4 || $wfp_fund->id === 5 || $wfp_fund->id === 6 || $wfp_fund->id === 7)
                         <div x-data="{ opens: true }" x-cloak>
                             <table class="min-w-full">
                                 <thead class="bg-green-800">
@@ -520,7 +520,7 @@
                                               <tr class="border-t border-gray-300">
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
-                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}} - {{$item['title_group']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>

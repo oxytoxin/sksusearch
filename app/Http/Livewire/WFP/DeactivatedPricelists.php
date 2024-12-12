@@ -19,7 +19,7 @@ class DeactivatedPricelists extends Component
     public $record;
     public $costCenters;
     public $filteredCostCenters;
-    
+
     public function mount()
     {
         $this->record =  Wfp::with([
@@ -57,7 +57,7 @@ class DeactivatedPricelists extends Component
         //         foreach ($fundAllocation->fundDrafts as $fundDraft) {
         //             $estimatedBudgetSum = $fundDraft->draft_items->sum('estimated_budget');
         //             $currentTotalSum = $fundDraft->draft_amounts->sum('current_total');
-        
+
         //             if ($estimatedBudgetSum != $currentTotalSum) {
         //                 return true; // Include this cost center
         //             }
@@ -96,9 +96,13 @@ foreach ($duplicates as $duplicate) {
 
 // Step 2: Process draft items and update or insert into fund_draft_amounts
 $draftItems = FundDraftItem::with('fundDraft') // Load the related fundDraft
-->select('fund_draft_id', 'title_group', DB::raw('SUM(estimated_budget) as total_budget'))
-->groupBy('fund_draft_id', 'title_group')
-->get();
+    ->select(
+        'fund_draft_id',
+        'title_group',
+        DB::raw('SUM(CAST(estimated_budget AS DECIMAL(15,2))) as total_budget') // Cast to DECIMAL
+    )
+    ->groupBy('fund_draft_id', 'title_group')
+    ->get();
 
 foreach ($draftItems as $item) {
     $existing = DB::table('fund_draft_amounts')
@@ -141,7 +145,7 @@ foreach ($draftItems as $item) {
                 'balance' => $initial_amount == 0 ? 0 : $initial_amount - $item->total_budget,
             ]);
         }
-        
+
     }
 }
 
@@ -175,6 +179,39 @@ DB::table('fund_draft_amounts')
         $title = 'Operation Success',
         $description = 'removed successfully',
     );
+
+    }
+
+    public function deleteItems()
+    {
+        foreach ($this->costCenters as $costCenter) {
+            foreach ($costCenter->fundAllocations as $allocation) {
+            // Ensure the allocation has a `category_group_id`
+
+            if ($allocation->fund_cluster_w_f_p_s_id === 1 || $allocation->fund_cluster_w_f_p_s_id === 3) {
+                $categories = FundAllocation::where('cost_center_id', $costCenter->id)->where('wpf_type_id', $allocation->wpf_type_id)->get();
+
+                foreach ($categories as $category) {
+                        if(($allocation->category_group_id === $category->category_group_id) && $allocation->initial_amount == '0.00')
+                        {
+                            $drafts = FundDraft::where('fund_allocation_id', $allocation->id)->get();
+                            foreach ($drafts as $draft) {
+                                $draft->draft_items()->where('title_group', $category->category_group_id)->delete();
+                                $draft->draft_amounts()->where('category_group_id', $category->category_group_id)->delete();
+                            }
+                        }else{
+                            continue;
+                        }
+                    }
+                }else{
+                    continue;
+                }
+            }
+        }
+        $this->dialog()->success(
+            $title = 'Operation Success',
+            $description = 'removed successfully',
+        );
 
     }
 

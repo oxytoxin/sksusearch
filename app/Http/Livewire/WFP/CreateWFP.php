@@ -198,19 +198,25 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->global_index = 1;
         $this->fund_allocations = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
 
-        if($this->wfp_fund->id === 1 || $this->wfp_fund->id === 2)
+        if($this->wfp_fund->id === 1 || $this->wfp_fund->id === 3)
         {
             if($this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts()->first()?->draft_amounts()->exists())
             {
-                $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts->map(function($allocation) {
+                $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts
+                // ->filter(function ($allocation) {
+                //     return $allocation->initial_amount != '0.00';
+                // })
+                ->map(function ($allocation) {
                     return [
                         'category_group_id' => $allocation->category_group_id,
                         'category_group' => $allocation->category_group,
                         'initial_amount' => $allocation->initial_amount,
                         'current_total' => $allocation->current_total,
-                        'balance' => $allocation->balance,
+                        'balance' => $allocation->initial_amount - $allocation->current_total,
                     ];
-                })->toArray();
+                })
+                ->toArray();
+
             }else{
                 $this->current_balance = $this->record->fundAllocations
                 ->where('wpf_type_id', $wfpType)
@@ -245,7 +251,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     ];
                 })->toArray();
                 // dd($this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts);
-               
+
             }else{
                 $this->current_balance = [];
             }
@@ -744,6 +750,25 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             // 'supplies_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'supplies_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
+
+        $is_valid_category_group = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+            ->pluck('category_group_id')
+            ->contains($this->supplies_category_attr->categoryGroups->id);
+
+        if ($is_valid_category_group) {
+            $fund_allocation = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+            ->where('category_group_id', $this->supplies_category_attr->categoryGroups->id)
+            ->first();
+
+            if ($fund_allocation && $fund_allocation->initial_amount == 0) {
+            $this->dialog()->error(
+                $title = 'Operation Failed',
+                $description = 'You don\'t have fund allocation for this title group.',
+            );
+            return;
+            }
+        }
+
         $intEstimatedBudget = (int)str_replace(',', '', $this->supplies_estimated_budget);
         if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
         {
@@ -1085,8 +1110,30 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             // 'mooe_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'mooe_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
+
+        $is_valid_category_group = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+        ->pluck('category_group_id')
+        ->contains($this->mooe_category_attr->categoryGroups->id);
+
+        if ($is_valid_category_group) {
+            $fund_allocation = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+            ->where('category_group_id', $this->mooe_category_attr->categoryGroups->id)
+            ->first();
+
+            if ($fund_allocation && $fund_allocation->initial_amount == 0) {
+            $this->dialog()->error(
+                $title = 'Operation Failed',
+                $description = 'You don\'t have fund allocation for this title group.',
+            );
+            return;
+            }
+        }
+
         $intEstimatedBudget = (int)str_replace(',', '', $this->mooe_estimated_budget);
-        //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
+        if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
+        {
+            $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
+        }
         if($this->mooe != null)
         {
             foreach($this->mooe as $key => $mooe)
@@ -1408,6 +1455,25 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             // 'training_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'training_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
+
+        $is_valid_category_group = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+        ->pluck('category_group_id')
+        ->contains($this->training_category_attr->categoryGroups->id);
+
+        if ($is_valid_category_group) {
+            $fund_allocation = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+            ->where('category_group_id', $this->training_category_attr->categoryGroups->id)
+            ->first();
+
+            if ($fund_allocation && $fund_allocation->initial_amount == 0) {
+            $this->dialog()->error(
+                $title = 'Operation Failed',
+                $description = 'You don\'t have fund allocation for this title group.',
+            );
+            return;
+            }
+        }
+
         $intEstimatedBudget = (int)str_replace(',', '', $this->training_estimated_budget);
         //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
         if($this->trainings != null)
@@ -1731,6 +1797,25 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             // 'machine_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'machine_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
+
+        $is_valid_category_group = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+        ->pluck('category_group_id')
+        ->contains($this->machine_category_attr->categoryGroups->id);
+
+        if ($is_valid_category_group) {
+            $fund_allocation = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+            ->where('category_group_id', $this->machine_category_attr->categoryGroups->id)
+            ->first();
+
+            if ($fund_allocation && $fund_allocation->initial_amount == 0) {
+            $this->dialog()->error(
+                $title = 'Operation Failed',
+                $description = 'You don\'t have fund allocation for this title group.',
+            );
+            return;
+            }
+        }
+
         $intEstimatedBudget = (int)str_replace(',', '', $this->machine_estimated_budget);
         //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
         if($this->machines != null)
@@ -2056,6 +2141,25 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             // 'building_cost_per_unit.gt' => 'Cost per unit must be greater than 0',
             'building_total_quantity.gt' => 'Total quantity must be greater than 0',
         ]);
+
+        $is_valid_category_group = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+        ->pluck('category_group_id')
+        ->contains($this->building_category_attr->categoryGroups->id);
+
+        if ($is_valid_category_group) {
+            $fund_allocation = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
+            ->where('category_group_id', $this->building_category_attr->categoryGroups->id)
+            ->first();
+
+            if ($fund_allocation && $fund_allocation->initial_amount == 0) {
+            $this->dialog()->error(
+                $title = 'Operation Failed',
+                $description = 'You don\'t have fund allocation for this title group.',
+            );
+            return;
+            }
+        }
+
         $intEstimatedBudget = (int)str_replace(',', '', $this->building_estimated_budget);
         //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
         if($this->buildings != null)
@@ -2335,7 +2439,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }
 
-        if($this->wfp_fund->id === 1 || $this->wfp_fund->id === 2)
+        if($this->wfp_fund->id === 1 || $this->wfp_fund->id === 3)
         {
             foreach ($this->current_balance as $balance) {
                 if ($balance['initial_amount'] < $balance['current_total']) {
@@ -2652,35 +2756,37 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->supplies[$index]['particular_id'];
             $uom = $this->supplies[$index]['uom'];
             $remarks = $this->supplies[$index]['remarks'];
-            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->first();
-            $wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
-
+            $supply_code = $this->supplies[$index]['supply_code'];
+            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+            // $draft_item = FundDraftItem::whereHas('fundDraft')->where('particular_id', $particular_id)->where('uom', $uom)
+            // ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        
+
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
-                        
+
                             $draft_amount->current_total -= $budget;
                             $draft_amount->balance += $budget;
                             $draft_amount->save();
-                            
+
                             if($draft_amount->current_total <= 0)
                             {
                                 $draft_amount->delete();
                             }
-                        
+
                         break;
                     }
                 }
             }
-           
+
             $draft_item->delete();
 
-           
+
             // Remove the supply at the given index
             unset($this->supplies[$index]);
             // unset($this->current_balance[$key]);
@@ -2698,15 +2804,20 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->mooe[$index]['particular_id'];
             $uom = $this->mooe[$index]['uom'];
             $remarks = $this->mooe[$index]['remarks'];
-            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->first();
-            $wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+            $supply_code = $this->supplies[$index]['supply_code'];
+            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+            // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+            // ->where('remarks', $remarks)->first();
+            //$wfp_draft_id = $draft_item->fund_draft_id;
+            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+            // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        
+
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
 
@@ -2723,7 +2834,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     }
                 }
             }
-          
+
             $draft_item->delete();
             // Remove the supply at the given index
             unset($this->mooe[$index]);
@@ -2741,15 +2852,20 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->trainings[$index]['particular_id'];
             $uom = $this->trainings[$index]['uom'];
             $remarks = $this->trainings[$index]['remarks'];
-            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->first();
-            $wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
-            
+            $supply_code = $this->supplies[$index]['supply_code'];
+            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+            // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+            // ->where('remarks', $remarks)->first();
+            // $wfp_draft_id = $draft_item->fund_draft_id;
+            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+            // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        
+
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
 
@@ -2784,12 +2900,17 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->machines[$index]['particular_id'];
             $uom = $this->machines[$index]['uom'];
             $remarks = $this->machines[$index]['remarks'];
-            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->first();
-            $wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+            $supply_code = $this->supplies[$index]['supply_code'];
+            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+            // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+            // ->where('remarks', $remarks)->first();
+            // $wfp_draft_id = $draft_item->fund_draft_id;
+            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+            // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
-            
+
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
@@ -2827,10 +2948,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->buildings[$index]['particular_id'];
             $uom = $this->buildings[$index]['uom'];
             $remarks = $this->buildings[$index]['remarks'];
-            $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->first();
-            $wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+            $supply_code = $this->supplies[$index]['supply_code'];
+            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+            // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+            // ->where('remarks', $remarks)->first();
+            // $wfp_draft_id = $draft_item->fund_draft_id;
+            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+            // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
