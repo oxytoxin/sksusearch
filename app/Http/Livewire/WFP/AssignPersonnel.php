@@ -55,13 +55,13 @@ class AssignPersonnel extends Component implements HasTable
                         if ($get('fund_cluster_w_f_p_s_id') === '3') {
                             return EmployeeInformation::where('position_id', 39)
                             ->whereNotIn('id', [auth()->user()->employee_information->id])
-                            ->whereDoesntHave('user.wfp_personnel')
+                            //->whereDoesntHave('user.wfp_personnel')
                             ->pluck('full_name', 'user_id');
                         }else{
 
                             return EmployeeInformation::where('campus_id', auth()->user()->employee_information->campus_id)
                             ->whereNotIn('id', [auth()->user()->employee_information->id])
-                            ->whereDoesntHave('user.wfp_personnel')
+                            //->whereDoesntHave('user.wfp_personnel')
                             ->pluck('full_name', 'user_id');
                         }
                     }),
