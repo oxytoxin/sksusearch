@@ -101,7 +101,7 @@
                   </svg>
                 </dt>
                 <dd class="text-sm leading-6 text-gray-500">
-                  <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->name}} - Office</dd>
+                  <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->name}}</dd>
               </dd>
               </div>
               <div class="mt-4 flex w-full flex-none gap-x-2 px-6">
@@ -245,7 +245,7 @@
                       </svg>
                     </dt>
                     <dd class="text-sm leading-6 text-gray-500">
-                      <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->name}} - Office</dd>
+                      <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->name}}</dd>
                   </dd>
                   </div>
                 <div class="mt-4 flex w-full flex-none gap-x-2 px-6">
