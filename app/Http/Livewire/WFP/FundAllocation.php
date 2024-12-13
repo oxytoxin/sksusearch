@@ -209,7 +209,7 @@ class FundAllocation extends Component implements HasTable
             ])
             ->query(function (Builder $query, array $data): Builder {
                 $this->data = $data;
-                return $query->whereHas('fundAllocations', function($query) use ($data) {
+                return $query->with('fundAllocations', function($query) use ($data) {
                     $query->where('wpf_type_id', $data['wfp_type']);
                 });
             }),
