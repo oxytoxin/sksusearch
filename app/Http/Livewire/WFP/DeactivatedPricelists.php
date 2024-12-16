@@ -186,33 +186,35 @@ DB::table('fund_draft_amounts')
     {
         foreach ($this->costCenters as $costCenter) {
             foreach ($costCenter->fundAllocations as $allocation) {
-            // Ensure the allocation has a `category_group_id`
+                // Ensure the allocation has a `category_group_id` and check if the allocation value is not zero
 
-            if ($allocation->fund_cluster_w_f_p_s_id === 1 || $allocation->fund_cluster_w_f_p_s_id === 3) {
-                $categories = FundAllocation::where('cost_center_id', $costCenter->id)->where('wpf_type_id', $allocation->wpf_type_id)->get();
+                if (($allocation->fund_cluster_w_f_p_s_id === 1 || $allocation->fund_cluster_w_f_p_s_id === 3)) {
 
-                foreach ($categories as $category) {
-                        if(($allocation->category_group_id === $category->category_group_id) && $allocation->initial_amount == '0.00')
+                    $categories = FundAllocation::where('cost_center_id', $costCenter->id)
+                        ->where('wpf_type_id', $allocation->wpf_type_id)
+                        ->where('initial_amount', '!=', '0.00')
+                        ->pluck('category_group_id')
+                        ->toArray();
+                        $drafts = FundDraft::where('fund_allocation_id', $allocation->id)->get();
+                        foreach ($drafts as $draft) {
+                        if(!$draft->draft_items()->whereIn('title_group', $categories)->exists())
                         {
-                            $drafts = FundDraft::where('fund_allocation_id', $allocation->id)->get();
-                            foreach ($drafts as $draft) {
-                                $draft->draft_items()->where('title_group', $category->category_group_id)->delete();
-                                $draft->draft_amounts()->where('category_group_id', $category->category_group_id)->delete();
-                            }
-                        }else{
-                            continue;
+                            $draft->draft_items()->delete();
+                        }
+
+                        if(!$draft->draft_amounts()->whereIn('category_group_id', $categories)->exists())
+                        {
+                            $draft->draft_amounts()->delete();
                         }
                     }
-                }else{
-                    continue;
                 }
             }
         }
+
         $this->dialog()->success(
             $title = 'Operation Success',
-            $description = 'removed successfully',
+            $description = 'Removed successfully',
         );
-
     }
 
     public function render()

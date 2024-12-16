@@ -2773,7 +2773,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->mooe[$index]['particular_id'];
             $uom = $this->mooe[$index]['uom'];
             $remarks = $this->mooe[$index]['remarks'];
-            $supply_code = $this->supplies[$index]['supply_code'];
+            $supply_code = $this->mooe[$index]['supply_code'];
             $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
             $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
             ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
@@ -2821,7 +2821,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->trainings[$index]['particular_id'];
             $uom = $this->trainings[$index]['uom'];
             $remarks = $this->trainings[$index]['remarks'];
-            $supply_code = $this->supplies[$index]['supply_code'];
+            $supply_code = $this->trainings[$index]['supply_code'];
             $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
             $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
             ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
@@ -2830,7 +2830,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             // $wfp_draft_id = $draft_item->fund_draft_id;
             $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
             // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
-
             foreach ($this->current_balance as $key => $item) {
                 if ($item['category_group_id'] === $title_group) {
                     if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
@@ -2869,7 +2868,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->machines[$index]['particular_id'];
             $uom = $this->machines[$index]['uom'];
             $remarks = $this->machines[$index]['remarks'];
-            $supply_code = $this->supplies[$index]['supply_code'];
+            $supply_code = $this->machines[$index]['supply_code'];
             $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
             $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
             ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
@@ -2917,7 +2916,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             $particular_id = $this->buildings[$index]['particular_id'];
             $uom = $this->buildings[$index]['uom'];
             $remarks = $this->buildings[$index]['remarks'];
-            $supply_code = $this->supplies[$index]['supply_code'];
+            $supply_code = $this->buildings[$index]['supply_code'];
             $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
             $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
             ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();

@@ -45,7 +45,7 @@ class AssignPersonnel extends Component implements HasTable
                 ->reactive()
                 ->options(fn () => FundClusterWFP::whereIn('id', [1,2,3,4,5,6,7])->pluck('name', 'id')),
                 Select::make('user_id')
-                    ->label('This is all the available users in this campus')
+                    ->label('User')
                     ->required()
                     ->searchable()
                     ->multiple()
@@ -59,8 +59,7 @@ class AssignPersonnel extends Component implements HasTable
                             ->pluck('full_name', 'user_id');
                         }else{
 
-                            return EmployeeInformation::where('campus_id', auth()->user()->employee_information->campus_id)
-                            ->whereNotIn('id', [auth()->user()->employee_information->id])
+                            return EmployeeInformation::whereNotIn('id', [auth()->user()->employee_information->id])
                             //->whereDoesntHave('user.wfp_personnel')
                             ->pluck('full_name', 'user_id');
                         }
