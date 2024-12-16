@@ -520,7 +520,7 @@
                                               <tr class="border-t border-gray-300">
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
-                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}} - {{$item['title_group']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
