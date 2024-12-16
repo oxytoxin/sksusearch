@@ -767,6 +767,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }else{
                     $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->supplies_particular_id)->where('uom', $this->supplies_uom)->where('remarks', $this->supplies_remarks)->first();
                     if (!$existingDraftItem) {
+                        
                         $this->supplies[] = [
                             'budget_category_id' => 1,
                             'budget_category' => 'Supplies & Semi-Expendables',
@@ -890,7 +891,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
+        if($this->wfp_fund->id === 2 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->supplies_category_attr->categoryGroups->id;
             $found = false;
@@ -1248,7 +1249,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
+        if($this->wfp_fund->id === 2 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->mooe_category_attr->categoryGroups->id;
             $found = false;
@@ -1590,7 +1591,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
+        if($this->wfp_fund->id === 2 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->training_category_attr->categoryGroups->id;
             $found = false;
@@ -1934,7 +1935,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         }
 
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
+        if($this->wfp_fund->id === 2 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->machine_category_attr->categoryGroups->id;
             $found = false;
@@ -2276,7 +2277,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         }
 
-        if($this->wfp_fund->id === 3 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
+        if($this->wfp_fund->id === 2 || $this->wfp_fund->id === 4 || $this->wfp_fund->id === 5 || $this->wfp_fund->id === 6 || $this->wfp_fund->id === 7)
         {
             $categoryGroupId = $this->building_category_attr->categoryGroups->id;
             $found = false;
