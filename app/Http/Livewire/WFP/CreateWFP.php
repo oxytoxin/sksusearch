@@ -211,9 +211,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     return [
                         'category_group_id' => $allocation->category_group_id,
                         'category_group' => $allocation->category_group,
-                        'initial_amount' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount,
+                        'initial_amount' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0,
                         'current_total' => $allocation->current_total,
-                        'balance' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount - $allocation->current_total,
+                        'balance' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0 - $allocation->current_total,
                     ];
                 })
                 ->toArray();
