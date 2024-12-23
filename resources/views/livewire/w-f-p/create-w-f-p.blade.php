@@ -521,6 +521,7 @@
                                               @endphp
                                               @forelse ($supplies as $item)
                                               <tr class="border-t border-gray-300">
+                                                @if($wfp_fund->id === 1 || $wfp_fund->id === 3)
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['account_title']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['particular']}}</td>
@@ -530,6 +531,17 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @else
+                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
@@ -566,6 +578,7 @@
                                               </tr>
                                               @forelse ($mooe as $item)
                                               <tr class="border-t border-gray-300">
+                                                @if($wfp_fund->id === 1 || $wfp_fund->id === 3)
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['account_title']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['particular']}}</td>
@@ -575,6 +588,17 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @else
+                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
@@ -611,6 +635,7 @@
                                               </tr>
                                               @forelse ($trainings as $item)
                                               <tr class="border-t border-gray-300">
+                                                @if($wfp_fund->id === 1 || $wfp_fund->id === 3)
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['account_title']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['particular']}}</td>
@@ -618,8 +643,19 @@
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right ">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right ">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @else
+                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
@@ -656,6 +692,7 @@
                                               </tr>
                                               @forelse ($machines as $item)
                                               <tr class="border-t border-gray-300">
+                                                @if($wfp_fund->id === 1 || $wfp_fund->id === 3)
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['account_title']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['particular']}}</td>
@@ -665,6 +702,17 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @else
+                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
@@ -701,6 +749,7 @@
                                               </tr>
                                               @forelse ($buildings as $item)
                                               <tr class="border-t border-gray-300">
+                                                @if($wfp_fund->id === 1 || $wfp_fund->id === 3)
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['account_title']}}</td>
                                                 <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['particular']}}</td>
@@ -710,6 +759,17 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @else
+                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
