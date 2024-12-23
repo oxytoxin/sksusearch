@@ -203,17 +203,18 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             if($this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts()->first()?->draft_amounts()->exists())
             {
                 $initial_amount = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
-                $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts
-                // ->filter(function ($allocation) {
-                //     return $allocation->initial_amount != '0.00';
-                // })
-                ->map(function ($allocation) use ($initial_amount){
+                $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts;
+                $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)
+                ->filter(function ($allocation) {
+                    return $allocation->initial_amount != '0.00';
+                })
+                ->map(function ($allocation) use ($initial_amount, $draft_amounts){
                     return [
                         'category_group_id' => $allocation->category_group_id,
-                        'category_group' => $allocation->category_group,
+                        'category_group' => $allocation->categoryGroup->name,
                         'initial_amount' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0,
-                        'current_total' => $allocation->current_total,
-                        'balance' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0 - $allocation->current_total,
+                        'current_total' => $draft_amounts->where('category_group_id', $allocation->category_group_id)->first()->current_total ?? 0,
+                        'balance' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0 - $draft_amounts->where('category_group_id', $allocation->category_group_id)->first()->current_total ?? 0,
                     ];
                 })
                 ->toArray();
@@ -767,7 +768,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }else{
                     $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->supplies_particular_id)->where('uom', $this->supplies_uom)->where('remarks', $this->supplies_remarks)->first();
                     if (!$existingDraftItem) {
-                        
+
                         $this->supplies[] = [
                             'budget_category_id' => 1,
                             'budget_category' => 'Supplies & Semi-Expendables',
