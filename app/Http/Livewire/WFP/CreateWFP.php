@@ -203,7 +203,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             if($this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts()->first()?->draft_amounts()->exists())
             {
                 $initial_amount = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
-                $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts;
+                $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_items;
                 $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)
                 ->filter(function ($allocation) {
                     return $allocation->initial_amount != '0.00';
@@ -213,8 +213,8 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'category_group_id' => $allocation->category_group_id,
                         'category_group' => $allocation->categoryGroup->name,
                         'initial_amount' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0,
-                        'current_total' => $draft_amounts->where('category_group_id', $allocation->category_group_id)->first()->current_total ?? 0,
-                        'balance' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0 - $draft_amounts->where('category_group_id', $allocation->category_group_id)->first()->current_total ?? 0,
+                        'current_total' => $draft_amounts->where('title_group', $allocation->category_group_id)->sum('estimated_budget') ?? 0,
+                        'balance' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0 - $draft_amounts->where('title_group', $allocation->category_group_id)->sum('estimated_budget') ?? 0,
                     ];
                 })
                 ->toArray();
