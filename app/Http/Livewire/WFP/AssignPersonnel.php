@@ -104,6 +104,7 @@ class AssignPersonnel extends Component implements HasTable
             ->wrap()
             ->searchable(),
             Tables\Columns\TextColumn::make('user.email')->label('Email')->searchable(),
+            Tables\Columns\TextColumn::make('cost_center.fundClusterWFP.name')->label('Fund Cluster')->searchable(),
             Tables\Columns\TextColumn::make('cost_center.name')->label('Cost Center')
             ->wrap()
             ->searchable(),

@@ -1,7 +1,7 @@
 <div class="bg-gray-100 px-2 py-4 rounded-lg">
     <div class="grid grid-cols-2">
         <div class="col-span-1 text-2xl text-gray-800">
-            Building & Infrastructure
+            PS
         </div>
         <div class="col-span-1">
             {{$this->form}}
