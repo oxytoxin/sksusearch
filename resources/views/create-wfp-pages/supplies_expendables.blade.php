@@ -1,7 +1,10 @@
 <div wire:ignore.self class="bg-gray-100 px-2 py-4 rounded-lg">
     <div class="grid grid-cols-2">
-        <div class="col-span-1 text-2xl text-gray-800">
-            Supplies & Semi-Expendables
+        @php
+            $name = App\Models\BudgetCategory::where('id', 1)->first()->name;
+        @endphp
+        <div class="col-span-1 text-xl text-gray-800">
+            {{$name}}
         </div>
         <div class="col-span-1">
             {{$this->form}}

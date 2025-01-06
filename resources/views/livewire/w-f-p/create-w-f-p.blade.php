@@ -246,9 +246,10 @@
                                         'Trainings',
                                         'Machines',
                                         'Buildings',
+                                        'PS',
                                     ];
                                 @endphp
-                                @for ($i = 1; $i <= 6; $i++)
+                                @for ($i = 1; $i <= 7; $i++)
                                     <div class="flex-1 text-center cursor-pointer" wire:click="setStep({{ $i }})">
                                         <div class="w-full h-1
                                             @if ($global_index == $i) bg-green-700
@@ -281,6 +282,8 @@
                                     @include('create-wfp-pages.machine_equipment')
                                 @elseif ($global_index == 6)
                                     @include('create-wfp-pages.building_infrastracure')
+                                @elseif ($global_index == 7)
+                                    @include('create-wfp-pages.ps-salaries')
                                 @endif
                             </div>
 
@@ -292,7 +295,7 @@
                                     </button>
                                 @endif
 
-                                @if ($global_index < 6)
+                                @if ($global_index < 7)
                                     <div></div>
                                     <button wire:click="increaseStep" class="bg-green-600 hover:bg-green-800 text-white font-bold py-1.5 px-3 rounded-lg">
                                         Next
@@ -512,9 +515,12 @@
                                           </tr>
                                         </thead>
                                         <tbody class="bg-white">
+                                            @php
+                                            $supply_name = App\Models\BudgetCategory::where('id', 1)->first()->name;
+                                            @endphp
                                             <tr class="border-t border-gray-200">
                                                 <th colspan="23" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
-                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">Supplies & Semi-Expendables</th>
+                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">{{$supply_name}}</th>
                                               </tr>
                                               @php
                                               $fund_allocation_categories = $fund_allocations->where('initial_amount', '!=', '0.00')->pluck('category_group_id')->toArray();
@@ -572,9 +578,12 @@
                                                 <th colspan="23" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
+                                            @php
+                                            $mooe_name = App\Models\BudgetCategory::where('id', 2)->first()->name;
+                                            @endphp
                                             <tr class="border-t border-gray-200">
                                                 <th colspan="23" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
-                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">MOOE</th>
+                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">{{$mooe_name}}</th>
                                               </tr>
                                               @forelse ($mooe as $item)
                                               <tr class="border-t border-gray-300">
@@ -629,9 +638,12 @@
                                                 <th colspan="23" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
+                                            @php
+                                            $training_name = App\Models\BudgetCategory::where('id', 3)->first()->name;
+                                            @endphp
                                             <tr class="border-t border-gray-200">
                                                 <th colspan="23" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
-                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">Trainings</th>
+                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">{{$training_name}}</th>
                                               </tr>
                                               @forelse ($trainings as $item)
                                               <tr class="border-t border-gray-300">
@@ -686,9 +698,12 @@
                                                 <th colspan="23" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
+                                            @php
+                                            $machine_name = App\Models\BudgetCategory::where('id', 4)->first()->name;
+                                            @endphp
                                             <tr class="border-t border-gray-200">
                                                 <th colspan="23" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
-                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">Machine & Equipment / Furniture & Fixtures / Bio / Vehicles</th>
+                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">{{$machine_name}}</th>
                                               </tr>
                                               @forelse ($machines as $item)
                                               <tr class="border-t border-gray-300">
@@ -743,9 +758,12 @@
                                                 <th colspan="23" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
                                               </tr>
                                             @endforelse
+                                            @php
+                                            $building_name = App\Models\BudgetCategory::where('id', 5)->first()->name;
+                                            @endphp
                                             <tr class="border-t border-gray-200">
                                                 <th colspan="23" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
-                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">Building & Infrastructure</th>
+                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">{{$building_name}}</th>
                                               </tr>
                                               @forelse ($buildings as $item)
                                               <tr class="border-t border-gray-300">
@@ -789,6 +807,66 @@
                                                 </td> --}}
                                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
                                                     <button wire:click="deleteBuilding({{$loop->index}})" class="text-red-600 hover:text-red-900">
+                                                        <svg class="w-5 h-5 text-red-600 hover:text-red-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                          </svg>
+                                                    </button>
+                                                </td>
+                                              </tr>
+                                            @empty
+                                            <tr class="border-t border-gray-200">
+                                                <th colspan="23" scope="colgroup" class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">No Record</th>
+                                              </tr>
+                                            @endforelse
+                                            @php
+                                            $ps_name = App\Models\BudgetCategory::where('id', 6)->first()->name;
+                                            @endphp
+                                            <tr class="border-t border-gray-200">
+                                                <th colspan="23" scope="colgroup" class="bg-yellow-100 py-2 pl-4 pr-3
+                                                text-left text-sm font-semibold text-gray-900 sm:pl-3">{{$ps_name}}</th>
+                                              </tr>
+                                              @forelse ($ps as $item)
+                                              <tr class="border-t border-gray-300">
+                                                @if($wfp_fund->id === 1 || $wfp_fund->id === 3)
+                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">{{$item['uacs']}}</td>
+                                                <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['account_title']}}</td>
+                                                <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['particular']}}</td>
+                                                <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['remarks']}}</td>
+                                                <td class="px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['supply_code']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['total_quantity']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @else
+                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['particular']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['remarks']}}</td>
+                                                <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                @endif
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][2]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][3]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][4]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][5]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][6]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][7]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][8]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][9]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][10]}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][11]}}</td>
+                                                {{-- <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                    @if($item['remarks'] != null)
+                                                    <button wire:click="viewRemarks({{$loop->index}}, 5)" class="text-blue-600 hover:text-blue-900">View Remarks</button>
+                                                    @endif
+                                                </td> --}}
+                                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                    <button wire:click="deletePs({{$loop->index}})" class="text-red-600 hover:text-red-900">
                                                         <svg class="w-5 h-5 text-red-600 hover:text-red-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                                           </svg>
