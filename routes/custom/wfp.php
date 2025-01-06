@@ -26,6 +26,7 @@ use App\Http\Livewire\WFP\WfpReport;
 use App\Http\Livewire\WFP\WfpSubmissions;
 use App\Http\Livewire\WFP\WFPTypes;
 use App\Http\Livewire\WFP\DeactivatedPricelists;
+use App\Http\Livewire\WFP\ViewAllocatedFund;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([
@@ -40,6 +41,7 @@ Route::middleware([
     Route::get('/wfp-history', WFPHistory::class)->name('wfp-history');
     Route::get('/allocate-funds/{record}', AllocateFunds::class)->name('allocate-funds');
     Route::get('/edit-allocate-funds/{record}/{wfpType}', EditAllocateFunds::class)->name('edit-allocate-funds');
+    Route::get('/view-allocated-funds/{record}/{wfpType}', ViewAllocatedFund::class)->name('view-allocated-funds');
     Route::get('/print-wfp/{record}', WfpReport::class)->name('print-wfp');
     Route::get('/wfp-submissions', WfpSubmissions::class)->name('wfp-submissions');
     Route::get('/wfp-pre', GeneratePpmp::class)->name('generate-ppmp');

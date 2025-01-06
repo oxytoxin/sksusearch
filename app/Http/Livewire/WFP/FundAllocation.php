@@ -21,6 +21,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Actions\ViewAction;
 
 class FundAllocation extends Component implements HasTable
 {
@@ -190,7 +191,14 @@ class FundAllocation extends Component implements HasTable
                 Notification::make()->title('Operation Success')->body('Fund Successfully Unlocked')->success()->send();
 
             })
-            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident)
+            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident),
+            ViewAction::make('view_allocation')
+            ->label('View Allocation')
+            ->button()
+            ->color('warning')
+            ->icon('ri-eye-line')
+            ->url(fn (CostCenter $record): string => route('wfp.view-allocated-funds', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
+            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident),
         ];
     }
 
