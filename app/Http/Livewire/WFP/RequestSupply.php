@@ -37,6 +37,7 @@ class RequestSupply extends Component implements HasForms
                 Grid::make(1)
                 ->schema([
                     Textarea::make('particulars')
+                    ->label('Particulars (Description & Specifications)')
                     ->required(),
                 //     RichEditor::make('particulars')
                 //     ->required()
@@ -51,7 +52,7 @@ class RequestSupply extends Component implements HasForms
                  ]),
                 Grid::make(3)
                 ->schema([
-                    TextInput::make('specification')->required(),
+                    TextInput::make('specification')->label('Short Description')->required(),
                     TextInput::make('uom')
                     ->label('UOM')
                     ->required(),
