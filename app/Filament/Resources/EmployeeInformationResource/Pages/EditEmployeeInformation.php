@@ -19,6 +19,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 
 class EditEmployeeInformation extends EditRecord
 {
@@ -52,6 +53,7 @@ class EditEmployeeInformation extends EditRecord
         DB::beginTransaction();
         $user = User::find($record['user_id'])->update([
             'email' => $data['email'],
+            'password' => Hash::make(strtolower(str_replace(" ", "", $data['last_name'] . "123"))),
         ]);
 
         $record->update([
