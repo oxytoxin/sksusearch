@@ -1662,8 +1662,8 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 foreach($this->current_balance as $item)
                 {
                     $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
-                    $draft_amounts->current_total = $item['current_total'];
-                    $draft_amounts->balance = $item['balance'];
+                    $draft_amounts->current_total = $item['current_total'] ?? 0;
+                    $draft_amounts->balance = $item['balance'] ?? 0;
                     $draft_amounts->save();
                 }
             }
