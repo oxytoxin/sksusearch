@@ -962,10 +962,25 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }else{
                 foreach($this->current_balance as $item)
                 {
-                    $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
-                    $draft_amounts->current_total = $item['current_total'];
-                    $draft_amounts->balance = $item['balance'];
-                    $draft_amounts->save();
+
+                    if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts()->exists())
+                    {
+                        $draft_amounts = FundDraftAmount::create([
+                            'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
+                            'category_group_id' => $item['category_group_id'],
+                            'category_group' => $item['category_group'],
+                            'initial_amount' => $item['initial_amount'],
+                            'current_total' => $item['current_total'],
+                            'balance' => $item['initial_amount'],
+                        ]);
+                    }else
+                    {
+                        $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
+                        $draft_amounts->current_total = $item['current_total'] ?? 0;
+                        $draft_amounts->balance = $item['balance'] ?? 0;
+                        $draft_amounts->save();
+                    }
+
                 }
             }
         }
@@ -1319,10 +1334,23 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }else{
                 foreach($this->current_balance as $item)
                 {
-                    $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
-                    $draft_amounts->current_total = $item['current_total'];
-                    $draft_amounts->balance = $item['balance'];
-                    $draft_amounts->save();
+                    if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts()->exists())
+                    {
+                        $draft_amounts = FundDraftAmount::create([
+                            'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
+                            'category_group_id' => $item['category_group_id'],
+                            'category_group' => $item['category_group'],
+                            'initial_amount' => $item['initial_amount'],
+                            'current_total' => $item['current_total'],
+                            'balance' => $item['initial_amount'],
+                        ]);
+                    }else{
+                        $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
+                        $draft_amounts->current_total = $item['current_total'];
+                        $draft_amounts->balance = $item['balance'];
+                        $draft_amounts->save();
+                    }
+
                 }
             }
         }
@@ -1661,10 +1689,23 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }else{
                 foreach($this->current_balance as $item)
                 {
-                    $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
-                    $draft_amounts->current_total = $item['current_total'] ?? 0;
-                    $draft_amounts->balance = $item['balance'] ?? 0;
-                    $draft_amounts->save();
+                    if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts()->exists())
+                    {
+                        $draft_amounts = FundDraftAmount::create([
+                            'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
+                            'category_group_id' => $item['category_group_id'],
+                            'category_group' => $item['category_group'],
+                            'initial_amount' => $item['initial_amount'],
+                            'current_total' => $item['current_total'],
+                            'balance' => $item['initial_amount'],
+                        ]);
+                    }else{
+                        $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
+                        $draft_amounts->current_total = $item['current_total'];
+                        $draft_amounts->balance = $item['balance'];
+                        $draft_amounts->save();
+                    }
+
                 }
             }
         }
@@ -2005,10 +2046,23 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }else{
                 foreach($this->current_balance as $item)
                 {
-                    $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
-                    $draft_amounts->current_total = $item['current_total'];
-                    $draft_amounts->balance = $item['balance'];
-                    $draft_amounts->save();
+                    if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts()->exists())
+                    {
+                        $draft_amounts = FundDraftAmount::create([
+                            'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
+                            'category_group_id' => $item['category_group_id'],
+                            'category_group' => $item['category_group'],
+                            'initial_amount' => $item['initial_amount'],
+                            'current_total' => $item['current_total'],
+                            'balance' => $item['initial_amount'],
+                        ]);
+                    }else{
+                        $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
+                        $draft_amounts->current_total = $item['current_total'];
+                        $draft_amounts->balance = $item['balance'];
+                        $draft_amounts->save();
+                    }
+
                 }
             }
         }
@@ -2348,10 +2402,23 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }else{
                 foreach($this->current_balance as $item)
                 {
-                    $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
-                    $draft_amounts->current_total = $item['current_total'];
-                    $draft_amounts->balance = $item['balance'];
-                    $draft_amounts->save();
+                    if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts()->exists())
+                    {
+                        $draft_amounts = FundDraftAmount::create([
+                            'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
+                            'category_group_id' => $item['category_group_id'],
+                            'category_group' => $item['category_group'],
+                            'initial_amount' => $item['initial_amount'],
+                            'current_total' => $item['current_total'],
+                            'balance' => $item['initial_amount'],
+                        ]);
+                    }else{
+                        $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
+                        $draft_amounts->current_total = $item['current_total'];
+                        $draft_amounts->balance = $item['balance'];
+                        $draft_amounts->save();
+                    }
+
                 }
             }
         }
