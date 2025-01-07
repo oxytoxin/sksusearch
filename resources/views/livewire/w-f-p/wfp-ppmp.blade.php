@@ -99,7 +99,7 @@
                           <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
-                          <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
+                          <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format((float)($item->cost_per_unit * $item->total_quantity), 2, '.', ',') }}</td>
                           @foreach (json_decode($item->quantity_year) as $quantity)
                           <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                           @endforeach
@@ -125,7 +125,7 @@
                             <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
+                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format((float)($item->cost_per_unit * $item->total_quantity), 2, '.', ',') }}</td>
                             @foreach (json_decode($item->quantity_year) as $quantity)
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
@@ -151,7 +151,7 @@
                             <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
+                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format((float)($item->cost_per_unit * $item->total_quantity), 2, '.', ',') }}</td>
                             @foreach (json_decode($item->quantity_year) as $quantity)
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
@@ -177,7 +177,7 @@
                             <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
+                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format((float)($item->cost_per_unit * $item->total_quantity), 2, '.', ',') }}</td>
                             @foreach (json_decode($item->quantity_year) as $quantity)
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
@@ -203,7 +203,7 @@
                             <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
+                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format((float)($item->cost_per_unit * $item->total_quantity), 2, '.', ',') }}</td>
                             @foreach (json_decode($item->quantity_year) as $quantity)
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
@@ -229,7 +229,7 @@
                             <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{$item->uom}}</td>
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->cost_per_unit, 2)}}</td>
-                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format($item->estimated_budget, 2)}}</td>
+                            <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">{{number_format((float)($item->cost_per_unit * $item->total_quantity), 2, '.', ',') }}</td>
                             @foreach (json_decode($item->quantity_year) as $quantity)
                             <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500 border-l border-gray-400">{{$quantity}}</td>
                             @endforeach
