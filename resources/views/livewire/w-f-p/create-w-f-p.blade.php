@@ -536,7 +536,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @else
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
@@ -546,7 +546,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
@@ -596,7 +596,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @else
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
@@ -606,7 +606,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
@@ -656,7 +656,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @else
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
@@ -666,7 +666,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{$item['cost_per_unit'] === '' ? number_format(0, 2) : number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
@@ -716,7 +716,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @else
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
@@ -726,7 +726,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
@@ -776,7 +776,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @else
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
@@ -786,7 +786,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
@@ -836,7 +836,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}}">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm {{in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600'}} text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @else
                                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item['uacs']}}</td>
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['account_title']}}</td>
@@ -846,7 +846,7 @@
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format((float)($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}</td>
                                                 @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][1]}}</td>
