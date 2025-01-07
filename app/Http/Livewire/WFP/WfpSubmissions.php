@@ -56,7 +56,7 @@ class WfpSubmissions extends Component implements HasTable
             Tables\Columns\TextColumn::make('fundClusterWfp.name')->label('Fund Cluster')->searchable(),
             Tables\Columns\TextColumn::make('costCenter.mfo.name')->label('MFO')->searchable(),
             Tables\Columns\TextColumn::make('fund_description')->searchable(),
-            Tables\Columns\TextColumn::make('created_at')
+            Tables\Columns\TextColumn::make('updated_at')
             ->label('Date Created')
             ->formatStateUsing(fn ($record) => Carbon::parse($record->created_at)->format('F d, Y h:i A'))
             ->searchable()->sortable(),
