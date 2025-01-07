@@ -24,13 +24,14 @@ class WFPHistory extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return Wfp::query()->whereIn('cost_center_id', $this->cost_centers->pluck('id')->toArray());
+        return Wfp::query()->whereIn('cost_center_id', $this->cost_centers->pluck('id')->toArray())->where('user_id', Auth::id());
     }
 
     protected function getTableColumns()
     {
         return [
             Tables\Columns\TextColumn::make('wfpType.description')->label('WFP Type')->searchable(),
+            Tables\Columns\TextColumn::make('costCenter.name')->label('Cost Center')->searchable(),
             Tables\Columns\TextColumn::make('fundClusterWfp.name')->label('Fund Cluster')->searchable(),
             Tables\Columns\TextColumn::make('costCenter.mfo.name')->label('MFO')->searchable(),
             Tables\Columns\TextColumn::make('fund_description')->searchable(),
