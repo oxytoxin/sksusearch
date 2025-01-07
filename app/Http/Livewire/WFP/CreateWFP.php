@@ -2937,7 +2937,13 @@ public function clearPs()
         if(!$is_not_valid)
         {
             $sumAllocated = $this->record->fundAllocations->sum('initial_amount');
-            $sumTotal = array_sum(array_column($this->current_balance, 'current_total'));
+            // $sumTotal = $this->record->fundAllocations
+            if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->draft_items()->exists())
+            {
+                $sumTotal = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->sum('estimated_budget');
+            }else{
+                $sumTotal = array_sum(array_column($this->current_balance, 'current_total'));
+            }
             $sumBalance = $sumAllocated - $sumTotal;
 
             //if wfp already exist

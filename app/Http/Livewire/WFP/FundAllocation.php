@@ -38,13 +38,17 @@ class FundAllocation extends Component implements HasTable
     public function mount($filter)
     {
         $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
-        if($filter)
+        if(session()->has('fund_cluster'))
         {
-            $this->filter($filter);
-        }else{
-
-            $this->fund_cluster = 1;
+            $this->fund_cluster = session('fund_cluster');
         }
+        // if($filter)
+        // {
+        //     $this->filter($filter);
+        // }else{
+
+        //     $this->fund_cluster = 1;
+        // }
         $this->wfp_type = WpfType::all()->count();
         $group = CategoryGroup::all()->pluck('name', 'id');
 
@@ -272,8 +276,8 @@ class FundAllocation extends Component implements HasTable
     public function filter($id)
     {
         $this->fund_cluster = $id;
+        session(['fund_cluster' => $id]);
     }
-
     public function render()
     {
         return view('livewire.w-f-p.fund-allocation');
