@@ -16,9 +16,13 @@ class WfpPpmp extends Component
     {
         $this->record = Wfp::find($record);
         $this->wfpDetails = $this->record->wfpDetails()->where('is_ppmp', 1)->get();
-        $total_quantity = $this->wfpDetails->sum('total_quantity');
-        $cost_per_unit = $this->wfpDetails->sum('cost_per_unit');
-        $this->program = $total_quantity * $cost_per_unit;
+        foreach($this->wfpDetails as $wfpDetail)
+        {
+            $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
+        }
+        // $total_quantity = $this->wfpDetails->sum('total_quantity');
+        // $cost_per_unit = $this->wfpDetails->sum('cost_per_unit');
+        // $this->program = $total_quantity * $cost_per_unit;
         $this->balance = $this->record->total_allocated_fund - $this->program;
     }
 

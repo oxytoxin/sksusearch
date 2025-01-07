@@ -17,9 +17,13 @@ class WfpReport extends Component
         $this->record = Wfp::find($record);
         $this->wfpDetails = $this->record->wfpDetails()->get();
         // $this->program = $this->wfpDetails->sum('estimated_budget');
-        $total_quantity = $this->wfpDetails->sum('total_quantity');
-        $cost_per_unit = $this->wfpDetails->sum('cost_per_unit');
-        $this->program = $total_quantity * $cost_per_unit;
+        foreach($this->wfpDetails as $wfpDetail)
+        {
+            $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
+        }
+        // $total_quantity = $this->wfpDetails->sum('total_quantity');
+        // $cost_per_unit = $this->wfpDetails->sum('cost_per_unit');
+        // $this->program = $total_quantity * $cost_per_unit;
         $this->balance = $this->record->total_allocated_fund - $this->program;
     }
 
