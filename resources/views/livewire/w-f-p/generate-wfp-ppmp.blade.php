@@ -15,8 +15,8 @@
                 <select id="tabs" name="tabs" class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
                         x-model="selectedTab" @change="showPrintable = false">
                     <option>101</option>
-                    <option>161</option>
                     <option>163</option>
+                    <option>161</option>
                     <option>164T / FHE</option>
                     <option>164T / Non-FHE</option>
                     <option>164OSF</option>
@@ -42,19 +42,19 @@
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
                        :class="{
-                           'bg-green-500 text-white': selectedTab === '161',
-                           'text-gray-800 hover:text-green-700': selectedTab !== '161'
+                           'bg-green-500 text-white': selectedTab === '163',
+                           'text-gray-800 hover:text-green-700': selectedTab !== '163'
                        }"
-                       @click.prevent="selectedTab = '161'; showPrintable = false">
+                       @click.prevent="selectedTab = '163'; showPrintable = false">
                        Fund {{$fund->where('id', 2)->first()->name}}
                     </a>
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
                        :class="{
-                           'bg-green-500 text-white': selectedTab === '163',
-                           'text-gray-800 hover:text-green-700': selectedTab !== '163'
+                           'bg-green-500 text-white': selectedTab === '161',
+                           'text-gray-800 hover:text-green-700': selectedTab !== '161'
                        }"
-                       @click.prevent="selectedTab = '163'; showPrintable = false">
+                       @click.prevent="selectedTab = '161'; showPrintable = false">
                        Fund {{$fund->where('id', 3)->first()->name}}
                     </a>
 

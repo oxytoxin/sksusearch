@@ -223,7 +223,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 2)->where('is_approved', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 3)->where('is_approved', 1);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
@@ -250,7 +250,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'General Admission and Support Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
@@ -279,7 +279,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Higher Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
@@ -308,7 +308,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Advanced Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
@@ -337,7 +337,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Research and Development';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
@@ -366,7 +366,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Extension Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
@@ -395,7 +395,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Local Fund Projects';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+            $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
@@ -425,7 +425,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3)->where('is_approved', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 2)->where('is_approved', 1);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(estimated_budget) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
@@ -452,7 +452,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = true;
         $this->title = 'ACCESS Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 1);
             });
@@ -483,7 +483,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = true;
         $this->title = 'Tacurong Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 2);
             });
@@ -514,7 +514,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = true;
         $this->title = 'Isulan Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 3);
             });
@@ -545,7 +545,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = true;
         $this->title = 'Kalamansig Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 4);
             });
@@ -576,7 +576,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = true;
         $this->title = 'Lutayan Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 5);
             });
@@ -607,7 +607,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = true;
         $this->title = 'Palimbang Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 6);
             });
@@ -638,7 +638,7 @@ class GenerateWfpPpmp extends Component
         $this->is_active = true;
         $this->title = 'Bagumbayan Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 7);
             });
