@@ -24,12 +24,12 @@ class UserPRE extends Component
         $this->title = FundClusterWFP::find($this->record->fund_cluster_w_f_p_s_id)->name;
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
             $query->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
-        })->select(DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
     public function render()
     {

@@ -253,10 +253,10 @@
                                 <span>Allocated Fund: </span><span>₱ {{number_format($record->total_allocated_fund, 2)}}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Program: </span><span>₱ {{number_format($record->program_allocated, 2)}}</span>
+                                <span>Program: </span><span>₱ {{number_format($program, 2)}}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Balance: </span><span>₱ {{number_format($record->balance, 2)}}</span>
+                                <span>Balance: </span><span>₱ {{number_format($balance, 2)}}</span>
                             </div>
                         </div>
                     </div>
