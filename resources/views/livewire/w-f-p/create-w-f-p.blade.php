@@ -665,7 +665,7 @@
                                                 <td class="px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['supply_code']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-wrap">{{$item['total_quantity']}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{$item['uom']}}</td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['cost_per_unit'], 2)}}</td>
+                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{$item['cost_per_unit'] === '' ? number_format(0, 2) : number_format($item['cost_per_unit'], 2)}}</td>
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-right">{{number_format($item['estimated_budget'], 2)}}</td>
                                                 @endif
                                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 border-x border-gray-400">{{$item['quantity'][0]}}</td>

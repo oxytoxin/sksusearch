@@ -5,12 +5,12 @@
             <button @click="printOut($refs.printContainer.outerHTML);" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                Print
             </button>
-            <button onclick="window.history.back()" class="flex hover:bg-gray-500 p-2 bg-gray-600 rounded-md font-light capitalize text-white text-sm">
+            <a href="{{ route('wfp.wfp-submissions', $record->fundClusterWFP->id) }}" class="flex hover:bg-gray-500 p-2 bg-gray-600 rounded-md font-light capitalize text-white text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.49 12 3.74 8.248m0 0 3.75-3.75m-3.75 3.75h16.5V19.5" />
                 </svg>
                 Back
-            </button>
+            </a>
         </div>
     </div>
     <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">

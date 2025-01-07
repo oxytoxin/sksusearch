@@ -22,6 +22,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ViewColumn;
 
 class FundAllocation extends Component implements HasTable
 {
@@ -93,6 +94,8 @@ class FundAllocation extends Component implements HasTable
 
                 }
             }),
+            ViewColumn::make('status')->label('WFP Status')->view('tables.columns.wfp-status'),
+
         ];
     }
 
@@ -220,6 +223,25 @@ class FundAllocation extends Component implements HasTable
                 return $query->with('fundAllocations', function($query) use ($data) {
                     $query->where('wpf_type_id', $data['wfp_type']);
                 });
+            }),
+            Filter::make('wfp_status')
+            ->form([
+                Forms\Components\Select::make('wfp_status')
+                ->label('WFP Status')
+                ->options([
+                    20 => 'All',
+                    1 => 'Approved',
+                    0 => 'Pending',
+                    500 => 'Modification Request'
+                ])->default(20)
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                if($data['wfp_status'] != 20) {
+                    return $query->whereHas('wfp', function($query) use ($data) {
+                        $query->where('is_approved', $data['wfp_status']);
+                    });
+                }
+                return $query;
             }),
             // Filter::make('mfo_id')
             // ->form([

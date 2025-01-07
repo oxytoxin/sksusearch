@@ -43,7 +43,7 @@ Route::middleware([
     Route::get('/edit-allocate-funds/{record}/{wfpType}', EditAllocateFunds::class)->name('edit-allocate-funds');
     Route::get('/view-allocated-funds/{record}/{wfpType}', ViewAllocatedFund::class)->name('view-allocated-funds');
     Route::get('/print-wfp/{record}', WfpReport::class)->name('print-wfp');
-    Route::get('/wfp-submissions', WfpSubmissions::class)->name('wfp-submissions');
+    Route::get('/wfp-submissions/{filter?}', WfpSubmissions::class)->name('wfp-submissions');
     Route::get('/wfp-pre', GeneratePpmp::class)->name('generate-ppmp');
     Route::get('/wfp-ppmp', GenerateWfpPpmp::class)->name('generate-wfp-ppmp');
     Route::get('/print-ppmp/{record}', WfpPpmp::class)->name('print-ppmp');

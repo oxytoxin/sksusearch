@@ -26,10 +26,16 @@ class WfpSubmissions extends Component implements HasTable
     public $fund_cluster;
     public $isPresident;
 
-    public function mount()
+    public function mount($filter)
     {
         $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
-        $this->fund_cluster = 1;
+        if($filter)
+        {
+            $this->filter($filter);
+        }else{
+
+            $this->fund_cluster = 1;
+        }
         $this->wfp_type = WpfType::all()->count();
     }
 
@@ -42,6 +48,7 @@ class WfpSubmissions extends Component implements HasTable
     {
         return [
             Tables\Columns\TextColumn::make('wfpType.description')->label('WFP Type')->searchable(),
+            Tables\Columns\TextColumn::make('costCenter.office.name')->label('Office')->searchable(),
             Tables\Columns\TextColumn::make('fundClusterWfp.name')->label('Fund Cluster')->searchable(),
             Tables\Columns\TextColumn::make('costCenter.mfo.name')->label('MFO')->searchable(),
             Tables\Columns\TextColumn::make('fund_description')->searchable(),
@@ -105,7 +112,7 @@ class WfpSubmissions extends Component implements HasTable
                 Forms\Components\Textarea::make('reason')
                 ->label('Reason for Modification')
                 ->required()
-   
+
             ])
             ->action(function ($record, $data) {
                 WfpApprovalRemark::create([
@@ -144,6 +151,23 @@ class WfpSubmissions extends Component implements HasTable
                     return $query->whereHas('costCenter', function($query) use ($data) {
                         $query->where('m_f_o_s_id', $data['mfo']);
                     });
+                }
+                return $query; // Return the original query if "All" is selected
+            }),
+            Filter::make('is_approved')
+            ->form([
+                Forms\Components\Select::make('is_approved')
+                ->label('Status')
+                ->options([
+                    '' => 'All',
+                    0 => 'Pending',
+                    1 => 'Approved',
+                    500 => 'For Modification'
+                ])
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                if (!empty($data['is_approved'])) {
+                    return $query->where('is_approved', $data['is_approved']);
                 }
                 return $query; // Return the original query if "All" is selected
             }),
