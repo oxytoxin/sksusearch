@@ -58,7 +58,7 @@ class WfpSubmissions extends Component implements HasTable
             Tables\Columns\TextColumn::make('fund_description')->searchable(),
             Tables\Columns\TextColumn::make('updated_at')
             ->label('Date Created')
-            ->formatStateUsing(fn ($record) => Carbon::parse($record->created_at)->format('F d, Y h:i A'))
+            ->formatStateUsing(fn ($record) => Carbon::parse($record->updated_at)->format('F d, Y h:i A'))
             ->searchable()->sortable(),
             Tables\Columns\TextColumn::make('user.employee_information.full_name')
             ->label('Created By')
