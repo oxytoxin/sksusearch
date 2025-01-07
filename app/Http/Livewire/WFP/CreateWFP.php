@@ -795,7 +795,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function addSupplies()
     {
         //validate all step 2
-        $this->validate([ 
+        $this->validate([
             'supplies_particular_id' => 'required',
             'supplies_uom' => 'required',
             // 'supplies_cost_per_unit' => 'required|gt:0',
@@ -3289,7 +3289,8 @@ public function clearPs()
 
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
-
+                        if($draft_amount)
+                        {
                             $draft_amount->current_total -= $budget;
                             $draft_amount->balance += $budget;
                             $draft_amount->save();
@@ -3298,7 +3299,7 @@ public function clearPs()
                             {
                                 $draft_amount->delete();
                             }
-
+                        }
                         break;
                     }
                 }
@@ -3341,13 +3342,16 @@ public function clearPs()
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
 
-                        $draft_amount->current_total -= $budget;
-                        $draft_amount->balance += $budget;
-                        $draft_amount->save();
-
-                        if($draft_amount->current_total <= 0)
+                        if($draft_amount)
                         {
-                            $draft_amount->delete();
+                            $draft_amount->current_total -= $budget;
+                            $draft_amount->balance += $budget;
+                            $draft_amount->save();
+
+                            if($draft_amount->current_total <= 0)
+                            {
+                                $draft_amount->delete();
+                            }
                         }
 
                         break;
@@ -3388,13 +3392,16 @@ public function clearPs()
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
 
-                        $draft_amount->current_total -= $budget;
-                        $draft_amount->balance += $budget;
-                        $draft_amount->save();
-
-                        if($draft_amount->current_total <= 0)
+                        if($draft_amount)
                         {
-                            $draft_amount->delete();
+                            $draft_amount->current_total -= $budget;
+                            $draft_amount->balance += $budget;
+                            $draft_amount->save();
+
+                            if($draft_amount->current_total <= 0)
+                            {
+                                $draft_amount->delete();
+                            }
                         }
 
                         break;
@@ -3436,13 +3443,16 @@ public function clearPs()
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
 
-                        $draft_amount->current_total -= $budget;
-                        $draft_amount->balance += $budget;
-                        $draft_amount->save();
-
-                        if($draft_amount->current_total <= 0)
+                        if($draft_amount)
                         {
-                            $draft_amount->delete();
+                            $draft_amount->current_total -= $budget;
+                            $draft_amount->balance += $budget;
+                            $draft_amount->save();
+
+                            if($draft_amount->current_total <= 0)
+                            {
+                                $draft_amount->delete();
+                            }
                         }
 
                         break;
@@ -3483,13 +3493,16 @@ public function clearPs()
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
 
-                        $draft_amount->current_total -= $budget;
-                        $draft_amount->balance += $budget;
-                        $draft_amount->save();
-
-                        if($draft_amount->current_total <= 0)
+                        if($draft_amount)
                         {
-                            $draft_amount->delete();
+                            $draft_amount->current_total -= $budget;
+                            $draft_amount->balance += $budget;
+                            $draft_amount->save();
+
+                            if($draft_amount->current_total <= 0)
+                            {
+                                $draft_amount->delete();
+                            }
                         }
 
                         break;
