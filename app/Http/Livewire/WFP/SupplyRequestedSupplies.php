@@ -98,6 +98,11 @@ class SupplyRequestedSupplies extends Component implements HasTable
         ];
     }
 
+    protected function shouldPersistTableFiltersInSession(): bool
+    {
+        return true;
+    }
+
     public function render()
     {
         return view('livewire.w-f-p.supply-requested-supplies');
