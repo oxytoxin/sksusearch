@@ -96,6 +96,11 @@ class AccountingRequestedSupplies extends Component implements HasTable
         ];
     }
 
+    protected function shouldPersistTableFiltersInSession(): bool
+    {
+        return true;
+    }
+
     public function render()
     {
         return view('livewire.w-f-p.accounting-requested-supplies');
