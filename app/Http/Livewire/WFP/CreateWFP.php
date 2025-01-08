@@ -3525,9 +3525,9 @@ public function clearPs()
         }
     }
 
-    public function deletePs()
+    public function deletePs($index)
     {
-        if (isset($this->ps)) {
+        if (isset($this->ps[$index])) {
             $budget = $this->ps[$index]['estimated_budget'];
             $title_group = $this->ps[$index]['title_group'];
             $particular_id = $this->ps[$index]['particular_id'];
@@ -3549,13 +3549,16 @@ public function clearPs()
                         $this->current_balance[$key]['current_total'] -= $budget;
                         $this->current_balance[$key]['balance'] += $budget;
 
-                        $draft_amount->current_total -= $budget;
-                        $draft_amount->balance += $budget;
-                        $draft_amount->save();
-
-                        if($draft_amount->current_total <= 0)
+                        if($draft_amount)
                         {
-                            $draft_amount->delete();
+                            $draft_amount->current_total -= $budget;
+                            $draft_amount->balance += $budget;
+                            $draft_amount->save();
+
+                            if($draft_amount->current_total <= 0)
+                            {
+                                $draft_amount->delete();
+                            }
                         }
 
                         break;
