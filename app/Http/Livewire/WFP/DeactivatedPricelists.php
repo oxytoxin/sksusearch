@@ -30,7 +30,10 @@ class DeactivatedPricelists extends Component
             $query->where('is_active', 0);
         })->get();
 
-        $this->costCenters = CostCenter::whereHas('fundAllocations.fundDrafts', function ($query) {
+        $this->costCenters = CostCenter::whereHas('fundAllocations',function ($query) {
+            $query->whereNotIn('fund_cluster_w_f_p_s_id', [1, 3]);
+        })
+        ->whereHas('fundAllocations.fundDrafts', function ($query) {
             $query->whereNotNull('id');
         })->with([
             // Aggregate draft_items by title_group
@@ -76,6 +79,7 @@ class DeactivatedPricelists extends Component
 
     public function updateAmounts()
     {
+       
         // Step 1: Identify and remove duplicates in fund_draft_amounts
     $duplicates = DB::table('fund_draft_amounts')
     ->select('fund_draft_id', 'category_group_id', DB::raw('COUNT(*) as count'))
@@ -148,6 +152,7 @@ foreach ($draftItems as $item) {
 
     }
 }
+
 
 $this->dialog()->success(
     $title = 'Operation Success',
