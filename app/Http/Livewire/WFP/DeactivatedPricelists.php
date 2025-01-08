@@ -38,7 +38,7 @@ class DeactivatedPricelists extends Component
         })->with([
             // Aggregate draft_items by title_group
             'fundAllocations.fundDrafts.draft_items' => function ($query) {
-                $query->select('fund_draft_id', 'title_group', DB::raw('SUM(estimated_budget) as total_budget'))
+                $query->select('fund_draft_id', 'title_group', DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
                     ->groupBy('fund_draft_id', 'title_group');
             },
             // Aggregate draft_amounts by category_item_id
@@ -103,7 +103,7 @@ $draftItems = FundDraftItem::with('fundDraft') // Load the related fundDraft
     ->select(
         'fund_draft_id',
         'title_group',
-        DB::raw('SUM(CAST(estimated_budget AS DECIMAL(15,2))) as total_budget') // Cast to DECIMAL
+        DB::raw('SUM(CAST((cost_per_unit * total_quantity) AS DECIMAL(15,2))) as total_budget') // Cast to DECIMAL
     )
     ->groupBy('fund_draft_id', 'title_group')
     ->get();
