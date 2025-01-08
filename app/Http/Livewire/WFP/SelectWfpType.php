@@ -39,18 +39,13 @@ class SelectWfpType extends Component implements HasTable
 
     public function mount()
     {
+        $isOfficeHead = auth()->user()->employee_information->office?->head_employee?->id == auth()->user()->employee_information->id;
         $this->fund_cluster = 1;
-        // if(session()->has('fund_cluster3'))
-        // {
-        //     $this->fund_cluster = session('fund_cluster3');
-        // }else{
-        //     $this->fund_cluster = 1;
-        // }
+
         $this->wfp_type = WpfType::all()->count();
         $head_id = WpfPersonnel::where('user_id', Auth::user()->id)->first()?->head_id;
-        if($head_id === null)
+        if($head_id === null || $isOfficeHead)
         {
-
             $this->user_wfp_id = Auth::user()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
             $this->wfp = WpfType::find($this->user_wfp_id);
             $this->cost_center_id = Auth::user()->employee_information->office->cost_centers->first()->id;
@@ -65,6 +60,7 @@ class SelectWfpType extends Component implements HasTable
                 $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
                 $this->office_id = Auth::user()->employee_information->office->id;
             }else{
+                
                 $this->user_wfp_id = User::where('id', $head_id)->first()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
                 $this->wfp = WpfType::find($this->user_wfp_id);
                 $this->cost_center_id = User::where('id', $head_id)->first()->employee_information->office->cost_centers->first()->id;
@@ -84,7 +80,10 @@ class SelectWfpType extends Component implements HasTable
     protected function getTableQuery()
     {
         $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
-
+        // return CostCenter::query()->whereHas('fundAllocations', function ($query) {
+        //     $query->where('is_locked', 1);
+        // })
+        // ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->whereIn('id', $this->cost_centers->pluck('id')->toArray());
         if($user === null)
         {
             return CostCenter::query()->whereHas('fundAllocations', function ($query) {
@@ -92,13 +91,17 @@ class SelectWfpType extends Component implements HasTable
             })
             ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->whereIn('id', $this->cost_centers->pluck('id')->toArray());
         }else{
-            // dd($user);
-            return CostCenter::query()->whereHas('fundAllocations', function ($query) {
+            return CostCenter::query()
+            ->whereHas('fundAllocations', function ($query) {
                 $query->where('is_locked', 1);
             })
             ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)
-            ->whereHas('wpfPersonnel', function ($query) {
-                $query->where('user_id', Auth::user()->id);
+            ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
+            ->orWhereHas('wpfPersonnel', function ($query) {
+                $query->where('user_id', Auth::user()->id)
+                      ->whereHas('cost_center', function ($subQuery) {
+                          $subQuery->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
+                      });
             });
             // ->whereIn('id', $this->cost_centers->pluck('id')->toArray());
         }
