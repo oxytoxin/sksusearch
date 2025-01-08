@@ -39,12 +39,13 @@ class SelectWfpType extends Component implements HasTable
 
     public function mount()
     {
-        if(session()->has('fund_cluster3'))
-        {
-            $this->fund_cluster = session('fund_cluster3');
-        }else{
-            $this->fund_cluster = 1;
-        }
+        $this->fund_cluster = 1;
+        // if(session()->has('fund_cluster3'))
+        // {
+        //     $this->fund_cluster = session('fund_cluster3');
+        // }else{
+        //     $this->fund_cluster = 1;
+        // }
         $this->wfp_type = WpfType::all()->count();
         $head_id = WpfPersonnel::where('user_id', Auth::user()->id)->first()?->head_id;
         if($head_id === null)
@@ -83,6 +84,7 @@ class SelectWfpType extends Component implements HasTable
     protected function getTableQuery()
     {
         $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
+
         if($user === null)
         {
             return CostCenter::query()->whereHas('fundAllocations', function ($query) {
@@ -90,6 +92,7 @@ class SelectWfpType extends Component implements HasTable
             })
             ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->whereIn('id', $this->cost_centers->pluck('id')->toArray());
         }else{
+            // dd($user);
             return CostCenter::query()->whereHas('fundAllocations', function ($query) {
                 $query->where('is_locked', 1);
             })
