@@ -3528,12 +3528,12 @@ public function clearPs()
     public function deletePs()
     {
         if (isset($this->ps)) {
-            $budget = $this->ps['estimated_budget'];
-            $title_group = $this->ps['title_group'];
-            $particular_id = $this->ps['particular_id'];
-            $uom = $this->ps['uom'];
-            $remarks = $this->ps['remarks'];
-            $supply_code = $this->ps['supply_code'];
+            $budget = $this->ps[$index]['estimated_budget'];
+            $title_group = $this->ps[$index]['title_group'];
+            $particular_id = $this->ps[$index]['particular_id'];
+            $uom = $this->ps[$index]['uom'];
+            $remarks = $this->ps[$index]['remarks'];
+            $supply_code = $this->ps[$index]['supply_code'];
             $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
             $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
             ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
