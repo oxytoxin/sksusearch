@@ -39,12 +39,17 @@ class SelectWfpType extends Component implements HasTable
 
     public function mount()
     {
-        $this->fund_cluster = 1;
+        if(session()->has('fund_cluster3'))
+        {
+            $this->fund_cluster = session('fund_cluster3');
+        }else{
+            $this->fund_cluster = 1;
+        }
         $this->wfp_type = WpfType::all()->count();
-        // dd(Auth::user()->employee_information->full_name);
         $head_id = WpfPersonnel::where('user_id', Auth::user()->id)->first()?->head_id;
         if($head_id === null)
         {
+
             $this->user_wfp_id = Auth::user()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
             $this->wfp = WpfType::find($this->user_wfp_id);
             $this->cost_center_id = Auth::user()->employee_information->office->cost_centers->first()->id;
@@ -183,6 +188,7 @@ class SelectWfpType extends Component implements HasTable
     public function filter($id)
     {
         $this->fund_cluster = $id;
+        session(['fund_cluster3' => $id]);
     }
 
 
