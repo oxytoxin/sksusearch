@@ -52,6 +52,7 @@ class WfpSubmissions extends Component implements HasTable
     {
         return [
             Tables\Columns\TextColumn::make('wfpType.description')->label('WFP Type')->searchable(),
+            Tables\Columns\TextColumn::make('costCenter.name')->label('Name')->searchable(),
             Tables\Columns\TextColumn::make('costCenter.office.name')->label('Office')->searchable(),
             Tables\Columns\TextColumn::make('fundClusterWfp.name')->label('Fund Cluster')->searchable(),
             Tables\Columns\TextColumn::make('costCenter.mfo.name')->label('MFO')->searchable(),
