@@ -22,12 +22,12 @@ class GeneratePpmp extends Component
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('is_approved', 1);
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('is_approved', 1);
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function gasPpmp()
@@ -44,14 +44,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
     }
 
@@ -64,14 +64,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function aesPpmp()
@@ -83,14 +83,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function rdPpmp()
@@ -102,14 +102,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function extensionPpmp()
@@ -121,14 +121,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function lfPpmp()
@@ -140,14 +140,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     //161
@@ -157,12 +157,12 @@ class GeneratePpmp extends Component
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 2)->where('is_approved', 1);
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 2)->where('is_approved', 1);
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function gasPpmp161()
@@ -179,14 +179,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
     }
 
@@ -199,14 +199,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function aesPpmp161()
@@ -218,14 +218,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function rdPpmp161()
@@ -237,14 +237,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function extensionPpmp161()
@@ -256,14 +256,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function lfPpmp161()
@@ -275,14 +275,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     //163
@@ -292,12 +292,12 @@ class GeneratePpmp extends Component
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function accessPpmp163()
@@ -310,7 +310,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 1);
             });
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
@@ -319,7 +319,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 1);
             });
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function tacurongPpmp163()
@@ -332,7 +332,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 2);
             });
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
@@ -341,7 +341,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 2);
             });
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function isulanPpmp163()
@@ -354,7 +354,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 3);
             });
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
@@ -363,7 +363,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 3);
             });
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function kalamansigPpmp163()
@@ -376,7 +376,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 4);
             });
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
@@ -385,7 +385,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 4);
             });
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function lutayanPpmp163()
@@ -398,7 +398,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 5);
             });
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
@@ -407,7 +407,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 5);
             });
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function palimbangPpmp163()
@@ -420,7 +420,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 6);
             });
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
@@ -429,7 +429,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 6);
             });
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function bagumbayanPpmp163()
@@ -442,7 +442,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 7);
             });
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
@@ -451,7 +451,7 @@ class GeneratePpmp extends Component
                 $query->where('campus_id', 7);
             });
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     //164T
@@ -461,12 +461,12 @@ class GeneratePpmp extends Component
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function gasPpmp164T()
@@ -477,14 +477,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
     }
 
@@ -496,14 +496,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function aesPpmp164T()
@@ -514,14 +514,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function rdPpmp164T()
@@ -532,14 +532,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function extensionPpmp164T()
@@ -550,14 +550,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function lfPpmp164T()
@@ -568,14 +568,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
      //164T-NonFHE
@@ -585,12 +585,12 @@ class GeneratePpmp extends Component
          $this->title = 'Sultan Kudarat State University';
          $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
              $query->where('fund_cluster_w_f_p_s_id', 7)->where('is_approved', 1);
-         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
              $query->where('fund_cluster_w_f_p_s_id', 7)->where('is_approved', 1);
-         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function gasPpmp164TN()
@@ -601,14 +601,14 @@ class GeneratePpmp extends Component
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 1);
              });
-         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 1);
              });
-         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
      }
 
@@ -620,14 +620,14 @@ class GeneratePpmp extends Component
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 2);
              });
-         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 2);
              });
-         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function aesPpmp164TN()
@@ -638,14 +638,14 @@ class GeneratePpmp extends Component
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 3);
              });
-         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 3);
              });
-         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function rdPpmp164TN()
@@ -656,14 +656,14 @@ class GeneratePpmp extends Component
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 4);
              });
-         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 4);
              });
-         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function extensionPpmp164TN()
@@ -674,14 +674,14 @@ class GeneratePpmp extends Component
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 5);
              });
-         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 5);
              });
-         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function lfPpmp164TN()
@@ -692,14 +692,14 @@ class GeneratePpmp extends Component
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 6);
              });
-         })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
          ->groupBy('category_item_id')
          ->get();
          $this->total = WfpDetail::whereHas('wfp', function($query) {
              $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
              $query->where('m_f_o_s_id', 6);
              });
-         })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
 
@@ -710,12 +710,12 @@ class GeneratePpmp extends Component
             $this->title = 'Sultan Kudarat State University';
             $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('fund_cluster_w_f_p_s_id', 5)->where('is_approved', 1);
-            })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('fund_cluster_w_f_p_s_id', 5)->where('is_approved', 1);
-            })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function gasPpmp164OSF()
@@ -726,14 +726,14 @@ class GeneratePpmp extends Component
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
-            })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
-            })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
         }
 
@@ -745,14 +745,14 @@ class GeneratePpmp extends Component
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
-            })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
-            })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function aesPpmp164OSF()
@@ -763,14 +763,14 @@ class GeneratePpmp extends Component
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
-            })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
-            })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function rdPpmp164OSF()
@@ -781,14 +781,14 @@ class GeneratePpmp extends Component
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
-            })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
-            })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function extensionPpmp164OSF()
@@ -799,14 +799,14 @@ class GeneratePpmp extends Component
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
-            })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
-            })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function lfPpmp164OSF()
@@ -817,14 +817,14 @@ class GeneratePpmp extends Component
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
-            })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
             ->groupBy('category_item_id')
             ->get();
             $this->total = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
-            })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
     //164MF
@@ -834,12 +834,12 @@ class GeneratePpmp extends Component
         $this->title = 'Sultan Kudarat State University';
         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 6)->where('is_approved', 1);
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 6)->where('is_approved', 1);
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function gasPpmp164MF()
@@ -850,14 +850,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 1);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
     }
 
@@ -869,14 +869,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 2);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function aesPpmp164MF()
@@ -887,14 +887,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 3);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function rdPpmp164MF()
@@ -905,14 +905,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 4);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function extensionPpmp164MF()
@@ -923,14 +923,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 5);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function lfPpmp164MF()
@@ -941,14 +941,14 @@ class GeneratePpmp extends Component
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
-        })->select('category_item_id', \DB::raw('SUM(estimated_budget) as total_budget'))
+        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
         ->groupBy('category_item_id')
         ->get();
         $this->total = WfpDetail::whereHas('wfp', function($query) {
             $query->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6);
             });
-        })->select(\DB::raw('SUM(estimated_budget) as total_budget'))->first();
+        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
 
