@@ -1,7 +1,7 @@
 <div x-data>
     <div class="p-4">
         <div class="flex justify-center">
-            <button @click="showPrintable = true" wire:click="sksuPpmp161" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+            <button @click="showPrintable = true" wire:click="sksuPpmp163" class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
                 SKSU 163
             </button>
         </div>
