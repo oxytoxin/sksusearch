@@ -51,7 +51,7 @@ class WfpSubmissions extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            Tables\Columns\TextColumn::make('costCenter.id')->label('ID')->toggleable(isToggledHiddenByDefault: true)->searchable(),
+            Tables\Columns\TextColumn::make('id')->label('ID')->toggleable(isToggledHiddenByDefault: true)->searchable(),
             Tables\Columns\TextColumn::make('wfpType.description')->label('WFP Type')->searchable(),
             Tables\Columns\TextColumn::make('costCenter.name')->label('Name')->searchable(),
             Tables\Columns\TextColumn::make('costCenter.office.name')->label('Office')->searchable(),
