@@ -44,11 +44,21 @@ class SelectWfpType extends Component implements HasTable
 
         $this->wfp_type = WpfType::all()->count();
         $head_id = WpfPersonnel::where('user_id', Auth::user()->id)->first()?->head_id;
-        $this->cost_centers = Auth::user()->employee_information->office->cost_centers
-        ->orWhereHas('wpfPersonnel', function ($query) {
-            $query->where('user_id', Auth::user()->id)
-            ->orWhere('head_id', Auth::user()->id);
-        });
+        $has_personnel = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->first();
+        if($has_personnel){
+            $this->cost_centers = Auth::user()->employee_information->office->cost_centers
+            ->whereHas('wpfPersonnel', function ($query) {
+                $query->where('user_id', Auth::user()->id)
+                ->orWhere('head_id', Auth::user()->id);
+            });
+        }else{
+            $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
+        }
+        // $this->cost_centers = Auth::user()->employee_information->office->cost_centers
+        // ->hereHas('wpfPersonnel', function ($query) {
+        //     $query->where('user_id', Auth::user()->id)
+        //     ->orWhere('head_id', Auth::user()->id);
+        // });
         // if($head_id === null)
         // {
         //     $this->user_wfp_id = Auth::user()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
