@@ -86,8 +86,10 @@ class SelectWfpType extends Component implements HasTable
         ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)
         ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
         ->orWhereHas('wpfPersonnel', function ($query) {
-            $query->where('user_id', Auth::user()->id)
-            ->orWhere('head_id', Auth::user()->id);
+            $query->where('user_id', Auth::user()->id);
+        })
+        ->orWhereHas('wpfPersonnel', function ($query) {
+            $query->where('head_id', Auth::user()->id);
         });
         // if($user === null)
         // {
