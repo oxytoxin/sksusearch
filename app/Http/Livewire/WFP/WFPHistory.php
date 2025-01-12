@@ -24,7 +24,10 @@ class WFPHistory extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return Wfp::query()->whereIn('cost_center_id', $this->cost_centers->pluck('id')->toArray())->where('user_id', Auth::id());
+        return Wfp::query()->whereIn('cost_center_id', $this->cost_centers->pluck('id')->toArray())->where('user_id', Auth::id())
+        ->orWhereHas('costCenter.wpfPersonnel', function ($query) {
+            $query->where('user_id', Auth::id());
+        });
     }
 
     protected function getTableColumns()
