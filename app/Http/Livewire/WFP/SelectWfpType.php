@@ -50,7 +50,7 @@ class SelectWfpType extends Component implements HasTable
             ->whereHas('wpfPersonnel', function ($query) {
                 $query->where('user_id', Auth::user()->id)
                 ->orWhere('head_id', Auth::user()->id);
-            });
+            })->get();
         }else{
             $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
         }
