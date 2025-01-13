@@ -27,6 +27,7 @@ use App\Http\Livewire\WFP\WfpSubmissions;
 use App\Http\Livewire\WFP\WFPTypes;
 use App\Http\Livewire\WFP\DeactivatedPricelists;
 use App\Http\Livewire\WFP\ViewAllocatedFund;
+use App\Http\Livewire\WFP\ViewRemarks;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([
@@ -60,4 +61,5 @@ Route::middleware([
     Route::get('/accounting-requested-supplies', AccountingRequestedSupplies::class)->name('accounting-requested-suppluies');
     Route::get('/pricelist-document', PriceListDocument::class)->name('pricelist-document');
     Route::get('/deactivated-pricelists', DeactivatedPricelists::class)->name('deactivated-pricelists');
+    Route::get('/view-remarks/{record}', ViewRemarks::class)->name('view-remarks');
 });
