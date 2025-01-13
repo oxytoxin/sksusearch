@@ -10,6 +10,7 @@ use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\ViewAction;
+use App\Models\WpfPersonnel;
 use Filament\Tables\Concerns\InteractsWithTable;
 
 class WFPHistory extends Component implements HasTable
@@ -19,11 +20,16 @@ class WFPHistory extends Component implements HasTable
 
     public function mount()
     {
-        $this->cost_centers = Auth::user()->employee_information->office->cost_centers()
+        $has_personnel = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->first();
+        if($has_personnel){
+            $this->cost_centers = Auth::user()->employee_information->office->cost_centers()
             ->with('wpfPersonnel', function ($query) {
                 $query->where('user_id', Auth::user()->id)
                 ->orWhere('head_id', Auth::user()->id);
             })->get();
+        }else{
+            $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
+        }
     }
 
     protected function getTableQuery()
