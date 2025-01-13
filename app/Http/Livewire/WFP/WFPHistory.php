@@ -19,16 +19,19 @@ class WFPHistory extends Component implements HasTable
 
     public function mount()
     {
-        $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
+        $this->cost_centers = Auth::user()->employee_information->office->cost_centers()
+            ->with('wpfPersonnel', function ($query) {
+                $query->where('user_id', Auth::user()->id)
+                ->orWhere('head_id', Auth::user()->id);
+            })->get();
     }
 
     protected function getTableQuery()
     {
-        return Wfp::query()->whereIn('cost_center_id', $this->cost_centers->pluck('id')->toArray())->where('user_id', Auth::id())
+        return Wfp::query()->whereIn('cost_center_id', $this->cost_centers->pluck('id')->toArray())
         ->orWhereHas('costCenter.wpfPersonnel', function ($query) {
-            $query->where('user_id', Auth::id());
-        })->orWhereHas('costCenter.wpfPersonnel', function ($query) {
-            $query->where('head_id', Auth::id());
+            $query->where('user_id', Auth::user()->id)
+                ->orWhere('head_id', Auth::user()->id);
         });
     }
 
