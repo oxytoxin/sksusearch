@@ -45,6 +45,12 @@ class SupplyResource extends Resource
                     ->searchable()
                     ->preload()
                     ->required(),
+                    Select::make('category_item_budget_id')
+                    ->relationship('categoryItemsBudget', 'name')
+                    ->label('Account Title Budget')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                     Select::make('category_group_id')
                     ->relationship('categoryGroups', 'name')
                     ->label('Category Group')
@@ -84,6 +90,7 @@ class SupplyResource extends Resource
                 TextColumn::make('categoryItems.budgetCategory.name')->wrap()->label('Budget Category'),
                 // TextColumn::make('categoryItems.id')->label('Account Title ID')->searchable(isIndividual: true, isGlobal: false)->sortable(),
                 TextColumn::make('categoryItems.name')->wrap()->label('Account Title')->searchable(),
+                TextColumn::make('categoryItemsBudget.name')->wrap()->label('Account Title Budget')->searchable(),
                 TextColumn::make('categoryGroups.name')->wrap()->label('Category Group')->searchable(),
                 TextColumn::make('supply_code')->searchable(isIndividual: true, isGlobal: false)->sortable(),
                 TextColumn::make('particulars')->wrap()->searchable(isIndividual: true, isGlobal: false)->html()->sortable(),

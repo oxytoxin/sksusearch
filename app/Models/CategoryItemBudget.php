@@ -15,6 +15,11 @@ class CategoryItemBudget extends Model
         return $this->belongsTo(BudgetCategory::class);
     }
 
+    // public function scopeActiveCategoryItems($query)
+    // {
+    //     return $query->where('is_active', 1);
+    // }
+
     public function supplies()
     {
         return $this->hasMany(Supply::class);

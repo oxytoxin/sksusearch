@@ -37,13 +37,13 @@
                 </div>
                 @if ($record->fundClusterWfp->id > 3)
                 <div class="py-2">
-                    <span class="text-left font-semibold">Source of Fund: </span>
-                    <span class="text-center">{{$record->source_fund}}</span>
+                    <span class="text-left font-semibold">MFO Fee: </span>
+                    <span class="text-center">{{$record->costCenter->mfoFee->name}}</span>
                 </div>
-                <div class="py-2">
+                {{-- <div class="py-2">
                     <span class="text-left font-semibold">If miscellaneous/fiduciary fee, please specify: </span>
                     <span class="text-center">{{$record->confirm_fund_source ?? 'N/A'}}</span>
-                </div>
+                </div> --}}
                 @endif
                 <div class="py-2">
                     <span class="text-left font-semibold">Cost Center: </span>
