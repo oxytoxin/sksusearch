@@ -20,19 +20,28 @@
             </p>
             <p class="text-md font-normal">{{$record->wfpType->description}}</p>
         </div>
-        <div>
+        <div class="flex justify-between">
+            <!-- Left Side -->
             <div class="p-6 flex-col text-sm w-1/4 font-medium divide-y-2 divide-gray-800">
                 <div class="py-2">
-                  <span class="text-left font-semibold">Fund:</span>
-                  <span class="text-center">{{$record->fundClusterWfp->name}} - {{$record->fund_description}}</span>
-              </div>
+                    <span class="text-left font-semibold">Fund Description:</span>
+                    <span class="text-center">{{$record->fund_description}}</span>
+                </div>
+                <div class="py-2">
+                    <span class="text-left font-semibold">Fund Cluster:</span>
+                    <span class="text-center">{{$record->fundClusterWfp->name}}</span>
+                </div>
+                <div class="py-2">
+                    <span class="text-left font-semibold">MFO:</span>
+                    <span class="text-center">{{$record->costCenter->mfo->name}}</span>
+                </div>
                 @if ($record->fundClusterWfp->id > 3)
                 <div class="py-2">
-                    <span class="text-left font-semibold">Souce of Fund: </span>
+                    <span class="text-left font-semibold">Source of Fund: </span>
                     <span class="text-center">{{$record->source_fund}}</span>
                 </div>
                 <div class="py-2">
-                    <span class="text-left font-semibold">if miscellaneous/fiduciary fee, please specify: </span>
+                    <span class="text-left font-semibold">If miscellaneous/fiduciary fee, please specify: </span>
                     <span class="text-center">{{$record->confirm_fund_source ?? 'N/A'}}</span>
                 </div>
                 @endif
@@ -44,8 +53,31 @@
                     <span class="text-left font-semibold">Cost Center Head: </span>
                     <span class="text-center">{{$record->costCenter->office->head_employee?->full_name.' - '.$record->costCenter->office->name}}</span>
                 </div>
-                <div></div>
+            </div>
 
+            <!-- Right Side -->
+            <div class="p-6 flex-col justify-end text-sm w-1/4 font-medium divide-y-2 divide-gray-800">
+                <!-- Add your content for the right side here -->
+                <div class="py-2">
+                    <span class="text-right font-semibold">Status:</span>
+                    @if($record->is_approved === 0)
+                    <span class="text-center">Pending</span>
+                    @elseif($record->is_approved === 1)
+                    <span class="text-center">Approved</span>
+                    @else
+                    <span class="text-center">For Modification</span>
+                    @endif
+
+                </div>
+
+                <div class="py-2">
+                    @if($record->is_approved === 1)
+                    <span class="text-left font-semibold">Date Approved:</span>
+                    <span class="text-center">{{Carbon\Carbon::parse($record->updated_at)->format('F d, Y h:i A')}}</span>
+                    @endif
+                </div>
+
+                <!-- Add more fields as needed -->
             </div>
         </div>
 
