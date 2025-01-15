@@ -22,24 +22,91 @@
                 <p class="text-md font-normal">{{$title}} - {{$record->fund_description}}</p>
             </div>
             <div>
+                @if($record->fundClusterWfp->id === 1 || $record->fundClusterWfp->id === 3)
                 <table class="w-full mt-4">
                     <thead>
                         <tr>
-                            <th class="border border-black">UACS Code</th>
-                            <th class="border border-black">Account Title</th>
-                            <th class="border border-black">Total</th>
+                            <th colspan="2" class="border border-black bg-gray-300">Receipts</th>
+                            <th colspan="3" class="border border-black bg-gray-300">Expenditure</th>
+                            <th class="border border-black bg-gray-300">Balance</th>
+                            {{-- <th colspan="2" class="border border-black bg-gray-300">Corresponding Account Codes</th> --}}
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($ppmp_details as $item)
+                        <thead>
+                            <tr>
+                                <th class="border border-black">Category Group</th>
+                                <th class="border border-black">Allocation</th>
+                                <th class="border border-black">UACS Code</th>
+                                <th class="border border-black">Account Title - Budget</th>
+                                <th class="border border-black">Programmed</th>
+                                <th class="border border-black"></th>
+                                {{-- <th class="border border-black">UACS Code</th>
+                                <th class="border border-black">Account Title</th> --}}
+                            </tr>
+                        </thead>
+                        @forelse($fund_allocation as $item)
                         <tr>
-                            <td class="border border-black px-2">{{$item->categoryItem->uacs_code}}</td>
-                            <td class="border border-black px-2">{{$item->categoryItem->name}}</td>
-                            <td class="border border-black text-right px-2">
+                            <td class="border border-black px-2">{{$item->categoryGroup->name}}</td>
+                            <td class="border border-black px-2">
                                 <div class="flex justify-between">
                                     <span>₱</span>
-                                    <span>{{number_format($item->total_budget, 2)}}</span>
+                                    <span>{{number_format($item->initial_amount, 2)}}</span>
                                 </div>
+                            </td>
+                            <td class="border border-black px-2">
+                                @foreach ($ppmp_details->where('category_group_id', $item->category_group_id) as $ppmp)
+                                <ul>
+                                    <li>
+                                        {{$ppmp->budget_uacs ?? $ppmp->uacs}}
+                                    </li>
+                                </ul>
+                                @endforeach
+                            </td>
+                            {{-- <td class="border border-black px-2">
+                                @foreach ($ppmp_details->where('category_group_id', $item->category_group_id) as $ppmp)
+                                <ul>
+                                    <li>
+                                        {{$ppmp === null ? $ppmp->item_name : $ppmp->budget_name}}
+                                    </li>
+                                </ul>
+                                @endforeach
+                            </td>
+                            <td class="border border-black px-2">
+                                @foreach ($ppmp_details->where('category_group_id', $item->category_group_id) as $ppmp)
+                                <ul>
+                                    <li>
+                                        <div class="flex justify-between">
+                                            <span>₱</span>
+                                            <span>{{number_format($ppmp->total_budget, 2)}}</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                                @endforeach
+                            </td> --}}
+                            <td class="border border-black px-2">
+                                <div class="flex justify-between">
+                                    <span>₱</span>
+                                    <span>{{number_format($item->initial_amount - $ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2)}}</span>
+                                </div>
+                            </td>
+                            <td class="border border-black px-2">
+                                @foreach ($ppmp_details->where('category_group_id', $item->category_group_id) as $ppmp)
+                                <ul>
+                                    <li>
+                                        {{$ppmp->uacs}}
+                                    </li>
+                                </ul>
+                                @endforeach
+                            </td>
+                            <td class="border border-black px-2">
+                                @foreach ($ppmp_details->where('category_group_id', $item->category_group_id) as $ppmp)
+                                <ul>
+                                    <li>
+                                        {{$ppmp->budget_name}}
+                                    </li>
+                                </ul>
+                                @endforeach
                             </td>
                         </tr>
                         @empty
@@ -48,7 +115,7 @@
                         </tr>
                         @endforelse
                     </tbody>
-                    <tr>
+                    {{-- <tr>
                         <td class="border border-black text-left font-semibold p-1" colspan="2">Grand Total</td>
                         <td class="border border-black text-right font-semibold px-2">
                             <div class="flex justify-between">
@@ -56,8 +123,12 @@
                                 <span>{{$total === null ? 0 : number_format($total->total_budget, 2)}}</span>
                             </div>
                         </td>
-                    </tr>
+                    </tr> --}}
                 </table>
+                @else
+                test
+                @endif
+
             </div>
             {{-- signatories --}}
             @php

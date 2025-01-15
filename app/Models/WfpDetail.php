@@ -38,5 +38,5 @@ class WfpDetail extends Model
     public function categoryItemBudget()
     {
         return $this->belongsTo(CategoryItemBudget::class, 'category_item_budget_id');
-    } 
+    }
 }
