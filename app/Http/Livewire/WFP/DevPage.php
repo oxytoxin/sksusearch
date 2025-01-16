@@ -40,7 +40,6 @@ class DevPage extends Component
         $missing_budget_categories = $this->account_titles->filter(function ($item) use ($budget_account_titles) {
             return !$budget_account_titles->contains('uacs_code', $item->uacs_code);
         });
-        dd($missing_budget_categories);
         foreach ($missing_budget_categories as $missing_category) {
             CategoryItemBudget::create([
             'uacs_code' => $missing_category->uacs_code,
