@@ -10,13 +10,45 @@
                 <div>
                   <button wire:click="addCategoryBudget" class="bg-green-600 p-4 text-gray-50 rounded-lg">Update</button>
                 </div>
-                {{-- <div>
-                  <button wire:click="removeAmounts" class="mt-4 bg-green-600 p-4 text-gray-50 rounded-lg">Remove</button>
-                </div>
                 <div>
-                    <button wire:click="deleteItems" class="mt-4 bg-green-600 p-4 text-gray-50 rounded-lg">Delete Items</button>
-                  </div> --}}
+                    <button wire:click="updateItems" class="mt-4 bg-green-600 p-4 text-gray-50 rounded-lg">Update Items</button>
+                  </div>
+                  <div>
+                    <button wire:click="updateUACS" class="mt-4 bg-green-600 p-4 text-gray-50 rounded-lg">Update UACS</button>
+                  </div>
                 <table class="min-w-full divide-y divide-gray-500 mt-10">
+                    <thead>
+                        <tr class="divide-x divide-gray-500">
+                            <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Category Item</th>
+                            <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Category Item UACS</th>
+                            <th scope="col" class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Category Item Budget</th>
+                            <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Particulars</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-500 bg-transparent">
+                        @forelse ($supplies as $item)
+                        <tr class="divide-x divide-gray-500">
+                            <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">
+                                {{ $item->categoryItems->name }}
+                            </td>
+                            <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">
+                                {{ $item->categoryItems->uacs_code }}
+                            </td>
+                            <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">
+                                {{ $item->categoryItemsBudget?->name }}
+                            </td>
+                            <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">
+                                {{ $item->particulars }}
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="3" class="text-center text-gray-500">No cost centers found.</td>
+                        </tr>
+                        @endforelse
+                      </tbody>
+                </table>
+                {{-- <table class="min-w-full divide-y divide-gray-500 mt-10">
                   <thead>
                     <tr class="divide-x divide-gray-500">
                         <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Budget Category</th>
@@ -51,7 +83,7 @@
                     </tr>
                     @endforelse
                   </tbody>
-                </table>
+                </table> --}}
 
               </div>
             </div>

@@ -15,7 +15,9 @@ class UserPRE extends Component
     public $record;
     public $cost_center;
     public $ppmp_details;
-    public $total;
+    public $total_allocated;
+    public $total_programmed;
+    public $balance;
     public $title;
     public $fund_allocation;
 
@@ -69,9 +71,12 @@ class UserPRE extends Component
             )
             ->groupBy('cost_center_id', 'category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
-            $this->total = WfpDetail::whereHas('wfp', function($query) {
+            $this->total_allocated = FundAllocation::where('cost_center_id', $this->cost_center->id)->where('initial_amount', '>', 0)->sum('initial_amount');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
             })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
         }else{
 
         }
