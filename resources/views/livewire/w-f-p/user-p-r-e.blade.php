@@ -165,7 +165,7 @@
                                 </div>
                             </td>
                             <td class="border border-black px-2">
-                                @foreach ($ppmp_details->where('category_group_id', $item->category_group_id) as $ppmp)
+                                @foreach ($ppmp_details as $ppmp)
                                 <ul>
                                     <li>
                                         {{$ppmp->budget_uacs ?? $ppmp->uacs}}
@@ -174,10 +174,13 @@
                                 @endforeach
                             </td>
                             <td class="border border-black px-2">
-                                @foreach ($ppmp_details->where('category_group_id', $item->category_group_id) as $ppmp)
+                                @foreach ($ppmp_details as $ppmp)
                                 <ul>
                                     <li>
-                                        {{$ppmp->budget_name ?? $ppmp->item_name}}
+                                        <div class="flex justify-between">
+                                            <span>{{$ppmp->budget_name}}</span>
+                                            <span>₱ {{number_format($ppmp->total_budget_per_uacs, 2)}}</span>
+                                        </div>
                                     </li>
                                 </ul>
                                 @endforeach
@@ -185,13 +188,13 @@
                             <td class="border border-black px-2">
                                 <div class="flex justify-between">
                                     <span>₱</span>
-                                    <span>{{number_format($ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2)}}</span>
+                                    <span>{{number_format($ppmp_details->sum('total_budget'), 2)}}</span>
                                 </div>
                             </td>
                             <td class="border border-black px-2">
                                 <div class="flex justify-between">
                                     <span>₱</span>
-                                    <span>{{number_format($item->initial_amount - $ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2)}}</span>
+                                    <span>{{number_format($item->initial_amount - $ppmp_details->sum('total_budget'), 2)}}</span>
                                 </div>
                             </td>
                             {{-- <td class="border border-black px-2">

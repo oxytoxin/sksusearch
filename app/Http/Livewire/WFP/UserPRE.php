@@ -67,7 +67,8 @@ class UserPRE extends Component
                 'category_items.name as item_name',
                 \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
                 'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
-                'category_item_budgets.name as budget_name' // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs')
             )
             ->groupBy('cost_center_id', 'category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
@@ -78,6 +79,7 @@ class UserPRE extends Component
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         }else{
+
             $this->fund_allocation = FundAllocation::whereHas('costCenter', function ($query) {
                 $query->where('id', $this->cost_center->id)
                       ->whereHas('mfoFee', function ($query) {
@@ -99,7 +101,8 @@ class UserPRE extends Component
                 'category_items.name as item_name',
                 \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
                 'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
-                'category_item_budgets.name as budget_name' // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
             )
             ->groupBy('cost_center_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
