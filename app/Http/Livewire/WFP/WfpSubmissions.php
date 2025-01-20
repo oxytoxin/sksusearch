@@ -32,6 +32,8 @@ class WfpSubmissions extends Component implements HasTable
         if(session()->has('fund_cluster2'))
         {
             $this->fund_cluster = session('fund_cluster2');
+        }else{
+            $this->fund_cluster = 1;
         }
         // if($filter)
         // {
