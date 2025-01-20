@@ -78,7 +78,38 @@ class UserPRE extends Component
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         }else{
+            $this->fund_allocation = FundAllocation::whereHas('costCenter', function ($query) {
+                $query->where('id', $this->cost_center->id)
+                      ->whereHas('mfoFee', function ($query) {
+                          $query->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                      });
+            })->get();
 
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+                $query->where('cost_center_id', $this->record->cost_center_id)
+                      ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+            })
+            ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+            ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+            ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+            ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+            ->select(
+                'wfps.cost_center_id as cost_center_id',
+                'category_items.uacs_code as uacs',
+                'category_items.name as item_name',
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+                'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+                'category_item_budgets.name as budget_name' // Include the related field in the select
+            )
+            ->groupBy('cost_center_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
+            ->get();
+
+
+            $this->total_allocated = FundAllocation::where('cost_center_id', $this->cost_center->id)->where('initial_amount', '>', 0)->sum('initial_amount');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+                $query->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+            })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
         }
 
     }
