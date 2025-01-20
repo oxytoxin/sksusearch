@@ -246,6 +246,8 @@
                 $isSupply = auth()->user()->employee_information->office_id == 49;
                 $isFinance = auth()->user()->employee_information->office_id == 25 && (auth()->user()->employee_information->position_id == 12 || auth()->user()->employee_information->position_id == 38);
                 $isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
+                $is_reizza = auth()->user()->id == 49;
+                $is_nolaila = auth()->user()->id == 467;
             @endphp
             <!-- Expandable link section, show/hide based on state. -->
             <div class="space-y-1" class="origin-top-left" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'>
@@ -261,6 +263,8 @@
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.fund-allocation', 1) }}">
                     Fund Allocation
                 </a>
+                @endif
+                @if ($isFinance || $is_reizza || $is_nolaila)
                 <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="{{ route('wfp.wfp-submissions', 1) }}">
                     WFP Submissions
                 </a>
