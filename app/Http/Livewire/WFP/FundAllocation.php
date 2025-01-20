@@ -41,6 +41,8 @@ class FundAllocation extends Component implements HasTable
         if(session()->has('fund_cluster'))
         {
             $this->fund_cluster = session('fund_cluster');
+        }else{
+            $this->fund_cluster = 1;
         }
         // if($filter)
         // {
