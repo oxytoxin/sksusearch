@@ -284,7 +284,7 @@ td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</
                     <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                         <div>
                             <div class="flex justify-between space-x-3">
-                                <span>Allocated Fund: </span><span>₱ {{number_format($record->total_allocated_fund, 2)}}</span>
+                                <span>Allocated Fund: </span><span>₱ {{number_format($record->costCenter->fundAllocations->sum('initial_amount'), 2)}}</span>
                             </div>
                             <div class="flex justify-between">
                                 <span>Program: </span><span>₱ {{number_format($program, 2)}}</span>
