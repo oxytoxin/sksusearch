@@ -158,7 +158,7 @@
                         </thead>
                         @forelse($fund_allocation as $item)
                         <tr>
-                            <td class="border border-black px-2">{{$item->costCenter->mfoFee->name}}</td>
+                            <td class="border border-black px-2">{{$item->costCenter->mfoFee?->name}}</td>
                             <td class="border border-black px-2">
                                 <div class="flex justify-between">
                                     <span>₱</span>

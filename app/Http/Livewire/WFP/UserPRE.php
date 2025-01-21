@@ -38,6 +38,7 @@ class UserPRE extends Component
             })
             ->get();
 
+
             // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
             //     $query->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
             // })

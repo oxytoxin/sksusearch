@@ -57,7 +57,7 @@ class CostCenterResource extends Resource
                     })
                     ->searchable()
                     //->relationship('mfoFee', 'name')
-                    ->visible(fn ($get) => $get('fund_cluster_w_f_p_s_id') > 2),
+                    ->visible(fn ($get) => $get('fund_cluster_w_f_p_s_id') != 1 || $get('fund_cluster_w_f_p_s_id') != 3),
                 ]),
 
                 Select::make('office_id')
