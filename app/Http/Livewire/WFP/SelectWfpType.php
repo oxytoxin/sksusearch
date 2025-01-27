@@ -94,7 +94,7 @@ class SelectWfpType extends Component implements HasTable
     protected function getTableQuery()
     {
         $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
-       
+
         return CostCenter::query()->whereHas('fundAllocations', function ($query) {
             $query->where('is_locked', 1);
         })
@@ -146,7 +146,7 @@ class SelectWfpType extends Component implements HasTable
             ->getStateUsing(function ($record) {
                 return $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()->wpfType->description;
             })
-            ->label('WFP Type'),
+            ->label('WFP Period'),
             Tables\Columns\TextColumn::make('fundAllocations.amount')
             ->label('Amount')
             ->formatStateUsing(function ($record) {

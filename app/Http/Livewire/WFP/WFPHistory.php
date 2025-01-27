@@ -44,7 +44,7 @@ class WFPHistory extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            Tables\Columns\TextColumn::make('wfpType.description')->label('WFP Type')->searchable(),
+            Tables\Columns\TextColumn::make('wfpType.description')->label('WFP Period')->searchable(),
             Tables\Columns\TextColumn::make('costCenter.name')->label('Cost Center')->searchable(),
             Tables\Columns\TextColumn::make('fundClusterWfp.name')->label('Fund Cluster')->searchable(),
             Tables\Columns\TextColumn::make('costCenter.mfo.name')->label('MFO')->searchable(),

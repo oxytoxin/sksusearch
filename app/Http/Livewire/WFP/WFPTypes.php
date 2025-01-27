@@ -30,6 +30,7 @@ class WFPTypes extends Component implements HasTable
     {
         return [
             Tables\Columns\TextColumn::make('type')
+            ->label('Period')
             ->formatStateUsing(fn ($state) => ucfirst($state))
             ->wrap()
             ->searchable(),
@@ -45,10 +46,11 @@ class WFPTypes extends Component implements HasTable
         return [
             Action::make('create_new')
             ->icon('ri-folder-add-line')
-            ->label('Create New WFP Type')
+            ->label('Create New WFP Period')
             ->button()
             ->form([
                 Select::make('type')
+                ->label('Period')
                 ->options([
                     'quarterly' => 'Quarterly',
                     'yearly' => 'Yearly',
@@ -62,7 +64,7 @@ class WFPTypes extends Component implements HasTable
                     'description' => $data['description']
                 ]);
 
-                Notification::make()->title('Operation Success')->body('WFP Type Successfully Added')->success()->send();
+                Notification::make()->title('Operation Success')->body('WFP Period Successfully Added')->success()->send();
             })
         ];
     }

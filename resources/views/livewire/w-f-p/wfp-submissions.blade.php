@@ -108,7 +108,7 @@
         </div>
         @else
         <div class="flex justify-center items-center h-64">
-            <h2 class="font-light text-gray-500">-- No WFP Type Added --</h2>
+            <h2 class="font-light text-gray-500">-- No WFP Period Added --</h2>
         </div>
         @endif
     </div>

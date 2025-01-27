@@ -68,7 +68,7 @@ class AllocateFunds extends Component
     {
        if($this->selectedType === "" || $this->selectedType === null)
        {
-        Notification::make()->title('Please Select a WFP Type')->danger()->send();
+        Notification::make()->title('Please Select a WFP Period')->danger()->send();
        }else{
                 //save the data
                 if (FundAllocation::where('cost_center_id', $this->record->id)
@@ -111,7 +111,7 @@ class AllocateFunds extends Component
     {
         if($this->selectedType === "" || $this->selectedType === null)
         {
-         Notification::make()->title('Please Select a WFP Type')->danger()->send();
+         Notification::make()->title('Please Select a WFP Period')->danger()->send();
         }else{
             $this->validate([
                 'fundInitialAmount' => 'required|numeric|min:100',

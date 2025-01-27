@@ -87,7 +87,7 @@ class FundAllocation extends Component implements HasTable
                 return $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()?->wpfType->description;
                 // return $record->fundAllocations->first()?->wpfType->description;
             })
-            ->label('WFP Type'),
+            ->label('WFP Period'),
             Tables\Columns\TextColumn::make('fundAllocations.amount')
             ->label('Amount')
             ->formatStateUsing(function ($record) {
@@ -115,7 +115,7 @@ class FundAllocation extends Component implements HasTable
             ->url(fn (CostCenter $record): string => route('wfp.allocate-funds', $record))
             // ->form([
             //     Select::make('wpf_type_id')
-            //     ->label('WFP Type')
+            //     ->label('WFP Period')
             //     ->required()
             //     ->options(WpfType::all()->pluck('description', 'id')),
             //     TextInput::make('amount')
@@ -149,7 +149,7 @@ class FundAllocation extends Component implements HasTable
             // ]))
             // ->form([
             //     Select::make('wpf_type_id')
-            //     ->label('WFP Type')
+            //     ->label('WFP Period')
             //     ->required()
             //     ->options(WpfType::all()->pluck('description', 'id')),
             //     TextInput::make('amount')
