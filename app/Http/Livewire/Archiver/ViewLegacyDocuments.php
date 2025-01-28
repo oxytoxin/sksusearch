@@ -49,7 +49,7 @@ class ViewLegacyDocuments extends Component implements HasTable
                 '1' => 'Disbursement Voucher',
                 '2' => 'Liquidation Report',
             ]),
-            MultiSelectFilter::make('fund_cluster.name')
+            MultiSelectFilter::make('fund_cluster_name')
             ->label('Fund Cluster')
             ->relationship('fund_cluster', 'name'),
             MultiSelectFilter::make('cheque_state')

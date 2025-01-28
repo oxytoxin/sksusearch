@@ -22,7 +22,7 @@ class ViewArchives extends Component implements HasTable
     protected function getTableFilters(): array
     {
         return [
-            MultiSelectFilter::make('fund_cluster.name')
+            MultiSelectFilter::make('fund_cluster_name')
             ->label('Fund Cluster')
             ->relationship('fund_cluster', 'name'),
             Filter::make('created_at')
