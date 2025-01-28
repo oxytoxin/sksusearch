@@ -11,6 +11,9 @@ use Filament\Tables\Contracts\HasTable;
 use Livewire\Component;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms;
+use Illuminate\Database\Eloquent\Builder;
 
 class ViewStaleCheques extends Component implements HasTable
 {
@@ -37,6 +40,22 @@ class ViewStaleCheques extends Component implements HasTable
                 '1' => 'Cancelled',
                 '2' => 'Stale',
             ]),
+            Filter::make('created_at')
+            ->form([
+                Forms\Components\DatePicker::make('created_from')->label('Uploaded From'),
+                Forms\Components\DatePicker::make('created_until')->label('Uploaded To'),
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                return $query
+                    ->when(
+                        $data['created_from'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                    )
+                    ->when(
+                        $data['created_until'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                    );
+            })
         ];
     }
 
@@ -61,13 +80,16 @@ class ViewStaleCheques extends Component implements HasTable
                 ->date()
                 ->sortable()
                 ->searchable(),
-           
+
             TextColumn::make('cheque_state')
                 ->label('Cheque State')
                 ->enum([
                     '1' => 'Cancelled',
                     '2' => 'Stale',
                 ]),
+            TextColumn::make('created_at')
+                ->label('Date uploaded')
+                ->searchable()->date(),
         ];
     }
     private function getTableActions()
@@ -98,7 +120,7 @@ class ViewStaleCheques extends Component implements HasTable
                 //     ->url(fn (LegacyDocument $record): string => route('archiver.archive-leg-doc.update', [$record]))
                 //     ->icon('ri-edit-2-line'),
             ])->icon('ri-flashlight-fill'),
-            
+
         ];
     }
     protected function getTableActionsPosition(): ?string

@@ -19,6 +19,8 @@ use Filament\Tables\Filters\MultiSelectFilter;
 use Filament\Tables\Filters\SelectFilter;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Filament\Forms;
+use Illuminate\Database\Eloquent\Builder;
 
 class ViewLegacyDocuments extends Component implements HasTable
 {
@@ -56,6 +58,22 @@ class ViewLegacyDocuments extends Component implements HasTable
                 '2' => 'Cancelled',
                 '3' => 'Stale',
             ]),
+            Filter::make('created_at')
+            ->form([
+                Forms\Components\DatePicker::make('created_from')->label('Uploaded From'),
+                Forms\Components\DatePicker::make('created_until')->label('Uploaded To'),
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                return $query
+                    ->when(
+                        $data['created_from'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                    )
+                    ->when(
+                        $data['created_until'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                    );
+            })
         ];
     }
 
@@ -121,6 +139,9 @@ class ViewLegacyDocuments extends Component implements HasTable
                     '2' => 'Liquidation Report',
                 ])
                 ->searchable()->sortable(),
+            TextColumn::make('created_at')
+                ->label('Date uploaded')
+                ->searchable()->date(),
 
         ];
     }

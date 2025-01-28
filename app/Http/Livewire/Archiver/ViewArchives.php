@@ -12,6 +12,8 @@ use Filament\Tables\Filters\MultiSelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
+use Filament\Forms;
+use Filament\Tables\Filters\Filter;
 
 class ViewArchives extends Component implements HasTable
 {
@@ -22,8 +24,24 @@ class ViewArchives extends Component implements HasTable
         return [
             MultiSelectFilter::make('fund_cluster.name')
             ->label('Fund Cluster')
-            ->relationship('fund_cluster', 'name')
-            
+            ->relationship('fund_cluster', 'name'),
+            Filter::make('created_at')
+            ->form([
+                Forms\Components\DatePicker::make('created_from')->label('Uploaded From'),
+                Forms\Components\DatePicker::make('created_until')->label('Uploaded To'),
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                return $query
+                    ->when(
+                        $data['created_from'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                    )
+                    ->when(
+                        $data['created_until'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                    );
+            })
+
         ];
     }
     protected function getTableQuery()
@@ -38,7 +56,7 @@ class ViewArchives extends Component implements HasTable
             ->searchable(),
             TextColumn::make('user.employee_information.full_name')
             ->searchable()
-            ->label('Requisitioner'),            
+            ->label('Requisitioner'),
             TextColumn::make('payee')
             ->searchable()
             ->label('Payee'),
@@ -55,6 +73,9 @@ class ViewArchives extends Component implements HasTable
             ->sum('disbursement_voucher_particulars', 'amount')
             ->label('Amount')
             ->money('php'),
+            TextColumn::make('created_at')
+            ->label('Date uploaded')
+            ->searchable()->date(),
         ];
     }
     protected function getTableActions(): array
