@@ -128,28 +128,30 @@ class DisbursementVouchersCreate extends Component implements HasForms
                         Card::make()->schema([
                             Select::make('voucher_subtype_id')
                                 ->label('Disbursement Voucher for')
-                                ->options(VoucherSubType::with('voucher_type')->get()->map(fn ($v) => ['id' => $v->id, 'name' => "{$v->voucher_type->name} - {$v->name}"])->pluck('name', 'id'))
+                                ->options(VoucherSubType::with('voucher_type')->get()->map(fn($v) => ['id' => $v->id, 'name' => "{$v->voucher_type->name} - {$v->name}"])->pluck('name', 'id'))
                                 ->disabled()
                                 ->default($this->voucher_subtype->id),
                             Select::make('travel_order_id')
                                 ->label('Travel Order')
                                 ->searchable()
                                 ->preload()
-                                ->visible(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
-                                ->required(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
-                                ->options(TravelOrder::where(function ($q) {
-                                    $q->approved()
-                                        ->whereHas('itineraries', function ($query) {
-                                            $query->whereUserId(auth()->id());
-                                        })
-                                        ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS);
-                                })->orWhere(function ($q) {
-                                    $q->approved()->where('travel_order_type_id', TravelOrderType::OFFICIAL_TIME);
-                                })
-                                    ->whereDoesntHave('disbursement_vouchers', function ($q) {
-                                        $q->where('user_id', auth()->id())->whereNotNull('cancelled_at');
+                                ->visible(fn() => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
+                                ->required(fn() => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
+                                ->options(
+                                    TravelOrder::where(function ($q) {
+                                        $q->approved()
+                                            ->whereHas('itineraries', function ($query) {
+                                                $query->whereUserId(auth()->id());
+                                            })
+                                            ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS);
+                                    })->orWhere(function ($q) {
+                                        $q->approved()->where('travel_order_type_id', TravelOrderType::OFFICIAL_TIME);
                                     })
-                                    ->pluck('tracking_code', 'id'))
+                                        ->whereDoesntHave('disbursement_vouchers', function ($q) {
+                                            $q->where('user_id', auth()->id())->whereNotNull('cheque_number')->whereNotNull('cancelled_at');
+                                        })
+                                        ->pluck('tracking_code', 'id')
+                                )
                                 ->reactive()
                                 ->afterStateUpdated(function ($set, $state) {
                                     $to = TravelOrder::find($state);
@@ -186,7 +188,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                     'self' => 'Self',
                                     'others' => 'Others',
                                 ])
-                                ->visible(fn () => !in_array($this->voucher_subtype->voucher_type_id, [1, 2]))
+                                ->visible(fn() => !in_array($this->voucher_subtype->voucher_type_id, [1, 2]))
                                 ->default('self')
                                 ->afterStateUpdated(function ($state, $set) {
                                     if ($state == 'self') {
@@ -199,7 +201,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->reactive(),
                             Grid::make(2)->schema([
                                 TextInput::make('payee')
-                                    ->disabled(fn ($get) => $get('payee_mode') == 'self' || in_array($this->voucher_subtype->voucher_type_id, [1, 2]))
+                                    ->disabled(fn($get) => $get('payee_mode') == 'self' || in_array($this->voucher_subtype->voucher_type_id, [1, 2]))
                                     ->required()
                                     ->placeholder('Enter payee name')
                                     ->default(auth()->user()->employee_information->full_name),
@@ -336,7 +338,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ])
                                 ->label('Utility Particulars')
                                 ->createItemButtonLabel('Add New Row')
-                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [27])),
+                                ->visible(fn($get) => in_array($this->voucher_subtype->id, [27])),
 
                             Repeater::make('water_utility_particulars')
                                 ->columns(5)
@@ -427,7 +429,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ])
                                 ->label('Utility Particulars')
                                 ->createItemButtonLabel('Add New Row')
-                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [70])),
+                                ->visible(fn($get) => in_array($this->voucher_subtype->id, [70])),
 
                             Repeater::make('fuel_utility_particulars')
                                 ->columns(4)
@@ -514,7 +516,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ])
                                 ->label('Utility Particulars')
                                 ->createItemButtonLabel('Add New Row')
-                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [71])),
+                                ->visible(fn($get) => in_array($this->voucher_subtype->id, [71])),
 
                             Repeater::make('telephone_utility_particulars')
                                 ->columns(2)
@@ -545,7 +547,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ])
                                 ->label('Utility Particulars')
                                 ->createItemButtonLabel('Add New Row')
-                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [74])),
+                                ->visible(fn($get) => in_array($this->voucher_subtype->id, [74])),
 
                             Repeater::make('internet_utility_particulars')
                                 ->columns(2)
@@ -576,7 +578,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ])
                                 ->label('Utility Particulars')
                                 ->createItemButtonLabel('Add New Row')
-                                ->visible(fn ($get) => in_array($this->voucher_subtype->id, [75])),
+                                ->visible(fn($get) => in_array($this->voucher_subtype->id, [75])),
 
                             Repeater::make('other_expenses')
                                 ->columns(2)
@@ -629,25 +631,25 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                 ]);
                                             }
                                         }),
-                                ])->createItemButtonLabel('Add New Row')->visible(fn ($get) => in_array($this->voucher_subtype->id, [27, 70, 71, 74, 75])),
+                                ])->createItemButtonLabel('Add New Row')->visible(fn($get) => in_array($this->voucher_subtype->id, [27, 70, 71, 74, 75])),
                             //Electricity, Water, Fuel (end)
                             #endregion
                             Fieldset::make('Date Range')
-                            ->schema([
-                                Flatpickr::make('activity_date_from')
-                                ->label('From')
-                                ->disableTime()
-                                ->required()
-                                ->disabled()
-                                ->columnSpan(1),
-                                Flatpickr::make('activity_date_to')
-                                ->label('To')
-                                ->disableTime()
-                                ->required()
-                                ->disabled()
-                                ->columnSpan(1),
-                            ])->columns(2)
-                            ->visible(fn ($get) => in_array($this->voucher_subtype->id, [3, 4, 5])),
+                                ->schema([
+                                    Flatpickr::make('activity_date_from')
+                                        ->label('From')
+                                        ->disableTime()
+                                        ->required()
+                                        ->disabled()
+                                        ->columnSpan(1),
+                                    Flatpickr::make('activity_date_to')
+                                        ->label('To')
+                                        ->disableTime()
+                                        ->required()
+                                        ->disabled()
+                                        ->columnSpan(1),
+                                ])->columns(2)
+                                ->visible(fn($get) => in_array($this->voucher_subtype->id, [3, 4, 5])),
                             #region DV PARTICULARS
                             Repeater::make('disbursement_voucher_particulars')
                                 ->schema([
@@ -661,23 +663,23 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                             ->reactive()
                                             ->numeric()
                                             ->minValue(1)
-                                            ->disabled(fn () => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
+                                            ->disabled(fn() => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
                                             ->required(),
                                     ]),
                                 ])
                                 ->minItems(1)
-                                ->visible(fn ($get) => $get('travel_order_id') || !in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
-                                ->disableItemDeletion(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
-                                ->disableItemCreation(fn () => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS)),
+                                ->visible(fn($get) => $get('travel_order_id') || !in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
+                                ->disableItemDeletion(fn() => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
+                                ->disableItemCreation(fn() => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS)),
                             #endregion
                         ]),
                         #region Actual Itinerary
                         Section::make('Actual Itinerary')
-                            ->visible(fn () => $this->shouldItineraryBeVisible())
+                            ->visible(fn() => $this->shouldItineraryBeVisible())
                             ->schema([
                                 Card::make([
                                     Placeholder::make('travel_order_details')
-                                        ->content(fn () => view('components.travel_orders.travel-order-details', [
+                                        ->content(fn() => view('components.travel_orders.travel-order-details', [
                                             'travel_order' => TravelOrder::find($this->travel_order_id),
                                             'itinerary_entries' => $this->itinerary_entries ?? [],
                                         ])),
@@ -749,7 +751,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                     ->schema([
                         Card::make()
                             ->schema([
-                                Placeholder::make('related_documents_list')->disableLabel()->content(fn () => view('components.disbursement_vouchers.related_documents', [
+                                Placeholder::make('related_documents_list')->disableLabel()->content(fn() => view('components.disbursement_vouchers.related_documents', [
                                     'voucher_subtype' => $this->voucher_subtype,
                                 ])),
                             ]),
@@ -843,12 +845,12 @@ class DisbursementVouchersCreate extends Component implements HasForms
                 'details' => collect($this->fuel_utility_particulars)->values()->toArray(),
                 'other_expenses' => collect($this->other_expenses)->values()->toArray(),
             ];
-        } else if ($this->voucher_subtype->id == 3 || $this->voucher_subtype->id == 4 || $this->voucher_subtype->id == 5){
+        } else if ($this->voucher_subtype->id == 3 || $this->voucher_subtype->id == 4 || $this->voucher_subtype->id == 5) {
             $other_details = [
                 'activity_date_from' => $this->activity_date_from,
                 'activity_date_to' => $this->activity_date_to,
             ];
-        }else{
+        } else {
             $other_details = [];
         }
         $dv = DisbursementVoucher::create([
@@ -910,7 +912,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->required()
                                 ->default('1'),
                             Textarea::make('explanation')->placeholder('Explanation or justifications')
-                                ->required(fn ($get) => $get('condition') != 1),
+                                ->required(fn($get) => $get('condition') != 1),
                         ])
                     ]),
                 Step::make('Print Certificate of Travel Completed')
