@@ -3,11 +3,11 @@
         $particulars = $evaluate(fn($get) => $get('disbursement_voucher_particulars'));
         $mop = $evaluate(fn($get) => $get('mop_id'));
         $total_amount = 0;
-        
+
         foreach ($particulars as $particular) {
             $total_amount += $particular['amount'];
         }
-        
+
     @endphp
 
     <div x-data="{ state: $wire.entangle('{{ $getStatePath() }}').defer }">
@@ -38,8 +38,7 @@
                         <div class="flex">
                             <div class="m-3 text-center">
 
-                                <img class="w-12 h-auto mx-auto" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $evaluate(fn($get) => $get('tracking_number')) }}"
-                                     alt="N/A">
+                                <img class="w-12 h-auto mx-auto" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $evaluate(fn($get) => $get('tracking_number')) }}" alt="N/A">
                                 <span class="flex justify-center text-xs font-normal">{{ $evaluate(fn($get) => $get('tracking_number')) }}</span>
                             </div>
 
@@ -75,11 +74,9 @@
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
                                 @if ($mop == '1')
-                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="comments" name="comments" type="checkbox" aria-describedby="comments-description"
-                                           readonly disabled checked>
+                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="comments" name="comments" type="checkbox" aria-describedby="comments-description" readonly disabled checked>
                                 @else
-                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="comments" name="comments" type="checkbox" aria-describedby="comments-description"
-                                           readonly disabled>
+                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="comments" name="comments" type="checkbox" aria-describedby="comments-description" readonly disabled>
                                 @endif
 
                             </div>
@@ -91,11 +88,9 @@
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
                                 @if ($mop == '2')
-                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="candidates" name="candidates" type="checkbox"
-                                           aria-describedby="candidates-description" readonly disabled checked>
+                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="candidates" name="candidates" type="checkbox" aria-describedby="candidates-description" readonly disabled checked>
                                 @else
-                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="candidates" name="candidates" type="checkbox"
-                                           aria-describedby="candidates-description" readonly disabled>
+                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="candidates" name="candidates" type="checkbox" aria-describedby="candidates-description" readonly disabled>
                                 @endif
 
                             </div>
@@ -107,11 +102,9 @@
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
                                 @if ($mop == '3')
-                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description"
-                                           readonly disabled checked>
+                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description" readonly disabled checked>
                                 @else
-                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description"
-                                           readonly disabled>
+                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description" readonly disabled>
                                 @endif
 
                             </div>
@@ -123,11 +116,9 @@
                         <div class="relative flex items-start">
                             <div class="flex items-center h-5">
                                 @if ($mop == 4)
-                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description"
-                                           readonly disabled checked>
+                                    <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description" readonly disabled checked>
                                 @else
-                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description"
-                                           readonly disabled>
+                                    <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500" id="offers" name="offers" type="checkbox" aria-describedby="offers-description" readonly disabled>
                                 @endif
 
                             </div>
@@ -247,12 +238,11 @@
                                     } else {
                                         $temp = ['none'];
                                     }
-                                
+
                                     $full_name = $temp[0];
                                 }
                             @endphp
-                            <span
-                                  class="font-extrabold underline uppercase print:text-10">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                            <span class="font-extrabold underline uppercase print:text-10">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                                 {{ isset($full_name) ? $full_name : 'none' }}
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
                             <p class="font-extrabold capitalize print:text-10">
@@ -339,18 +329,22 @@
                         </div>
                     </div>
                 </div>
+                @php
+                    $president = App\Models\EmployeeInformation::where('position_id', 34)->where('office_id', 51)->first();
+                    $accountant = App\Models\EmployeeInformation::where('position_id', 15)->where('office_id', 3)->first();
+                @endphp
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-12">
                     <div class="flex items-center w-1/2 space-y-1 text-center border-r-2 border-black print:text-8">
                         <div class="flex w-20 h-auto text-center border-r border-black print:h-8 print:w-16">
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
-                        <span class="flex mx-auto my-auto font-extrabold uppercase print:text-10">JESHER Y. PALOMARIA</span>
+                        <span class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
                     </div>
                     <div class="flex items-center w-1/2 space-y-1 text-center border-r-2 border-black print:text-8">
                         <div class="flex w-20 h-auto text-center border-r border-black print:h-8 print:w-16">
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
-                        <span class="flex mx-auto my-auto font-extrabold uppercase print:text-10">SAMSON L. MOLAO</span>
+                        <span class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-12">
