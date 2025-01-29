@@ -23,6 +23,7 @@ class DisbursementVouchersUnliquidated extends Component implements HasTable
                 $query->whereNull('cancelled_at');
             })
             ->whereRelation('voucher_subtype', 'voucher_type_id', 1)
+            ->whereNot('voucher_subtype_id', 69)
             ->whereUserId(auth()->id())
             ->whereNotNull('cheque_number');
     }
@@ -37,7 +38,7 @@ class DisbursementVouchersUnliquidated extends Component implements HasTable
     protected function getTableActions(): array
     {
         return [
-            Action::make('liquidate')->button()->url(fn ($record) => route('requisitioner.liquidation-reports.create', [
+            Action::make('liquidate')->button()->url(fn($record) => route('requisitioner.liquidation-reports.create', [
                 'disbursement_voucher' => $record
             ]))
         ];

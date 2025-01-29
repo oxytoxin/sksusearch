@@ -118,7 +118,7 @@ class LiquidationReportsIndex extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Liquidation Report requested for cancellation.')->success()->send();
             })
-                ->visible(fn ($record) => !$record->cheque_number && !$record->cancelled_at && !$record->for_cancellation && !$record->certified_by_accountant)
+                ->visible(fn($record) => !$record->cheque_number && !$record->cancelled_at && !$record->for_cancellation && !$record->certified_by_accountant)
                 ->requiresConfirmation()
                 ->button()
                 ->color('danger'),
@@ -127,7 +127,7 @@ class LiquidationReportsIndex extends Component implements HasTable
                     ->label('Progress')
                     ->icon('ri-loader-4-fill')
                     ->modalHeading('Liquidation Report Progress')
-                    ->modalContent(fn ($record) => view('components.timeline_views.progress_logs', [
+                    ->modalContent(fn($record) => view('components.timeline_views.progress_logs', [
                         'record' => $record,
                         'steps' => LiquidationReportStep::whereEnabled(true)->where('id', '>', 2000)->get(),
                     ])),
@@ -135,30 +135,30 @@ class LiquidationReportsIndex extends Component implements HasTable
                     ->label('Activity Timeline')
                     ->icon('ri-list-check-2')
                     ->modalHeading('Liquidation Report Activity Timeline')
-                    ->modalContent(fn ($record) => view('components.timeline_views.activity_logs', [
+                    ->modalContent(fn($record) => view('components.timeline_views.activity_logs', [
                         'record' => $record,
                     ])),
                 ViewAction::make('related_documents')
                     ->label('Related Documents')
                     ->icon('ri-file-copy-2-line')
                     ->modalHeading('Liquidation Report Related Documents')
-                    ->modalContent(fn ($record) => view('components.liquidation_reports.liquidation-report-verified-documents', [
+                    ->modalContent(fn($record) => view('components.liquidation_reports.liquidation-report-verified-documents', [
                         'liquidation_report' => $record,
                     ])),
                 ViewAction::make('ctc')
                     ->label('Certificate of Travel Completion')
                     ->icon('ri-file-text-line')
-                    ->url(fn ($record) => route('ctc.show', ['ctc' => $record->travel_completed_certificate]), true)
-                    ->visible(fn ($record) => $record->travel_completed_certificate()->exists()),
+                    ->url(fn($record) => route('ctc.show', ['ctc' => $record->travel_completed_certificate]), true)
+                    ->visible(fn($record) => $record->travel_completed_certificate()->exists()),
                 ViewAction::make('actual_itinerary')
                     ->label('Actual Itinerary')
                     ->icon('ri-file-copy-line')
-                    ->url(fn ($record) => route('signatory.itinerary.print', ['itinerary' => $record->disbursement_voucher->travel_order->itineraries()->where('user_id', $record->user_id)->whereIsActual(true)->first()]), true)
-                    ->visible(fn ($record) => $record->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->exists()),
+                    ->url(fn($record) => route('signatory.itinerary.print', ['itinerary' => $record->disbursement_voucher->travel_order->itineraries()->where('user_id', $record->user_id)->whereIsActual(true)->first()]), true)
+                    ->visible(fn($record) => $record->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS && $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->exists()),
                 ViewAction::make('view')
                     ->label('Preview')
                     ->openUrlInNewTab()
-                    ->url(fn ($record) => route('requisitioner.liquidation-reports.show', ['liquidation_report' => $record]), true),
+                    ->url(fn($record) => route('requisitioner.liquidation-reports.show', ['liquidation_report' => $record]), true),
             ])->icon('ri-eye-line'),
         ];
     }
