@@ -149,6 +149,18 @@ class WfpSubmissions extends Component implements HasTable
     protected function getTableFilters(): array
     {
         return [
+            Filter::make('wfp_type')
+            ->form([
+                Forms\Components\Select::make('wfp_type')
+                ->label('WFP Period')
+                ->options(WpfType::all()->pluck('description', 'id')->prepend('All', ''))
+            ])
+            ->query(function (Builder $query, array $data): Builder {
+                if (!empty($data['wfp_type'])) {
+                    return $query->where('wpf_type_id', $data['wfp_type']);
+                }
+                return $query; // Return the original query if "All" is selected
+            }),
             Filter::make('mfo')
             ->form([
                 Forms\Components\Select::make('mfo')

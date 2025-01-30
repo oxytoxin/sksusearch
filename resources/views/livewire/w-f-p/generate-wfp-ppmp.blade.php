@@ -23,7 +23,6 @@
                     <option>164MF</option>
                 </select>
             </div>
-
             @php
                 $fund = App\Models\FundClusterWFP::get();
             @endphp
@@ -94,6 +93,16 @@
                        Fund {{$fund->where('id', 6)->first()->name}}
                     </a>
                 </nav>
+            </div>
+            <div class="mt-5">
+                <div class="flex justify-start items-center">
+                    <select wire:model="selectedType" id="wfp_type" name="wfp_type" class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                        <option value="0" disabled selected>Select WFP Type</option>
+                        @foreach($wfp_types as $type)
+                            <option value="{{ $type->id }}">{{ $type->description }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <!-- Content for each tab -->

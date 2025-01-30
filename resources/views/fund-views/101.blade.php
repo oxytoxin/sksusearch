@@ -57,8 +57,8 @@
                     <tbody>
                         @forelse($ppmp_details as $item)
                         <tr>
-                            <td class="border border-black px-2">{{$item->categoryItem->uacs_code}}</td>
-                            <td class="border border-black px-2">{{$item->categoryItem->name}}</td>
+                            <td class="border border-black px-2">{{$item->categoryItem?->uacs_code}}</td>
+                            <td class="border border-black px-2">{{$item->categoryItem?->name}}</td>
                             <td class="border border-black text-right px-2">
                                 <div class="flex justify-between">
                                     <span>₱</span>

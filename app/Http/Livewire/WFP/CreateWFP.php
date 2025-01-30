@@ -190,9 +190,11 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $psDetailModal = false;
      public $wfp_param;
 
+     public $supplies_particular;
 
     public function mount($record, $wfpType, $isEdit)
     {
+
         $costCenter_id = Wfp::where('id', $record)->first()?->cost_center_id;
         $this->wfp_param = $wfpType;
         if($isEdit === 1)
@@ -479,13 +481,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             ->searchable()
             ->placeholder('Search for a particular')
             ->getSearchResultsUsing(function (string $search){
-                $id = $this->global_index - 1;
-                return Supply::whereHas('categoryItems', function ($query) use ($id) {
-                    $query->where('budget_category_id', $id);
-                })->where('is_active', 1)->where('particulars', 'like', "%{$search}%")
-                  ->orWhere('specifications', 'like', "%{$search}%")
-                  ->limit(50)->pluck('particulars', 'id');
-
+                    $id = $this->global_index - 1;
+                    return Supply::whereHas('categoryItems', function ($query) use ($id) {
+                        $query->where('budget_category_id', $id);
+                    })->where('is_active', 1)->where('particulars', 'like', "%{$search}%")
+                      ->orWhere('specifications', 'like', "%{$search}%")
+                      ->limit(50)->pluck('particulars', 'id');
                 // switch($this->global_index)
                 // {
                 //     case 2:
@@ -542,10 +543,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 switch($this->global_index)
                 {
                     case 2:
-                        if($this->data['supplies_particular'] != null)
+                        if($this->supplies_particular != null)
                         {
-                            $this->supplies_particular_id = $this->data['supplies_particular'];
-                            $this->supplies_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->supplies_particular_id = $this->supplies_particular;
+                            $this->supplies_category_attr = Supply::find($this->supplies_particular);
                             $this->supplies_specs = $this->supplies_category_attr->specifications;
                             $this->supplies_code = $this->supplies_category_attr->supply_code;
                             $this->supplies_uacs = $this->supplies_category_attr->categoryItems->uacs_code;
@@ -574,10 +575,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         }
                         break;
                     case 3:
-                        if($this->data['supplies_particular'] != null)
+                        if($this->supplies_particular != null)
                         {
-                            $this->mooe_particular_id = $this->data['supplies_particular'];
-                            $this->mooe_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->mooe_particular_id = $this->supplies_particular;
+                            $this->mooe_category_attr = Supply::find($this->supplies_particular);
                             $this->mooe_specs = $this->mooe_category_attr->specifications;
                             $this->mooe_code = $this->mooe_category_attr->supply_code;
                             $this->mooe_uacs = $this->mooe_category_attr->categoryItems->uacs_code;
@@ -605,10 +606,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         }
                         break;
                     case 4:
-                        if($this->data['supplies_particular'] != null)
+                        if($this->supplies_particular != null)
                         {
-                            $this->training_particular_id = $this->data['supplies_particular'];
-                            $this->training_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->training_particular_id = $this->supplies_particular;
+                            $this->training_category_attr = Supply::find($this->supplies_particular);
                             $this->training_specs = $this->training_category_attr->specifications;
                             $this->training_code = $this->training_category_attr->supply_code;
                             $this->training_uacs = $this->training_category_attr->categoryItems->uacs_code;
@@ -636,10 +637,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         }
                         break;
                     case 5:
-                        if($this->data['supplies_particular'] != null)
+                        if($this->supplies_particular != null)
                         {
-                            $this->machine_particular_id = $this->data['supplies_particular'];
-                            $this->machine_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->machine_particular_id = $this->supplies_particular;
+                            $this->machine_category_attr = Supply::find($this->supplies_particular);
                             $this->machine_specs = $this->machine_category_attr->specifications;
                             $this->machine_code = $this->machine_category_attr->supply_code;
                             $this->machine_uacs = $this->machine_category_attr->categoryItems->uacs_code;
@@ -667,10 +668,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         }
                         break;
                     case 6:
-                        if($this->data['supplies_particular'] != null)
+                        if($this->supplies_particular != null)
                         {
-                            $this->building_particular_id = $this->data['supplies_particular'];
-                            $this->building_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->building_particular_id = $this->supplies_particular;
+                            $this->building_category_attr = Supply::find($this->supplies_particular);
                             $this->building_specs = $this->building_category_attr->specifications;
                             $this->building_code = $this->building_category_attr->supply_code;
                             $this->building_uacs = $this->building_category_attr->categoryItems->uacs_code;
@@ -698,10 +699,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         }
                         break;
                     case 7:
-                        if($this->data['supplies_particular'] != null)
+                        if($this->supplies_particular != null)
                         {
-                            $this->ps_particular_id = $this->data['supplies_particular'];
-                            $this->ps_category_attr = Supply::find($this->data['supplies_particular']);
+                            $this->ps_particular_id = $this->supplies_particular;
+                            $this->ps_category_attr = Supply::find($this->supplies_particular);
                             $this->ps_specs = $this->ps_category_attr->specifications;
                             $this->ps_code = $this->ps_category_attr->supply_code;
                             $this->ps_uacs = $this->ps_category_attr->categoryItems->uacs_code;
@@ -1098,7 +1099,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearSupplies()
     {
-        $this->data['supplies_particular'] = null;
+        $this->supplies_particular = null;
         $this->supplies_particular_id = null;
         $this->supplies_specs = null;
         $this->supplies_code = null;
@@ -1458,7 +1459,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearMooe()
     {
-        $this->data['supplies_particular'] = null;
+        $this->supplies_particular = null;
         $this->mooe_particular_id = null;
         $this->mooe_specs = null;
         $this->mooe_code = null;
@@ -1813,7 +1814,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearTrainings()
     {
-        $this->data['supplies_particular'] = null;
+        $this->supplies_particular = null;
         $this->training_particular_id = null;
         $this->training_specs = null;
         $this->training_code = null;
@@ -2170,7 +2171,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearMachine()
     {
-        $this->data['supplies_particular'] = null;
+        $this->supplies_particular = null;
         $this->machine_particular_id = null;
         $this->machine_specs = null;
         $this->machine_code = null;
@@ -2527,7 +2528,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function clearBuilding()
     {
-        $this->data['supplies_particular'] = null;
+        $this->supplies_particular = null;
         $this->building_particular_id = null;
         $this->building_specs = null;
         $this->building_code = null;
@@ -2879,7 +2880,7 @@ public function showPsDetails()
 
 public function clearPs()
 {
-    $this->data['supplies_particular'] = null;
+    $this->supplies_particular = null;
     $this->ps_particular_id = null;
     $this->ps_specs = null;
     $this->ps_code = null;
@@ -2898,13 +2899,17 @@ public function clearPs()
 
     public function decreaseStep()
     {
-        $this->data['supplies_particular'] = null;
+        $this->emit('refreshComponent');
+        $this->supplies_particular = null;
+        //$this->form->fill();
         $this->global_index--;
     }
 
     public function increaseStep()
     {
-        $this->data['supplies_particular'] = null;
+        $this->emit('refreshComponent');
+        //$this->form->fill();
+        $this->supplies_particular = null;
         $this->global_index++;
     }
 
@@ -3580,16 +3585,27 @@ public function clearPs()
         }
     }
 
+    public function refreshComponent()
+    {
+        $this->refresh();
+        dd($this->supplies_particular);
+    }
+
     public function setStep($step)
     {
+        $this->emit('refreshComponent');
+
+        // dd($this->supplies_particular);
+         $this->supplies_particular = null;
+
         $this->global_index = $step;
     }
 
 
-    protected function getFormStatePath(): string
-    {
-        return 'data';
-    }
+    // protected function getFormStatePath(): string
+    // {
+    //     return 'data';
+    // }
 
 
     public function render(): View
