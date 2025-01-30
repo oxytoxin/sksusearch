@@ -4,6 +4,7 @@ namespace App\Http\Livewire\WFP;
 
 use App\Models\CategoryItems;
 use App\Models\CategoryItemBudget;
+use App\Models\CostCenter;
 use App\Models\Supply;
 use Livewire\Component;
 use WireUi\Traits\Actions;
@@ -15,9 +16,14 @@ class DevPage extends Component
     public $budget_account_titles;
     public $merged_titles;
     public $supplies;
+    public $cost_centers;
+    public $supply_code;
 
     public function mount()
     {
+
+        $this->cost_centers = [];
+
         $this->account_titles = CategoryItems::where('is_active', 1)
             ->where('uacs_code', 'like', '5%')
             ->get();
@@ -39,6 +45,21 @@ class DevPage extends Component
 
 
         $this->supplies = Supply::whereNull('category_item_budget_id')->get();
+
+    }
+
+    public function generateCostCenters()
+    {
+        if($this->supply_code)
+        {
+            $this->cost_centers = CostCenter::whereHas('wfp', function ($query) {
+                $query->whereHas('wfpDetails', function ($query) {
+                    $query->whereHas('supply', function($query) {
+                        $query->where('supply_code', $this->supply_code);
+                    });
+                });
+            })->get();
+        }
 
     }
 
