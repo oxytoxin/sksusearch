@@ -14,6 +14,7 @@
                     <table class="min-w-full divide-y divide-gray-500 mt-10">
                         <thead>
                             <tr class="divide-x divide-gray-500">
+                                <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900"></th>
                                 <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Office</th>
                                 <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Cost Center</th>
                                 <th scope="col" class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900">Cost Center Head</th>
@@ -23,6 +24,9 @@
                           <tbody class="divide-y divide-gray-500 bg-transparent">
                             @forelse ($cost_centers as $item)
                             <tr class="divide-x divide-gray-500">
+                                <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">
+                                   <a target="_blank" class="bg-green-600 rounded-md p-4 m-2 text-gray-50" href="{{route('wfp.print-wfp', $item->wfp->id)}}">View WFP</a>
+                                </td>
                                 <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">
                                     {{ $item->office->name }}
                                 </td>
