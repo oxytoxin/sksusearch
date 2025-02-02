@@ -138,19 +138,22 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->visible(fn() => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
                                 ->required(fn() => in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS))
                                 ->options(
-                                    TravelOrder::where(function ($q) {
-                                        $q->approved()
-                                            ->whereHas('itineraries', function ($query) {
-                                                $query->whereUserId(auth()->id());
-                                            })
-                                            ->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS);
-                                    })->orWhere(function ($q) {
-                                        $q->approved()->where('travel_order_type_id', TravelOrderType::OFFICIAL_TIME);
-                                    })
-                                        ->whereDoesntHave('disbursement_vouchers', function ($q) {
-                                            $q->where('user_id', auth()->id())->whereNotNull('cheque_number')->whereNotNull('cancelled_at');
+                                    TravelOrder::query()
+                                        ->where(function ($q) {
+                                            $q->where(function ($q) {
+                                                $q->where('travel_order_type_id', TravelOrderType::OFFICIAL_BUSINESS)
+                                                    ->whereHas('itineraries', function ($query) {
+                                                        $query->whereUserId(auth()->id());
+                                                    });
+                                            })->orWhere('travel_order_type_id', TravelOrderType::OFFICIAL_TIME);
                                         })
-                                        ->pluck('tracking_code', 'id')
+                                        ->whereRelation('disbursement_vouchers', 'cancelled_at', '!=', null)
+                                        ->approved()
+                                        ->select(
+                                            DB::raw("CONCAT(purpose,' ( ',tracking_code,' )') AS tcAndP"),
+                                            'id'
+                                        )
+                                        ->pluck('tcAndP', 'id')
                                 )
                                 ->reactive()
                                 ->afterStateUpdated(function ($set, $state) {
