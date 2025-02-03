@@ -20,4 +20,9 @@ class MfoFee extends Model
         return $this->belongsTo(FundClusterWFP::class, 'fund_cluster_w_f_p_s_id');
     }
 
+    public function costCenter()
+    {
+        return $this->belongsTo(CostCenter::class, 'cost_center_id');
+    }
+
 }

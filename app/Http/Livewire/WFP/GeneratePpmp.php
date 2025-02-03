@@ -3,9 +3,12 @@
 namespace App\Http\Livewire\WFP;
 
 use App\Models\Wfp;
-use App\Models\WfpDetail;
-use Livewire\Component;
 use App\Models\WpfType;
+use Livewire\Component;
+use App\Models\WfpDetail;
+use App\Models\FundAllocation;
+use App\Models\MfoFee;
+use DB;
 
 class GeneratePpmp extends Component
 {
@@ -16,11 +19,17 @@ class GeneratePpmp extends Component
     public $total;
     public $wfp_types;
     public $selectedType;
+    public $fund_allocation;
+    public $total_allocated;
+    public $total_programmed;
+    public $balance;
+
 
     public function mount()
     {
         $this->wfp_types = WpfType::all();
         $this->selectedType = 1;
+
     }
 
     //101
@@ -299,201 +308,636 @@ class GeneratePpmp extends Component
     {
         $this->is_active = true;
         $this->title = 'Sultan Kudarat State University';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
+        ->where('wpf_type_id', $this->selectedType)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2);
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function accessPpmp163()
     {
         $this->is_active = true;
         $this->title = 'ACCESS Campus';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 1);
-            });
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
+        ->where('wpf_type_id', $this->selectedType)
+        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->where('offices.campus_id', 1)
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 1);
-            });
-            });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2);
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 1);
+        //     });
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 1);
+        //     });
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function tacurongPpmp163()
     {
         $this->is_active = true;
         $this->title = 'Tacurong Campus';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 2);
-            });
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 3)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('offices.campus_id', 2)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 2);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3)
+            ->whereHas('costCenter', function($query) {
+                $query->whereHas('office', function($query) {
+                    $query->where('campus_id', 2);
+                });
             });
-            });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('offices.campus_id', 2)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 2);
+        //     });
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 2);
+        //     });
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function isulanPpmp163()
     {
         $this->is_active = true;
         $this->title = 'Isulan Campus';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 3);
-            });
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 3)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('offices.campus_id', 3)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 3);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3)
+            ->whereHas('costCenter', function($query) {
+                $query->whereHas('office', function($query) {
+                    $query->where('campus_id', 3);
+                });
             });
-            });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('offices.campus_id', 3)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 3);
+        //     });
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 3);
+        //     });
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function kalamansigPpmp163()
     {
         $this->is_active = true;
         $this->title = 'Kalamansig Campus';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 4);
-            });
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 3)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('offices.campus_id', 4)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 4);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3)
+            ->whereHas('costCenter', function($query) {
+                $query->whereHas('office', function($query) {
+                    $query->where('campus_id', 4);
+                });
             });
-            });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('offices.campus_id', 4)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 4);
+        //     });
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 4);
+        //     });
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function lutayanPpmp163()
     {
         $this->is_active = true;
         $this->title = 'Lutayan Campus';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 5);
-            });
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 3)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('offices.campus_id', 5)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 5);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3)
+            ->whereHas('costCenter', function($query) {
+                $query->whereHas('office', function($query) {
+                    $query->where('campus_id', 5);
+                });
             });
-            });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('offices.campus_id', 5)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 5);
+        //     });
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 5);
+        //     });
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function palimbangPpmp163()
     {
         $this->is_active = true;
         $this->title = 'Palimbang Campus';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 6);
-            });
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 3)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('offices.campus_id', 6)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 6);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3)
+            ->whereHas('costCenter', function($query) {
+                $query->whereHas('office', function($query) {
+                    $query->where('campus_id', 6);
+                });
             });
-            });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('offices.campus_id', 6)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 6);
+        //     });
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 6);
+        //     });
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function bagumbayanPpmp163()
     {
         $this->is_active = true;
         $this->title = 'Bagumbayan Campus';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 7);
-            });
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 3)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('offices.campus_id', 7)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
-                $query->where('campus_id', 7);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3)
+            ->whereHas('costCenter', function($query) {
+                $query->whereHas('office', function($query) {
+                    $query->where('campus_id', 7);
+                });
             });
-            });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join with the offices table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('offices.campus_id', 7)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 7);
+        //     });
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
+        //         $query->where('campus_id', 7);
+        //     });
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     //164T
     public function sksuPpmp164T()
     {
+
         $this->is_active = true;
         $this->title = 'Sultan Kudarat State University';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
+        ->where('wpf_type_id', $this->selectedType)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function gasPpmp164T()
     {
         $this->is_active = true;
         $this->title = 'General Admission and Support Services';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 1);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 1)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 1);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 1);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 1)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 1);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 1);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
     }
 
@@ -501,90 +945,295 @@ class GeneratePpmp extends Component
     {
         $this->is_active = true;
         $this->title = 'Higher Education Services';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 2);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 2)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 2);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 2);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 2)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 2);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 2);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function aesPpmp164T()
     {
         $this->is_active = true;
         $this->title = 'Advanced Education Services';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 3);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 3)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 3);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 3);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 3)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 3);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 3);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function rdPpmp164T()
     {
         $this->is_active = true;
         $this->title = 'Research and Development';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 4);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 4)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 4);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 4);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 4)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 4);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 4);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function extensionPpmp164T()
     {
         $this->is_active = true;
         $this->title = 'Extension Services';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 5);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 5)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 5);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 5);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 5)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 5);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 5);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function lfPpmp164T()
     {
         $this->is_active = true;
         $this->title = 'Local Fund Projects';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 6)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 6);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 6)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
      //164T-NonFHE
@@ -592,123 +1241,405 @@ class GeneratePpmp extends Component
      {
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
-         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)->where('is_approved', 1);
-         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-         ->groupBy('category_item_id')
+
+
+         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+         ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
+         ->where('wpf_type_id', $this->selectedType)
+         ->groupBy('wpf_type_id','mfo_fees.id')
          ->get();
-         $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)->where('is_approved', 1);
-         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+
+         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+         })
+         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+         ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+         ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+         ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+         ->select(
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+             'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+             'category_item_budgets.name as budget_name', // Include the related field in the select
+             'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+         )
+         ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+         ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+         ->get();
+
+        //  $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)->where('is_approved', 1);
+        //  })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        //  ->groupBy('category_item_id')
+        //  ->get();
+        //  $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)->where('is_approved', 1);
+        //  })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function gasPpmp164TN()
      {
          $this->is_active = true;
          $this->title = 'General Admission and Support Services';
-         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 1);
-             });
-         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-         ->groupBy('category_item_id')
-         ->get();
-         $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 1);
-             });
-         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
+         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+         ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
+         ->where('wpf_type_id', $this->selectedType)
+         ->where('cost_centers.m_f_o_s_id', 1)
+         ->groupBy('wpf_type_id','mfo_fees.id')
+         ->get();
+
+         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->whereHas('costCenter', function($query) {
+                 $query->where('m_f_o_s_id', 1);
+             });
+         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+         })
+         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+         ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+         ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+         ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+         ->select(
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+             'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+             'category_item_budgets.name as budget_name', // Include the related field in the select
+             'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+         )
+         ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+         ->where('cost_centers.m_f_o_s_id', 1)
+         ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+         ->get();
+
+        //  $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 1);
+        //      });
+        //  })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        //  ->groupBy('category_item_id')
+        //  ->get();
+        //  $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 1);
+        //      });
+        //  })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function hesPpmp164TN()
      {
          $this->is_active = true;
          $this->title = 'Higher Education Services';
-         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 2);
-             });
-         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-         ->groupBy('category_item_id')
+
+         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+         ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
+         ->where('wpf_type_id', $this->selectedType)
+         ->where('cost_centers.m_f_o_s_id', 2)
+         ->groupBy('wpf_type_id','mfo_fees.id')
          ->get();
-         $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 2);
+
+         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->whereHas('costCenter', function($query) {
+                 $query->where('m_f_o_s_id', 2);
              });
-         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+         })
+         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+         ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+         ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+         ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+         ->select(
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+             'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+             'category_item_budgets.name as budget_name', // Include the related field in the select
+             'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+         )
+         ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+         ->where('cost_centers.m_f_o_s_id', 2)
+         ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+         ->get();
+
+        //  $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 2);
+        //      });
+        //  })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        //  ->groupBy('category_item_id')
+        //  ->get();
+        //  $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 2);
+        //      });
+        //  })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function aesPpmp164TN()
      {
          $this->is_active = true;
          $this->title = 'Advanced Education Services';
-         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 3);
-             });
-         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-         ->groupBy('category_item_id')
+
+         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+         ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
+         ->where('wpf_type_id', $this->selectedType)
+         ->where('cost_centers.m_f_o_s_id', 3)
+         ->groupBy('wpf_type_id','mfo_fees.id')
          ->get();
-         $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 3);
+
+         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->whereHas('costCenter', function($query) {
+                 $query->where('m_f_o_s_id', 3);
              });
-         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+         })
+         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+         ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+         ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+         ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+         ->select(
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+             'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+             'category_item_budgets.name as budget_name', // Include the related field in the select
+             'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+         )
+         ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+         ->where('cost_centers.m_f_o_s_id', 3)
+         ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+         ->get();
+
+        //  $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 3);
+        //      });
+        //  })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        //  ->groupBy('category_item_id')
+        //  ->get();
+        //  $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 3);
+        //      });
+        //  })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function rdPpmp164TN()
      {
          $this->is_active = true;
          $this->title = 'Research and Development';
-         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 4);
-             });
-         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-         ->groupBy('category_item_id')
+
+         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+         ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
+         ->where('wpf_type_id', $this->selectedType)
+         ->where('cost_centers.m_f_o_s_id', 4)
+         ->groupBy('wpf_type_id','mfo_fees.id')
          ->get();
-         $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 4);
+
+         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->whereHas('costCenter', function($query) {
+                 $query->where('m_f_o_s_id', 4);
              });
-         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+         })
+         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+         ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+         ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+         ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+         ->select(
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+             'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+             'category_item_budgets.name as budget_name', // Include the related field in the select
+             'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+         )
+         ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+         ->where('cost_centers.m_f_o_s_id', 4)
+         ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+         ->get();
+
+        //  $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 4);
+        //      });
+        //  })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        //  ->groupBy('category_item_id')
+        //  ->get();
+        //  $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 4);
+        //      });
+        //  })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function extensionPpmp164TN()
      {
          $this->is_active = true;
          $this->title = 'Extension Services';
-         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 5);
-             });
-         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-         ->groupBy('category_item_id')
+
+         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+         ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
+         ->where('wpf_type_id', $this->selectedType)
+         ->where('cost_centers.m_f_o_s_id', 5)
+         ->groupBy('wpf_type_id','mfo_fees.id')
          ->get();
-         $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 5);
+
+         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->whereHas('costCenter', function($query) {
+                 $query->where('m_f_o_s_id', 5);
              });
-         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+         })
+         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+         ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+         ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+         ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+         ->select(
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+             'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+             'category_item_budgets.name as budget_name', // Include the related field in the select
+             'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+         )
+         ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+         ->where('cost_centers.m_f_o_s_id', 5)
+         ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+         ->get();
+
+        //  $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 5);
+        //      });
+        //  })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        //  ->groupBy('category_item_id')
+        //  ->get();
+        //  $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 5);
+        //      });
+        //  })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
      public function lfPpmp164TN()
      {
          $this->is_active = true;
          $this->title = 'Local Fund Projects';
-         $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 6);
-             });
-         })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-         ->groupBy('category_item_id')
+
+         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+         ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
+         ->where('wpf_type_id', $this->selectedType)
+         ->where('cost_centers.m_f_o_s_id', 6)
+         ->groupBy('wpf_type_id','mfo_fees.id')
          ->get();
-         $this->total = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
-             $query->where('m_f_o_s_id', 6);
+
+         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->whereHas('costCenter', function($query) {
+                 $query->where('m_f_o_s_id', 6);
              });
-         })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+         })
+         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+         ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+         ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+         ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+         ->select(
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+             'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+             'category_item_budgets.name as budget_name', // Include the related field in the select
+             'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+             \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+         )
+         ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+         ->where('cost_centers.m_f_o_s_id', 6)
+         ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+         ->get();
+
+        //  $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 6);
+        //      });
+        //  })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        //  ->groupBy('category_item_id')
+        //  ->get();
+        //  $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //      $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+        //      $query->where('m_f_o_s_id', 6);
+        //      });
+        //  })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
      }
 
 
@@ -717,123 +1648,405 @@ class GeneratePpmp extends Component
         {
             $this->is_active = true;
             $this->title = 'Sultan Kudarat State University';
-            $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)->where('is_approved', 1);
-            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-            ->groupBy('category_item_id')
+
+            $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+            ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+            ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+            ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
+            ->where('wpf_type_id', $this->selectedType)
+            ->groupBy('wpf_type_id','mfo_fees.id')
             ->get();
-            $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)->where('is_approved', 1);
-            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+
+            $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+            $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+            })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+            })
+            ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+            ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+            ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+            ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+            ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+            ->select(
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+                'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+            )
+            ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+            ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+            ->get();
+
+
+            // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)->where('is_approved', 1);
+            // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+            // ->groupBy('category_item_id')
+            // ->get();
+            // $this->total = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)->where('is_approved', 1);
+            // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function gasPpmp164OSF()
         {
             $this->is_active = true;
             $this->title = 'General Admission and Support Services';
-            $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 1);
-                });
-            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-            ->groupBy('category_item_id')
-            ->get();
-            $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 1);
-                });
-            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
+            $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+            ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+            ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+            ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
+            ->where('wpf_type_id', $this->selectedType)
+            ->where('cost_centers.m_f_o_s_id', 1)
+            ->groupBy('wpf_type_id','mfo_fees.id')
+            ->get();
+
+            $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+            $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->whereHas('costCenter', function($query) {
+                    $query->where('m_f_o_s_id', 1);
+                });
+            })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+            })
+            ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+            ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+            ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+            ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+            ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+            ->select(
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+                'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+            )
+            ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+            ->where('cost_centers.m_f_o_s_id', 1)
+            ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+            ->get();
+
+            // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 1);
+            //     });
+            // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+            // ->groupBy('category_item_id')
+            // ->get();
+            // $this->total = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 1);
+            //     });
+            // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function hesPpmp164OSF()
         {
             $this->is_active = true;
             $this->title = 'Higher Education Services';
-            $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 2);
-                });
-            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-            ->groupBy('category_item_id')
+
+            $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+            ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+            ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+            ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
+            ->where('wpf_type_id', $this->selectedType)
+            ->where('cost_centers.m_f_o_s_id', 2)
+            ->groupBy('wpf_type_id','mfo_fees.id')
             ->get();
-            $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 2);
+
+            $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+            $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->whereHas('costCenter', function($query) {
+                    $query->where('m_f_o_s_id', 2);
                 });
-            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+            })
+            ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+            ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+            ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+            ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+            ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+            ->select(
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+                'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+            )
+            ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+            ->where('cost_centers.m_f_o_s_id', 2)
+            ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+            ->get();
+
+            // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 2);
+            //     });
+            // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+            // ->groupBy('category_item_id')
+            // ->get();
+            // $this->total = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 2);
+            //     });
+            // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function aesPpmp164OSF()
         {
             $this->is_active = true;
             $this->title = 'Advanced Education Services';
-            $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 3);
-                });
-            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-            ->groupBy('category_item_id')
+
+            $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+            ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+            ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+            ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
+            ->where('wpf_type_id', $this->selectedType)
+            ->where('cost_centers.m_f_o_s_id', 3)
+            ->groupBy('wpf_type_id','mfo_fees.id')
             ->get();
-            $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 3);
+
+            $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+            $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->whereHas('costCenter', function($query) {
+                    $query->where('m_f_o_s_id', 3);
                 });
-            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+            })
+            ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+            ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+            ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+            ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+            ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+            ->select(
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+                'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+            )
+            ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+            ->where('cost_centers.m_f_o_s_id', 3)
+            ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+            ->get();
+
+            // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 3);
+            //     });
+            // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+            // ->groupBy('category_item_id')
+            // ->get();
+            // $this->total = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 3);
+            //     });
+            // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function rdPpmp164OSF()
         {
             $this->is_active = true;
             $this->title = 'Research and Development';
-            $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 4);
-                });
-            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-            ->groupBy('category_item_id')
+
+            $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+            ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+            ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+            ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
+            ->where('wpf_type_id', $this->selectedType)
+            ->where('cost_centers.m_f_o_s_id', 4)
+            ->groupBy('wpf_type_id','mfo_fees.id')
             ->get();
-            $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 4);
+
+            $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+            $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->whereHas('costCenter', function($query) {
+                    $query->where('m_f_o_s_id', 4);
                 });
-            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+            })
+            ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+            ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+            ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+            ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+            ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+            ->select(
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+                'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+            )
+            ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+            ->where('cost_centers.m_f_o_s_id', 4)
+            ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+            ->get();
+
+            // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 4);
+            //     });
+            // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+            // ->groupBy('category_item_id')
+            // ->get();
+            // $this->total = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 4);
+            //     });
+            // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function extensionPpmp164OSF()
         {
             $this->is_active = true;
             $this->title = 'Extension Services';
-            $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 5);
-                });
-            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-            ->groupBy('category_item_id')
+
+            $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+            ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+            ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+            ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
+            ->where('wpf_type_id', $this->selectedType)
+            ->where('cost_centers.m_f_o_s_id', 5)
+            ->groupBy('wpf_type_id','mfo_fees.id')
             ->get();
-            $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 5);
+
+            $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+            $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->whereHas('costCenter', function($query) {
+                    $query->where('m_f_o_s_id', 5);
                 });
-            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+            })
+            ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+            ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+            ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+            ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+            ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+            ->select(
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+                'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+            )
+            ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+            ->where('cost_centers.m_f_o_s_id', 5)
+            ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+            ->get();
+
+            // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 5);
+            //     });
+            // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+            // ->groupBy('category_item_id')
+            // ->get();
+            // $this->total = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 5);
+            //     });
+            // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
         public function lfPpmp164OSF()
         {
             $this->is_active = true;
             $this->title = 'Local Fund Projects';
-            $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 6);
-                });
-            })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-            ->groupBy('category_item_id')
+
+            $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+            ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+            ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+            ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
+            ->where('wpf_type_id', $this->selectedType)
+            ->where('cost_centers.m_f_o_s_id', 6)
+            ->groupBy('wpf_type_id','mfo_fees.id')
             ->get();
-            $this->total = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
-                $query->where('m_f_o_s_id', 6);
+
+            $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+            $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->whereHas('costCenter', function($query) {
+                    $query->where('m_f_o_s_id', 6);
                 });
-            })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+            $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+            })
+            ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+            ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+            ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+            ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+            ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+            ->select(
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+                'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+            )
+            ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+            ->where('cost_centers.m_f_o_s_id', 6)
+            ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+            ->get();
+
+            // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 6);
+            //     });
+            // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+            // ->groupBy('category_item_id')
+            // ->get();
+            // $this->total = WfpDetail::whereHas('wfp', function($query) {
+            //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            //     $query->where('m_f_o_s_id', 6);
+            //     });
+            // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         }
 
     //164MF
@@ -841,123 +2054,404 @@ class GeneratePpmp extends Component
     {
         $this->is_active = true;
         $this->title = 'Sultan Kudarat State University';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)->where('is_approved', 1);
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
+        ->where('wpf_type_id', $this->selectedType)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)->where('is_approved', 1);
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)->where('is_approved', 1);
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)->where('is_approved', 1);
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function gasPpmp164MF()
     {
         $this->is_active = true;
         $this->title = 'General Admission and Support Services';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 1);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
-        ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 1);
-            });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 1)
+        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->get();
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 1);
+            });
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 1)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 1);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 1);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function hesPpmp164MF()
     {
         $this->is_active = true;
         $this->title = 'Higher Education Services';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 2);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 2)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 2);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 2);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 2)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 2);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 2);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function aesPpmp164MF()
     {
         $this->is_active = true;
         $this->title = 'Advanced Education Services';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 3);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 3)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 3);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 3);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 3)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 3);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 3);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function rdPpmp164MF()
     {
         $this->is_active = true;
         $this->title = 'Research and Development';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 4);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 4)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 4);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 4);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 4)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 4);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 4);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function extensionPpmp164MF()
     {
         $this->is_active = true;
         $this->title = 'Extension Services';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 5);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 5)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 5);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 5);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 5)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 5);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 5);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function lfPpmp164MF()
     {
         $this->is_active = true;
         $this->title = 'Local Fund Projects';
-        $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6);
-            });
-        })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        ->groupBy('category_item_id')
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
+        ->where('wpf_type_id', $this->selectedType)
+        ->where('cost_centers.m_f_o_s_id', 6)
+        ->groupBy('wpf_type_id','mfo_fees.id')
         ->get();
-        $this->total = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
-            $query->where('m_f_o_s_id', 6);
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->whereHas('costCenter', function($query) {
+                $query->where('m_f_o_s_id', 6);
             });
-        })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->where('cost_centers.m_f_o_s_id', 6)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6);
+        //     });
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+        //     $query->where('m_f_o_s_id', 6);
+        //     });
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
 
