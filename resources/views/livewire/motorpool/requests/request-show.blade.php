@@ -1,6 +1,12 @@
 <div>
-
-    <div id="print_to" class="col-span-2 print-bg-white">
+    <p class="text-left text-lg font-semibold tracking-wide text-green-800">Select a date</p>
+    <div class="mt-4">
+        @foreach ($request->date_and_times as $date)
+        <button wire:click="showPrintable({{$date->id}})" class="px-4 py-3 bg-green-700 text-white rounded-lg cursor-pointer hover:bg-green-800">{{Carbon\Carbon::parse($date->travel_date)->format('F d, Y')}}</button>
+        @endforeach
+    </div>
+    @if($showPrintable)
+    <div id="print_to" class="col-span-2 print-bg-white mt-5">
         <div class="flex w-full justify-between border-b-4 border-black p-6 print:flex">
             <div id="header" class="ml-3 flex w-full text-left">
                 <div class="my-auto inline"><img src="{{ asset('images/sksulogo.png') }}" alt="sksu logo"
@@ -131,7 +137,7 @@
                             12. Date of Travel:
                             <span class=" tracking-wide underline">
                                 &nbsp
-                                {{ date_format(date_create($request->date_of_travel), 'F d,Y') }}
+                                {{ date_format(date_create($selectedDate), 'F d,Y') }}
                                 &nbsp
                             </span>
                         </div>
@@ -275,18 +281,19 @@
             Print Driver's Trip Ticket
         </button>
     </div>
+    @endif
     @push('scripts')
         <script>
             function printDiv(divName) {
-                var printContents = document.getElementById(divName).innerHTML;
-                var originalContents = document.body.innerHTML;
+            var printContents = document.getElementById(divName).innerHTML;
+            var originalContents = document.body.innerHTML;
 
-                document.body.innerHTML = printContents;
+            document.body.innerHTML = printContents;
 
-                window.print();
+            window.print();
 
-                document.body.innerHTML = originalContents;
-
+            document.body.innerHTML = originalContents;
+            location.reload(); // Reload the page after print preview is closed
             }
         </script>
     @endpush
