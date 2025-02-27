@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Livewire\WFP\AccountingRequestedSupplies;
+use App\Http\Livewire\WFP\AddSupplementalFund;
 use App\Http\Livewire\WFP\AllocateFunds;
 use App\Http\Livewire\WFP\EditAllocateFunds;
 use App\Http\Livewire\WFP\AssignPersonnel;
@@ -63,5 +64,6 @@ Route::middleware([
     Route::get('/pricelist-document', PriceListDocument::class)->name('pricelist-document');
     Route::get('/deactivated-pricelists', DeactivatedPricelists::class)->name('deactivated-pricelists');
     Route::get('/view-remarks/{record}', ViewRemarks::class)->name('view-remarks');
+    Route::get('/add-supplemental-fund/{record}/{wfpType}', AddSupplementalFund::class)->name('add-supplemental-fund');
     Route::get('/dev-page', DevPage::class)->name('dev-page');
 });

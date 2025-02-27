@@ -18,6 +18,7 @@ use Filament\Forms\Components\Select;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -100,7 +101,8 @@ class FundAllocation extends Component implements HasTable
 
                 }
             }),
-            ViewColumn::make('status')->label('WFP Status')->view('tables.columns.wfp-status'),
+            ViewColumn::make('status')
+            ->label('WFP Status')->view('tables.columns.wfp-status'),
 
         ];
     }
@@ -113,28 +115,6 @@ class FundAllocation extends Component implements HasTable
             ->label('Allocate Fund')
             ->button()
             ->url(fn (CostCenter $record): string => route('wfp.allocate-funds', $record))
-            // ->form([
-            //     Select::make('wpf_type_id')
-            //     ->label('WFP Period')
-            //     ->required()
-            //     ->options(WpfType::all()->pluck('description', 'id')),
-            //     TextInput::make('amount')
-            //     ->label('Amount')
-            //     ->required()
-            //     ->mask(fn (TextInput\Mask $mask) => $mask
-            //         ->numeric()
-            //         ->thousandsSeparator(','),
-            // )
-            // ])
-            // ->action(function($data, $record) {
-            //     $record->fundAllocations()->create([
-            //         'wpf_type_id' => $data['wpf_type_id'],
-            //         'amount' => $data['amount']
-            //     ]);
-
-            //     Notification::make()->title('Operation Success')->body('Fund Successfully Added')->success()->send();
-
-            // })
             ->requiresConfirmation()
             ->visible(fn ($record) => !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$this->isPresident),
             Action::make('edit_fund')
@@ -143,33 +123,6 @@ class FundAllocation extends Component implements HasTable
             ->button()
             ->color('warning')
             ->url(fn (CostCenter $record): string => route('wfp.edit-allocate-funds', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-            // ->mountUsing(fn ($record, Forms\ComponentContainer $form) => $form->fill([
-            //     'wpf_type_id' => $record->fundAllocations->first()->wpf_type_id,
-            //     'amount' => $record->fundAllocations->sum('amount')
-            // ]))
-            // ->form([
-            //     Select::make('wpf_type_id')
-            //     ->label('WFP Period')
-            //     ->required()
-            //     ->options(WpfType::all()->pluck('description', 'id')),
-            //     TextInput::make('amount')
-            //     ->label('Amount')
-            //     ->required()
-            //     ->mask(fn (TextInput\Mask $mask) => $mask
-            //         ->numeric()
-            //         ->thousandsSeparator(','),
-            //     )
-            // ])
-            // ->action(function($data, $record) {
-            //     $record->fundAllocations()->update([
-            //         'wpf_type_id' => $data['wpf_type_id'],
-            //         'amount' => $data['amount']
-            //     ]);
-
-            //     Notification::make()->title('Operation Success')->body('Fund Successfully Updated')->success()->send();
-
-            // })
-            // ->requiresConfirmation()
             ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()  && !$this->isPresident),
             Action::make('lock_fund')
             ->icon('ri-lock-line')
@@ -186,28 +139,39 @@ class FundAllocation extends Component implements HasTable
 
             })
             ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()  && !$this->isPresident),
-            Action::make('unlock_fund')
-            ->icon('ri-lock-line')
-            ->label('Unlock fund')
-            ->button()
-            ->color('danger')
-            ->requiresConfirmation()
-            ->action(function($record) {
-                $record->fundAllocations()->update([
-                    'is_locked' => false
-                ]);
+            ActionGroup::make([
+                Action::make('unlock_fund')
+                ->icon('ri-lock-line')
+                ->label('Unlock fund')
+                ->button()
+                ->color('danger')
+                ->requiresConfirmation()
+                ->action(function($record) {
+                    $record->fundAllocations()->update([
+                        'is_locked' => false
+                    ]);
 
-                Notification::make()->title('Operation Success')->body('Fund Successfully Unlocked')->success()->send();
+                    Notification::make()->title('Operation Success')->body('Fund Successfully Unlocked')->success()->send();
 
-            })
-            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident),
-            ViewAction::make('view_allocation')
-            ->label('View Allocation')
-            ->button()
-            ->color('warning')
-            ->icon('ri-eye-line')
-            ->url(fn (CostCenter $record): string => route('wfp.view-allocated-funds', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-            ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident),
+                })
+                ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident),
+                ViewAction::make('view_allocation')
+                ->label('View Allocation')
+                ->button()
+                ->color('warning')
+                ->icon('ri-eye-line')
+                ->url(fn (CostCenter $record): string => route('wfp.view-allocated-funds', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
+                ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident),
+                //action for adding supplemental fund
+                Action::make('supplemental_fund')
+                ->icon('ri-money-dollar-circle-line')
+                ->label('Add Supplemental Fund')
+                ->button()
+                ->color('success')
+                ->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
+                ->visible(fn (CostCenter $record) => $record->wfp?->is_approved === 1)
+            ])
+
         ];
     }
 
@@ -222,6 +186,7 @@ class FundAllocation extends Component implements HasTable
             Filter::make('wfp_type')
             ->form([
                 Forms\Components\Select::make('wfp_type')
+                ->label('WFP Period')
                 ->options(WpfType::all()->pluck('description', 'id')->toArray())->default(1)
             ])
             ->query(function (Builder $query, array $data): Builder {
