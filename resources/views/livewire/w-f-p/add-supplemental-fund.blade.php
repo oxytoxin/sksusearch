@@ -20,9 +20,6 @@
                       <dt class="text-sm font-semibold leading-6 text-gray-900">Fund - {{$record->fundClusterWFP->name}}</dt>
                       <dd class="mt-1 text-base font-semibold leading-6 text-gray-900"></dd>
                     </div> --}}
-                <div class="flex w-full flex-none gap-x-4 px-6 pt-3">
-                    <span class="text-sm font-semibold">Programmed</span>
-                </div>
                 <div class="mt-3 flex w-full flex-none gap-x-4 px-6 pt-3">
                   <dt class="flex-none">
                     <span class="sr-only">Client</span>
@@ -66,7 +63,7 @@
                   <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->mfo->name}} - MFO</dd>
                 </div>
                 </dl>
-                <div class="border-t border-gray-900/5 px-6 py-3">
+                <div class="mt-2 border-t border-gray-900/5 px-6 py-3">
                     <span class="text-sm font-semibold">Add funds to each category group</span>
                     <div class="px-4 sm:px-6 lg:px-8">
                         <div class="mt-4 flow-root">
@@ -114,7 +111,6 @@
                           </div>
                         </div>
                       </div>
-
                   </div>
             </div>
           </div>
@@ -127,9 +123,6 @@
                       <dt class="text-sm font-semibold leading-6 text-gray-900">Fund - {{$record->fundClusterWFP->name}}</dt>
                       <dd class="mt-1 text-base font-semibold leading-6 text-gray-900"></dd>
                     </div> --}}
-                <div class="flex w-full flex-none gap-x-4 px-6 pt-3">
-                    <span class="text-sm font-semibold">Balance</span>
-                </div>
                 <div class="mt-3 flex w-full flex-none gap-x-4 px-6 pt-3">
                   <dt class="flex-none">
                     <span class="sr-only">Client</span>
@@ -187,10 +180,11 @@
                             <thead class="border-b border-gray-300 text-gray-900">
                               <tr>
                                 <th scope="col" class="py-3.5 pl-4 pr-0 text-left text-sm font-semibold text-gray-900 sm:pl-0">Category Group</th>
-                                <th scope="col" class="hidden px-3 py-3.5 text-right text-sm font-semibold text-gray-900 sm:table-cell"></th>
+                                {{-- <th scope="col" class="hidden px-3 py-3.5 text-right text-sm font-semibold text-gray-900 sm:table-cell"></th> --}}
                                 <th scope="col" class="py-3.5 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Balance</th>
-                                <th scope="col" class="hidden py-3.5 text-right text-sm font-semibold text-gray-900 sm:table-cell"></th>
+                                <th scope="col" class="py-3.5 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Supplemental</th>
                                 <th scope="col" class="py-3.5 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0">Sub Total</th>
+                                <th scope="col" class="hidden py-3.5 text-right text-sm font-semibold text-gray-900 sm:table-cell"></th>
                               </tr>
                             </thead>
                             <tbody>
@@ -199,10 +193,11 @@
                                     <td class="max-w-0 py-3 pl-4 pr-3 text-sm sm:pl-0">
                                       <div class="font-medium text-gray-900">{{$item->name}}</div>
                                     </td>
-                                    <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell"></td>
+                                    {{-- <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell"></td> --}}
                                     <td class="hidden px-3 py-3 text-left text-sm text-gray-500 sm:table-cell">₱ {{ number_format($this->calculateSubTotal($item->id), 2) }}</td>
+                                    <td class="hidden px-3 py-3 text-left text-sm text-gray-500 sm:table-cell">₱ {{ number_format($this->calculateSupplemental($item->id), 2) }}</td>
+                                    <td class="hidden px-3 py-3 text-left text-sm text-gray-500 sm:table-cell">₱ {{ number_format($this->calculateSupplementalTotal($item->id), 2) }}</td>
                                     <td class="hidden py-3 text-right text-sm text-gray-500 sm:table-cell"></td>
-                                    <td class="hidden px-3 py-3 text-left text-sm text-gray-500 sm:table-cell">₱ {{ number_format($this->calculateSubTotal($item->id), 2) }}</td>
                                   </tr>
                                 @empty
                                     <tr>
@@ -213,9 +208,12 @@
                             </tbody>
                             <tfoot>
                               <tr>
-                                <th scope="row" colspan="3" class="hidden pl-4 pr-3 pt-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">Total</th>
+                                <th scope="row" class="hidden pl-4 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">Total</th>
                                 <th scope="row" class="pl-4 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 sm:hidden">Total</th>
-                                <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($this->calculateTotal(), 2) }}</td>
+                                <td class="pl-3 pr-4 pt-4 text-left text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($this->calculateTotal(), 2) }}</td>
+                                <td class="pl-3 pr-4 pt-4 text-left text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($this->calculateTotalSupplemental(), 2) }}</td>
+                                <td class="pl-3 pr-4 pt-4 text-left text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($this->calculateGrandTotal(), 2) }}</td>
+
                               </tr>
                             </tfoot>
                           </table>

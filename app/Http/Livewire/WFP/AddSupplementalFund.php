@@ -18,6 +18,7 @@ class AddSupplementalFund extends Component
     public $fund_description;
     public $allocations = [];
     public $amounts = [];
+    public $balances = [];
 
     public function mount($record, $wfpType)
     {
@@ -35,10 +36,10 @@ class AddSupplementalFund extends Component
         {
             foreach($wfp->wfpDetails as $allocation)
             {
-            if (!isset($this->amounts[$allocation->category_group_id])) {
-                $this->amounts[$allocation->category_group_id] = 0;
+            if (!isset($this->balances[$allocation->category_group_id])) {
+                $this->balances[$allocation->category_group_id] = 0;
             }
-            $this->amounts[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+            $this->balances[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
             }
         }
 
@@ -57,7 +58,32 @@ class AddSupplementalFund extends Component
         // {
         //     $this->amounts[$categoryGroupId] = $this->amounts[$categoryGroupId];
         // }
+        return $this->balances[$categoryGroupId] ?? 0;
+    }
+
+    public function calculateSupplemental($categoryGroupId)
+    {
         return $this->amounts[$categoryGroupId] ?? 0;
+    }
+
+    public function calculateTotalSupplemental()
+    {
+        return array_sum($this->amounts);
+    }
+
+    public function calculateSupplementalTotal($categoryGroupId)
+    {
+        // Return the amount associated with the given category group ID
+        $amount = $this->amounts[$categoryGroupId] ?? 0;
+        $balance = $this->balances[$categoryGroupId] ?? 0;
+        $sum = $amount + $balance;
+        return $sum ?? 0;
+    }
+
+    public function calculateGrandTotal()
+    {
+        // Calculate the total of all amounts
+        return array_sum($this->amounts) + array_sum($this->balances);
     }
 
     public function calculateBalance($categoryGroupId)
@@ -69,7 +95,7 @@ class AddSupplementalFund extends Component
     public function calculateTotal()
     {
         // Calculate the total of all amounts
-        return array_sum($this->amounts);
+        return array_sum($this->balances);
     }
 
     public function calculateTotalBalance()
