@@ -18,6 +18,7 @@ class AddSupplementalFund extends Component
     public $fund_description;
     public $allocations = [];
     public $amounts = [];
+    public $programmed = [];
     public $balances = [];
 
     public function mount($record, $wfpType)
@@ -36,16 +37,26 @@ class AddSupplementalFund extends Component
         {
             foreach($wfp->wfpDetails as $allocation)
             {
-            if (!isset($this->balances[$allocation->category_group_id])) {
-                $this->balances[$allocation->category_group_id] = 0;
+            if (!isset($this->programmed[$allocation->category_group_id])) {
+                $this->programmed[$allocation->category_group_id] = 0;
             }
-            $this->balances[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+            $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
             }
         }
 
         foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
             $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
         }
+
+
+
+        //i want to get the balances from the allocations subtracted by the programmed, use map
+        $this->balances = collect($this->allocations)->map(function($allocation, $categoryGroupId) {
+            return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
+        });
+
+
+
     }
 
     public function calculateSubTotal($categoryGroupId)
@@ -58,7 +69,10 @@ class AddSupplementalFund extends Component
         // {
         //     $this->amounts[$categoryGroupId] = $this->amounts[$categoryGroupId];
         // }
-        return $this->balances[$categoryGroupId] ?? 0;
+        $amount = $this->allocations[$categoryGroupId] ?? 0;
+        $programmed = $this->programmed[$categoryGroupId] ?? 0;
+        $balance = $amount - $programmed;
+        return $balance ?? 0;
     }
 
     public function calculateSupplemental($categoryGroupId)
@@ -75,7 +89,7 @@ class AddSupplementalFund extends Component
     {
         // Return the amount associated with the given category group ID
         $amount = $this->amounts[$categoryGroupId] ?? 0;
-        $balance = $this->balances[$categoryGroupId] ?? 0;
+        $balance = $this->programmed[$categoryGroupId] ?? 0;
         $sum = $amount + $balance;
         return $sum ?? 0;
     }
@@ -83,19 +97,19 @@ class AddSupplementalFund extends Component
     public function calculateGrandTotal()
     {
         // Calculate the total of all amounts
-        return array_sum($this->amounts) + array_sum($this->balances);
+        return array_sum($this->amounts) + array_sum($this->programmed);
     }
 
     public function calculateBalance($categoryGroupId)
     {
         // Return the difference between the initial amount and the amount associated with the given category group ID
-        //return $this->allocations[$categoryGroupId] - $this->calculateSubTotal($categoryGroupId);
+        return $this->allocations[$categoryGroupId] - $this->calculateSubTotal($categoryGroupId);
     }
 
     public function calculateTotal()
     {
         // Calculate the total of all amounts
-        return array_sum($this->balances);
+        return $this->balances->sum();
     }
 
     public function calculateTotalBalance()
