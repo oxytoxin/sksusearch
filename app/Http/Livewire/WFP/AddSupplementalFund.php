@@ -55,8 +55,6 @@ class AddSupplementalFund extends Component
             return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
         });
 
-
-
     }
 
     public function calculateSubTotal($categoryGroupId)
@@ -88,16 +86,21 @@ class AddSupplementalFund extends Component
     public function calculateSupplementalTotal($categoryGroupId)
     {
         // Return the amount associated with the given category group ID
+        $allocation = $this->allocations[$categoryGroupId] ?? 0;
         $amount = $this->amounts[$categoryGroupId] ?? 0;
-        $balance = $this->programmed[$categoryGroupId] ?? 0;
-        $sum = $amount + $balance;
+        $programmed = $this->programmed[$categoryGroupId] ?? 0;
+        $balance = $amount - $programmed;
+        $sum = $allocation + $balance;
         return $sum ?? 0;
     }
 
     public function calculateGrandTotal()
     {
         // Calculate the total of all amounts
-        return array_sum($this->amounts) + array_sum($this->programmed);
+       // return array_sum($this->amounts) + array_sum($this->programmed);
+       $balance = array_sum($this->allocations) - array_sum($this->programmed);
+       $amount = array_sum($this->amounts);
+       return $balance + $amount;
     }
 
     public function calculateBalance($categoryGroupId)
@@ -109,7 +112,7 @@ class AddSupplementalFund extends Component
     public function calculateTotal()
     {
         // Calculate the total of all amounts
-        return $this->balances->sum();
+        return array_sum($this->allocations) - array_sum($this->programmed);
     }
 
     public function calculateTotalBalance()
