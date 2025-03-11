@@ -7,16 +7,19 @@ use Livewire\Component;
 use App\Models\Supplier;
 use App\Models\RequestSchedule;
 use App\Models\EmployeeInformation;
+use App\Models\FuelRequisition as ModelsFuelRequisition;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use WireUi\Traits\Actions;
 use Filament\Forms\Concerns\InteractsWithForms;
 
 class FuelRequisition extends Component implements HasForms
 {
     use InteractsWithForms;
+    use Actions;
 
     public $request;
     public $showPrintable = false;
@@ -27,12 +30,14 @@ class FuelRequisition extends Component implements HasForms
     public $article;
     public $other_article;
     public $purpose;
+    public $quantity;
+    public $unit;
     public $driver_id;
 
     public function mount($request)
     {
         $this->request = RequestSchedule::find($request);
-        $this->slip_number = now()->year . '-' . str_pad(RequestSchedule::max('id') + 1, 5, '0', STR_PAD_LEFT);
+        $this->slip_number = now()->year . '-' . str_pad(ModelsFuelRequisition::max('id') + 1, 4, '0', STR_PAD_LEFT);
     }
 
 
@@ -68,6 +73,7 @@ class FuelRequisition extends Component implements HasForms
             ->schema([
                 TextInput::make('quantity')
                 ->label('Quantity')
+                ->numeric()
                 ->required(),
                 TextInput::make('unit')
                 ->label('Unit')
@@ -83,6 +89,56 @@ class FuelRequisition extends Component implements HasForms
                 })->pluck('full_name', 'id'))
             ->searchable()
         ];
+    }
+
+    public function saveFuel()
+    {
+        $this->dialog()->confirm([
+            'title'       => 'Are you Sure?',
+            'description' => 'Save this fuel request?',
+            'icon'        => 'warning',
+            'accept'      => [
+                'label'  => 'Yes, save it',
+                'method' => 'saveFuelFinal',
+                'params' => 'Saved',
+            ],
+            'reject' => [
+                'label'  => 'Cancel',
+            ],
+        ]);
+    }
+
+    public function saveFuelFinal()
+    {
+        $this->validate([
+            'slip_number' => 'required',
+            'supplier_id' => 'required',
+            'address' => 'required',
+            'article' => 'required',
+            'quantity' => 'required',
+            'unit' => 'required',
+            'purpose' => 'required',
+            'driver_id' => 'required',
+        ]);
+
+        ModelsFuelRequisition::create([
+            'slip_number' => $this->slip_number,
+            'supplier_id' => $this->supplier_id,
+            'article' => $this->article,
+            'other_article' => $this->other_article,
+            'quantity' => $this->quantity,
+            'unit' => $this->unit,
+            'purpose' => $this->purpose,
+            'requested_by' => $this->driver_id,
+        ]);
+
+        $this->dialog()->success(
+            $title = 'Operation Success',
+            $description = 'Fuel Requisition saved!'
+        );
+
+        return redirect()->route('motorpool.request.fuel-requisition');
+
     }
 
     public function render()
