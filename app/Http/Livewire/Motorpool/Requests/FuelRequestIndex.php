@@ -22,6 +22,7 @@ class FuelRequestIndex extends Component implements HasTable
     {
         return [
             Tables\Columns\TextColumn::make('user.name')
+                ->label('Requested By')
                 ->searchable()
                 ->wrap(),
             Tables\Columns\TextColumn::make('slip_number')
@@ -52,10 +53,15 @@ class FuelRequestIndex extends Component implements HasTable
     {
         return [
             ViewAction::make('print')
-            ->label('Fuel Requisition Form')
+            ->label('Fuel Requisition Slip')
             ->icon('ri-printer-fill')
             ->button()
             ->color('success')
+            ->modalContent(fn(FuelRequisition $record) => view('components.motorpool.fuel-requisition-slip', $record))
+            ->modalContent(fn ($record) => view('components.motorpool.fuel-requisition-slip', [
+                'fuel_request' => $record,
+            ]))
+             //->view('components.motorpool.fuel-requisition-slip')
             //->openUrlInNewTab()
             //->url(fn ($record) => route('motorpool.request.show', ['request' => $record]), true)
         ];

@@ -19,4 +19,9 @@ class FuelRequisition extends Model
     {
         return $this->belongsTo(User::class, 'requested_by');
     }
+
+    public function request_schedule()
+    {
+        return $this->belongsTo(RequestSchedule::class);
+    }
 }

@@ -66,7 +66,7 @@ class FuelRequisition extends Component implements HasForms
             ->reactive()
             ->required(),
             TextInput::make('other_article')
-            ->label('Others')
+            ->label('Other Details')
             ->required(fn ($get) => $get('article') == 'Others')
             ->visible(fn ($get) => $get('article') == 'Others'),
             Grid::make(2)
@@ -122,6 +122,7 @@ class FuelRequisition extends Component implements HasForms
         ]);
 
         ModelsFuelRequisition::create([
+            'request_schedule_id' => $this->request->id,
             'slip_number' => $this->slip_number,
             'supplier_id' => $this->supplier_id,
             'article' => $this->article,

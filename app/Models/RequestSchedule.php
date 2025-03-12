@@ -51,4 +51,9 @@ class RequestSchedule extends Model
     {
         return $this->hasMany(RequestScheduleTimeAndDate::class);
     }
+
+    public function fuel_request()
+    {
+        return $this->hasOne(FuelRequisition::class);
+    }
 }

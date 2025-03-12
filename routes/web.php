@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Livewire\Shared\TravelCompletedCertificatePrint;
 use App\Http\Livewire\TestComponent;
+use App\Models\FuelRequisition;
 use App\Models\LegacyDocument;
 use Illuminate\Support\Facades\Route;
 
@@ -26,4 +27,9 @@ Route::get('auth/google', 'App\Http\Controllers\GoogleController@redirectToGoogl
 Route::get('auth/google/callback', 'App\Http\Controllers\GoogleController@handleGoogleCallback');
 Route::middleware(['auth:sanctum', 'verified'])->get('redirects', 'App\Http\Controllers\HomeController@index')->name('redirect');
 
-Route::get('/test', TestComponent::class);
+Route::get('/test', function () {
+    $fuel = FuelRequisition::first();
+    return view('components.motorpool.fuel-requisition-slip', [
+        'fuel_request' => $fuel
+    ]);
+});
