@@ -104,7 +104,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                         Repeater::make('particulars')
                             ->schema([
                                 Textarea::make('purpose')->required(),
-                                TextInput::make('amount')->disabled(fn () => $this->disbursement_voucher?->travel_order_id)->numeric()->minValue(0)->required()->reactive()
+                                TextInput::make('amount')->disabled(fn() => $this->disbursement_voucher?->travel_order_id)->numeric()->minValue(0)->required()->reactive()
                                     ->afterStateUpdated(function ($set, $get) {
                                         try {
                                             $particulars = collect($this->data['particulars']);
@@ -117,16 +117,16 @@ class LiquidationReportsCreate extends Component implements HasForms
                                         }
                                     }),
                             ])
-                            ->disableItemDeletion(fn () => $this->disbursement_voucher?->travel_order_id)
-                            ->disableItemCreation(fn () => $this->disbursement_voucher?->travel_order_id)
+                            ->disableItemDeletion(fn() => $this->disbursement_voucher?->travel_order_id)
+                            ->disableItemCreation(fn() => $this->disbursement_voucher?->travel_order_id)
                             ->columns(2)
-                            ->visible(fn () => $this->disbursement_voucher),
+                            ->visible(fn() => $this->disbursement_voucher),
                         Section::make('Actual Itinerary')
-                            ->visible(fn () => $this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
+                            ->visible(fn() => $this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
                             ->schema([
                                 Card::make([
                                     Placeholder::make('travel_order_details')
-                                        ->content(fn () => view('components.travel_orders.travel-order-details', [
+                                        ->content(fn() => view('components.travel_orders.travel-order-details', [
                                             'travel_order' => $this->disbursement_voucher?->travel_order,
                                             'itinerary_entries' => $this->data['itinerary_entries'] ?? [],
                                         ])),
@@ -195,7 +195,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                     ->schema([
                         Placeholder::make('gross_amount')
                             ->view('components.liquidation_reports.liquidation-details')
-                            ->visible(fn ($get) => $get('disbursement_voucher_id')),
+                            ->visible(fn($get) => $get('disbursement_voucher_id')),
                         Fieldset::make('Refund')
                             ->schema([
                                 SlimRepeater::make('refund_particulars')->schema([
@@ -259,7 +259,7 @@ class LiquidationReportsCreate extends Component implements HasForms
                     ->schema([
                         Placeholder::make('related_documents')
                             ->disableLabel()
-                            ->content(fn ($record) => view('components.liquidation_reports.related-documents', [
+                            ->content(fn($record) => view('components.liquidation_reports.related-documents', [
                                 'voucher_subtype' => $this->disbursement_voucher?->voucher_subtype
                             ]))
 
@@ -361,7 +361,7 @@ class LiquidationReportsCreate extends Component implements HasForms
             $or_amount = $refund_particular['amount'] ?? null;
             return [
                 Step::make('Certificate of Travel Completed')
-                    ->schema(fn () => [
+                    ->schema(fn() => [
                         Card::make([
                             Radio::make('condition')->options([
                                 '1' => 'Strictly in accordance with the approved itinerary.',
@@ -372,11 +372,11 @@ class LiquidationReportsCreate extends Component implements HasForms
                                 ->required()
                                 ->default('1'),
                             Textarea::make('explanation')->placeholder('Explanation or justifications')
-                                ->required(fn ($get) => $get('condition') != 1),
+                                ->required(fn($get) => $get('condition') != 1),
                         ])
                     ]),
                 Step::make('Print Certificate of Travel Completed')
-                    ->visible(fn () => in_array($this->disbursement_voucher?->voucher_subtype_id, [1, 2]))
+                    ->visible(fn() => in_array($this->disbursement_voucher?->voucher_subtype_id, [1, 2]))
                     ->schema([
                         Placeholder::make('ctc')
                             ->disableLabel()
@@ -564,8 +564,8 @@ class LiquidationReportsCreate extends Component implements HasForms
                 $daily_itinerary_entries[] =  [
                     'mot_id' => $entry->mot_id,
                     'place' => $entry->place,
-                    'departure_time' => $entry->departure_time,
-                    'arrival_time' => $entry->arrival_time,
+                    'departure_time' => $entry->departure_time->shiftTimezone('UTC'),
+                    'arrival_time' => $entry->arrival_time->shiftTimezone('UTC'),
                     'transportation_expenses' => $entry->transportation_expenses,
                     'other_expenses' => $entry->other_expenses,
                 ];

@@ -64,15 +64,15 @@ class ItineraryCreate extends Component implements HasForms
                 ->reactive(),
             Placeholder::make('itinerary_template')
                 ->label('Itinerary Template Selector')
-                ->content(fn () => view('components.travel_orders.itinerary-template-selector', ['itineraries' => $this->travel_order->itineraries]))
-                ->visible(fn () => filled($this->travel_order)),
+                ->content(fn() => view('components.travel_orders.itinerary-template-selector', ['itineraries' => $this->travel_order->itineraries]))
+                ->visible(fn() => filled($this->travel_order)),
             Card::make([
                 Placeholder::make('travel_order_details')
-                    ->content(fn () => view('components.travel_orders.travel-order-details', [
+                    ->content(fn() => view('components.travel_orders.travel-order-details', [
                         'travel_order' => $this->travel_order,
                         'itinerary_entries' => $this->itinerary_entries,
                     ])),
-            ])->visible(fn ($get) => $get('travel_order_id')),
+            ])->visible(fn($get) => $get('travel_order_id')),
             Builder::make('itinerary_entries')->blocks([
                 Block::make('new_entry')->schema([
                     Grid::make(2)->schema([
@@ -126,24 +126,25 @@ class ItineraryCreate extends Component implements HasForms
                                 ->default(0)
                                 ->required()
                                 ->numeric()
-                                ->disabled(fn ($get) => $get('mot_id') == 13)
+                                ->disabled(fn($get) => $get('mot_id') == 13)
                                 ->reactive(),
                             TextInput::make('other_expenses')->label('Others')->default(0)->numeric()->reactive(),
                         ])
                 ]),
-            ])->disableItemCreation()->disableItemDeletion()->visible(fn ($get) => $get('travel_order_id')),
+            ])->disableItemCreation()->disableItemDeletion()->visible(fn($get) => $get('travel_order_id')),
         ];
     }
 
     public function save()
     {
-        $this->form->validate();
+        $entries = $this->form->validate();
         DB::beginTransaction();
         $coverage = [];
         foreach ($this->itinerary_entries as $entry) {
             $coverage[] = [
                 'date' => $entry['data']['date'],
                 'per_diem' => $entry['data']['per_diem'],
+                'original_per_diem' => $entry['data']['original_per_diem'],
                 'total_expenses' => $entry['data']['total_expenses'],
                 'breakfast' => $entry['data']['breakfast'],
                 'lunch' => $entry['data']['lunch'],
@@ -253,7 +254,7 @@ class ItineraryCreate extends Component implements HasForms
                         'date' => $coverage['date'],
                         'per_diem' => $coverage['per_diem'],
                         'has_per_diem' => true,
-                        'original_per_diem' => $coverage['per_diem'],
+                        'original_per_diem' => $coverage['original_per_diem'] ?? $coverage['per_diem'],
                         'total_expenses' => $coverage['total_expenses'],
                         'breakfast' => $coverage['breakfast'],
                         'lunch' => $coverage['lunch'],
@@ -263,8 +264,8 @@ class ItineraryCreate extends Component implements HasForms
                             return [
                                 'mot_id' => $entry->mot_id,
                                 'place' => $entry->place,
-                                'departure_time' => $entry->departure_time,
-                                'arrival_time' => $entry->arrival_time,
+                                'departure_time' => $entry->departure_time->shiftTimezone('UTC'),
+                                'arrival_time' => $entry->arrival_time->shiftTimezone('UTC'),
                                 'transportation_expenses' => $entry->transportation_expenses,
                                 'other_expenses' => $entry->other_expenses,
                             ];
