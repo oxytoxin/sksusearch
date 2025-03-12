@@ -5,7 +5,7 @@
         $total_amount = 0;
 
         foreach ($particulars as $particular) {
-            $total_amount += $particular['amount'];
+            $total_amount += floatval($particular['amount']);
         }
 
     @endphp
@@ -200,7 +200,7 @@
                     <div class="text-right h-44 w-36">
                         <div class="flex flex-col">
                             @foreach ($particulars as $particular)
-                                {{ number_format($particular['amount'], 2) }}
+                                {{ number_format(floatval($particular['amount']), 2) }}
                             @endforeach
                         </div>
                     </div>

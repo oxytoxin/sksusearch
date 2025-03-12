@@ -147,7 +147,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                                     });
                                             })->orWhere('travel_order_type_id', TravelOrderType::OFFICIAL_TIME);
                                         })
-                                        ->whereRelation('disbursement_vouchers', 'cancelled_at', '!=', null)
+                                        ->whereDoesntHave('disbursement_vouchers', fn($q) => $q->where('cancelled_at', null))
                                         ->approved()
                                         ->select(
                                             DB::raw("CONCAT(purpose,' ( ',tracking_code,' )') AS tcAndP"),
@@ -665,7 +665,6 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                         TextInput::make('amount')
                                             ->reactive()
                                             ->numeric()
-                                            ->minValue(1)
                                             ->disabled(fn() => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
                                             ->required(),
                                     ]),

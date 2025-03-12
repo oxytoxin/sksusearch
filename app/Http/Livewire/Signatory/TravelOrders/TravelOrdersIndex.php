@@ -23,11 +23,11 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
             Tables\Columns\TextColumn::make('date_from')->label('From')->date()->searchable(),
             Tables\Columns\TextColumn::make('date_to')->label('To')->date()->searchable(),
             Tables\Columns\TextColumn::make('approved')->label('Status')
-                ->formatStateUsing(fn ($record) => $record->signatories->contains('pivot.is_approved', 2) ? 'Cancelled'
+                ->formatStateUsing(fn($record) => $record->signatories->contains('pivot.is_approved', 2) ? 'Cancelled'
                     : ($record->signatories->contains('pivot.is_approved', 0) ? 'Pending'
                         : 'Approved')),
             Tables\Columns\TextColumn::make('signed')->label('Signed')
-                ->formatStateUsing(fn ($record) => $record->signatories()->wherePivot('user_id', auth()->id())->value('is_approved') ? 'Signed' : 'Pending'),
+                ->formatStateUsing(fn($record) => $record->signatories()->wherePivot('user_id', auth()->id())->value('is_approved') ? 'Signed' : 'Pending'),
 
         ];
     }
@@ -36,10 +36,10 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
     {
         return [
             Action::make('view')
-                ->url(fn (TravelOrder $record): string => route('signatory.travel-orders.view', $record))
+                ->url(fn(TravelOrder $record): string => route('signatory.travel-orders.view', $record))
                 ->icon('heroicon-o-eye'),
             Action::make('print')
-                ->url(fn (TravelOrder $record): string => route('signatory.travel-orders.show', $record))
+                ->url(fn(TravelOrder $record): string => route('signatory.travel-orders.show', $record))
                 ->icon('heroicon-o-printer'),
         ];
     }
