@@ -22,6 +22,7 @@ class User extends Authenticatable implements FilamentUser
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    
 
     /**
      * The attributes that should be hidden for serialization.

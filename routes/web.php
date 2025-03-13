@@ -37,14 +37,3 @@ Route::get('/test', function () {
 
 
 
-Route::prefix('websocket')->group(function(){
-
-
-    Route::get('/fire-event',function () {
-        event(new  \App\Events\TestEvent('Hello World'));
-       return 'done';
-    });
-
-    Route::get('/test-page',  CountetTest::class);
-});
-

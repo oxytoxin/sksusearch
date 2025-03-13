@@ -80,6 +80,9 @@
                     </div>
                 @endif
 
+                <div class="relative ml-3">
+                    @livewire('notification.notification-dropdown')
+                </div>
                 <!-- Settings Dropdown -->
                 <div class="relative ml-3">
                     <x-jet-dropdown align="right" width="48">
@@ -126,8 +129,11 @@
                                 <x-jet-dropdown-link href="{{ route('logout') }}" @click.prevent="$root.submit();">
                                     {{ __('Log Out') }}
                                 </x-jet-dropdown-link>
+                                
                             </form>
                         </x-slot>
+
+
                     </x-jet-dropdown>
                 </div>
             </div>
