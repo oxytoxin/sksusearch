@@ -164,6 +164,51 @@ trait OfficeDashboardActions
                 $record->activity_logs()->create([
                     'description' => $description,
                 ]);
+                $end_date = null;
+                $liquidation_period_end_date = null;
+                switch($record->voucher_subtype_id)
+                {
+                    case 1:
+                        //local travel
+                        $end_date = $record->travel_order->date_to;
+                        $liquidation_period_end_date = $end_date->addDays(30);
+                        break;
+                    case 2:
+                        //foreign travel
+                        $end_date = $record->travel_order->date_to;
+                        $liquidation_period_end_date = $end_date->addDays(60);
+                        break;
+                    case 3:
+                        //activities
+                        $end_date = $record->other_details['activity_date_to'] ?? null;
+                        $liquidation_period_end_date = $end_date->addDays(20);
+                        break;
+                    case 4:
+                        //payroll
+                        $end_date = $record->other_details['activity_date_to'] ?? null;
+                        $liquidation_period_end_date = $end_date->addDays(5);
+                        break;
+                    case 5:
+                        //special disbursing officer
+                        $end_date = $record->other_details['activity_date_to'] ?? null;
+                        $liquidation_period_end_date = $end_date->addDays(5);
+                        break;
+                    default:
+                        $end_date = null;
+                        $liquidation_period_end_date = null;
+                        break;
+                }
+
+                $record->cash_advance_reminder()->create([
+                    'status' => 'On-Going',
+                    'voucher_end_date' => $end_date,
+                    'liquidation_period_end_date' => $liquidation_period_end_date,
+                    'step' => 1,
+                    'is_sent' => false,
+                    'title' => 'Send FMR',
+                    'message' => 'Ongoing liquidation of cash advance.',
+                ]);
+
                 DB::commit();
                 Notification::make()->title('Cheque/ADA made for requisitioner.')->success()->send();
             })
