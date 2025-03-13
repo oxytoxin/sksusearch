@@ -2,6 +2,7 @@
 
 use App\Http\Livewire\Motorpool\Requests\FuelRequestIndex;
 use App\Http\Livewire\Motorpool\Requests\FuelRequisition;
+use App\Http\Livewire\Motorpool\Requests\FuelRequisitionSlip;
 use App\Http\Livewire\Motorpool\Requests\RequestIndex;
 use App\Http\Livewire\Motorpool\Requests\RequestNewSchedule;
 use App\Http\Livewire\Motorpool\Requests\RequestShow;
@@ -24,4 +25,5 @@ Route::middleware([
     Route::get('/requests/show/{request}', RequestShow::class)->name('request.show');
     Route::get('/requests/fuel-requisition', FuelRequestIndex::class)->name('request.fuel-requisition');
     Route::get('/requests/fuel-request/{request}', FuelRequisition::class)->name('request.fuel-request');
+    Route::get('/requests/fuel-request-slip/{request}', FuelRequisitionSlip::class)->name('request.fuel-request-slip');
 });

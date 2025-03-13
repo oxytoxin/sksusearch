@@ -143,12 +143,10 @@
 
         </div>
         <div class="flex justify-center py-5">
-            <button type="button" value="click" onclick="printDiv('print_to')" id="printto"
+            {{-- <button type="button" value="click" onclick="printDiv('print_to')" id="printto"
                 class="w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 max-w-sm rounded-full px-4 py-2 font-semibold tracking-wider text-white active:text-white">
                 Print Fuel Requisition Slip
-            </button>
-
-
+            </button> --}}
         <script>
             function printDiv(divName) {
                 var printContents = document.getElementById(divName).innerHTML;

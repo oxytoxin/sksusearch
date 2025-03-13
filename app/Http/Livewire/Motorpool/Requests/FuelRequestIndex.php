@@ -57,13 +57,9 @@ class FuelRequestIndex extends Component implements HasTable
             ->icon('ri-printer-fill')
             ->button()
             ->color('success')
-            ->modalContent(fn(FuelRequisition $record) => view('components.motorpool.fuel-requisition-slip', $record))
-            ->modalContent(fn ($record) => view('components.motorpool.fuel-requisition-slip', [
-                'fuel_request' => $record,
-            ]))
              //->view('components.motorpool.fuel-requisition-slip')
-            //->openUrlInNewTab()
-            //->url(fn ($record) => route('motorpool.request.show', ['request' => $record]), true)
+            ->openUrlInNewTab()
+            ->url(fn ($record) => route('motorpool.request.fuel-request-slip', ['request' => $record]), true)
         ];
     }
 
