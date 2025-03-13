@@ -108,7 +108,7 @@
                                                         <div class="flex space-x-8 justify-center items-center">
                                                             <div>
                                                                 <input disabled {{ $request->article === 'Others' ? 'checked' : '' }} type="checkbox">
-                                                                <label for="">Others :</label>
+                                                                <label for="">Others : {{$request->article === 'Others' ? $request->other_article : ''}}</label>
                                                             </div>
                                                             <div>
                                                                 <span></span>
