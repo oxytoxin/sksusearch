@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HomeController;
 use App\Http\Livewire\Shared\TravelCompletedCertificatePrint;
+use App\Http\Livewire\Test\CountetTest;
 use App\Http\Livewire\TestComponent;
 use App\Models\FuelRequisition;
 use App\Models\LegacyDocument;
@@ -33,3 +34,17 @@ Route::get('/test', function () {
         'fuel_request' => $fuel
     ]);
 });
+
+
+
+Route::prefix('websocket')->group(function(){
+
+
+    Route::get('/fire-event',function () {
+        event(new  \App\Events\TestEvent('Hello World'));
+       return 'done';
+    });
+
+    Route::get('/test-page',  CountetTest::class);
+});
+

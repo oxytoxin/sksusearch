@@ -17,3 +17,4 @@ Alpine.plugin(Tooltip);
 window.Alpine = Alpine
 window.tippy = tippy;
 Alpine.start()
+

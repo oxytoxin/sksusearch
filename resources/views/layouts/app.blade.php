@@ -19,7 +19,7 @@
     <script defer src="https://unpkg.com/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/alpine-tooltip@1.x.x/dist/cdn.min.js" defer></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.js'></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js','resources/js/websocket.js'])
     @livewireStyles
     @livewireScripts
     @stack('scripts')
@@ -75,6 +75,7 @@
             <main class="flex-1">
                 <div class="py-6">
                     <div class="max-w-full px-4 mx-auto sm:px-6 md:px-8">
+
                         {{ $slot }}
                     </div>
                 </div>
