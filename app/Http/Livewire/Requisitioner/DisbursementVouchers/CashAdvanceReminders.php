@@ -41,8 +41,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
 
                 // Send FMR
-
-                 NotificationController::sendFMR(Auth::user(), $record->user, $record);
+                 NotificationController::sendFMR(Auth::user(), $record->disbursementVoucher->user, $record);
 
 
             })

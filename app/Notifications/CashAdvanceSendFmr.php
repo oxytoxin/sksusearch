@@ -34,11 +34,11 @@ class CashAdvanceSendFmr extends Notification implements ShouldBroadcast
     public function toDatabase($notifiable)
     {
         return [
-            'type' => 'cash_advance_creation',
-            'title' => 'Cash Advance cheque number '. $this->disbursement_voucher->cheque_number??'No Number',
-            'message' => 'Cash advance assigned cheque number by ' . $this->user->name,
+            'type' => 'cash_advance_reminder_fmr',
+            'title' => 'FMR Sent by'. $this->user->name,
+            'message' => 'You have not liquidated your cash advance.',
             'profile_image' => $this->user->profile_photo_url,
-            'url' => route('disbursement-vouchers.index'),
+            'url' => route('requisitioner.disbursement-vouchers.unliquidated'),
             'time' => now(),
         ];
     }
