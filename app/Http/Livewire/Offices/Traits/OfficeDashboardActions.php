@@ -2,22 +2,26 @@
 
 namespace App\Http\Livewire\Offices\Traits;
 
-use App\Forms\Components\Flatpickr;
-use App\Models\DisbursementVoucher;
-use App\Models\DisbursementVoucherStep;
 use App\Models\FundCluster;
 use App\Models\TravelOrderType;
-use Filament\Forms\Components\CheckboxList;
 use Illuminate\Support\Facades\DB;
+use App\Forms\Components\Flatpickr;
+use App\Http\Controllers\NotificationController;
+use App\Models\DisbursementVoucher;
+use App\Models\EmployeeInformation;
 use Filament\Tables\Actions\Action;
-use Filament\Notifications\Notification;
-use Filament\Forms\Components\RichEditor;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\ActionGroup;
+use App\Models\DisbursementVoucherStep;
+use App\Notifications\SubmissionRequestNotification;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\CheckboxList;
 
 trait OfficeDashboardActions
 {
@@ -108,6 +112,12 @@ trait OfficeDashboardActions
                 ->label('Verify Related Documents')
                 ->modalHeading('Verify Related Documents')
                 ->action(function ($record, $data) {
+                    // $receiver = $record->user;
+                    // NotificationController::cashAdvanceCreation(Auth::user(), Auth::user(), $record);
+
+
+                    // return;
+
                     $record->refresh();
                     DB::beginTransaction();
                     $record->update([
@@ -208,6 +218,11 @@ trait OfficeDashboardActions
                     'title' => 'Send FMR',
                     'message' => 'Ongoing liquidation of cash advance.',
                 ]);
+
+
+                $receiver = $record->user;
+                NotificationController::cashAdvanceCreation(Auth::user(), $receiver, $record);
+
 
                 DB::commit();
                 Notification::make()->title('Cheque/ADA made for requisitioner.')->success()->send();

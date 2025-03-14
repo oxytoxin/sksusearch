@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Icu\IcuDashboard;
 use App\Http\Livewire\Test\CountetTest;
@@ -20,6 +21,8 @@ Route::middleware([
 
     Route::get('/test-page',  CountetTest::class)->name('test');
 
+
+    Route::get('/test', [NotificationController::class,'testNotification'])->name('test-notification');
 
 });
 
