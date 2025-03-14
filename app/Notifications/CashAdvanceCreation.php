@@ -50,9 +50,10 @@ class CashAdvanceCreation extends Notification implements ShouldBroadcast
     }
 
     public function broadcastOn()
-    {
-        return new PrivateChannel('notifications.' . $this->user->id);
-    }
+{
+    return new PrivateChannel('notifications.' . $this->receiver->id);
+}
+
 
 
 

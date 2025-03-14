@@ -75,4 +75,20 @@
             View All Notifications
         </a>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if ({{ auth()->check() ? 'true' : 'false' }}) {
+                console.log("📡 Subscribing to: notifications.{{ auth()->id() }}");
+
+                window.Echo.private(`notifications.{{ auth()->id() }}`)
+                    .listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (notification) => {
+                        console.log("🔔 New Notification:", notification);
+                        window.livewire.emit('refreshNotifications'); // Refresh Livewire dropdown
+                    });
+            } else {
+                console.warn("⚠️ User is not authenticated, skipping WebSocket subscription.");
+            }
+        });
+    </script>
+
 </div>

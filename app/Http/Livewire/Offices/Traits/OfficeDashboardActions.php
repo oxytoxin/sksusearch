@@ -112,18 +112,11 @@ trait OfficeDashboardActions
                 ->label('Verify Related Documents')
                 ->modalHeading('Verify Related Documents')
                 ->action(function ($record, $data) {
+                    // $receiver = $record->user;
+                    // NotificationController::cashAdvanceCreation(Auth::user(), Auth::user(), $record);
 
-                // $owner = $record->user;
 
-
-
-                // NotificationController::cashAdvanceCreation(Auth::user(), $owner, $record);
-                // $accountant = EmployeeInformation::accountantUser();
-                // // $currentUser = Auth::user();
-                // // $currentUser->notify(new SubmissionRequestNotification($currentUser));
-
-                // return;
-
+                    // return;
 
                     $record->refresh();
                     DB::beginTransaction();
@@ -227,20 +220,9 @@ trait OfficeDashboardActions
                 ]);
 
 
-                $owner = $record->user;
-                NotificationController::cashAdvanceCreation(Auth::user(), $owner, $record);
-                // $accountant = EmployeeInformation::accountantUser();
-                // $currentUser = Auth::user();
-                // $currentUser->notify(new SubmissionRequestNotification($currentUser));
+                $receiver = $record->user;
+                NotificationController::cashAdvanceCreation(Auth::user(), $receiver, $record);
 
-                // $owner = $record->user;
-                // $accountant = EmployeeInformation::accountantUser();
-                // dd($owner, $accountant);
-
-
-                // $owner = $record->user;
-                // $accountant = EmployeeInformation::accountantUser();
-                // dd($owner, $accountant);
 
                 DB::commit();
                 Notification::make()->title('Cheque/ADA made for requisitioner.')->success()->send();
