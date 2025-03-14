@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Notification;
 
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationDropdown extends Component
 {
@@ -10,7 +11,10 @@ class NotificationDropdown extends Component
     public $notifications = [];
     public $unreadCount = 0;
 
-    protected $listeners = ['refreshNotifications' => 'loadNotifications'];
+    protected $listeners = [
+        'refreshNotifications' => 'loadNotifications',
+        'markAllAsRead' => 'markAllAsRead' // ✅ Added listener for marking all as read
+    ];
 
     public function mount()
     {
@@ -19,89 +23,43 @@ class NotificationDropdown extends Component
 
     public function loadNotifications()
     {
-        // Using fake static data for now
-        $this->notifications = [
-            [
-                'id' => 1,
-                'title' => 'New Order Placed',
-                'message' => 'Order #1234 has been placed successfully!',
-                'time' => '2 mins ago',
-                'type' => 'order',
-                'read' => false,
-            ],
-            [
-                'id' => 2,
-                'title' => 'Payment Received',
-                'message' => 'Payment of $50 has been successfully received.',
-                'time' => '10 mins ago',
-                'type' => 'payment',
-                'read' => true,
-            ],
-            [
-                'id' => 3,
-                'title' => 'New Message',
-                'message' => 'You have received a new message from Alex.',
-                'time' => '30 mins ago',
-                'type' => 'message',
-                'read' => false,
-            ],
-            [
-                'id' => 3,
-                'title' => 'New Message',
-                'message' => 'You have received a new message from Alex.',
-                'time' => '30 mins ago',
-                'type' => 'message',
-                'read' => false,
-            ],
-            [
-                'id' => 3,
-                'title' => 'New Message',
-                'message' => 'You have received a new message from Alex.',
-                'time' => '30 mins ago',
-                'type' => 'message',
-                'read' => false,
-            ],
-            [
-                'id' => 3,
-                'title' => 'New Message',
-                'message' => 'You have received a new message from Alex.',
-                'time' => '30 mins ago',
-                'type' => 'message',
-                'read' => false,
-            ],
-            [
-                'id' => 3,
-                'title' => 'New Message',
-                'message' => 'You have received a new message from Alex.',
-                'time' => '30 mins ago',
-                'type' => 'message',
-                'read' => false,
-            ],
-            [
-                'id' => 3,
-                'title' => 'New Message',
-                'message' => 'You have received a new message from Alex.',
-                'time' => '30 mins ago',
-                'type' => 'message',
-                'read' => false,
-            ],
-        ];
+        $user = Auth::user();
 
-        // Count unread notifications
-        $this->unreadCount = collect($this->notifications)->where('read', false)->count();
+        if ($user) {
+            // Fetch latest 20 notifications from database
+            $this->notifications = $user->notifications()
+                ->latest()
+                ->take(20)
+                ->get();
+
+            // Get unread notifications count
+            $this->unreadCount = $user->unreadNotifications()->count();
+        }
     }
 
-    // public function markAsRead($notificationId)
-    // {
-    //     foreach ($this->notifications as &$notification) {
-    //         if ($notification['id'] == $notificationId) {
-    //             $notification['read'] = true;
-    //         }
-    //     }
+    public function markAsRead($notificationId)
+    {
+        $user = Auth::user();
 
-    //     // Recalculate unread count
-    //     $this->unreadCount = collect($this->notifications)->where('read', false)->count();
-    // }
+        if ($user) {
+            $notification = $user->notifications()->find($notificationId);
+            if ($notification && is_null($notification->read_at)) {
+                $notification->markAsRead();
+                $this->loadNotifications();
+            }
+        }
+    }
+
+    public function markAllAsRead()
+    {
+        $user = Auth::user();
+
+        if ($user) {
+            $user->unreadNotifications->markAsRead();
+            $this->loadNotifications();
+        }
+    }
+
     public function render()
     {
         return view('livewire.notification.notification-dropdown');

@@ -81,6 +81,7 @@
                 @endif
 
                 <div class="relative ml-3">
+                    {{-- @livewire('notification.notification-badge') --}}
                     @livewire('notification.notification-dropdown')
                 </div>
                 <!-- Settings Dropdown -->
@@ -129,7 +130,7 @@
                                 <x-jet-dropdown-link href="{{ route('logout') }}" @click.prevent="$root.submit();">
                                     {{ __('Log Out') }}
                                 </x-jet-dropdown-link>
-                                
+
                             </form>
                         </x-slot>
 
