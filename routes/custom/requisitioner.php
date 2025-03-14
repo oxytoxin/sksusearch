@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Livewire\LiquidationReports\LiquidationReportsShow;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\CashAdvanceReminders;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCancelled;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCreate;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersIndex;
@@ -55,4 +56,5 @@ Route::middleware([
     Route::get('/motorpool/request-vehicle/new', RequestVehicleCreate::class)->name('motorpool.create');
     Route::get('/motorpool/vehicle-request-form/{request}', VehicleRequestFormShow::class)->name('motorpool.show-request-form');
     Route::get('/motorpool/vehicle-request-details/{request}', RequestVehicleShow::class)->name('motorpool.show');
+    Route::get('/ca-reminders', CashAdvanceReminders::class)->name('ca-reminders');
 });
