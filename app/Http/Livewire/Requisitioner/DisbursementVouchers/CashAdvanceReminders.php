@@ -2,15 +2,17 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
-use App\Models\CaReminderStep;
 use Dom\Text;
 use Livewire\Component;
-use Filament\Tables\Concerns\InteractsWithTable;
+use App\Models\CaReminderStep;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
+use App\Http\Controllers\NotificationController;
+use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\Action;
 
 class CashAdvanceReminders extends Component implements HasTable
 {
@@ -35,8 +37,14 @@ class CashAdvanceReminders extends Component implements HasTable
         return [
             Action::make('sendFMR')->label('Send FMR')->icon('ri-send-plane-fill')
             ->button()
-            ->action(function () {
+            ->action(function ($record) {
+
+
                 // Send FMR
+
+                 NotificationController::sendFMR(Auth::user(), $record->user, $record);
+
+
             })
             // ->url(fn($record) => route('requisitioner.liquidation-reports.create', [
             //     'disbursement_voucher' => $record
