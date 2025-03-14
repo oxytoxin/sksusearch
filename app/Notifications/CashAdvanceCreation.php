@@ -38,7 +38,7 @@ class CashAdvanceCreation extends Notification implements ShouldBroadcast
             'title' => 'Cash Advance cheque number '. $this->disbursement_voucher->cheque_number??'No Number',
             'message' => 'Cash advance assigned cheque number by ' . $this->user->name,
             'profile_image' => $this->user->profile_photo_url,
-            'url' => 'facebook.com',
+            'url' => route('disbursement-vouchers.index'),
             'time' => now(),
         ];
     }
