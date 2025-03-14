@@ -9,8 +9,8 @@ window.Echo = new Echo({
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER || "mt1",
     wsHost: import.meta.env.VITE_PUSHER_HOST || window.location.hostname,
     wsPort: import.meta.env.VITE_PUSHER_PORT || 6001,
-    forceTLS: false,
-    encrypted: false,
+    forceTLS: true,
+    encrypted: true,
     disableStats: true,
     enabledTransports: ['ws', 'wss'],
 });
