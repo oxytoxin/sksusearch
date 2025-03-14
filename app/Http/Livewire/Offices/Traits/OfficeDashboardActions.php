@@ -112,11 +112,11 @@ trait OfficeDashboardActions
                 ->label('Verify Related Documents')
                 ->modalHeading('Verify Related Documents')
                 ->action(function ($record, $data) {
-                    // $receiver = $record->user;
-                    // NotificationController::cashAdvanceCreation(Auth::user(), Auth::user(), $record);
+                    $receiver = $record->user;
+                    NotificationController::cashAdvanceCreation(Auth::user(), Auth::user(), $record);
 
 
-                    // return;
+                    return;
 
                     $record->refresh();
                     DB::beginTransaction();
