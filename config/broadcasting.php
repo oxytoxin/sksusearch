@@ -39,7 +39,7 @@ return [
                 'useTLS' => false,
                 'encrypted' => false,
                 'host' => env('PUSHER_HOST', '127.0.0.1'),
-                'port' => env('PUSHER_PORT', 6001),
+                'port' => env('PUSHER_PORT', 6007),
                 'scheme' => env('PUSHER_SCHEME', 'http'),
                 'wsHost' => env('PUSHER_HOST', '127.0.0.1'), // Fix WebSocket Host
                 'disableStats' => true, // Performance Optimization

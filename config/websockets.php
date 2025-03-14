@@ -8,7 +8,7 @@ return [
      * Set a custom dashboard configuration
      */
     'dashboard' => [
-        'port' => env('LARAVEL_WEBSOCKETS_PORT', 6001),
+        'port' => env('LARAVEL_WEBSOCKETS_PORT', 6007),
         'domain' => env('LARAVEL_WEBSOCKETS_DOMAIN'),
 
         'path' => env('LARAVEL_WEBSOCKETS_PATH', 'laravel-websockets'),
