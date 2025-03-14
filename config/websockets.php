@@ -118,16 +118,17 @@ return [
      */
     'ssl' => [
 
-        //  'local_cert' => env('LARAVEL_WEBSOCKETS_SSL_LOCAL_CERT', null),
+        'local_cert' => env('LARAVEL_WEBSOCKETS_SSL_LOCAL_CERT', null),
 
+        'capath' => env('LARAVEL_WEBSOCKETS_SSL_CA', null),
 
-        // 'local_pk' => env('LARAVEL_WEBSOCKETS_SSL_LOCAL_PK', null),
+        'local_pk' => env('LARAVEL_WEBSOCKETS_SSL_LOCAL_PK', null),
 
-        // 'passphrase' => env('LARAVEL_WEBSOCKETS_SSL_PASSPHRASE', null),
+        'passphrase' => env('LARAVEL_WEBSOCKETS_SSL_PASSPHRASE', null),
 
-        'local_cert' => '/etc/letsencrypt/live/proxy.sksusearch.com/fullchain.pem', # ✅ Use Let's Encrypt SSL
-        'local_pk' => '/etc/letsencrypt/live/proxy.sksusearch.com/privkey.pem',
-        'passphrase' => null,
+        'verify_peer' => env('APP_ENV') === 'production',
+
+        'allow_self_signed' => env('APP_ENV') !== 'production',
     ],
 
     /*
