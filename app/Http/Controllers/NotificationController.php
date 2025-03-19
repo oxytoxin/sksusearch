@@ -14,12 +14,18 @@ use App\Notifications\CashAdvanceStep3Reminder;
 use App\Notifications\CashAdvanceStep4Reminder;
 use App\Notifications\CashAdvanceStep5Reminder;
 use App\Notifications\SubmissionRequestNotification;
+use App\Notifications\SystemReminder;
 
 class NotificationController extends Controller
 {
 
 
 
+    public static function sendCASystemReminder($type, $title,$message,$senderName,$receiverName,$senderId,$receiver,$disbursement_voucher
+    ){
+      
+        $receiver->notify( new SystemReminder($type, $title, $message,$senderName,$receiverName,$senderId,$receiver,$disbursement_voucher));
+    }
     public static function cashAdvanceCreation($user, $receiver, $disbursement_voucher){
 
         $receiver->notify( new CashAdvanceCreation($user, $receiver, $disbursement_voucher));

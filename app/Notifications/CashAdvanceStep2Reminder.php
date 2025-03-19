@@ -19,7 +19,7 @@ class CashAdvanceStep2Reminder extends Notification implements ShouldBroadcast
 
     public function __construct($user, $receiver, $disbursement_voucher)
     {
-        $this->user = $user; 
+        $this->user = $user;
         $this->receiver = $receiver;
         $this->disbursement_voucher = $disbursement_voucher;
     }

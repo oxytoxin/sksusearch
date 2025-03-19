@@ -1,12 +1,15 @@
 <?php
 
-use App\Http\Controllers\HomeController;
-use App\Http\Livewire\Shared\TravelCompletedCertificatePrint;
-use App\Http\Livewire\Test\CountetTest;
-use App\Http\Livewire\TestComponent;
-use App\Models\FuelRequisition;
+use Carbon\Carbon;
+use App\Models\CaReminderStep;
 use App\Models\LegacyDocument;
+use App\Models\FuelRequisition;
+use App\Http\Livewire\TestComponent;
 use Illuminate\Support\Facades\Route;
+use App\Http\Livewire\Test\CountetTest;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Livewire\Shared\TravelCompletedCertificatePrint;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,3 +40,23 @@ Route::get('/test', function () {
 
 
 
+Route::get('/test-example', function(){
+    $now = Carbon::now();
+    $voucher  = CaReminderStep::find(6);
+
+
+    NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', Auth::user()->name, null, Auth::user(), $voucher );
+    //$liquidationDeadline = Carbon::parse($voucher->liquidation_period_end_date);
+
+    // dd($liquidationDeadline, $now->greaterThanOrEqualTo($liquidationDeadline), $voucher->step);
+
+
+    // $cashAdvances = CaReminderStep::whereHas('disbursement_voucher.liquidation_report',function($query){
+    //      $query->where('current_step_id','!=', 8000);
+    // })
+    //  ->where('status','On-Going')
+    // ->get();
+
+
+    // dd($cashAdvances);
+});

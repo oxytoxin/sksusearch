@@ -29,5 +29,9 @@ class CaReminderStep extends Model
     {
         return $this->belongsTo(DisbursementVoucher::class);
     }
+    public function disbursement_voucher()
+    {
+        return $this->belongsTo(DisbursementVoucher::class);
+    }
 
 }
