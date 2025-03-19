@@ -22,6 +22,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\CheckboxList;
+use Carbon\Carbon;
 
 trait OfficeDashboardActions
 {
@@ -112,12 +113,6 @@ trait OfficeDashboardActions
                 ->label('Verify Related Documents')
                 ->modalHeading('Verify Related Documents')
                 ->action(function ($record, $data) {
-                    // $receiver = $record->user;
-                    // NotificationController::cashAdvanceCreation(Auth::user(), Auth::user(), $record);
-
-
-                    // return;
-
                     $record->refresh();
                     DB::beginTransaction();
                     $record->update([
@@ -180,39 +175,39 @@ trait OfficeDashboardActions
                 {
                     case 1:
                         //local travel
-                        $end_date = $record->travel_order->date_to;
-                        //$liquidation_period_end_date = $end_date->addDays(30);
+                        $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
+                        $liquidation_period_end_date = Carbon::parse($end_date)->addDays(30)->format('Y-m-d');
                         break;
                     case 2:
                         //foreign travel
-                        $end_date = $record->travel_order->date_to;
-                        //$liquidation_period_end_date = $end_date->addDays(60);
+                        $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
+                        $liquidation_period_end_date = Carbon::parse($end_date)->addDays(60)->format('Y-m-d');
                         break;
                     case 3:
                         //activities
-                        $end_date = $record->other_details['activity_date_to'] ?? null;
-                        //$liquidation_period_end_date = $end_date->addDays(20);
+                        $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
+                        $liquidation_period_end_date = Carbon::parse($end_date)->addDays(20)->format('Y-m-d');
                         break;
                     case 4:
                         //payroll
-                        $end_date = $record->other_details['activity_date_to'] ?? null;
-                        //$liquidation_period_end_date = $end_date->addDays(5);
+                        $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
+                        $liquidation_period_end_date = Carbon::parse($end_date)->addDays(5)->format('Y-m-d');
                         break;
                     case 5:
                         //special disbursing officer
-                        $end_date = $record->other_details['activity_date_to'] ?? null;
-                        //$liquidation_period_end_date = $end_date->addDays(5);
+                        $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
+                        $liquidation_period_end_date = Carbon::parse($end_date)->addDays(5)->format('Y-m-d');
                         break;
                     default:
                         $end_date = null;
-                        //$liquidation_period_end_date = null;
+                        $liquidation_period_end_date = null;
                         break;
                 }
 
                 $record->cash_advance_reminder()->create([
                     'status' => 'On-Going',
                     'voucher_end_date' => $end_date,
-                    'liquidation_period_end_date' => $end_date,
+                    'liquidation_period_end_date' => $liquidation_period_end_date,
                     'step' => 1,
                     'is_sent' => false,
                     'title' => 'Send FMR',

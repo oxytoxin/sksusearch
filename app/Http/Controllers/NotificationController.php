@@ -21,10 +21,10 @@ class NotificationController extends Controller
 
 
 
-    public static function sendCASystemReminder($type, $title,$message,$senderName,$receiverName,$senderId,$receiver,$disbursement_voucher
+    public static function sendCASystemReminder($type, $title,$message,$senderName,$receiverName,$senderId,$receiver,$route,$disbursement_voucher
     ){
-      
-        $receiver->notify( new SystemReminder($type, $title, $message,$senderName,$receiverName,$senderId,$receiver,$disbursement_voucher));
+
+        $receiver->notify( new SystemReminder($type, $title, $message,$senderName,$receiverName,$senderId,$receiver,$route, $disbursement_voucher));
     }
     public static function cashAdvanceCreation($user, $receiver, $disbursement_voucher){
 

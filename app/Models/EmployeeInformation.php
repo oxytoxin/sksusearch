@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\EmployeeInformation;
+use App\Models\EmployeeInformation as EmployeeInformationModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -59,6 +59,6 @@ class EmployeeInformation extends Model
     }
 
     public static function accountantUser(){
-        return EmployeeInformation::where('position_id', 15)->where('office_id', 3)->first();
+        return EmployeeInformationModel::where('position_id', 15)->where('office_id', 3)->first();
     }
 }

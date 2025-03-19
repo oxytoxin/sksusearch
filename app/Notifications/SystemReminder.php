@@ -20,6 +20,7 @@ class SystemReminder extends Notification implements ShouldBroadcast
     public $receiverName;
     public $senderId;
     public $receiver;
+    public $route;
     public $disbursement_voucher;
 
     public function __construct(
@@ -30,6 +31,7 @@ class SystemReminder extends Notification implements ShouldBroadcast
         $receiverName = null,
         $senderId = null,
         $receiver = null,
+        $route = null,
         $disbursement_voucher = null
         )
 
@@ -43,6 +45,7 @@ class SystemReminder extends Notification implements ShouldBroadcast
         $this->receiverName = $receiverName;
         $this->senderId = $senderId;
         $this->receiver = $receiver;
+        $this->route = $route;
         $this->disbursement_voucher = $disbursement_voucher;
     }
 
@@ -62,7 +65,7 @@ class SystemReminder extends Notification implements ShouldBroadcast
             'senderId' => $this->senderId,
             'receiverId' => $this->receiver->id,
             'profile_image' => null,
-            'url' => route('disbursement-vouchers.show', $this->disbursement_voucher->id),
+            'url' => $this->route,
             'time' => now(),
         ];
     }
