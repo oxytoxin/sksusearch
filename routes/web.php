@@ -40,13 +40,15 @@ Route::get('/test', function () {
 
 
 
+
+
 Route::get('/test-example', function(){
     $now = Carbon::now();
     $voucher  = CaReminderStep::find(1);
     // dd($voucher->disbursement_voucher);
 
 
-   NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', Auth::user()->name, null, Auth::user(), $voucher->disbursement_voucher  );
+//    NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', Auth::user()->name, null, Auth::user(), $voucher->disbursement_voucher  );
     //$liquidationDeadline = Carbon::parse($voucher->liquidation_period_end_date);
 
     // dd($liquidationDeadline, $now->greaterThanOrEqualTo($liquidationDeadline), $voucher->step);
@@ -61,3 +63,5 @@ Route::get('/test-example', function(){
 
     // dd($cashAdvances);
 });
+
+
