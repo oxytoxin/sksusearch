@@ -33,21 +33,7 @@ liquidation of the cash advance described below.
             </p>
         </div>
 
-       {{-- <div class="border-2 mt-2  border-gray-800 grid  grid-cols-12 text-xs   text-gray-800">
-            <div class="col-span-2  "> DV number:</div>
-            <div class="col-span-3  ">101-2022-10-2593 </div>
-            <div class="col-span-5  "> End of travel/implementation/payroll period</div>
-            <div class="col-span-2  ">January 21,20</div>
-            <div class="col-span-2  "> Amount:</div>
-            <div class="col-span-3  "> 100,100 </div>
-            <div class="col-span-5  "> Liquidation deadline::</div>
-            <div class="col-span-2  ">January 21,20</div>
-            <div class="col-span-2  "> Date disbursed:</div>
-            <div class="col-span-3  ">January 21,20 </div>
-            <div class="col-span-5  "> Purpose::</div>
-            <div class="col-span-2  ">This is the purpose of cash advance example content </div>
-    
-        </div>  --}}
+      
 
         <div class=" text-xs text-gray-900 mt-2 ">
             <table class="w-full ">
