@@ -48,7 +48,7 @@ Route::get('/test-example', function(){
     // dd($voucher->disbursement_voucher);
 
 
-   NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', Auth::user()->name, null, Auth::user(), '', $voucher->disbursement_voucher  );
+   NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', Auth::user()->name,  Auth::user(), Auth::user(), '', $voucher->disbursement_voucher  );
     //$liquidationDeadline = Carbon::parse($voucher->liquidation_period_end_date);
 
     // dd($liquidationDeadline, $now->greaterThanOrEqualTo($liquidationDeadline), $voucher->step);
