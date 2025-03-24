@@ -57,6 +57,7 @@ class CheckCashAdvanceReminders extends Command
             // check if within the deadline
             $liquidationDeadline = Carbon::parse($record->liquidation_period_end_date);
             $receiver = EmployeeInformation::accountantUser();
+            $president = EmployeeInformation::presidentUser();
 
 
             //if ($now->greaterThanOrEqualTo($liquidationDeadline)) {
@@ -75,16 +76,48 @@ class CheckCashAdvanceReminders extends Command
 
                     break;
                     case 2:
-                        $record->update(['status' => 'Pending', 'is_sent' => false , 'step'=> 3]);
+                        NotificationController::sendCASystemReminder(
+                        'Cash Advance Reminder',
+                        'Formal Management Demand',
+                        'A cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please remind the user to submit a liquidation report.',
+                        'System',
+                        $receiver->user->name, null, $receiver->user,
+                        route('requisitioner.ca-reminders'),
+                        $record->disbursement_voucher);
+                        $record->update(['status' => 'Pending', 'is_sent' => false , 'step'=> 3, 'is_sent' => 0]);
                         break;
                     case 3:
-                        $record->update(['status' => 'Pending', 'is_sent' => false , 'step'=> 4]);
+                        NotificationController::sendCASystemReminder(
+                        'Cash Advance Reminder',
+                        'Show Cause Order',
+                        'A cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please remind the user to submit a liquidation report.',
+                        'System',
+                        $president->user->name, null, $president->user,
+                        route('requisitioner.ca-reminders'),
+                        $record->disbursement_voucher);
+                        $record->update(['status' => 'Pending', 'is_sent' => false , 'step'=> 4, 'is_sent' => 0]);
                         break;
                     case 4:
-                        $record->update(['status' => 'Pending', 'is_sent' => false , 'step'=> 5]);
+                        NotificationController::sendCASystemReminder(
+                            'Cash Advance Reminder',
+                            'Edorsement for FD',
+                            'A cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please remind the user to submit a liquidation report.',
+                            'System',
+                            $president->user->name, null, $president->user,
+                            route('requisitioner.ca-reminders'),
+                            $record->disbursement_voucher);
+                        $record->update(['status' => 'Pending', 'is_sent' => false , 'step'=> 5, 'is_sent' => 0]);
                         break;
                     case 5:
-                        $record->update(['status' => 'Overdue', 'is_sent' => false , 'step'=> 1]);
+                        NotificationController::sendCASystemReminder(
+                            'Cash Advance Reminder',
+                            'Unliquidated',
+                            'A cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' has beed marked Unliquidated.',
+                            'System',
+                            $president->user->name, null, $president->user,
+                            route('requisitioner.ca-reminders'),
+                            $record->disbursement_voucher);
+                        $record->update(['status' => 'Unliquidated', 'is_sent' => false , 'step'=> 1, 'is_sent' => 0]);
                         Log::warning("Cash Advance #{$record->id} is overdue!");
                         break;
                 }

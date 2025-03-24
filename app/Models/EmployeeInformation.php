@@ -61,4 +61,8 @@ class EmployeeInformation extends Model
     public static function accountantUser(){
         return EmployeeInformationModel::where('position_id', 15)->where('office_id', 3)->first();
     }
+
+    public static function presidentUser(){
+        return EmployeeInformationModel::where('position_id', 34)->where('office_id', 51)->first();
+    }
 }

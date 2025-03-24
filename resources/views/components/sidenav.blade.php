@@ -73,9 +73,16 @@
             <a href="{{ route('requisitioner.disbursement-vouchers.unliquidated') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="#">
                 Unliquidated
             </a>
+            @php
+              $is_president = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
+              $is_accountant = auth()->user()->employee_information->office_id == 3 && auth()->user()->employee_information->position_id == 15;
+            @endphp
+            @if ($is_president || $is_accountant)
             <a href="{{ route('requisitioner.ca-reminders') }}" class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900" href="#">
                 Cash Advance Liquidation Reminders
             </a>
+            @endif
+
         </div>
     </div>
 
