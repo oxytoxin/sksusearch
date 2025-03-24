@@ -49,7 +49,6 @@ Route::get('/test-example', function(){
 
 
    NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', Auth::user()->name,  Auth::user()->id, Auth::user(), '', $voucher->disbursement_voucher  );
-    //$liquidationDeadline = Carbon::parse($voucher->liquidation_period_end_date);
 
 
 
