@@ -17,6 +17,9 @@ window.Echo = new Echo({
 
 console.log("✅ WebSocket Setup Completed");
 
+
+
+
 // // ✅ Ensure user is authenticated before subscribing
 // if (window.Laravel?.userId) {
 //     console.log(`🔗 Subscribing to private channel: notifications.${window.Laravel.userId}`);
