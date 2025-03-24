@@ -41,6 +41,7 @@ Route::get('formal-management-reminder', FormalManagementReminder::class)->name(
 Route::get('endorsement-for-fd', EndorsementForFD::class)->name('endorsement-for-fd');
 Route::get('show-cause-order', ShowCauseOrder::class)->name('show-cause-order');
 
+
 });
 
 
