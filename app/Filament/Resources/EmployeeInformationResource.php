@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EmployeeInformationResource\Pages;
 use App\Filament\Resources\EmployeeInformationResource\RelationManagers;
+use App\Filament\Resources\EmployeeInformationResource\RelationManagers\DesignationsRelationManager;
 use App\Models\Campus;
 use App\Models\EmployeeInformation;
 use App\Models\Office;
@@ -55,7 +56,7 @@ class EmployeeInformationResource extends Resource
                                 TextInput::make('full_name')->required(),
                                 TextInput::make('email')->default('@sksu.edu.ph')
                                     ->email()
-                                    ->unique('users', 'email', fn ($record) => $record?->user)
+                                    ->unique('users', 'email', fn($record) => $record?->user)
                                     ->required(),
                             ]),
                     ])->columns(2),
@@ -74,8 +75,8 @@ class EmployeeInformationResource extends Resource
                                 Select::make('office_id')
                                     ->label('Office')
                                     ->reactive()
-                                    ->visible(fn ($get) => $get('campus_id'))
-                                    ->options(fn ($get) => Office::where('campus_id', $get('campus_id'))->pluck('name', 'id'))
+                                    ->visible(fn($get) => $get('campus_id'))
+                                    ->options(fn($get) => Office::where('campus_id', $get('campus_id'))->pluck('name', 'id'))
                                     ->searchable()->required(),
                             ]),
                         Select::make('position_id')
@@ -102,13 +103,13 @@ class EmployeeInformationResource extends Resource
             ->columns([
                 TextColumn::make('full_name')->searchable(['first_name', 'last_name'])->sortable(),
                 TextColumn::make('position.description')->searchable()->sortable()->limit(20)
-                    ->tooltip(fn ($record): string => $record->position?->description ?? 'No Position')
+                    ->tooltip(fn($record): string => $record->position?->description ?? 'No Position')
                     ->default('No Position'),
                 TextColumn::make('campus.name')->searchable()->sortable()->limit(20)
-                    ->tooltip(fn ($record): string => $record->campus?->name ?? "Not Assigned")
+                    ->tooltip(fn($record): string => $record->campus?->name ?? "Not Assigned")
                     ->default('Not Assigned'),
                 TextColumn::make('office.name')->searchable()->sortable()->limit(20)
-                    ->tooltip(fn ($record): string => $record->office?->name ?? "No Office")
+                    ->tooltip(fn($record): string => $record->office?->name ?? "No Office")
                     ->default('No Office'),
                 ToggleColumn::make('active')
                     ->label('Active')
@@ -131,7 +132,7 @@ class EmployeeInformationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            DesignationsRelationManager::class
         ];
     }
 

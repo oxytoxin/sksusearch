@@ -54,15 +54,22 @@ class EmployeeInformation extends Model
             $designation[] = $this->office->name;
         }
         return Attribute::make(
-            get: fn () => implode(' - ', $designation),
+            get: fn() => implode(' - ', $designation),
         );
     }
 
-    public static function accountantUser(){
+    public static function accountantUser()
+    {
         return EmployeeInformationModel::where('position_id', 15)->where('office_id', 3)->first();
     }
 
-    public static function presidentUser(){
+    public static function presidentUser()
+    {
         return EmployeeInformationModel::where('position_id', 34)->where('office_id', 51)->first();
+    }
+
+    public function designations()
+    {
+        return $this->hasMany(Designation::class);
     }
 }
