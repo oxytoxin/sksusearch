@@ -20,6 +20,8 @@ use Filament\Forms\Components\Grid;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
 
 class OfficeDisbursementVouchersIndex extends Component implements HasTable
 {
@@ -31,6 +33,12 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
     public function updated($name, $value)
     {
         if ($name == 'tracking_num_from_scan') {
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                $route = Route::getRoutes()->match(Request::create($value));
+                if ($route->getName() == 'disbursement-vouchers.show-from-trn') {
+                    $value = $route->parameters['disbursement_voucher'];
+                }
+            }
             $dv = DisbursementVoucher::where("tracking_number", '=', $value)->whereRelation('current_step', 'process', '=', "Forwarded to")->whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->first();
             if ($dv != null) {
                 DB::beginTransaction();
@@ -62,7 +70,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 redirect()->route('office.dashboard');
             } else {
                 Notification::make()->title('Document Not Found or Already Received')->warning()->send();
-                redirect()->route('office.dashboard');
+                $this->tracking_num_from_scan = null;
             }
         }
     }
@@ -105,11 +113,11 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                     return $query
                         ->when(
                             $data['from'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
+                            fn(Builder $query, $date): Builder => $query->whereDate('submitted_at', '>=', $date),
                         )
                         ->when(
                             $data['until'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
+                            fn(Builder $query, $date): Builder => $query->whereDate('submitted_at', '<=', $date),
                         );
                 })
         ];
@@ -152,7 +160,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
-                ->visible(fn ($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id)
+                ->visible(fn($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id)
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
@@ -174,12 +182,12 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
-                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false)
+                ->visible(fn($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false)
                 ->form(function () {
                     return [
                         Select::make('return_step_id')
                             ->label('Return to')
-                            ->options(fn ($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
+                            ->options(fn($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
                             ->required(),
                         RichEditor::make('remarks')
                             ->label('Remarks (Optional)')
@@ -191,7 +199,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             Action::make('Cancel')->action(function ($record) {
                 DB::beginTransaction();
                 $process_ids = DisbursementVoucherStep::where('process', 'Received by')->orWhere('process', 'Received in')->pluck('id');
-                $next_step = $process_ids->last(fn ($value) => $value < auth()->user()->employee_information->office->office_group->disbursement_voucher_starting_step->id);
+                $next_step = $process_ids->last(fn($value) => $value < auth()->user()->employee_information->office->office_group->disbursement_voucher_starting_step->id);
                 $record->update([
                     'current_step_id' => $next_step,
                 ]);

@@ -1,11 +1,10 @@
 <div class="mt-4">
-    <div class="w-full p-5 mb-2 bg-white border border-gray-300 shadow-sm rounded-xl">
+    <div class="mb-2 w-full rounded-xl border border-gray-300 bg-white p-5 shadow-sm">
 
-        <div class="flex py-1 rounded-md">
+        <div class="flex rounded-md py-1">
             <div class="w-full">
                 <div class="flex">
-                    <input class="w-full py-1 rounded-md" id="tracking_num_from_scan" id="tracking_num_from_scan" name="tracking_num_from_scan" type="text" x-ref="tracking_num_from_scan"
-                           wire:model.debounce.750ms="tracking_num_from_scan" placeholder="Click me to start Scan-to-Receive">
+                    <input class="w-full rounded-md py-1" id="tracking_num_from_scan" id="tracking_num_from_scan" name="tracking_num_from_scan" type="text" x-ref="tracking_num_from_scan" wire:model.lazy="tracking_num_from_scan" placeholder="Click me to start Scan-to-Receive">
                 </div>
             </div>
         </div>
