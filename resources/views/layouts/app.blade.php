@@ -30,9 +30,8 @@
         <x-jet-banner />
 
         <div class="min-h-screen bg-primary-100">
-            @livewire('navigation-menu')
-
             @auth
+                @livewire('navigation-menu')
                 <div>
                     <!-- Static sidebar for desktop -->
                     <div class="hidden md:fixed md:flex md:h-full md:w-64 md:flex-col">
