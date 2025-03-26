@@ -1,5 +1,5 @@
 <div class="relative" x-data="{ open: false }">
-   
+
 <button @click="open = !open" class="relative p-2 text-white">
 {{-- <button @click="open = !open; if(open) { Livewire.emit('markAllAsRead'); }" class="relative p-2 text-white"> --}}
     <i class="fa-solid fa-bell text-xl"></i>
@@ -90,7 +90,7 @@
 
         @if ($notifications->count())
         <a href="{{ route('notification.all') }}"
-           class="block w-full p-3 text-center text-primary-900 hover:text-primary-700 hover:underline">
+           class="block w-full p-3 text-center text-primary-600 hover:text-primary-600 hover:bg-primary-100 transition duration-150 ease-in-out">
             View All Notifications
         </a>
     @endif
