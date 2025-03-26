@@ -4,7 +4,7 @@
             <x-native-select class="col-span-1" id="vehicle-select" label="Vehicle" wire:model="vehicle">
                 <option value="" selected>All</option>
                 @forelse ($vehicles as $vehicle)
-                    <option class="uppercase" value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }}</option>
+                    <option class="uppercase" value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }}, {{$vehicle->plate_number}}</option>
                 @empty
                     <option>No vehicle</option>
                 @endforelse

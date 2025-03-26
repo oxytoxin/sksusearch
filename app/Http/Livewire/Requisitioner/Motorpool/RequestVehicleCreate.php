@@ -222,7 +222,7 @@ class RequestVehicleCreate extends Component implements HasForms
 
             Select::make('vehicle_id')
                 ->label('Vehicle')
-                ->options(Vehicle::select(DB::raw("CONCAT(campuses.name, ' - ', vehicles.model) AS value"), 'vehicles.id')
+                ->options(Vehicle::select(DB::raw("CONCAT(campuses.name, ' - ', vehicles.model, ', ', vehicles.plate_number) AS value"), 'vehicles.id')
                 ->join('campuses', 'campuses.id', '=', 'vehicles.campus_id')
                 ->pluck('value', 'id'))
                 ->searchable()
