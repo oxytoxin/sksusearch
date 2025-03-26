@@ -102,7 +102,7 @@
             if ({{ auth()->check() ? 'true' : 'false' }}) {
                 console.log("📡 Subscribing to: notifications.{{ auth()->id() }}");
 
-                window.Echo.Channel(`notifications.{{ auth()->id() }}`)
+                window.Echo.channel(`notifications.{{ auth()->id() }}`)
                     .listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (notification) => {
                         console.log("🔔 New Notification:", notification);
                         window.livewire.emit('refreshNotifications');
