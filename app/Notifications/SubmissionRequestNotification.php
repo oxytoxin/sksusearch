@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -46,7 +47,7 @@ class SubmissionRequestNotification extends Notification implements ShouldBroadc
 
     public function broadcastOn()
     {
-        return new PrivateChannel('notifications.' . $this->user->id);
+        return new Channel('notifications.' . $this->user->id);
     }
 
 }
