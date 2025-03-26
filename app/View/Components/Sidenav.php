@@ -39,7 +39,12 @@ class Sidenav extends Component
             ->whereNotNull('cheque_number')
             ->count();
         $lr_to_sign = LiquidationReport::whereSignatoryId(auth()->id())->whereNull('cancelled_at')->count();
-        $to_to_sign = TravelOrder::query()->whereRelation('signatories', 'user_id', auth()->id())->count();
+        $to_to_sign = TravelOrder::query()
+            ->whereRelation('signatories', function (Builder $query) {
+            $query->where('user_id', auth()->id())
+                  ->where('is_approved', 0);
+            })
+            ->count();
         return view('components.sidenav', [
             'dv_to_sign' => $dv_to_sign,
             'unliquidated_count' => $unliquidated_count,
