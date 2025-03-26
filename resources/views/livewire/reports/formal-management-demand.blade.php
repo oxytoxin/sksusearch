@@ -33,7 +33,7 @@ liquidation of the cash advance described below.
             </p>
         </div>
 
-      
+
 
         <div class=" text-xs text-gray-900 mt-2 ">
             <table class="w-full ">
@@ -57,7 +57,7 @@ liquidation of the cash advance described below.
                 </tr>
             </table>
         </div>
-        
+
 
         <p class="text-xs  text-gray-800 leading-relaxed mt-2">
             Records also show that a prior reminder contained in FMR No. xxxx-xxxx was issued to you on &lt;Date&gt; in
@@ -66,35 +66,35 @@ relation hereto.
 
         <div class="mt-6 text-justify leading-relaxed text-xs text-gray-800">
             <p>In view of the foregoing premises, you are hereby ordered to effect the immediate liquidation of the cash advance described above. You are given the following alternatives, which must be duly acted upon within five (5) working days upon receipt of this notice:</p>
-        
+
             <ol class="mt-4 list-decimal pl-6">
                 <li>Liquidate the cash advance in full;</li>
                 <li>Execute a Waiver for Deduction Against Personnel Pay (WDAPP) for the outstanding balance (OB) of the cash advance; or</li>
                 <li>Make partial liquidation of the cash advance and execute a Waiver for Deduction Against Personnel Pay for the remainder.</li>
             </ol>
-        
+
             <p class="mt-4">Failure on your part to comply with this directive may result in the filing of proper administrative<sup>1</sup> and criminal<sup>2</sup> charges against you. If partial or full liquidation has already been made, please coordinate with the Accounting Office for validation and correction of records.</p>
-        
+
             <p class="mt-6 ">For your guidance and immediate compliance.</p>
         </div>
 
-        
+
         <div class="text-xs mt-4 text-gray-800">
 
-        
+
             <!-- Accountant Name Section -->
            <div class="grid grid-cols-3">
 
                <div class="col-span-1">
-                   
+
                    <div class="text-center">
-                       
+
                        <p class="font-bold">Jesher Palomaria</p>
                        <p>Accountant III</p>
                     </div>
-                    
+
                     <!-- Signature Line -->
-                    
+
                     <div class="mt-6">
                         <hr class="border-t border-black mx-8">
                     </div>
@@ -126,7 +126,7 @@ relation hereto.
                 </div>
 
             </div>
-           
+
             <!-- User Intention Checkboxes -->
             {{-- <div class="mt-6 flex justify-between">
                 <div>
@@ -144,7 +144,7 @@ relation hereto.
                         <span>Settle partially with liquidation and with WDAPP</span>
                     </label>
                 </div>
-        
+
                 <!-- Date Fields -->
                 <div class="text-right">
                     <p class="font-bold">By date:</p>
@@ -162,15 +162,15 @@ relation hereto.
                     <sup>2</sup>Paragraph 9.3.3, COA Circular No. 97-002 | Section 89 & 128, PD No. 1445 | Article 218, Act No. 3815 (The Revised Penal Code), as amended
                 </p>
             </div>
-        
+
             <!-- Final Note -->
             <p class="mt-4 text-xs ">
                 Note: If you received this FMD through personal service, please indicate your intended mode of settlement by ticking the applicable checkbox in the lower right of this document. If you received this FMD via electronic service, you may indicate said mode in your reply. Non-indication of any particular mode shall give rise to the presumption that you elect to liquidate your cash advance in full.
             </p>
         </div>
     </div>
-        
-    
+
+
 
         <button onclick="printDiv('printableDiv')" class="mt-4 px-4 py-2 bg-primary-500 text-white rounded">
             Print Document
