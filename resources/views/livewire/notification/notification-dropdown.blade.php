@@ -105,7 +105,7 @@
                 window.Echo.private(`notifications.{{ auth()->id() }}`)
                     .listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (notification) => {
                         console.log("🔔 New Notification:", notification);
-                        window.livewire.emit('refreshNotifications'); // Refresh Livewire dropdown
+                        window.livewire.emit('refreshNotifications'); 
                     });
             } else {
                 console.warn("⚠️ User is not authenticated, skipping WebSocket subscription.");

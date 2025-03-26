@@ -35,7 +35,7 @@ class NotificationDropdown extends Component
         if ($notification && is_null($notification->read_at)) {
             $notification->markAsRead();
             $this->loadNotifications();
-            $this->emitBrowserEvent(); // Optional
+            $this->dispatchBrowserEvent('emitToAllNotifications');
         }
     }
 
