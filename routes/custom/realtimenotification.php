@@ -7,6 +7,7 @@ use App\Http\Livewire\Reports\ShowCauseOrder;
 use App\Http\Livewire\Cashier\CashierDashboard;
 use App\Http\Livewire\Reports\EndorsementForFD;
 use App\Http\Controllers\NotificationController;
+use App\Http\Livewire\Notification\AllNotifications;
 use App\Http\Livewire\Accounting\AccountingDashboard;
 use App\Http\Livewire\Reports\FormalManagementDemand;
 use App\Http\Livewire\Reports\FormalManagementReminder;
@@ -28,11 +29,16 @@ Route::middleware([
 
     Route::get('/test', [NotificationController::class,'testNotification'])->name('test-notification');
 
+    Route::get('/all', AllNotifications::class)
+
+    ->name('all');
+
 });
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
 ])->prefix('print')->name('print.')->group(function () {
+
 
 
 

@@ -45,7 +45,7 @@ Route::get('/test', function () {
 
 Route::get('/test-example', function(){
     $now = Carbon::now();
-    $voucher  = CaReminderStep::find(1);
+    $voucher  = CaReminderStep::find(6);
     // dd($voucher->disbursement_voucher);
 
 
