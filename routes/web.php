@@ -45,11 +45,12 @@ Route::get('/test', function () {
 
 Route::get('/test-example', function(){
     $now = Carbon::now();
+    // $voucher  = CaReminderStep::find(6);
     $voucher  = CaReminderStep::find(1);
     // dd($voucher->disbursement_voucher);
 
 
-   NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', Auth::user()->name,  Auth::user()->id, Auth::user(), '', $voucher->disbursement_voucher  );
+   NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', Auth::user()->name,  Auth::user()->id, Auth::user(), 'facebook.com', $voucher->disbursement_voucher  );
 
 
 
