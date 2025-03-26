@@ -102,10 +102,10 @@
             if ({{ auth()->check() ? 'true' : 'false' }}) {
                 console.log("📡 Subscribing to: notifications.{{ auth()->id() }}");
 
-                window.Echo.private(`notifications.{{ auth()->id() }}`)
+                window.Echo.Channel(`notifications.{{ auth()->id() }}`)
                     .listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (notification) => {
                         console.log("🔔 New Notification:", notification);
-                        window.livewire.emit('refreshNotifications'); 
+                        window.livewire.emit('refreshNotifications');
                     });
             } else {
                 console.warn("⚠️ User is not authenticated, skipping WebSocket subscription.");

@@ -71,7 +71,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             if ({{ auth()->check() ? 'true' : 'false' }}) {
-                window.Echo.private(`notifications.{{ auth()->id() }}`)
+                window.Echo.Channel(`notifications.{{ auth()->id() }}`)
                     .listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (notification) => {
                         Livewire.emit('refreshNotifications');
                     });

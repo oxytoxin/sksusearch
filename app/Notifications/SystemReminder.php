@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -79,6 +80,6 @@ class SystemReminder extends Notification implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new PrivateChannel('notifications.' . $this->receiver->id);
+        return new Channel('notifications.' . $this->receiver->id);
     }
 }
