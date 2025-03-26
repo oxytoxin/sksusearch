@@ -1,11 +1,10 @@
 <div class="relative" x-data="{ open: false }">
-    <!-- Notification Bell Button -->
-   <!-- Notification Bell Button -->
+   
 <button @click="open = !open" class="relative p-2 text-white">
 {{-- <button @click="open = !open; if(open) { Livewire.emit('markAllAsRead'); }" class="relative p-2 text-white"> --}}
     <i class="fa-solid fa-bell text-xl"></i>
 
-    <!-- Notification Badge -->
+
     @if ($unreadCount > 0)
         <span class="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
             {{ $unreadCount }}
@@ -14,13 +13,13 @@
 </button>
 
 
-    <!-- Notification Dropdown -->
+
     <div x-show="open" x-cloak @click.away="open = false" class="absolute right-0 top-10 w-80 bg-white shadow-2xl rounded-lg overflow-hidden z-50">
-        <!-- Notification Header -->
+
         <div class="px-4 py-2 bg-white border-b flex justify-between items-center">
             <h3 class="text-lg text-primary-600 font-semibold">Notifications</h3>
 
-            <!-- Hide Button If All Notifications Are Read -->
+
             @if ($unreadCount > 0)
                 <button
                     wire:click="markAllAsRead"
