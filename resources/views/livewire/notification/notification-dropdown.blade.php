@@ -67,6 +67,7 @@
                 </p>
 
                 <p class="text-xs text-gray-400 mt-1">
+                    {{-- {{ \Carbon\Carbon::parse($notification->created_at)->format('l, F j, Y - g:i A') }} --}}
                     {{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}
                 </p>
             </div>
@@ -88,9 +89,14 @@
         </div>
 
 
-        <a href="#" class="block w-full p-3 text-center text-primary-900 hover:text-primary-700 hover:underline">
+        @if ($notifications->count())
+        <a href="{{ route('notification.all') }}"
+           class="block w-full p-3 text-center text-primary-900 hover:text-primary-700 hover:underline">
             View All Notifications
         </a>
+    @endif
+
+
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

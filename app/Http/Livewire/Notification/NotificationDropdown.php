@@ -7,13 +7,12 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationDropdown extends Component
 {
-
     public $notifications = [];
     public $unreadCount = 0;
 
     protected $listeners = [
         'refreshNotifications' => 'loadNotifications',
-        'markAllAsRead' => 'markAllAsRead' // ✅ Added listener for marking all as read
+        'markAllAsRead' => 'markAllAsRead'
     ];
 
     public function mount()
@@ -24,39 +23,29 @@ class NotificationDropdown extends Component
     public function loadNotifications()
     {
         $user = Auth::user();
-
         if ($user) {
-            // Fetch latest 20 notifications from database
-            $this->notifications = $user->notifications()
-                ->latest()
-                ->take(20)
-                ->get();
-
-            // Get unread notifications count
+            $this->notifications = $user->notifications()->latest()->take(20)->get();
             $this->unreadCount = $user->unreadNotifications()->count();
         }
     }
 
     public function markAsRead($notificationId)
     {
-        $user = Auth::user();
-
-        if ($user) {
-            $notification = $user->notifications()->find($notificationId);
-            if ($notification && is_null($notification->read_at)) {
-                $notification->markAsRead();
-                $this->loadNotifications();
-            }
+        $notification = Auth::user()->notifications()->find($notificationId);
+        if ($notification && is_null($notification->read_at)) {
+            $notification->markAsRead();
+            $this->loadNotifications();
+            $this->emitBrowserEvent(); // Optional
         }
     }
 
     public function markAllAsRead()
     {
         $user = Auth::user();
-
         if ($user) {
             $user->unreadNotifications->markAsRead();
             $this->loadNotifications();
+            $this->dispatchBrowserEvent('emitToAllNotifications');
         }
     }
 
