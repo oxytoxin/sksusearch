@@ -2,7 +2,7 @@
 
     <div class="flex">
         <div class="flex mr-2">
-            <img src="{{ asset('images/sksulogo.png') }}" class="w-16 mx-auto  h-16" alt="University Logo">
+            <img src="{{ asset('images/bagong-pilipinas-logo.png') }}" class="w-16 mx-auto  h-16" alt="University Logo">
             <img src="{{ asset('images/headerlogo2.png') }}" class="w-16 mx-auto  h-16" alt="Header Logo">
         </div>
         <div>
