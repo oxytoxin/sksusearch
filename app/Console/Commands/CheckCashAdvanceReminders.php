@@ -53,6 +53,9 @@ class CheckCashAdvanceReminders extends Command
 
         foreach ($cashAdvances as $record) {
 
+            //$record->created_at plus 5mins
+            $updated_at = Carbon::parse($record->updated_at);
+            $updated_at_deadline = $updated_at->addMinutes(5);
 
             // check if within the deadline
             $liquidationDeadline = Carbon::parse($record->liquidation_period_end_date);
@@ -60,8 +63,8 @@ class CheckCashAdvanceReminders extends Command
             $president = EmployeeInformation::presidentUser();
 
 
-            //if ($now->greaterThanOrEqualTo($liquidationDeadline)) {
-
+            // if ($now->greaterThanOrEqualTo($liquidationDeadline)) {
+                if ($now->greaterThanOrEqualTo($updated_at_deadline)) {
                 switch ($record->step) {
                     case 1:
                         NotificationController::sendCASystemReminder(
@@ -73,7 +76,6 @@ class CheckCashAdvanceReminders extends Command
                         route('requisitioner.ca-reminders'),
                         $record->disbursement_voucher);
                         $record->update(['status' => 'Pending', 'is_sent' => false , 'step'=> 2]);
-
                     break;
                     case 2:
                         NotificationController::sendCASystemReminder(
@@ -123,7 +125,7 @@ class CheckCashAdvanceReminders extends Command
                 }
 
                 Log::info("Cash Advance #{$record->id} moved to {$record->status}");
-            //}
+            }
         }
 
         $this->info('Cash Advance Reminder Check completed.');
