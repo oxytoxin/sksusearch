@@ -35,13 +35,13 @@ class CashAdvanceReminders extends Component implements HasTable
         {
             return CaReminderStep::query()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
-                    $query->where('current_step_id', '>=', 8000);
+                    $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
         }else{
             return CaReminderStep::query()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
-                    $query->where('current_step_id', '>=', 8000);
+                    $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
         }

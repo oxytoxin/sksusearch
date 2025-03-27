@@ -47,7 +47,7 @@ class CheckCashAdvanceReminders extends Command
         // $cashAdvances = CaReminderStep::with('disbursement_voucher.liquidation_report',function($query){
             $cashAdvances = CaReminderStep::whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
-                    $query->where('current_step_id', '>=', 8000);
+                    $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             })->where('status', 'On-Going')->get();
 
