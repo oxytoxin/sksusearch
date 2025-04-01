@@ -1,6 +1,7 @@
 <nav class="flex flex-col space-y-1 px-2 md:mt-5" x-data x-cloak>
 
     <div class="space-y-1" x-data="{ open: false }">
+
         <!-- Current: "bg-primary-100 text-primary-900", Default: "bg-white text-primary-600 hover:bg-primary-50 hover:text-primary-900" -->
         <button class="group flex w-full items-center rounded-md py-2 pr-2 text-left text-sm font-medium text-primary-600 hover:bg-primary-50 hover:text-primary-900 focus:outline-none focus:ring-2 focus:ring-primary-500" type="button" aria-controls="sub-menu-1" aria-expanded="false" x-on:click="open=!open">
             <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
@@ -360,7 +361,21 @@
             @endif --}}
             </div>
         </div>
-
+        <!-- Current: "bg-primary-100 text-primary-900", Default: "bg-white text-primary-600 hover:bg-primary-50 hover:text-primary-900" -->
+        <a class="group flex w-full items-center rounded-md py-2 pr-2 text-left text-sm font-medium text-primary-600 hover:bg-primary-50 hover:text-primary-900 focus:outline-none focus:ring-2 focus:ring-primary-500" href="{{ config('app.v2_url') . '/activity-designs' }}" aria-controls="sub-menu-1" aria-expanded="false">
+            <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
+            <svg class="" aria-hidden="true" :class="open ?
+                'rotate-90 flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400' :
+                'flex-shrink-0 w-5 h-5 mr-2 text-primary-300 transition-colors duration-150 ease-in-out transform group-hover:text-primary-400'" viewBox="0 0 20 20">
+                <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
+            </svg>
+            Activity Design
+            {{-- @if ($dv_to_sign > 0)
+                <span class="mx-auto inline-flex h-2 w-2 items-center justify-center rounded-full bg-primary-100 p-3 text-xs font-medium text-primary-600">
+                    {{ $dv_to_sign }}
+                </span>
+            @endif --}}
+        </a>
         @if (in_array(auth()->user()->employee_information->position_id, [24, 12, 15, 38]))
             <div class="space-y-1" x-data="{ open: false }">
                 <button class="group flex w-full items-center rounded-md py-2 pr-2 text-left text-sm font-medium text-primary-600 hover:bg-primary-50 hover:text-primary-900 focus:outline-none focus:ring-2 focus:ring-primary-500" type="button" aria-controls="sub-menu-1" aria-expanded="false" x-on:click="open=!open">
