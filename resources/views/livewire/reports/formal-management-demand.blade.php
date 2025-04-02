@@ -3,18 +3,17 @@
     <div id="printableDiv" class="p-6 bg-white shadow-md border border-gray-300 mx-auto max-w-3xl">
 
         <x-sksu-header/>
-        @dump($record)
 
         <div class="mb-4 text-gray-800">
             <h2 class="text-center text-xl  mt-2 ">Formal Management Demand</h2>
-            <p class="text-center"> No. {{ $record->generateTrackingNumber() }}</p> 
+            <p class="text-center"> No. {{ $record->generateTrackingNumber() }}</p>
 
         </div>
         <div class="border-b pb-2 border-black text-gray-800 text-xs">
 
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12 "> To:</p>
-                <div class=""> {{ $record->user->name }}</div> 
+                <div class=""> {{ $record->user->name }}</div>
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12 "> Re:</p>
@@ -22,7 +21,7 @@
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12 "> Date:</p>
-                <div class=""> {{ now()->format('F d, Y') }}</div> 
+                <div class=""> {{ now()->format('F d, Y') }}</div>
             </div>
         </div>
 
@@ -38,21 +37,21 @@ liquidation of the cash advance described below.
             <table class="w-full">
                 <tr>
                     <td class="border border-gray-800 px-2">DV number:</td>
-                    <td class="border border-gray-800 px-2">{{ $record->generateTrackingNumber() }}</td> 
+                    <td class="border border-gray-800 px-2">{{ $record->generateTrackingNumber() }}</td>
                     <td class="border border-gray-800 px-2">End of travel/implementation/payroll period:</td>
-                    <td class="border border-gray-800 px-2"></td> 
+                    <td class="border border-gray-800 px-2"></td>
                 </tr>
                 <tr>
                     <td class="border border-gray-800 px-2">Amount:</td>
-                    <td class="border border-gray-800 px-2">₱</td> 
+                    <td class="border border-gray-800 px-2">₱</td>
                     <td class="border border-gray-800 px-2">Liquidation deadline:</td>
-                    <td class="border border-gray-800 px-2"></td> 
+                    <td class="border border-gray-800 px-2"></td>
                 </tr>
                 <tr>
                     <td class="border border-gray-800 px-2">Date disbursed:</td>
-                    <td class="border border-gray-800 px-2"></td> 
+                    <td class="border border-gray-800 px-2"></td>
                     <td class="border border-gray-800 px-2">Purpose:</td>
-                    <td class="border border-gray-800 px-2"></td> 
+                    <td class="border border-gray-800 px-2"></td>
                 </tr>
             </table>
         </div>
