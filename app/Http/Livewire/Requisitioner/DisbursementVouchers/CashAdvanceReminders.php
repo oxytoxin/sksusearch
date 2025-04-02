@@ -109,7 +109,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursementVoucher->user->name,
                         $this->accounting->id,
                         $record->disbursementVoucher->user,
-                        route('print.formal-management-reminder'),
+                        route('print.formal-management-reminder', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 2 && $record->is_sent == 0),
@@ -150,7 +150,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursementVoucher->user->name,
                         $this->accounting->id,
                         $record->disbursementVoucher->user,
-                        route('print.formal-management-demand'),
+                        route('print.formal-management-demand', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 3 && $record->is_sent == 0),
@@ -191,7 +191,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursementVoucher->user->name,
                         $this->accounting->id,
                         $record->disbursementVoucher->user,
-                        route('print.show-cause-order'),
+                        route('print.show-cause-order', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 4 && $record->is_sent == 0),
@@ -210,7 +210,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
                     $this->accounting,
                     $record->disbursementVoucher->user->name, $this->accounting->id, $record->disbursementVoucher->user,
-                    route('print.endorsement-for-fd'),
+                    route('print.endorsement-for-fd', $record->disbursement_voucher),
                     $record->disbursement_voucher);
 
 
