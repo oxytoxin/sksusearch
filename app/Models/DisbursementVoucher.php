@@ -85,6 +85,8 @@ class DisbursementVoucher extends Model
         return $this->hasMany(DisbursementVoucherParticular::class);
     }
 
+
+
     public function fund_cluster()
     {
         return $this->belongsTo(FundCluster::class);
@@ -112,5 +114,10 @@ class DisbursementVoucher extends Model
     public function cash_advance_reminder()
     {
         return $this->hasOne(CaReminderStep::class);
+    }
+    
+    public function totalSumDisbursementVoucherParticular()
+    {
+        return $this->disbursement_voucher_particulars->sum('final_amount');
     }
 }

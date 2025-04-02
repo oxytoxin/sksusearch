@@ -7,13 +7,13 @@
             <h1 class="text-xl font-bold   text-center ">
                 Formal Management Reminder
             </h1>
-            <p class="text-center">No. xxxx-xxxx</p>
+            <p class="text-center">No. {{ $record?->cash_advance_reminder?->fmr_number ??'' }}</p>
         </div>
 
         <div class="border-b pb-2 border-black text-gray-800 text-xs">
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12">To:</p>
-                <div class="">Kristine Mae Ampas</div>
+                <div class="">{{$record?->user?->name}}</div>
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12">Re:</p>
@@ -21,14 +21,15 @@
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12">Date:</p>
-                <div class="">January 10, 2025</div>
+                <div class="">{{ $record->step_data['sent_at'] ?? now()->format('F d, Y') }}</div>
             </div>
         </div>
+        @dump($record)
 
         <div class="mt-4 text-xs text-gray-800 leading-relaxed">
             <p>
                 Pursuant to Section 1 of the Sanctions for Violations of Rules and Regulations Related to the Liquidation of
-                Cash Advances, as adopted through BOR Resolution No. 56, s. 2024, your attention is hereby drawn to the
+                Cash Advances, as adopted through BOR Resolution No. 56, s. {{ now()->format('Y') }}, your attention is hereby drawn to the
                 following cash advance that is now due for liquidation:
             </p>
         </div>
@@ -37,24 +38,34 @@
             <table class="w-full">
                 <tr>
                     <td class="border border-gray-800 px-2">DV number:</td>
-                    <td class="border border-gray-800 px-2">2024-001</td>
+                    <td class="border border-gray-800 px-2">{{$record->dv_number ??''}}</td>
                     <td class="border border-gray-800 px-2">End of travel/implementation/payroll period:</td>
-                    <td class="border border-gray-800 px-2">March 15, 2024</td>
+                    <td class="border border-gray-800 px-2">{{ $record?->cash_advance_reminder?->voucher_end_date ? date_format(date_create($record->cash_advance_reminder->voucher_end_date), 'F d, Y') : '' }} </td>
                 </tr>
                 <tr>
                     <td class="border border-gray-800 px-2">Amount:</td>
-                    <td class="border border-gray-800 px-2">₱50,000</td>
+                    <td class="border border-gray-800 px-2">₱{{$record->totalSumDisbursementVoucherParticular() ?? 0}}</td>
                     <td class="border border-gray-800 px-2">Liquidation deadline:</td>
-                    <td class="border border-gray-800 px-2">March 20, 2024</td>
+                    <td class="border border-gray-800 px-2">{{ $record?->cash_advance_reminder?->liquidation_period_end_date ? date_format(date_create($record->cash_advance_reminder->liquidation_period_end_date), 'F d, Y') : '' }}</td>
                 </tr>
                 <tr>
-                    <td class="border border-gray-800 px-2">Date disbursed:</td>
-                    <td class="border border-gray-800 px-2">March 1, 2024</td>
-                    <td class="border border-gray-800 px-2">Purpose:</td>
-                    <td class="border border-gray-800 px-2">Office Supplies Procurement</td>
+                    <td class="border border-gray-800 px-2">Check/ADA number</td>
+                    <td class="border border-gray-800 px-2">{{$record->cheque_number ??''}}</td>
+                    <td class="border border-gray-800 px-2">Date Disbursed</td>
+                    <td class="border border-gray-800 px-2">
+                        {{ $record?->cheque_number_added_at ? date_format(date_create($record->cheque_number_added_at), 'F d, Y') : '' }}
+                    </td>
                 </tr>
             </table>
         </div>
+
+        <div class="mt-4 text-xs text-gray-800 leading-relaxed">
+            <h1>Purpose:</h1>
+            <ul class="list-disc pl-6 mt-2">
+                @foreach ($record->disbursement_voucher_particulars as $particular)
+                    <li>{{ $particular->purpose }}</li>
+                @endforeach
+            </ul>
 
         <div class="mt-4 text-xs text-gray-800 leading-relaxed">
             <p>Please be informed that cash advances, depending on the type, must be liquidated by the following deadlines:</p>
@@ -75,8 +86,10 @@
         </div>
 
         <div class="mt-6 text-xs text-gray-800 ">
-            <p class="font-bold">[ACCOUNTANT’S SIGNATURE OVER PRINTED NAME]</p>
-            <p>Accountant III</p>
+            <div class="mt-6 text-xs text-gray-800 ">
+                <p class="font-bold">{{App\Models\EmployeeInformation::accountantUser()->full_name}}</p>
+                <p>{{App\Models\EmployeeInformation::accountantUser()?->position->description}}-{{App\Models\EmployeeInformation::accountantUser()?->office->name}}</p>
+            </div>
         </div>
 
         <div class="mt-12 text-xs text-gray-800">

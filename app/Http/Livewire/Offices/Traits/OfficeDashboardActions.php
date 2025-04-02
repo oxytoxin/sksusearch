@@ -161,6 +161,8 @@ trait OfficeDashboardActions
                 $record->update([
                     'cheque_number' => $data['cheque_number'],
                     'current_step_id' => $record->current_step_id + 1000,
+                    'cheque_number_added_at' => now(),
+
                 ]);
                 $description = 'Cheque/ADA made for requisitioner.';
                 if ($this->isOic()) {

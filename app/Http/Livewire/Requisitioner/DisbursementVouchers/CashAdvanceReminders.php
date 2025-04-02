@@ -34,15 +34,14 @@ class CashAdvanceReminders extends Component implements HasTable
     {
         $is_president = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
         $is_accountant = auth()->user()->employee_information->office_id == 3 && auth()->user()->employee_information->position_id == 15;
-        $is_auditor = auth()->user()->employee_information->office_id == 61 && auth()->user()->employee_information->position_id == 31;
         if($is_president)
         {
-            return CaReminderStep::query()->whereIn('step', [4])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
-        }elseif($is_accountant){
+        }else if($is_accountant){
             return CaReminderStep::query()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
@@ -55,7 +54,6 @@ class CashAdvanceReminders extends Component implements HasTable
                 })->orDoesntHave('liquidation_report');
             });
         }
-
     }
 
     protected function getTableColumns()
@@ -72,65 +70,112 @@ class CashAdvanceReminders extends Component implements HasTable
     {
         return [
             Action::make('sendFMR')->label('Send FMR')->icon('ri-send-plane-fill')
-            ->button()
-            ->action(function ($record) {
+                ->button()
+                ->action(function ($record) {
 
 
-                $record->is_sent = 1;
-                $record->status = 'On-Going';
-                $record->save();
-                // Send FMR
-                NotificationController::sendCASystemReminder(
-                    'FMR',
-                    'Formal Management Reminder',
-                    'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
-                    $this->accounting,
-                    $record->disbursementVoucher->user->name, $this->accounting->id, $record->disbursementVoucher->user,
-                    route('print.formal-management-reminder'),
-                    $record->disbursement_voucher);
+                    $record->is_sent = 1;
+                    $record->status = 'On-Going';
+                    $record->save();
 
-            })->requiresConfirmation()->visible(fn ($record) => $record->step == 2 && $record->is_sent == 0),
+                    // Store history
+                    $record->caReminderStepHistories()->create([
+                        'step_data' => [
+                            'disbursement_voucher_id' => $record->disbursement_voucher_id,
+                            'status' => $record->status,
+                            'voucher_end_date' => $record->voucher_end_date,
+                            'liquidation_period_end_date' => $record->liquidation_period_end_date,
+                            'step' => $record->step,
+                            'is_sent' => $record->is_sent,
+                            'title' => $record->title,
+                            'message' => $record->message,
+                            'sent_at' => now(),
+                        ],
+                    ]);
+                    // Send FMR
+                    NotificationController::sendCASystemReminder(
+                        'FMR',
+                        'Formal Management Reminder',
+                        'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
+                        $this->accounting,
+                        $record->disbursementVoucher->user->name,
+                        $this->accounting->id,
+                        $record->disbursementVoucher->user,
+                        route('print.formal-management-reminder'),
+                        $record->disbursement_voucher
+                    );
+                })->requiresConfirmation()->visible(fn($record) => $record->step == 2 && $record->is_sent == 0),
             Action::make('sendFMD')->label('Send FMD')->icon('ri-send-plane-fill')
-            ->button()
-            ->action(function ($record) {
+                ->button()
+                ->action(function ($record) {
 
-                $record->is_sent = 1;
-                $record->status = 'On-Going';
-                $record->save();
-                // Send FMD
-                NotificationController::sendCASystemReminder(
-                    'FMD',
-                    'Formal Management Demand',
-                    'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
-                    $this->accounting,
-                    $record->disbursementVoucher->user->name, $this->accounting->id, $record->disbursementVoucher->user,
-                    route('print.formal-management-demand'),
-                    $record->disbursement_voucher);
-
-
-            })->requiresConfirmation()->visible(fn ($record) => $record->step == 3 && $record->is_sent == 0),
+                    $record->is_sent = 1;
+                    $record->status = 'On-Going';
+                    $record->save();
+                    // Store history
+                    $record->caReminderStepHistories()->create([
+                        'step_data' => [
+                            'disbursement_voucher_id' => $record->disbursement_voucher_id,
+                            'status' => $record->status,
+                            'voucher_end_date' => $record->voucher_end_date,
+                            'liquidation_period_end_date' => $record->liquidation_period_end_date,
+                            'step' => $record->step,
+                            'is_sent' => $record->is_sent,
+                            'title' => $record->title,
+                            'message' => $record->message,
+                            'sent_at' => now(),
+                        ],
+                    ]);
+                    // Send FMD
+                    NotificationController::sendCASystemReminder(
+                        'FMD',
+                        'Formal Management Demand',
+                        'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
+                        $this->accounting,
+                        $record->disbursementVoucher->user->name,
+                        $this->accounting->id,
+                        $record->disbursementVoucher->user,
+                        route('print.formal-management-demand'),
+                        $record->disbursement_voucher
+                    );
+                })->requiresConfirmation()->visible(fn($record) => $record->step == 3 && $record->is_sent == 0),
             Action::make('sendSOC')->label('Send SOC')->icon('ri-send-plane-fill')
-            ->button()
-            ->action(function ($record) {
+                ->button()
+                ->action(function ($record) {
 
-                $record->is_sent = 1;
-                $record->status = 'On-Going';
-                $record->save();
-                // Send FMR
-                NotificationController::sendCASystemReminder(
-                    'SOC',
-                    'Show Cause Order',
-                    'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
-                    $this->accounting,
-                    $record->disbursementVoucher->user->name, $this->accounting->id, $record->disbursementVoucher->user,
-                    route('print.show-cause-order'),
-                    $record->disbursement_voucher);
-
-
-            })->requiresConfirmation()->visible(fn ($record) => $record->step == 4 && $record->is_sent == 0),
+                    $record->is_sent = 1;
+                    $record->status = 'On-Going';
+                    $record->save();
+                    // Store history
+                    $record->caReminderStepHistories()->create([
+                        'step_data' => [
+                            'disbursement_voucher_id' => $record->disbursement_voucher_id,
+                            'status' => $record->status,
+                            'voucher_end_date' => $record->voucher_end_date,
+                            'liquidation_period_end_date' => $record->liquidation_period_end_date,
+                            'step' => $record->step,
+                            'is_sent' => $record->is_sent,
+                            'title' => $record->title,
+                            'message' => $record->message,
+                            'sent_at' => now(),
+                        ],
+                    ]);
+                    // Send FMR
+                    NotificationController::sendCASystemReminder(
+                        'SOC',
+                        'Show Cause Order',
+                        'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
+                        $this->accounting,
+                        $record->disbursementVoucher->user->name,
+                        $this->accounting->id,
+                        $record->disbursementVoucher->user,
+                        route('print.show-cause-order'),
+                        $record->disbursement_voucher
+                    );
+                })->requiresConfirmation()->visible(fn($record) => $record->step == 4 && $record->is_sent == 0),
             Action::make('sendFD')->label('Send FD')->icon('ri-send-plane-fill')
-            ->button()
-            ->action(function ($record) {
+                ->button()
+                ->action(function ($record) {
 
                 $record->is_sent = 1;
                 $record->status = 'On-Going';
@@ -147,10 +192,6 @@ class CashAdvanceReminders extends Component implements HasTable
 
 
             })->requiresConfirmation()->visible(fn ($record) => $record->step == 5 && $record->is_sent == 0),
-            ViewAction::make('view')
-            ->label('Preview DV')
-            ->openUrlInNewTab()
-            ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record->disbursementVoucher]), true),
         ];
     }
 

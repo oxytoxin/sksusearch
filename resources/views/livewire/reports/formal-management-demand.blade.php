@@ -3,17 +3,18 @@
     <div id="printableDiv" class="p-6 bg-white shadow-md border border-gray-300 mx-auto max-w-3xl">
 
         <x-sksu-header/>
+        @dump($record)
 
         <div class="mb-4 text-gray-800">
             <h2 class="text-center text-xl  mt-2 ">Formal Management Demand</h2>
-            <p class="text-center"> No. xxxxxxxx</p>
+            <p class="text-center"> No. {{ $record->generateTrackingNumber() }}</p> 
 
         </div>
         <div class="border-b pb-2 border-black text-gray-800 text-xs">
 
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12 "> To:</p>
-                <div class=""> Kristine Mae Ampas</div>
+                <div class=""> {{ $record->user->name }}</div> 
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12 "> Re:</p>
@@ -21,7 +22,7 @@
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12 "> Date:</p>
-                <div class=""> January 21,2025</div>
+                <div class=""> {{ now()->format('F d, Y') }}</div> 
             </div>
         </div>
 
@@ -33,31 +34,28 @@ liquidation of the cash advance described below.
             </p>
         </div>
 
-
-
-        <div class=" text-xs text-gray-900 mt-2 ">
-            <table class="w-full ">
+        <div class="text-xs text-gray-900 mt-2">
+            <table class="w-full">
                 <tr>
-                    <td class="border border-gray-800  px-2 ">DV number:</td>
-                    <td class="border border-gray-800  px-2  ">2024-001</td>
-                    <td class="border border-gray-800  px-2 ">End of travel/implementation/payroll period:</td>
-                    <td class="border border-gray-800  px-2 ">March 15, 2024</td>
+                    <td class="border border-gray-800 px-2">DV number:</td>
+                    <td class="border border-gray-800 px-2">{{ $record->generateTrackingNumber() }}</td> 
+                    <td class="border border-gray-800 px-2">End of travel/implementation/payroll period:</td>
+                    <td class="border border-gray-800 px-2"></td> 
                 </tr>
                 <tr>
-                    <td class="border border-gray-800  px-2 ">Amount:</td>
-                    <td class="border border-gray-800  px-2 ">₱50,000</td>
-                    <td class="border border-gray-800  px-2 ">Liquidation deadline:</td>
-                    <td class="border border-gray-800  px-2 ">March 20, 2024</td>
+                    <td class="border border-gray-800 px-2">Amount:</td>
+                    <td class="border border-gray-800 px-2">₱</td> 
+                    <td class="border border-gray-800 px-2">Liquidation deadline:</td>
+                    <td class="border border-gray-800 px-2"></td> 
                 </tr>
                 <tr>
-                    <td class="border border-gray-800  px-2 ">Date disbursed:</td>
-                    <td class="border border-gray-800  px-2 ">March 1, 2024</td>
-                    <td class="border border-gray-800  px-2 ">Purpose:</td>
-                    <td class="border border-gray-800  px-2 ">Office Supplies Procurement</td>
+                    <td class="border border-gray-800 px-2">Date disbursed:</td>
+                    <td class="border border-gray-800 px-2"></td> 
+                    <td class="border border-gray-800 px-2">Purpose:</td>
+                    <td class="border border-gray-800 px-2"></td> 
                 </tr>
             </table>
         </div>
-
 
         <p class="text-xs  text-gray-800 leading-relaxed mt-2">
             Records also show that a prior reminder contained in FMR No. xxxx-xxxx was issued to you on &lt;Date&gt; in
@@ -78,22 +76,17 @@ relation hereto.
             <p class="mt-6 ">For your guidance and immediate compliance.</p>
         </div>
 
-
         <div class="text-xs mt-4 text-gray-800">
 
+            <div class="grid grid-cols-3">
 
-            <!-- Accountant Name Section -->
-           <div class="grid grid-cols-3">
+                <div class="col-span-1">
 
-               <div class="col-span-1">
+                    <div class="text-center">
 
-                   <div class="text-center">
-
-                       <p class="font-bold">Jesher Palomaria</p>
-                       <p>Accountant III</p>
+                        <p class="font-bold">Jesher Palomaria</p>
+                        <p>Accountant III</p>
                     </div>
-
-                    <!-- Signature Line -->
 
                     <div class="mt-6">
                         <hr class="border-t border-black mx-8">
@@ -127,34 +120,6 @@ relation hereto.
 
             </div>
 
-            <!-- User Intention Checkboxes -->
-            {{-- <div class="mt-6 flex justify-between">
-                <div>
-                    <p class="font-bold">I hereby express my intention to:</p>
-                    <label class="flex items-center mt-4">
-                        <input type="checkbox" class="mr-2">
-                        <span>Liquidate the cash advance in full</span>
-                    </label>
-                    <label class="flex items-center mt-2">
-                        <input type="checkbox" class="mr-2">
-                        <span>Execute a WDAPP for the full OB</span>
-                    </label>
-                    <label class="flex items-center mt-2">
-                        <input type="checkbox" class="mr-2">
-                        <span>Settle partially with liquidation and with WDAPP</span>
-                    </label>
-                </div>
-
-                <!-- Date Fields -->
-                <div class="text-right">
-                    <p class="font-bold">By date:</p>
-                    <hr class="border-t border-black w-32 mt-2">
-                    <hr class="border-t border-black w-32 mt-2">
-                    <hr class="border-t border-black w-32 mt-2">
-                </div>
-            </div>
-         --}}
-            <!-- Legal References -->
             <div class="mt-8 text-xs">
                 <p class="">
                     <sup>1</sup>Section 5 of CSC Memorandum Circular No. 23, s. 2019 | Section 53, Rule 10, RRACCS
@@ -163,29 +128,25 @@ relation hereto.
                 </p>
             </div>
 
-            <!-- Final Note -->
             <p class="mt-4 text-xs ">
                 Note: If you received this FMD through personal service, please indicate your intended mode of settlement by ticking the applicable checkbox in the lower right of this document. If you received this FMD via electronic service, you may indicate said mode in your reply. Non-indication of any particular mode shall give rise to the presumption that you elect to liquidate your cash advance in full.
             </p>
         </div>
     </div>
 
+    <button onclick="printDiv('printableDiv')" class="mt-4 px-4 py-2 bg-primary-500 text-white rounded">
+        Print Document
+    </button>
 
-
-        <button onclick="printDiv('printableDiv')" class="mt-4 px-4 py-2 bg-primary-500 text-white rounded">
-            Print Document
-        </button>
-
-        <script>
-            function printDiv(divName) {
-                var printContents = document.getElementById(divName).innerHTML;
-                var originalContents = document.body.innerHTML;
-                document.body.innerHTML = printContents;
-                window.print();
-                document.body.innerHTML = originalContents;
-            }
-        </script>
-    </div>
-
+    <script>
+        function printDiv(divName) {
+            var printContents = document.getElementById(divName).innerHTML;
+            var originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+        }
+    </script>
+</div>
 
 </div>
