@@ -50,7 +50,7 @@ Route::get('/test-example', function(){
     // dd($voucher->disbursement_voucher);
 
 
-   NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', Auth::user()->name,  Auth::user()->id, Auth::user(), 'facebook.com', $voucher->disbursement_voucher  );
+   NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', auth()->user()->name,  auth()->user()->id, auth()->user(), 'facebook.com', $voucher->disbursement_voucher  );
 
 
 
