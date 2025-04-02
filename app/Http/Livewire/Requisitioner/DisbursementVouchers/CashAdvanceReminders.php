@@ -8,6 +8,7 @@ use App\Models\CaReminderStep;
 use App\Models\EmployeeInformation;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -51,6 +52,7 @@ class CashAdvanceReminders extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
+            TextColumn::make('disbursementVoucher.dv_number')->label('DV Number'),
             TextColumn::make('disbursementVoucher.tracking_number')->label('DV Tracking Number'),
             TextColumn::make('disbursementVoucher.user.name')->label('Requested By'),
             TextColumn::make('status'),
@@ -136,6 +138,10 @@ class CashAdvanceReminders extends Component implements HasTable
 
 
             })->requiresConfirmation()->visible(fn ($record) => $record->step == 5 && $record->is_sent == 0),
+            ViewAction::make('view')
+            ->label('Preview DV')
+            ->openUrlInNewTab()
+            ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record->disbursementVoucher]), true),
         ];
     }
 
