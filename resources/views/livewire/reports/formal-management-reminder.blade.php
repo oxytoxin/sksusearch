@@ -24,7 +24,7 @@
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12">Date:</p>
-                <div class="">{{ $record->step_data['sent_at'] ?? now()->format('F d, Y') }}</div>
+                <div class="">{{ $record?->cash_advance_reminder->fmr_date ?? }}</div>
             </div>
         </div>
         {{-- @dump($record) --}}
