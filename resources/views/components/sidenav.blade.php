@@ -77,8 +77,9 @@
             @php
                 $is_president = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
                 $is_accountant = auth()->user()->employee_information->office_id == 3 && auth()->user()->employee_information->position_id == 15;
+                $is_auditor = auth()->user()->employee_information->office_id == 61 && auth()->user()->employee_information->position_id == 31;
             @endphp
-            @if ($is_president || $is_accountant)
+            @if ($is_president || $is_accountant || $is_auditor)
                 <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900" href="{{ route('requisitioner.ca-reminders') }}" href="#">
                     Notices
                 </a>
