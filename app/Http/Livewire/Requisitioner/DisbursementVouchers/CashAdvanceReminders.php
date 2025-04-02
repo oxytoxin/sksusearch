@@ -21,26 +21,35 @@ class CashAdvanceReminders extends Component implements HasTable
     use InteractsWithTable;
     public $accounting;
     public $president;
+    public $auditor;
 
     public function mount()
     {
         $this->accounting = EmployeeInformation::accountantUser();
         $this->president = EmployeeInformation::presidentUser();
+        $this->auditor = EmployeeInformation::auditorUser();
     }
 
     protected function getTableQuery(): Builder|Relation
     {
         $is_president = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
         $is_accountant = auth()->user()->employee_information->office_id == 3 && auth()->user()->employee_information->position_id == 15;
+        $is_auditor = auth()->user()->employee_information->office_id == 61 && auth()->user()->employee_information->position_id == 31;
         if($is_president)
         {
-            return CaReminderStep::query()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->whereIn('step', [4])->whereHas('disbursement_voucher', function ($query) {
+                $query->whereHas('liquidation_report', function ($query) {
+                    $query->where('current_step_id', '<', 8000);
+                })->orDoesntHave('liquidation_report');
+            });
+        }elseif($is_accountant){
+            return CaReminderStep::query()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
         }else{
-            return CaReminderStep::query()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->whereIn('step', [5])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
