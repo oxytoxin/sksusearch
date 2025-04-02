@@ -61,6 +61,7 @@ class CheckCashAdvanceReminders extends Command
             $liquidationDeadline = Carbon::parse($record->liquidation_period_end_date);
             $receiver = EmployeeInformation::accountantUser();
             $president = EmployeeInformation::presidentUser();
+            $auditor = EmployeeInformation::auditorUser();
 
 
             // if ($now->greaterThanOrEqualTo($liquidationDeadline)) {
@@ -105,7 +106,7 @@ class CheckCashAdvanceReminders extends Command
                             'Edorsement for FD',
                             'A cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please remind the user to submit a liquidation report.',
                             'System',
-                            $president->user->name, null, $president->user,
+                            $auditor->user->name, null, $auditor->user,
                             route('requisitioner.ca-reminders'),
                             $record->disbursement_voucher);
                         $record->update(['status' => 'Pending', 'is_sent' => false , 'step'=> 5, 'is_sent' => 0]);
