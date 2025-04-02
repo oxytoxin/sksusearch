@@ -1,4 +1,7 @@
 <div>
+    <div class="mx-auto max-w-3xl mb-4 flex justify-end"><button onclick="printDiv('printableDiv')" class=" px-4 py-2 bg-primary-500 text-white rounded text-sm">
+        Print Document
+    </button></div>
     <div id="printableDiv" class="p-6 bg-white shadow-md border border-gray-300 mx-auto max-w-3xl">
          <x-sksu-header />
 
@@ -21,10 +24,10 @@
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12">Date:</p>
-                <div class="">{{ $record->step_data['sent_at'] ?? now()->format('F d, Y') }}</div>
+                <div class="">{{ $record?->cash_advance_reminder?->fmr_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y') : 'N/A' }}</div>
             </div>
         </div>
-        @dump($record)
+        {{-- @dump($record) --}}
 
         <div class="mt-4 text-xs text-gray-800 leading-relaxed">
             <p>
@@ -69,11 +72,11 @@
 
         <div class="mt-4 text-xs text-gray-800 leading-relaxed">
             <p>Please be informed that cash advances, depending on the type, must be liquidated by the following deadlines:</p>
-            <ul class="list-decimal pl-6 mt-2">
-                <li>Salaries, wages, etc.: within five (5) days after each 15-day/month-end pay period<sup>1</sup></li>
-                <li>Local travel: within thirty (30) days after return to permanent official station<sup>2</sup></li>
-                <li>Foreign travel: within sixty (60) days after return to the Philippines<sup>3</sup></li>
-                <li>Special activities: within twenty (20) days from accomplishment of the purpose<sup>4</sup></li>
+            <ul class="pl-6 mt-2">
+                <li>(1) Salaries, wages, etc.: within five (5) days after each 15-day/month-end pay period<sup>1</sup></li>
+                <li>(2) Local travel: within thirty (30) days after return to permanent official station<sup>2</sup></li>
+                <li>(3) Foreign travel: within sixty (60) days after return to the Philippines<sup>3</sup></li>
+                <li>(4) Special activities: within twenty (20) days from accomplishment of the purpose<sup>4</sup></li>
             </ul>
 
             <p class="mt-4">
@@ -101,9 +104,7 @@
         </div>
     </div>
 
-    <button onclick="printDiv('printableDiv')" class="mt-4 px-4 py-2 bg-primary-500 text-white rounded">
-        Print Document
-    </button>
+
 
     <script>
         function printDiv(divName) {
