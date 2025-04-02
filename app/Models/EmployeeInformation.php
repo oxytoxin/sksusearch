@@ -68,6 +68,12 @@ class EmployeeInformation extends Model
         return EmployeeInformationModel::where('position_id', 34)->where('office_id', 51)->first();
     }
 
+    public static function auditorUser()
+    {
+        return EmployeeInformationModel::where('position_id', 31)->where('office_id', 61)->first();
+    }
+
+
     public function designations()
     {
         return $this->hasMany(Designation::class);

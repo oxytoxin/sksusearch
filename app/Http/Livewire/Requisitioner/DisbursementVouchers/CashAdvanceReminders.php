@@ -8,6 +8,7 @@ use App\Models\CaReminderStep;
 use App\Models\EmployeeInformation;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,25 +21,34 @@ class CashAdvanceReminders extends Component implements HasTable
     use InteractsWithTable;
     public $accounting;
     public $president;
+    public $auditor;
 
     public function mount()
     {
         $this->accounting = EmployeeInformation::accountantUser();
         $this->president = EmployeeInformation::presidentUser();
+        $this->auditor = EmployeeInformation::auditorUser();
     }
 
     protected function getTableQuery(): Builder|Relation
     {
         $is_president = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
         $is_accountant = auth()->user()->employee_information->office_id == 3 && auth()->user()->employee_information->position_id == 15;
-        if ($is_president) {
+        if($is_president)
+        {
             return CaReminderStep::query()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
-        } else {
+        }else{
             return CaReminderStep::query()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
+                $query->whereHas('liquidation_report', function ($query) {
+                    $query->where('current_step_id', '<', 8000);
+                })->orDoesntHave('liquidation_report');
+            });
+        }else{
+            return CaReminderStep::query()->whereIn('step', [5])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
@@ -49,6 +59,7 @@ class CashAdvanceReminders extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
+            TextColumn::make('disbursementVoucher.dv_number')->label('DV Number'),
             TextColumn::make('disbursementVoucher.tracking_number')->label('DV Tracking Number'),
             TextColumn::make('disbursementVoucher.user.name')->label('Requested By'),
             TextColumn::make('status'),
@@ -81,7 +92,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             'sent_at' => now(),
                         ],
                     ]);
-                    // Send FMR 
+                    // Send FMR
                     NotificationController::sendCASystemReminder(
                         'FMR',
                         'Formal Management Reminder',
@@ -166,36 +177,21 @@ class CashAdvanceReminders extends Component implements HasTable
                 ->button()
                 ->action(function ($record) {
 
-                    $record->is_sent = 1;
-                    $record->status = 'On-Going';
-                    $record->save();
-                    // Store history
-                    $record->caReminderStepHistories()->create([
-                        'step_data' => [
-                            'disbursement_voucher_id' => $record->disbursement_voucher_id,
-                            'status' => $record->status,
-                            'voucher_end_date' => $record->voucher_end_date,
-                            'liquidation_period_end_date' => $record->liquidation_period_end_date,
-                            'step' => $record->step,
-                            'is_sent' => $record->is_sent,
-                            'title' => $record->title,
-                            'message' => $record->message,
-                            'sent_at' => now(),
-                        ],
-                    ]);
-                    // Send FMR
-                    NotificationController::sendCASystemReminder(
-                        'FD',
-                        'Endorsement For FD',
-                        'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
-                        $this->accounting,
-                        $record->disbursementVoucher->user->name,
-                        $this->accounting->id,
-                        $record->disbursementVoucher->user,
-                        route('print.endorsement-for-fd'),
-                        $record->disbursement_voucher
-                    );
-                })->requiresConfirmation()->visible(fn($record) => $record->step == 5 && $record->is_sent == 0),
+                $record->is_sent = 1;
+                $record->status = 'On-Going';
+                $record->save();
+                // Send FMR
+                NotificationController::sendCASystemReminder(
+                    'FD',
+                    'Endorsement For FD',
+                    'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
+                    $this->accounting,
+                    $record->disbursementVoucher->user->name, $this->accounting->id, $record->disbursementVoucher->user,
+                    route('print.endorsement-for-fd'),
+                    $record->disbursement_voucher);
+
+
+            })->requiresConfirmation()->visible(fn ($record) => $record->step == 5 && $record->is_sent == 0),
         ];
     }
 
