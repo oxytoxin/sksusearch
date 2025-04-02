@@ -76,6 +76,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
                     $record->is_sent = 1;
                     $record->status = 'On-Going';
+                    $record->fmr_date = now();
                     $record->save();
 
                     // Store history
@@ -111,6 +112,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
                     $record->is_sent = 1;
                     $record->status = 'On-Going';
+                    $record->fmd_date = now();
                     $record->save();
                     // Store history
                     $record->caReminderStepHistories()->create([
@@ -139,12 +141,13 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 3 && $record->is_sent == 0),
-            Action::make('sendSOC')->label('Send SOC')->icon('ri-send-plane-fill')
+            Action::make('sendSOC')->label('Send SCO')->icon('ri-send-plane-fill')
                 ->button()
                 ->action(function ($record) {
 
                     $record->is_sent = 1;
                     $record->status = 'On-Going';
+                    $record->sco_date = now();
                     $record->save();
                     // Store history
                     $record->caReminderStepHistories()->create([
@@ -162,7 +165,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     ]);
                     // Send FMR
                     NotificationController::sendCASystemReminder(
-                        'SOC',
+                        'SCO',
                         'Show Cause Order',
                         'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
                         $this->accounting,
@@ -179,6 +182,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
                 $record->is_sent = 1;
                 $record->status = 'On-Going';
+                $record->fd_date = now();
                 $record->save();
                 // Send FMR
                 NotificationController::sendCASystemReminder(
