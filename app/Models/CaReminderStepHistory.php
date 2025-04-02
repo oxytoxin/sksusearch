@@ -9,6 +9,10 @@ class CaReminderStepHistory extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'step_data' => 'array',
+    ];
+
     public function caReminderStep()
     {
         return $this->belongsTo(CaReminderStep::class);
