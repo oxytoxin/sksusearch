@@ -9,37 +9,41 @@
             ENDORSEMENT FOR ISSUANCE OF FORMAL DEMAND TO LIQUIDATE
         </h1>
         <div class="text-xs text-gray-800">
-            <p class="">[Date]</p>
-            <p class="mt-4 font-bold">ARIANNE JOY A. PURAZO-DUQUE</p>
-            <p>State Auditor III</p>
-            <p>Audit Team Leader, SKSU</p>
-            <p class="mt-2">Madame:</p>
+            <p class="">{{ $record?->cash_advance_reminder?->fd_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fd_date)->format('F d, Y') : '' }}</p>
+            <p class="mt-4 font-bold">{{ App\Models\EmployeeInformation::auditorUser()->full_name }}</p>
+            <p>{{App\Models\EmployeeInformation::auditorUser()?->position->description}}</p>
+            <p>{{App\Models\EmployeeInformation::auditorUser()?->office->name}}</p>
+            <p class="mt-2">Sir/Madame:</p>
 
             <p class="mt-4">
-                This is in relation to the following cash advance issued to <span class="underline">[NAME]</span>:
+                This is in relation to the following cash advance issued to <span class="underline">{{$record?->user?->name}}</span>:
             </p>
 
-            <table class="w-full mt-2 mb-4">
-                <tr>
-                    <td class="border border-gray-800 px-2">DV number:</td>
-                    <td class="border border-gray-800 px-2">2024-001</td>
-                    <td class="border border-gray-800 px-2">End of travel/implementation/payroll period:</td>
-                    <td class="border border-gray-800 px-2">March 15, 2024</td>
-                </tr>
-                <tr>
-                    <td class="border border-gray-800 px-2">Amount:</td>
-                    <td class="border border-gray-800 px-2">₱50,000</td>
-                    <td class="border border-gray-800 px-2">Liquidation deadline:</td>
-                    <td class="border border-gray-800 px-2">March 20, 2024</td>
-                </tr>
-                <tr>
-                    <td class="border border-gray-800 px-2">Date disbursed:</td>
-                    <td class="border border-gray-800 px-2">March 1, 2024</td>
-                    <td class="border border-gray-800 px-2">Purpose:</td>
-                    <td class="border border-gray-800 px-2">Office Supplies Procurement</td>
-                </tr>
-            </table>
-
+            <div class="text-xs text-gray-900 mt-2">
+                <table class="w-full">
+                    <tr>
+                        <td class="border border-gray-800 px-2">DV number:</td>
+                        <td class="border border-gray-800 px-2">{{$record->dv_number ??''}}</td>
+                        <td class="border border-gray-800 px-2">End of travel/implementation/payroll period:</td>
+                        <td class="border border-gray-800 px-2">{{ $record?->cash_advance_reminder?->voucher_end_date ? date_format(date_create($record->cash_advance_reminder->voucher_end_date), 'F d, Y') : '' }} </td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-800 px-2">Amount:</td>
+                        <td class="border border-gray-800 px-2">{{ number_format($record->totalSumDisbursementVoucherParticular() ?? 0, 2) }}</td>
+                        <td class="border border-gray-800 px-2">Liquidation deadline:</td>
+                        <td class="border border-gray-800 px-2">{{ $record?->cash_advance_reminder?->liquidation_period_end_date ? date_format(date_create($record->cash_advance_reminder->liquidation_period_end_date), 'F d, Y') : '' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-800 px-2">Check/ADA number</td>
+                        <td class="border border-gray-800 px-2">{{$record->cheque_number ??''}}</td>
+                        <td class="border border-gray-800 px-2">Date Disbursed</td>
+                        <td class="border border-gray-800 px-2">
+                            {{ $record?->cheque_number_added_at ? date_format(date_create($record->cheque_number_added_at), 'F d, Y') : '' }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="mt-4 text-xs text-gray-800 leading-relaxed">
             <p>
                 As of this writing, the cash advance has been outstanding for <span class="underline">xx</span> days from the end of the travel/implementation/payroll period.
             </p>
@@ -48,27 +52,32 @@
                 Management had already issued the following notices:
             </p>
             <ul class="list-decimal pl-6 mt-2">
-                <li>Formal Management Reminder, FMR No. xxxx-xxxx dated [date], received [date]</li>
-                <li>Formal Management Demand, FMD No. xxxx-xxxx dated [date], received [date]</li>
-                <li>Show Cause Order, Office of the President Memo No. xxx, s. 20xx dated [date], received [date]</li>
+                <li>Formal Management Reminder, FMR No.  {{ $record?->cash_advance_reminder?->fmr_number ??'' }} dated {{ $record?->cash_advance_reminder?->fmr_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y') : '' }}, received {{ $record?->cash_advance_reminder?->fmr_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y') : '' }}</li>
+                <li>Formal Management Demand, FMD No. {{ $record?->cash_advance_reminder->fmd_number ??'' }} dated {{ $record?->cash_advance_reminder?->fmd_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmd_date)->format('F d, Y') : '' }}, received {{ $record?->cash_advance_reminder?->fmd_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmd_date)->format('F d, Y') : '' }}</li>
+                <li>Show Cause Order, Office of the President Memo No. {{ $record->cash_advance_reminder->memorandum_number }}, s.  xx dated {{ $record?->cash_advance_reminder?->sco_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco)->format('F d, Y') : '' }}, received {{ $record?->cash_advance_reminder?->sco ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco)->format('F d, Y') : '' }}</li>
             </ul>
 
             <p class="mt-4">
-                Despite the above, the accountable officer has failed to comply. This constitutes wilful negligence and refusal to comply with legal obligations.
+                Despite service of the aforesaid notices containing urgent directives to render account on the cash advance, the
+accountable officer still failed to make substantial compliance with the given orders. Management already sees
+this as constituting wilful negligence on his/her part with respect to a reasonable official order and an outright
+refusal by him/her to perform an obligation required by law.
             </p>
 
             <p class="mt-4">
-                In view of the foregoing, request is hereby made for the issuance of a FORMAL DEMAND as per Section 5 of CSC Memorandum Circular No. 23, s. 2019.
+                In view of the foregoing premises, request is hereby made for the issuance of a <b>FORMAL DEMAND</b> as provided for under Section 5 of CSC Memorandum Circular No. 23, s. 2019.
             </p>
 
             <p class="mt-4">
-                We appreciate the transmittal of the requested document within three (3) working days from receipt of this endorsement.
+            We will appreciate the transmittal of the requested document within three (3) working days from receipt of this
+            endorsement.
             </p>
 
             <p class="mt-4">We look forward to your usual support.</p>
 
-            <p class="mt-6 font-bold">[NAME]</p>
+            <p class="mt-6 font-bold">{{App\Models\EmployeeInformation::presidentUser()->full_name}}</p>
             <p>University President</p>
+            </div>
         </div>
     </div>
 
