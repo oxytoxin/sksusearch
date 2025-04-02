@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Str;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Str;
 
 /**
  * @mixin IdeHelperDisbursementVoucher
@@ -115,9 +116,15 @@ class DisbursementVoucher extends Model
     {
         return $this->hasOne(CaReminderStep::class);
     }
-    
+
     public function totalSumDisbursementVoucherParticular()
     {
         return $this->disbursement_voucher_particulars->sum('final_amount');
     }
+
+    public function daysOutstanding()
+{
+    $endDate = $this->cash_advance_reminder->voucher_end_date;
+    return $endDate ? Carbon::now()->diffInDays(Carbon::parse($endDate)) : null;
+}
 }

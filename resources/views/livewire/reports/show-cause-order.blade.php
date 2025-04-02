@@ -1,3 +1,8 @@
+<div>
+
+    <div class="mx-auto max-w-3xl mb-4 flex justify-end"><button onclick="printDiv('printableDiv')" class=" px-4 py-2 bg-primary-500 text-white rounded text-sm">
+        Print Document
+    </button></div>
 <div id="printableDiv" class="p-6 bg-white shadow-md border border-gray-300 mx-auto max-w-3xl">
     <x-sksu-header />
     <h1 class="text-xl font-bold pt-1 mt-2 text-center">Office of the President</h1>
@@ -28,35 +33,7 @@
             Official records show that you have been granted the following cash advance:
         </p>
 
-        <div class="text-xs text-gray-900 mt-2">
-            <table class="w-full">
-                <tr>
-                    <td class="border border-gray-800 px-2">DV number:</td>
-                    <td class="border border-gray-800 px-2">{{ $record->dv_number ?? '' }}</td>
-                    <td class="border border-gray-800 px-2">End of travel/implementation/payroll period:</td>
-                    <td class="border border-gray-800 px-2">
-                        {{ $record?->cash_advance_reminder?->voucher_end_date ? date_format(date_create($record->cash_advance_reminder->voucher_end_date), 'F d, Y') : '' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="border border-gray-800 px-2">Amount:</td>
-                    <td class="border border-gray-800 px-2">
-                        {{ number_format($record->totalSumDisbursementVoucherParticular() ?? 0, 2) }}</td>
-                    <td class="border border-gray-800 px-2">Liquidation deadline:</td>
-                    <td class="border border-gray-800 px-2">
-                        {{ $record?->cash_advance_reminder?->liquidation_period_end_date ? date_format(date_create($record->cash_advance_reminder->liquidation_period_end_date), 'F d, Y') : '' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="border border-gray-800 px-2">Check/ADA number</td>
-                    <td class="border border-gray-800 px-2">{{ $record->cheque_number ?? '' }}</td>
-                    <td class="border border-gray-800 px-2">Date Disbursed</td>
-                    <td class="border border-gray-800 px-2">
-                        {{ $record?->cheque_number_added_at ? date_format(date_create($record->cheque_number_added_at), 'F d, Y') : '' }}
-                    </td>
-                </tr>
-            </table>
-        </div>
+        <x-disbursement-voucher-table :record="$record" />
         <div>
             <div class="mt-4 text-xs text-gray-800 leading-relaxed">
                 <h1>Purpose:</h1>
@@ -109,9 +86,6 @@
     </div>
 </div>
 
-<button onclick="printDiv('printableDiv')" class="mt-4 px-4 py-2 bg-primary-500 text-white rounded">
-    Print Document
-</button>
 
 <script>
     function printDiv(divName) {
@@ -122,3 +96,4 @@
         document.body.innerHTML = originalContents;
     }
 </script>
+</div>
