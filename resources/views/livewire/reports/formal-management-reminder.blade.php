@@ -7,7 +7,7 @@
             <h1 class="text-xl font-bold   text-center ">
                 Formal Management Reminder
             </h1>
-            <p class="text-center">No. {{ $record->dv_number ??'' }}</p>
+            <p class="text-center">No. {{ $record?->cash_advance_reminder?->fmr_number ??'' }}</p>
         </div>
 
         <div class="border-b pb-2 border-black text-gray-800 text-xs">
@@ -40,29 +40,32 @@
                     <td class="border border-gray-800 px-2">DV number:</td>
                     <td class="border border-gray-800 px-2">{{$record->dv_number ??''}}</td>
                     <td class="border border-gray-800 px-2">End of travel/implementation/payroll period:</td>
-                    <td class="border border-gray-800 px-2">{{ $record?->current_step?->voucher_end_date ? date_format(date_create($record->current_step->voucher_end_date), 'F d, Y') : '' }} </td>
+                    <td class="border border-gray-800 px-2">{{ $record?->cash_advance_reminder?->voucher_end_date ? date_format(date_create($record->cash_advance_reminder->voucher_end_date), 'F d, Y') : '' }} </td>
                 </tr>
                 <tr>
                     <td class="border border-gray-800 px-2">Amount:</td>
                     <td class="border border-gray-800 px-2">₱{{$record->totalSumDisbursementVoucherParticular() ?? 0}}</td>
                     <td class="border border-gray-800 px-2">Liquidation deadline:</td>
-                    <td class="border border-gray-800 px-2">{{ $record?->current_step?->liquidation_period_end_date ? date_format(date_create($record->current_step->liquidation_period_end_date), 'F d, Y') : '' }}</td>
+                    <td class="border border-gray-800 px-2">{{ $record?->cash_advance_reminder?->liquidation_period_end_date ? date_format(date_create($record->cash_advance_reminder->liquidation_period_end_date), 'F d, Y') : '' }}</td>
                 </tr>
                 <tr>
                     <td class="border border-gray-800 px-2">Check/ADA number</td>
                     <td class="border border-gray-800 px-2">{{$record->cheque_number ??''}}</td>
-                    <td class="border border-gray-800 px-2">Date Disburse</td>
-                    <td class="border border-gray-800 px-2">Put the update check Date</td>
+                    <td class="border border-gray-800 px-2">Date Disbursed</td>
+                    <td class="border border-gray-800 px-2">
+                        {{ $record?->cheque_number_added_at ? date_format(date_create($record->cheque_number_added_at), 'F d, Y') : '' }}
+                    </td>
                 </tr>
             </table>
         </div>
 
         <div class="mt-4 text-xs text-gray-800 leading-relaxed">
             <h1>Purpose:</h1>
-
-            <p>
-                The cash advance was granted for the purpose of <span class="font-bold">[insert purpose]</span>.
-            </p>
+            <ul class="list-disc pl-6 mt-2">
+                @foreach ($record->disbursement_voucher_particulars as $particular)
+                    <li>{{ $particular->purpose }}</li>
+                @endforeach
+            </ul>
 
         <div class="mt-4 text-xs text-gray-800 leading-relaxed">
             <p>Please be informed that cash advances, depending on the type, must be liquidated by the following deadlines:</p>
@@ -83,8 +86,10 @@
         </div>
 
         <div class="mt-6 text-xs text-gray-800 ">
-            <p class="font-bold">[ACCOUNTANT’S SIGNATURE OVER PRINTED NAME]</p>
-            <p>Accountant III</p>
+            <div class="mt-6 text-xs text-gray-800 ">
+                <p class="font-bold">{{App\Models\EmployeeInformation::accountantUser()->full_name}}</p>
+                <p>{{App\Models\EmployeeInformation::accountantUser()?->position->description}}-{{App\Models\EmployeeInformation::accountantUser()?->office->name}}</p>
+            </div>
         </div>
 
         <div class="mt-12 text-xs text-gray-800">
