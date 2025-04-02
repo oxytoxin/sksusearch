@@ -37,12 +37,12 @@ class CashAdvanceReminders extends Component implements HasTable
         $is_accountant = auth()->user()->employee_information->office_id == 3 && auth()->user()->employee_information->position_id == 15;
         if($is_president)
         {
-            return CaReminderStep::query()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->whereIn('step', [4])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
-        }else if($is_accountant){
+        }elseif($is_accountant){
             return CaReminderStep::query()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
