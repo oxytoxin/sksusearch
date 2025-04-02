@@ -13,6 +13,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\NotificationController;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -71,12 +72,18 @@ class CashAdvanceReminders extends Component implements HasTable
         return [
             Action::make('sendFMR')->label('Send FMR')->icon('ri-send-plane-fill')
                 ->button()
-                ->action(function ($record) {
+                ->form([
+                    TextInput::make('fmr_number')
+                    ->label('FMR Number')
+                    ->required()
+                ])
+                ->action(function ($record, $data) {
 
 
                     $record->is_sent = 1;
                     $record->status = 'On-Going';
                     $record->fmr_date = now();
+                    $record->fmr_number = $data['fmr_number'];
                     $record->save();
 
                     // Store history
@@ -108,11 +115,17 @@ class CashAdvanceReminders extends Component implements HasTable
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 2 && $record->is_sent == 0),
             Action::make('sendFMD')->label('Send FMD')->icon('ri-send-plane-fill')
                 ->button()
-                ->action(function ($record) {
+                ->form([
+                    TextInput::make('fmd_number')
+                    ->label('FMD Number')
+                    ->required()
+                ])
+                ->action(function ($record, $data) {
 
                     $record->is_sent = 1;
                     $record->status = 'On-Going';
                     $record->fmd_date = now();
+                    $record->fmd_number = $data['fmd_number'];
                     $record->save();
                     // Store history
                     $record->caReminderStepHistories()->create([
@@ -143,11 +156,17 @@ class CashAdvanceReminders extends Component implements HasTable
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 3 && $record->is_sent == 0),
             Action::make('sendSOC')->label('Send SCO')->icon('ri-send-plane-fill')
                 ->button()
-                ->action(function ($record) {
+                ->form([
+                    TextInput::make('memorandum_number')
+                    ->label('Memorandum Number')
+                    ->required()
+                ])
+                ->action(function ($record, $data) {
 
                     $record->is_sent = 1;
                     $record->status = 'On-Going';
                     $record->sco_date = now();
+                    $record->memorandum_number = $data['memorandum_number'];
                     $record->save();
                     // Store history
                     $record->caReminderStepHistories()->create([
@@ -196,6 +215,12 @@ class CashAdvanceReminders extends Component implements HasTable
 
 
             })->requiresConfirmation()->visible(fn ($record) => $record->step == 5 && $record->is_sent == 0),
+            ViewAction::make('view')
+            ->label('Preview DV')
+            ->openUrlInNewTab()
+            ->button()
+            ->color('success')
+            ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record->disbursement_voucher]), true),
         ];
     }
 
