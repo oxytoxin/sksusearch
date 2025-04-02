@@ -47,11 +47,12 @@ Route::middleware([
 // Route::get('formal-management-reminder', FormalManagementReminder::class)->name('formal-management-reminder');
 // Route::get('endorsement-for-fd', EndorsementForFD::class)->name('endorsement-for-fd');
 // Route::get('show-cause-order', ShowCauseOrder::class)->name('show-cause-order');
-Route::get('formal-management-demand/{record}', FormalManagementDemand::class)->name('formal-management-demand');
-Route::get('formal-management-reminder/{record}', FormalManagementReminder::class)->name('formal-management-reminder');
-Route::get('endorsement-for-fd/{record}', EndorsementForFD::class)->name('endorsement-for-fd');
-Route::get('show-cause-order/{record}', ShowCauseOrder::class)->name('show-cause-order');
-Route::get('disbursement-voucher/{record}', ShowCauseOrder::class)->name('disbursement-voucher');
-
+Route::middleware(['check.voucher.subtype'])->group(function () {
+    Route::get('formal-management-demand/{record}', FormalManagementDemand::class)->name('formal-management-demand');
+    Route::get('formal-management-reminder/{record}', FormalManagementReminder::class)->name('formal-management-reminder');
+    Route::get('endorsement-for-fd/{record}', EndorsementForFD::class)->name('endorsement-for-fd');
+    Route::get('show-cause-order/{record}', ShowCauseOrder::class)->name('show-cause-order');
+    Route::get('disbursement-voucher/{record}', ShowCauseOrder::class)->name('disbursement-voucher');
+});
 
 });
