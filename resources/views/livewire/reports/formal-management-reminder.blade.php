@@ -24,7 +24,7 @@
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12">Date:</p>
-                <div class="">{{ $record?->cash_advance_reminder->fmr_date ?? }}</div>
+                <div class="">{{ $record?->cash_advance_reminder?->fmr_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y') : 'N/A' }}</div>
             </div>
         </div>
         {{-- @dump($record) --}}
