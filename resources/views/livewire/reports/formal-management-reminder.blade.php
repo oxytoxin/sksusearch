@@ -24,7 +24,7 @@
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12">Date:</p>
-                <div class="">{{ $record?->cash_advance_reminder?->fmr_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y') : 'N/A' }}</div>
+                <div class="">{{ $record?->cash_advance_reminder?->fmr_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y') : '' }}</div>
             </div>
         </div>
         {{-- @dump($record) --}}
@@ -47,7 +47,7 @@
                 </tr>
                 <tr>
                     <td class="border border-gray-800 px-2">Amount:</td>
-                    <td class="border border-gray-800 px-2">₱{{$record->totalSumDisbursementVoucherParticular() ?? 0}}</td>
+                    <td class="border border-gray-800 px-2">{{ number_format($record->totalSumDisbursementVoucherParticular() ?? 0, 2) }}</td>
                     <td class="border border-gray-800 px-2">Liquidation deadline:</td>
                     <td class="border border-gray-800 px-2">{{ $record?->cash_advance_reminder?->liquidation_period_end_date ? date_format(date_create($record->cash_advance_reminder->liquidation_period_end_date), 'F d, Y') : '' }}</td>
                 </tr>
@@ -73,10 +73,10 @@
         <div class="mt-4 text-xs text-gray-800 leading-relaxed">
             <p>Please be informed that cash advances, depending on the type, must be liquidated by the following deadlines:</p>
             <ul class="pl-6 mt-2">
-                <li>(1) Salaries, wages, etc.: within five (5) days after each 15-day/month-end pay period<sup>1</sup></li>
-                <li>(2) Local travel: within thirty (30) days after return to permanent official station<sup>2</sup></li>
-                <li>(3) Foreign travel: within sixty (60) days after return to the Philippines<sup>3</sup></li>
-                <li>(4) Special activities: within twenty (20) days from accomplishment of the purpose<sup>4</sup></li>
+                <li>(1) Salaries, wages, etc.:<span class="ml-6"> within five (5) after each 15-day/month-end pay period</span><sup>1</sup></li>
+                <li>(2) Local travel: <span class="ml-6">within thirty (30) days after return to permanent official station</span><sup>2</sup></li>
+                <li>(3) Foreign travel: <span class="ml-6">within sixty (60) days after return to the Philippines</span><sup>3</sup></li>
+                <li>(4) Special activities: <span class="ml-6">within twenty (20) days from accomplishment of the purpose</span><sup>4</sup></li>
             </ul>
 
             <p class="mt-4">
