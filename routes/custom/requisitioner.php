@@ -57,4 +57,5 @@ Route::middleware([
     Route::get('/motorpool/vehicle-request-form/{request}', VehicleRequestFormShow::class)->name('motorpool.show-request-form');
     Route::get('/motorpool/vehicle-request-details/{request}', RequestVehicleShow::class)->name('motorpool.show');
     Route::get('/ca-reminders', CashAdvanceReminders::class)->name('ca-reminders');
+    // Route::get('/ca-reminders', CashAdvanceReminders::class)->name('ca-reminders');
 });
