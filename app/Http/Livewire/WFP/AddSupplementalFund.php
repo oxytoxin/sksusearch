@@ -6,9 +6,11 @@ use Livewire\Component;use App\Models\CategoryGroup;
 use App\Models\FundAllocation;
 use App\Models\CostCenter;
 use App\Models\WpfType;
+use WireUi\Traits\Actions;
 
 class AddSupplementalFund extends Component
 {
+    use Actions;
     public $record;
     public $category_groups;
     public $category_groups_supplemental;
@@ -23,6 +25,7 @@ class AddSupplementalFund extends Component
 
     public function mount($record, $wfpType)
     {
+
         $this->record = CostCenter::find($record);
         $this->category_groups = CategoryGroup::where('is_active', 1)->get();
         $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function($query) {
@@ -119,6 +122,21 @@ class AddSupplementalFund extends Component
     {
         // Calculate the total balance
         return array_sum($this->allocations) - $this->calculateTotal();
+    }
+
+    public function confirmSupplementalFund()
+    {
+        $this->dialog()->confirm([
+            'title'       => 'Are you Sure?',
+            'description' => 'Do you really want to save this information?',
+            'acceptLabel' => 'Yes, save it',
+            'method'      => 'addSupplementalFund',
+        ]);
+    }
+
+    public function addSupplementalFund()
+    {
+        dd($this->amounts);
     }
 
     public function render()
