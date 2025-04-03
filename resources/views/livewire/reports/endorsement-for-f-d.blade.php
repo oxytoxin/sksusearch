@@ -8,7 +8,7 @@
         <h1 class="text-xl font-bold  pt-1 mt-2 text-center">
             Office of the President
         </h1>
-        <h1 class="    text-center my-6">
+        <h1 class="    text-center mt-2 mb-8">
             ENDORSEMENT FOR ISSUANCE OF FORMAL DEMAND TO LIQUIDATE
         </h1>
         <div class="text-xs text-gray-800">
@@ -61,7 +61,7 @@ refusal by him/her to perform an obligation required by law.
         </div>
     </div>
 
-  
+
 
     <script>
         function printDiv(divName) {
