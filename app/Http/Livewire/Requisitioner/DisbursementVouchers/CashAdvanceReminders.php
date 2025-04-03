@@ -33,8 +33,8 @@ class CashAdvanceReminders extends Component implements HasTable
 
     protected function getTableQuery(): Builder|Relation
     {
-        $is_president = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
-        $is_accountant = auth()->user()->employee_information->office_id == 3 && auth()->user()->employee_information->position_id == 15;
+        $is_president = Auth::user()->employee_information->office_id == 51 && Auth::user()->employee_information->position_id == 34;
+        $is_accountant = Auth::user()->employee_information->office_id == 3 && Auth::user()->employee_information->position_id == 15;
         if($is_president)
         {
             return CaReminderStep::query()->whereIn('step', [4])->whereHas('disbursement_voucher', function ($query) {
@@ -83,7 +83,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     $record->status = 'On-Going';
                     $record->fmr_date = now();
                     $record->fmr_number = $data['fmr_number'];
-                    $record->user_id = auth()->id();
+                    $record->user_id = Auth::id();
                     $record->save();
 
                     // Store history
@@ -103,7 +103,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'FMR',
-                        'user_id' => auth()->id(),
+                        'user_id' => Auth::id(),
                     ]);
 
                     $this->emit('historyCreated');
@@ -134,7 +134,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     $record->status = 'On-Going';
                     $record->fmd_date = now();
                     $record->fmd_number = $data['fmd_number'];
-                    $record->user_id = auth()->id();
+                    $record->user_id = Auth::id();
                     $record->save();
 
                     // Store history
@@ -154,7 +154,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'FMD',
-                        'user_id' => auth()->id(),
+                        'user_id' => Auth::id(),
                     ]);
 
                     $this->emit('historyCreated');
@@ -185,7 +185,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     $record->status = 'On-Going';
                     $record->sco_date = now();
                     $record->memorandum_number = $data['memorandum_number'];
-                    $record->user_id = auth()->id();
+                    $record->user_id = Auth::id();
                     $record->save();
 
                     // Store history
@@ -205,7 +205,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'SCO',
-                        'user_id' => auth()->id(),
+                        'user_id' => Auth::id(),
                     ]);
 
                     $this->emit('historyCreated');
@@ -230,7 +230,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     $record->is_sent = 1;
                     $record->status = 'On-Going';
                     $record->fd_date = now();
-                    $record->user_id = auth()->id();
+                    $record->user_id = Auth::id();
                     $record->save();
 
                     // Store history
@@ -250,7 +250,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'FD',
-                        'user_id' => auth()->id(),
+                        'user_id' => Auth::id(),
                     ]);
 
                     $this->emit('historyCreated');

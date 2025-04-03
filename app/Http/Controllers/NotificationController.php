@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Message;
+use App\Events\MessageSent;
 use Illuminate\Http\Request;
 use App\Models\EmployeeInformation;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\SystemReminder;
 use App\Notifications\TestNotification;
 use App\Notifications\CashAdvanceSendFmr;
 use App\Notifications\CashAdvanceCreation;
@@ -14,10 +17,25 @@ use App\Notifications\CashAdvanceStep3Reminder;
 use App\Notifications\CashAdvanceStep4Reminder;
 use App\Notifications\CashAdvanceStep5Reminder;
 use App\Notifications\SubmissionRequestNotification;
-use App\Notifications\SystemReminder;
 
 class NotificationController extends Controller
 {
+
+    public static function sendMessage($content, $senderId, $receiverId, $disbursementVoucherId)
+    {
+        // Create a new message
+        $message = new Message();
+        $message->content = $content;
+        $message->user_id = $senderId;
+        $message->receiver_id = $receiverId;
+        $message->disbursement_voucher_id = $disbursementVoucherId;
+        $message->save();
+
+        // Dispatch the MessageSent event
+        event(new MessageSent($message));
+    }
+
+    // Other existing methods...
 
 
 

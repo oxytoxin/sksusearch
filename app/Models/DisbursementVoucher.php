@@ -131,7 +131,11 @@ class DisbursementVoucher extends Model
 
     public function daysOutstanding()
     {
-        $endDate = $this->cash_advance_reminder->voucher_end_date;
+        $cashAdvanceReminder = $this->cash_advance_reminder;
+        if (!$cashAdvanceReminder) {
+            return null;
+        }
+        $endDate = $cashAdvanceReminder->voucher_end_date;
         return $endDate ? Carbon::now()->diffInDays(Carbon::parse($endDate)) : null;
     }
 }
