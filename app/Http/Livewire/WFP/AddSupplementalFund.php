@@ -7,6 +7,7 @@ use App\Models\FundAllocation;
 use App\Models\CostCenter;
 use App\Models\WpfType;
 use WireUi\Traits\Actions;
+use Filament\Notifications\Notification;
 
 class AddSupplementalFund extends Component
 {
@@ -136,7 +137,20 @@ class AddSupplementalFund extends Component
 
     public function addSupplementalFund()
     {
-        dd($this->amounts);
+        foreach($this->amounts as $categoryGroupId => $amount)
+        {
+            FundAllocation::create([
+                'cost_center_id' => $this->record->id,
+                'wpf_type_id' => $this->selectedType,
+                'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
+                'category_group_id' => $categoryGroupId,
+                'initial_amount' => $amount,
+                'is_supplemental' => 1,
+            ]);
+        }
+
+        Notification::make()->title('Successfully Saved')->success()->send();
+        return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
     }
 
     public function render()
