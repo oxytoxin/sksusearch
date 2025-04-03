@@ -79,10 +79,11 @@ class CashAdvanceReminders extends Component implements HasTable
                 ])
                 ->action(function ($record, $data) {
                     // Update record
+                    $record->is_sent = 1;
+                    $record->status = 'On-Going';
                     $record->fmr_date = now();
                     $record->fmr_number = $data['fmr_number'];
-                    $record->step = 3;
-                    $record->status = 'Sent';
+                    $record->user_id = auth()->id();
                     $record->save();
 
                     // Store history
@@ -102,7 +103,10 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'FMR',
+                        'user_id' => auth()->id(),
                     ]);
+
+                    $this->emit('historyCreated');
 
                     // Send FMR
                     NotificationController::sendCASystemReminder(
@@ -126,10 +130,11 @@ class CashAdvanceReminders extends Component implements HasTable
                 ])
                 ->action(function ($record, $data) {
                     // Update record
+                    $record->is_sent = 1;
+                    $record->status = 'On-Going';
                     $record->fmd_date = now();
                     $record->fmd_number = $data['fmd_number'];
-                    $record->step = 4;
-                    $record->status = 'Sent';
+                    $record->user_id = auth()->id();
                     $record->save();
 
                     // Store history
@@ -149,8 +154,10 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'FMD',
+                        'user_id' => auth()->id(),
                     ]);
 
+                    $this->emit('historyCreated');
 
                     // Send FMD
                     NotificationController::sendCASystemReminder(
@@ -178,7 +185,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     $record->status = 'On-Going';
                     $record->sco_date = now();
                     $record->memorandum_number = $data['memorandum_number'];
-                    $record->step = 5;
+                    $record->user_id = auth()->id();
                     $record->save();
 
                     // Store history
@@ -198,7 +205,10 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'SCO',
+                        'user_id' => auth()->id(),
                     ]);
+
+                    $this->emit('historyCreated');
 
                     // Send SCO
                     NotificationController::sendCASystemReminder(
@@ -220,7 +230,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     $record->is_sent = 1;
                     $record->status = 'On-Going';
                     $record->fd_date = now();
-                    $record->step = 6;
+                    $record->user_id = auth()->id();
                     $record->save();
 
                     // Store history
@@ -240,7 +250,10 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'FD',
+                        'user_id' => auth()->id(),
                     ]);
+
+                    $this->emit('historyCreated');
 
                     // Send FD
                     NotificationController::sendCASystemReminder(

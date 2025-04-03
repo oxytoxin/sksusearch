@@ -3,10 +3,13 @@
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
 use Livewire\Component;
+use App\Models\EmployeeInformation;
+use Filament\Tables\Filters\Layout;
 use App\Models\CaReminderStepHistory;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Concerns\InteractsWithTable;
 
 class SentNotificationHistory extends Component implements HasTable
@@ -14,7 +17,7 @@ class SentNotificationHistory extends Component implements HasTable
     use InteractsWithTable;
 
 
-
+    protected $listeners = ['historyCreated' => '$refresh'];
     public function render()
     {
         return view('livewire.requisitioner.disbursement-vouchers.sent-notification-history');
@@ -22,8 +25,21 @@ class SentNotificationHistory extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return CaReminderStepHistory::query();
+        $query = CaReminderStepHistory::query()->latest();
+
+        if (auth()->id() === EmployeeInformation::presidentUser()->user_id) {
+            $query->whereHas('caReminderStep', function ($q) {
+                $q->where('user_id', auth()->id());
+            });
+        }
+
+        return $query;
     }
+
+//     protected function getTableFiltersLayout(): ?string
+// {
+//     return Layout::AboveContentCollapsible;
+// }
 
     protected function getTableActions(): array
     {
@@ -37,7 +53,21 @@ class SentNotificationHistory extends Component implements HasTable
                ->color('success')
                ->icon('heroicon-o-eye')
                ->tooltip('View Disbursement Voucher')
-          
+
+        ];
+    }
+
+    protected function getTableFilters(): array
+    {
+        return [
+            SelectFilter::make('type')
+                ->options([
+                    'FMR' => 'Formal Management Reminder',
+                    'FMD' => 'Formal Management Demand',
+                    'SCO' => 'Show Cause Order',
+                    'FD' => 'Formal Demand',
+                ])
+                ->label('Type')
         ];
     }
 
