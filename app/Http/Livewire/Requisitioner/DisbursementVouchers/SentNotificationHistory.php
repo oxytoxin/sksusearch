@@ -9,6 +9,7 @@ use App\Models\CaReminderStepHistory;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Concerns\InteractsWithTable;
 
@@ -52,8 +53,47 @@ class SentNotificationHistory extends Component implements HasTable
                ->button()
                ->color('success')
                ->icon('heroicon-o-eye')
-               ->tooltip('View Disbursement Voucher')
+               ->tooltip('View Disbursement Voucher'),
 
+           ViewAction::make('FMD')
+               ->label('View FMD')
+               ->modalContent(fn($record) => $record->type === 'FMD' ? view('reports.formal-management-demand', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
+               ->modalWidth('4xl')
+               ->button()
+               ->color('primary')
+               ->icon('heroicon-o-document-text')
+               ->tooltip('View FMD')
+               ->visible(fn($record) => $record->type === 'FMD'),
+
+           ViewAction::make('FMR')
+               ->label('View FMR')
+               ->modalContent(fn($record) => $record->type === 'FMR' ? view('reports.formal-management-reminder', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
+               ->modalWidth('4xl')
+               ->button()
+               ->color('primary')
+               ->icon('heroicon-o-document-text')
+               ->tooltip('View FMR')
+               ->visible(fn($record) => $record->type === 'FMR'),
+
+           ViewAction::make('FD')
+               ->label('View FD')
+               ->modalContent(fn($record) => $record->type === 'FD' ? view('reports.endorsement-for-f-d', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
+               ->modalWidth('4xl')
+               ->button()
+               ->color('primary')
+               ->icon('heroicon-o-document-text')
+               ->tooltip('View FD')
+               ->visible(fn($record) => $record->type === 'FD'),
+
+           ViewAction::make('SCO')
+               ->label('View SCO')
+               ->modalContent(fn($record) => $record->type === 'SCO' ? view('reports.show-cause-order', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
+               ->modalWidth('4xl')
+               ->button()
+               ->color('primary')
+               ->icon('heroicon-o-document-text')
+               ->tooltip('View SCO')
+               ->visible(fn($record) => $record->type === 'SCO'),
         ];
     }
 
