@@ -75,12 +75,18 @@ class SentNotificationHistory extends Component implements HasTable
     {
         return [
             TextColumn::make('caReminderStep.disbursementVoucher.dv_number')->label('DV Number')->searchable(),
+            TextColumn::make('caReminderStep.disbursementVoucher.tracking_number')->label('Tracking Number')->searchable(),
+            TextColumn::make('type')->label('Type'),
+            TextColumn::make('caReminderStep.disbursementVoucher.totalSum')->label('Amount'),
+            TextColumn::make('sent_at')->label('Sent Date')->dateTime('F j, Y, g:i a'),
             TextColumn::make('sender_name')->label('Sender')->searchable(),
             TextColumn::make('receiver_name')->label('Receiver')->searchable(),
-            TextColumn::make('caReminderStep.disbursementVoucher.totalSum')->label('Amount')->searchable(),
-            TextColumn::make('sent_at')->label('Sent Date')->dateTime('F j, Y, g:i a'),
-            TextColumn::make('type')->label('Type')->searchable(),
-            // TextColumn::make('step_data')->label('Step Data'),
+            // TextColumn::make('step_data')
+            //     ->label('Step Data')
+            //     ->wrap()
+            //     ->formatStateUsing(fn($state) => json_encode($state, JSON_PRETTY_PRINT))
+            //     ->toggleable()
+            //     ,
             // TextColumn::make('created_at')->label('Created At'),
         ];
     }
