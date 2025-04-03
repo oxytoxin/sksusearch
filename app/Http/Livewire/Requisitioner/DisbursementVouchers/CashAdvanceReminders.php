@@ -122,8 +122,8 @@ class CashAdvanceReminders extends Component implements HasTable
                 ])
                 ->action(function ($record, $data) {
 
-                    $record->is_sent = 1;
-                    $record->status = 'On-Going';
+                    // $record->is_sent = 1;
+                    // $record->status = 'On-Going';
                     $record->fmd_date = now();
                     $record->fmd_number = $data['fmd_number'];
                     $record->save();
@@ -139,6 +139,10 @@ class CashAdvanceReminders extends Component implements HasTable
                             'title' => $record->title,
                             'message' => $record->message,
                             'sent_at' => now(),
+                            'sender_name' => $this->accounting->name,
+                            'receiver_name' => $record->disbursementVoucher->user->name,
+                            'voucher_name' => $record->disbursementVoucher->name,
+                            'type' => 'FMR'
                         ],
                     ]);
                     // Send FMD
