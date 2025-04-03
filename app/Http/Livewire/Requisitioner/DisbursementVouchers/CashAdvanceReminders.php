@@ -78,12 +78,11 @@ class CashAdvanceReminders extends Component implements HasTable
                     ->required()
                 ])
                 ->action(function ($record, $data) {
-
-
-                    $record->is_sent = 1;
-                    $record->status = 'On-Going';
+                    // Update record
                     $record->fmr_date = now();
                     $record->fmr_number = $data['fmr_number'];
+                    $record->step = 3;
+                    $record->status = 'Sent';
                     $record->save();
 
                     // Store history
@@ -99,7 +98,12 @@ class CashAdvanceReminders extends Component implements HasTable
                             'message' => $record->message,
                             'sent_at' => now(),
                         ],
+                        'sender_name' => $this->accounting->user->name,
+                        'sent_at' => now(),
+                        'receiver_name' => $record->disbursementVoucher->user->name,
+                        'type' => 'FMR',
                     ]);
+
                     // Send FMR
                     NotificationController::sendCASystemReminder(
                         'FMR',
@@ -121,14 +125,15 @@ class CashAdvanceReminders extends Component implements HasTable
                     ->required()
                 ])
                 ->action(function ($record, $data) {
-
-                    // $record->is_sent = 1;
-                    // $record->status = 'On-Going';
+                    // Update record
                     $record->fmd_date = now();
                     $record->fmd_number = $data['fmd_number'];
+                    $record->step = 4;
+                    $record->status = 'Sent';
                     $record->save();
+
                     // Store history
-                    $record->caReminderStepHistories()->create([
+                    $historyData = $record->caReminderStepHistories()->create([
                         'step_data' => [
                             'disbursement_voucher_id' => $record->disbursement_voucher_id,
                             'status' => $record->status,
@@ -139,12 +144,14 @@ class CashAdvanceReminders extends Component implements HasTable
                             'title' => $record->title,
                             'message' => $record->message,
                             'sent_at' => now(),
-                            'sender_name' => $this->accounting->name,
-                            'receiver_name' => $record->disbursementVoucher->user->name,
-                            'voucher_name' => $record->disbursementVoucher->name,
-                            'type' => 'FMR'
                         ],
+                        'sender_name' => $this->accounting->user->name,
+                        'sent_at' => now(),
+                        'receiver_name' => $record->disbursementVoucher->user->name,
+                        'type' => 'FMD',
                     ]);
+
+
                     // Send FMD
                     NotificationController::sendCASystemReminder(
                         'FMD',
@@ -166,12 +173,14 @@ class CashAdvanceReminders extends Component implements HasTable
                     ->required()
                 ])
                 ->action(function ($record, $data) {
-
+                    // Update record
                     $record->is_sent = 1;
                     $record->status = 'On-Going';
                     $record->sco_date = now();
                     $record->memorandum_number = $data['memorandum_number'];
+                    $record->step = 5;
                     $record->save();
+
                     // Store history
                     $record->caReminderStepHistories()->create([
                         'step_data' => [
@@ -185,8 +194,13 @@ class CashAdvanceReminders extends Component implements HasTable
                             'message' => $record->message,
                             'sent_at' => now(),
                         ],
+                        'sender_name' => $this->accounting->user->name,
+                        'sent_at' => now(),
+                        'receiver_name' => $record->disbursementVoucher->user->name,
+                        'type' => 'SCO',
                     ]);
-                    // Send FMR
+
+                    // Send SCO
                     NotificationController::sendCASystemReminder(
                         'SCO',
                         'Show Cause Order',
@@ -202,23 +216,43 @@ class CashAdvanceReminders extends Component implements HasTable
             Action::make('sendFD')->label('Send FD')->icon('ri-send-plane-fill')
                 ->button()
                 ->action(function ($record) {
+                    // Update record
+                    $record->is_sent = 1;
+                    $record->status = 'On-Going';
+                    $record->fd_date = now();
+                    $record->step = 6;
+                    $record->save();
 
-                $record->is_sent = 1;
-                $record->status = 'On-Going';
-                $record->fd_date = now();
-                $record->save();
-                // Send FMR
-                NotificationController::sendCASystemReminder(
-                    'FD',
-                    'Endorsement For FD',
-                    'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
-                    $this->accounting,
-                    $record->disbursementVoucher->user->name, $this->accounting->id, $record->disbursementVoucher->user,
-                    route('print.endorsement-for-fd', $record->disbursement_voucher),
-                    $record->disbursement_voucher);
+                    // Store history
+                    $record->caReminderStepHistories()->create([
+                        'step_data' => [
+                            'disbursement_voucher_id' => $record->disbursement_voucher_id,
+                            'status' => $record->status,
+                            'voucher_end_date' => $record->voucher_end_date,
+                            'liquidation_period_end_date' => $record->liquidation_period_end_date,
+                            'step' => $record->step,
+                            'is_sent' => $record->is_sent,
+                            'title' => $record->title,
+                            'message' => $record->message,
+                            'sent_at' => now(),
+                        ],
+                        'sender_name' => $this->accounting->user->name,
+                        'sent_at' => now(),
+                        'receiver_name' => $record->disbursementVoucher->user->name,
+                        'type' => 'FD',
+                    ]);
 
-
-            })->requiresConfirmation()->visible(fn ($record) => $record->step == 5 && $record->is_sent == 0),
+                    // Send FD
+                    NotificationController::sendCASystemReminder(
+                        'FD',
+                        'Endorsement For FD',
+                        'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
+                        $this->accounting,
+                        $record->disbursementVoucher->user->name, $this->accounting->id, $record->disbursementVoucher->user,
+                        route('print.endorsement-for-fd', $record->disbursement_voucher),
+                        $record->disbursement_voucher
+                    );
+                })->requiresConfirmation()->visible(fn($record) => $record->step == 5 && $record->is_sent == 0),
             ViewAction::make('view')
             ->label('Preview DV')
             ->openUrlInNewTab()

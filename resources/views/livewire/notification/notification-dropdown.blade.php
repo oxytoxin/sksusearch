@@ -83,8 +83,15 @@
         </div>
     @endif
 @empty
+<div class="text-center p-4 ">
+  <!-- <svg class="mx-auto size-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+    <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22c1.1 0 2-.9 2-2H10c0 1.1.9 2 2 2zm6-6V9c0-3.07-1.63-5.64-4.5-6.32V2a1.5 1.5 0 00-3 0v.68C7.63 3.36 6 5.92 6 9v7l-1.29 1.29a1 1 0 00-.21 1.09c.14.31.45.52.79.52h14c.34 0 .65-.21.79-.52a1 1 0 00-.21-1.09L18 16z" />
+  </svg> -->
+  <h3 class="mt-2 text-sm font-semibold text-gray-900 text-primary-600">No Notifications Available</h3>
+  {{-- <p class="mt-1 text-sm text-gray-500 text-primary-600">You're all caught up! No new notifications.</p> --}}
+</div>
 
-            @endforelse
+@endforelse
         </div>
 
 

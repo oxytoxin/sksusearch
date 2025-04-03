@@ -19,4 +19,10 @@ class HomeController extends Controller
             'disbursement_voucher' => $disbursement_voucher
         ]);
     }
+    public function disbursement_voucher_view_no_layout(DisbursementVoucher $disbursement_voucher)
+    {
+        return view('components.disbursement_vouchers.disbursement_voucher_view_no_layout', [
+            'disbursement_voucher' => $disbursement_voucher
+        ]);
+    }
 }

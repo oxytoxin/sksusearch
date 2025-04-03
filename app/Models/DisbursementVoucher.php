@@ -36,6 +36,14 @@ class DisbursementVoucher extends Model
         );
     }
 
+    protected function totalSum(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->disbursement_voucher_particulars->sum('final_amount') / 100,
+            set: fn ($value) => $value * 100,
+        );
+    }
+
     public function petty_cash_fund_records()
     {
         return $this->morphMany(PettyCashFundRecord::class, 'recordable');
@@ -86,8 +94,6 @@ class DisbursementVoucher extends Model
         return $this->hasMany(DisbursementVoucherParticular::class);
     }
 
-
-
     public function fund_cluster()
     {
         return $this->belongsTo(FundCluster::class);
@@ -97,6 +103,7 @@ class DisbursementVoucher extends Model
     {
         return $this->morphMany(ActivityLog::class, 'loggable');
     }
+
     public function scanned_documents()
     {
         return $this->morphMany(ScannedDocument::class, 'documentable');
@@ -123,8 +130,8 @@ class DisbursementVoucher extends Model
     }
 
     public function daysOutstanding()
-{
-    $endDate = $this->cash_advance_reminder->voucher_end_date;
-    return $endDate ? Carbon::now()->diffInDays(Carbon::parse($endDate)) : null;
-}
+    {
+        $endDate = $this->cash_advance_reminder->voucher_end_date;
+        return $endDate ? Carbon::now()->diffInDays(Carbon::parse($endDate)) : null;
+    }
 }
