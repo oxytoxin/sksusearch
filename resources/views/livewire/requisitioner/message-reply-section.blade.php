@@ -41,7 +41,7 @@
                             </div>
                         @endif
                         @foreach ($message->replies as $reply)
-                            <div class="ml-8 mt-2 border-l-2 pl-3 {{ auth()->id() === $reply->user_id ? 'bg-primary-100' : 'bg-gray-50' }} rounded-lg relative">
+                            <div class="ml-8 mt-2 border-l-2 border-gray-300 pl-3 {{ auth()->id() === $reply->user_id ? 'bg-primary-100' : 'bg-gray-50' }} rounded-lg relative">
                                 <div class="flex items-center mb-2">
                                     <div class="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full mr-2">
                                         <span class="text-sm font-bold text-primary-800">{{ $reply->user->name[0] }}</span>
@@ -80,12 +80,19 @@
             console.log(`Subscribing to messages.${disbursementVoucherId}`);
             console.log("Echo is available");
             window.Echo.channel(`messages.${disbursementVoucherId}`)
-            // window.Echo.channel(`messages`)
-
                 .listen('MessageSent', (message) => {
                     console.log("New Message:", message);
-                    Livewire.emit('refreshMessages'); // Emit the event to refresh messages
+                    Livewire.emit('refreshMessages'); // Ensure this line is present
+                })
+                .listen('ReplyAdded', (reply) => {
+                    console.log("New Reply:", reply);
+                    Livewire.emit('refreshMessages'); // Ensure this line is present
+                })
+                .listen('MessageDeleted', (message) => {
+                    console.log("Message Deleted:", message);
+                    Livewire.emit('refreshMessages'); // Ensure this line is present
                 });
+                
         });
     </script>
 </div>

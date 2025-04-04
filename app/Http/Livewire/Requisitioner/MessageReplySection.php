@@ -8,6 +8,8 @@ use Livewire\Component;
 use App\Models\EmployeeInformation;
 use WireUi\Traits\Actions;
 use App\Events\MessageSent;
+use App\Events\ReplyAdded;
+use App\Events\MessageDeleted;
 
 class MessageReplySection extends Component
 {
@@ -85,6 +87,8 @@ class MessageReplySection extends Component
         $this->replyContent = '';
         $this->replyingTo = null;
         $this->emit('replyAdded', $reply->id);
+        $this->emit('refreshMessages');
+        event(new ReplyAdded($reply, $this->disbursement_voucher->id));
     }
 
     public function confirmDelete($messageId)
@@ -104,6 +108,8 @@ class MessageReplySection extends Component
         if ($message) {
             $message->delete();
             $this->emit('messageDeleted', $messageId);
+            $this->emit('refreshMessages');
+            event(new MessageDeleted($messageId, $this->disbursement_voucher->id));
         }
     }
 
