@@ -19,7 +19,7 @@ class MessageReplySection extends Component
     public $replyingTo = null;
     public $replyContent = '';
 
-    protected $listeners = ['messageAdded', 'replyAdded', 'messageDeleted'];
+    protected $listeners = ['messageAdded', 'replyAdded', 'messageDeleted', 'refreshMessages'];
 
     public function mount($disbursement_voucher)
     {
@@ -53,11 +53,10 @@ class MessageReplySection extends Component
 
         $message->save();
 
-        // Dispatch the event
-        event(new MessageSent($message));
+        $this->emit('messageAdded', $message->id);
+        event(new MessageSent($message, $this->disbursement_voucher->id));
 
         $this->messageContent = '';
-        $this->emit('messageAdded', $message->id);
     }
 
     public function addReply($parentId)
@@ -116,7 +115,9 @@ class MessageReplySection extends Component
             ->with('replies')
             ->orderBy('created_at', 'desc')
             ->get();
+
     }
+
     public function messageAdded($messageId)
     {
         $this->loadMessages();
@@ -128,6 +129,11 @@ class MessageReplySection extends Component
     }
 
     public function messageDeleted($messageId)
+    {
+        $this->loadMessages();
+    }
+
+    public function refreshMessages()
     {
         $this->loadMessages();
     }

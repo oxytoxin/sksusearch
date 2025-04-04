@@ -17,6 +17,8 @@ class MessageSent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels, InteractsWithBroadcasting;
 
     public $message;
+    public $disbursement_voucher_id;
+
 
     /**
      * Create a new event instance.
@@ -24,25 +26,20 @@ class MessageSent implements ShouldBroadcast
      * @param Message $message
      * @return void
      */
-    public function __construct(Message $message)
+    public function __construct(Message $message, $disbursement_voucher_id)
     {
         $this->message = $message;
+        $this->disbursement_voucher_id = $disbursement_voucher_id;
     }
 
-    public function via($notifiable)
-    {
-        return ['broadcast'];
-    }
 
-    public function broadcastAs()
-    {
-        return 'message.sent';
-    }
+
 
     public function broadcastOn()
     {
-        return new Channel('messages.' . $this->message->disbursement_voucher_id);
+        return new Channel('messages.' . $this->disbursement_voucher_id);
     }
+
 
     public function broadcastWith()
     {

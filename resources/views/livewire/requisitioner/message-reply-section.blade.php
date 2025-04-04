@@ -78,18 +78,14 @@
         document.addEventListener('DOMContentLoaded', function () {
             const disbursementVoucherId = @json($disbursement_voucher->id);
             console.log(`Subscribing to messages.${disbursementVoucherId}`);
-            if (window.Echo) {
-                console.log("Echo is available");
-                window.Echo.channel(`messages.${disbursementVoucherId}`)
-                    .listen('.message.sent', (message) => {
-                        console.log("🔔 New Meesasge:", message);
+            console.log("Echo is available");
+            window.Echo.channel(`messages.${disbursementVoucherId}`)
+            // window.Echo.channel(`messages`)
 
-                    });
-            } else {
-                console.error("Echo is not available");
-            }
+                .listen('MessageSent', (message) => {
+                    console.log("New Message:", message);
+                    Livewire.emit('refreshMessages'); // Emit the event to refresh messages
+                });
         });
-
-
     </script>
 </div>
