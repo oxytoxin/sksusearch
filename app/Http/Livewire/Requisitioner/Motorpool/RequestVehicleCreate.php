@@ -335,7 +335,7 @@ class RequestVehicleCreate extends Component implements HasForms
                         }
                     }
 
-                    if($conflict)
+                    if($conflict && $this->is_vehicle_preferred)
                     {
                         if($hasConflictTime)
                         {

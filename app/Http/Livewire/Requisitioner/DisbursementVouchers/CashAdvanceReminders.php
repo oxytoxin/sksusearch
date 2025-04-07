@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class CashAdvanceReminders extends Component implements HasTable
 {
@@ -269,9 +270,9 @@ class CashAdvanceReminders extends Component implements HasTable
             Action::make('uploadFD')->label('Upload FD')->icon('ri-send-plane-fill')
             ->button()
             ->form([
-                TextInput::make('fmr_number')
-                ->label('FMR Number')
-                ->required(),
+                SpatieMediaLibraryFileUpload::make('attachments')
+    ->multiple()
+    ->reorderable()
 
             ])->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
             ViewAction::make('view')
