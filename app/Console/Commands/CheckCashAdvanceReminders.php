@@ -106,23 +106,23 @@ class CheckCashAdvanceReminders extends Command
                             'Edorsement for FD',
                             'A cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please remind the user to submit a liquidation report.',
                             'System',
-                            $auditor->user->name, null, $auditor->user,
+                            $president->user->name, null, $president->user,
                             route('requisitioner.ca-reminders'),
                             $record->disbursement_voucher);
                         $record->update(['status' => 'Pending', 'is_sent' => false , 'step'=> 5, 'is_sent' => 0]);
                         break;
-                    case 5:
-                        NotificationController::sendCASystemReminder(
-                            'Cash Advance Reminder',
-                            'Unliquidated',
-                            'A cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' has beed marked Unliquidated.',
-                            'System',
-                            $president->user->name, null, $president->user,
-                            route('requisitioner.ca-reminders'),
-                            $record->disbursement_voucher);
-                        $record->update(['status' => 'Unliquidated', 'is_sent' => false , 'step'=> 1, 'is_sent' => 0]);
-                        Log::warning("Cash Advance #{$record->id} is overdue!");
-                        break;
+                    // case 5:
+                    //     NotificationController::sendCASystemReminder(
+                    //         'Cash Advance Reminder',
+                    //         'Unliquidated',
+                    //         'A cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' has beed marked Unliquidated.',
+                    //         'System',
+                    //         $president->user->name, null, $president->user,
+                    //         route('requisitioner.ca-reminders'),
+                    //         $record->disbursement_voucher);
+                    //     $record->update(['status' => 'Unliquidated', 'is_sent' => false , 'step'=> 1, 'is_sent' => 0]);
+                    //     Log::warning("Cash Advance #{$record->id} is overdue!");
+                    //     break;
                 }
 
                 Log::info("Cash Advance #{$record->id} moved to {$record->status}");

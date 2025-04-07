@@ -37,7 +37,7 @@ class CashAdvanceReminders extends Component implements HasTable
         $is_accountant = Auth::user()->employee_information->office_id == 3 && Auth::user()->employee_information->position_id == 15;
         if($is_president)
         {
-            return CaReminderStep::query()->whereIn('step', [4])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
@@ -49,7 +49,7 @@ class CashAdvanceReminders extends Component implements HasTable
                 })->orDoesntHave('liquidation_report');
             });
         }else{
-            return CaReminderStep::query()->whereIn('step', [5])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->whereIn('step', [6])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
@@ -230,6 +230,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     $record->status = 'On-Going';
                     $record->fd_date = now();
                     $record->user_id = Auth::id();
+                    $record->step = 6;
                     $record->save();
 
                     // Store history
@@ -265,6 +266,14 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 5 && $record->is_sent == 0),
+            Action::make('uploadFD')->label('Upload FD')->icon('ri-send-plane-fill')
+            ->button()
+            ->form([
+                TextInput::make('fmr_number')
+                ->label('FMR Number')
+                ->required(),
+
+            ])->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
             ViewAction::make('view')
             ->label('Preview DV')
             ->openUrlInNewTab()
