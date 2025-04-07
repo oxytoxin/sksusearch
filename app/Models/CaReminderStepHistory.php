@@ -17,4 +17,6 @@ class CaReminderStepHistory extends Model
     {
         return $this->belongsTo(CaReminderStep::class);
     }
+    
+
 }
