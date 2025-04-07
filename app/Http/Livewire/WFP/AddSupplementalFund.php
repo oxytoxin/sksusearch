@@ -149,6 +149,9 @@ class AddSupplementalFund extends Component
             ]);
         }
 
+        $this->record->has_supplemental = 1;
+        $this->record->save();
+
         Notification::make()->title('Successfully Saved')->success()->send();
         return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
     }

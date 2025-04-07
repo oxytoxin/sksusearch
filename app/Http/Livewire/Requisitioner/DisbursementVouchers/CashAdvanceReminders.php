@@ -103,7 +103,6 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'FMR',
-                        'user_id' => Auth::id(),
                     ]);
 
                     $this->emit('historyCreated');
@@ -154,7 +153,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'FMD',
-                        'user_id' => Auth::id(),
+                        // 'user_id' => Auth::id(),
                     ]);
 
                     $this->emit('historyCreated');
@@ -205,7 +204,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'SCO',
-                        'user_id' => Auth::id(),
+                        // 'user_id' => Auth::id(),
                     ]);
 
                     $this->emit('historyCreated');
@@ -250,7 +249,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'FD',
-                        'user_id' => Auth::id(),
+                        // 'user_id' => Auth::id(),
                     ]);
 
                     $this->emit('historyCreated');
