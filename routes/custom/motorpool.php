@@ -19,7 +19,7 @@ Route::middleware([
     // Route::get('/vehicle', VehicleIndex::class)->name('vehicle.index');
     // Route::get('/vehicle/create/{from_schedules}', VehicleCreate::class)->name('vehicle.create');
     // Route::get('/vehicle/edit/{vehicle}', VehicleEdit::class)->name('vehicle.edit');
-    Route::get('/schedule/view/{year?}/{month?}', ViewSchedules::class)->name('view-schedule');
+    Route::get('/schedule/view/{year?}/{month?}/{vehicle?}', ViewSchedules::class)->name('view-schedule');
     Route::get('/requests', RequestIndex::class)->name('request.index');
     Route::get('/requests/new', RequestNewSchedule::class)->name('request.new');
     Route::get('/requests/show/{request}', RequestShow::class)->name('request.show');

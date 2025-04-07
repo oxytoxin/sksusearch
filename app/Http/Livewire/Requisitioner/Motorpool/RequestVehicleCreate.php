@@ -361,7 +361,7 @@ class RequestVehicleCreate extends Component implements HasForms
                             ->actions([
                                 Action::make('view')
                                     ->button()
-                                    ->url(route('motorpool.view-schedule', ['year' => $year, 'month' => $month]), shouldOpenInNewTab: true),
+                                    ->url(route('motorpool.view-schedule', ['year' => $year, 'month' => $month, 'vehicle' => $vehicleId]), shouldOpenInNewTab: true),
                             ])->persistent()
                             ->danger()->send();
                             return;

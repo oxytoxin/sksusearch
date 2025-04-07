@@ -2,20 +2,23 @@
 
 namespace App\Http\Livewire\Requisitioner\Motorpool;
 
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use App\Forms\Components\Flatpickr;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Repeater;
-use App\Models\RequestSchedule;
-use App\Models\RequestScheduleTimeAndDate;
-use App\Models\EmployeeInformation;
-use App\Models\Position;
+use DB;
+use Carbon\Carbon;
 use App\Models\Vehicle;
 use Livewire\Component;
+use App\Models\Position;
 use WireUi\Traits\Actions;
-use DB;
+use App\Models\RequestSchedule;
+use App\Forms\Components\Flatpickr;
+use App\Models\EmployeeInformation;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\Repeater;
+use Filament\Notifications\Notification;
+use Filament\Forms\Components\DatePicker;
+use App\Models\RequestScheduleTimeAndDate;
+use Filament\Notifications\Actions\Action;
+use Filament\Forms\Concerns\InteractsWithForms;
 
 class RequestVehicleShow extends Component implements HasForms
 {
@@ -251,10 +254,23 @@ class RequestVehicleShow extends Component implements HasForms
                     $this->assignVehicleModal = false;
                     $this->emit('refreshComponent');
                 }else{
-                    $this->dialog()->error(
-                        $title = 'Vehicle Unavailable',
-                        $description = 'Vehicle has an existing schedule with this records date and time.'
-                    );
+                    $request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $this->request_schedule->id)->get();
+                    $vehicle = Vehicle::find($vehicleId);
+                    $date = Carbon::parse($request_schedule_date_and_time->travel_date)->format('F d, Y');
+                            $carbonDate = Carbon::createFromFormat('F d, Y', $date);
+                            $year = $carbonDate->year;
+                            $month = $carbonDate->month;
+                    Notification::make()->title('Operation Failed')->body("The vehicle {$vehicle->model} - ({$vehicle->plate_number}) has a conflict in the approved schedules")
+                            ->actions([
+                                Action::make('view')
+                                    ->button()
+                                    ->url(route('motorpool.view-schedule',  ['year' => $year, 'month' => $month, 'vehicle' => $vehicleId]), shouldOpenInNewTab: true),
+                            ])->persistent()
+                            ->danger()->send();
+                    // $this->dialog()->error(
+                    //     $title = 'Vehicle Unavailable',
+                    //     $description = 'Vehicle has an existing schedule with this records date and time.'
+                    // );
                 }
 
             }

@@ -15,17 +15,20 @@ class ViewSchedules extends Component
     public $vehicle;
     public $year;
     public $month;
+    public $is_driver = false;
 
 
     protected $rules = [
         'vehicles' => 'required',
     ];
-    public function mount($year = null, $month = null)
+    public function mount($year = null, $month = null, $vehicle = null)
     {
         $this->vehicles = Vehicle::get();
         $this->events = $this->getFormattedEvents();
         $this->year = $year ?? now()->year;
         $this->month = $month ?? now()->month;
+        $this->vehicle = $vehicle ?? null;
+        $this->is_driver = auth()->user()->employee_information->position_id == 28;
     }
 
     public function updatedVehicle($value)
@@ -40,7 +43,10 @@ class ViewSchedules extends Component
         $events = RequestScheduleTimeAndDate::query()->whereHas('request_schedule', function ($query) {
             $query->where('status', 'Approved')->whereNotNull('vehicle_id')
             ->when($this->vehicle, function ($query) {
-                $query->where('vehicle_id', $this->vehicle);
+            $query->where('vehicle_id', $this->vehicle);
+            })
+            ->when($this->is_driver, function ($query) {
+            $query->where('driver_id', auth()->user()->id);
             });
         })->get();
 
