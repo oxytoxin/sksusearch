@@ -29,9 +29,14 @@ class TravelOrder extends Model
     protected function registrationAmount(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value / 100,
-            set: fn ($value) => $value * 100,
+            get: fn($value) => $value / 100,
+            set: fn($value) => $value * 100,
         );
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
     }
 
     public function travel_order_type()
@@ -108,7 +113,7 @@ class TravelOrder extends Model
         }
 
         return Attribute::make(
-            get: fn () => implode(', ', $destination),
+            get: fn() => implode(', ', $destination),
         );
     }
 

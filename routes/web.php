@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttachmentsController;
 use Carbon\Carbon;
 use App\Models\CaReminderStep;
 use App\Models\LegacyDocument;
@@ -41,17 +42,19 @@ Route::get('/test', function () {
 });
 
 
+Route::get('/attachments/{attachment}/download', [AttachmentsController::class, 'download'])->name('attachments.download');
 
 
 
-Route::get('/test-example', function(){
+
+Route::get('/test-example', function () {
     $now = Carbon::now();
     // $voucher  = CaReminderStep::find(6);
     $voucher  = CaReminderStep::find(1);
     // dd($voucher->disbursement_voucher);
 
 
-   NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', auth()->user()->name,  auth()->user()->id, auth()->user(), 'facebook.com', $voucher->disbursement_voucher  );
+    NotificationController::sendCASystemReminder('Type', 'Title', 'Mesage', 'Sender Name', auth()->user()->name,  auth()->user()->id, auth()->user(), 'facebook.com', $voucher->disbursement_voucher);
 
 
 
@@ -65,5 +68,3 @@ Route::get('/test-example', function(){
 
     // dd($cashAdvances);
 });
-
-

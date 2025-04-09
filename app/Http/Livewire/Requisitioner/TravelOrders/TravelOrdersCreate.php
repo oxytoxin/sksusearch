@@ -8,9 +8,12 @@ use App\Models\PhilippineProvince;
 use App\Models\PhilippineRegion;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
+use Awcodes\FilamentTableRepeater\Components\TableRepeater;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -97,12 +100,25 @@ class TravelOrdersCreate extends Component implements HasForms
                     TextInput::make('other_details')->nullable(),
                 ]),
             ])->visible(fn($get) => $get('travel_order_type_id') == TravelOrderType::OFFICIAL_BUSINESS),
+            TableRepeater::make('attachments')
+                ->hideLabels()
+                ->schema([
+                    FileUpload::make('path')
+                        ->required()
+                        ->removeUploadedFileButtonPosition('right')
+                        ->validationAttribute('file')
+                        ->storeFileNamesIn('file_name')
+                        ->maxFiles(1),
+                    Textarea::make('description')
+                        ->rows(3)
+                        ->required(),
+                ]),
         ];
     }
 
     protected function createTravelOrder()
     {
-        return TravelOrder::create([
+        $to = TravelOrder::create([
             'tracking_code' => TravelOrder::generateTrackingCode(),
             'travel_order_type_id' => $this->data['travel_order_type_id'],
             'date_from' => $this->data['date_from'],
@@ -116,6 +132,19 @@ class TravelOrdersCreate extends Component implements HasForms
             'philippine_city_id' => $this->data['travel_order_type_id'] == TravelOrderType::OFFICIAL_BUSINESS ? PhilippineCity::firstWhere('city_municipality_code', $this->data['city_code'])?->id : null,
             'other_details' => $this->data['other_details'],
         ]);
+
+        foreach ($this->data['attachments'] as $key => $attachment) {
+            $file = collect($attachment['path'])->first();
+            $filename = $file->getClientOriginalName();
+            $path = $file->store('travel_order_attachments');
+            $to->attachments()->create([
+                'file_name' => $filename,
+                'path' => $path,
+                'description' => $attachment['description'],
+            ]);
+        }
+
+        return $to;
     }
 
     protected function fetchSignatories()

@@ -36,20 +36,19 @@ class CashAdvanceReminders extends Component implements HasTable
     {
         $is_president = Auth::user()->employee_information->office_id == 51 && Auth::user()->employee_information->position_id == 34;
         $is_accountant = Auth::user()->employee_information->office_id == 3 && Auth::user()->employee_information->position_id == 15;
-        if($is_president)
-        {
+        if ($is_president) {
             return CaReminderStep::query()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
-        }elseif($is_accountant){
+        } elseif ($is_accountant) {
             return CaReminderStep::query()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
-        }else{
+        } else {
             return CaReminderStep::query()->whereIn('step', [6])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
@@ -75,8 +74,8 @@ class CashAdvanceReminders extends Component implements HasTable
                 ->button()
                 ->form([
                     TextInput::make('fmr_number')
-                    ->label('FMR Number')
-                    ->required()
+                        ->label('FMR Number')
+                        ->required()
                 ])
                 ->action(function ($record, $data) {
                     // Update record
@@ -125,8 +124,8 @@ class CashAdvanceReminders extends Component implements HasTable
                 ->button()
                 ->form([
                     TextInput::make('fmd_number')
-                    ->label('FMD Number')
-                    ->required()
+                        ->label('FMD Number')
+                        ->required()
                 ])
                 ->action(function ($record, $data) {
                     // Update record
@@ -176,8 +175,8 @@ class CashAdvanceReminders extends Component implements HasTable
                 ->button()
                 ->form([
                     TextInput::make('memorandum_number')
-                    ->label('Memorandum Number')
-                    ->required()
+                        ->label('Memorandum Number')
+                        ->required()
                 ])
                 ->action(function ($record, $data) {
                     // Update record
@@ -260,27 +259,29 @@ class CashAdvanceReminders extends Component implements HasTable
                     NotificationController::sendCASystemReminder(
                         'FD',
                         'Endorsement For FD',
-                        'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
+                        'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
                         $this->accounting,
-                        $record->disbursementVoucher->user->name, $this->accounting->id, $record->disbursementVoucher->user,
+                        $record->disbursementVoucher->user->name,
+                        $this->accounting->id,
+                        $record->disbursementVoucher->user,
                         route('print.endorsement-for-fd', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 5 && $record->is_sent == 0),
             Action::make('uploadFD')->label('Upload FD')->icon('ri-send-plane-fill')
-            ->button()
-            ->form([
-                SpatieMediaLibraryFileUpload::make('attachments')
-    ->multiple()
-    ->reorderable()
+                ->button()
+                ->form([
+                    SpatieMediaLibraryFileUpload::make('attachments')
+                        ->multiple()
+                        ->reorderable()
 
-            ])->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
+                ])->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
             ViewAction::make('view')
-            ->label('Preview DV')
-            ->openUrlInNewTab()
-            ->button()
-            ->color('success')
-            ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record->disbursement_voucher]), true),
+                ->label('Preview DV')
+                ->openUrlInNewTab()
+                ->button()
+                ->color('success')
+                ->url(fn($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record->disbursement_voucher]), true),
         ];
     }
 
