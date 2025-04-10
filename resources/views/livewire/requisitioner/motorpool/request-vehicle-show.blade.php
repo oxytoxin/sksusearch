@@ -61,7 +61,7 @@
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Purpose : {{ $request->purpose }}</p>
                         <p class="mt-1 text-sm whitespace-pre-line text-primary-500"></p>
-                        @if ($is_president && $request->status == 'Pending')
+                        @if ($is_president && $request->status == 'Pending' && $request->travel_order->is_fully_approved)
                             <div class="flex justify-between w-full mt-10">
                                 <span>&nbsp;</span>
                                 <div class="flex space-x-3">

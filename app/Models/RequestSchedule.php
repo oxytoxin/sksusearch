@@ -27,6 +27,11 @@ class RequestSchedule extends Model
         return $this->belongsTo(EmployeeInformation::class, 'driver_id');
     }
 
+    public function travel_order()
+    {
+        return $this->belongsTo(TravelOrder::class, 'travel_order_id');
+    }
+
     public function vehicle()
     {
         return $this->belongsTo(Vehicle::class, 'vehicle_id');

@@ -55,7 +55,7 @@ class CheckCashAdvanceReminders extends Command
 
             //$record->created_at plus 5mins
             $updated_at = Carbon::parse($record->updated_at);
-            $updated_at_deadline = $updated_at->addMinutes(5);
+            $updated_at_deadline = $updated_at->addMinutes(2);
 
             // check if within the deadline
             $liquidationDeadline = Carbon::parse($record->liquidation_period_end_date);

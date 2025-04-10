@@ -13,6 +13,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\NotificationController;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -200,7 +202,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             'message' => $record->message,
                             'sent_at' => now(),
                         ],
-                        'sender_name' => $this->accounting->user->name,
+                        'sender_name' => $this->president->user->name,
                         'sent_at' => now(),
                         'receiver_name' => $record->disbursementVoucher->user->name,
                         'type' => 'SCO',
@@ -222,7 +224,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 4 && $record->is_sent == 0),
-            Action::make('sendFD')->label('Send FD')->icon('ri-send-plane-fill')
+            Action::make('sendFD')->label('Endorse FD')->icon('ri-send-plane-fill')
                 ->button()
                 ->action(function ($record) {
                     // Update record
@@ -246,9 +248,9 @@ class CashAdvanceReminders extends Component implements HasTable
                             'message' => $record->message,
                             'sent_at' => now(),
                         ],
-                        'sender_name' => $this->accounting->user->name,
+                        'sender_name' => $this->president->user->name,
                         'sent_at' => now(),
-                        'receiver_name' => $record->disbursementVoucher->user->name,
+                        'receiver_name' => $this->auditor->user->name,
                         'type' => 'FD',
                         // 'user_id' => Auth::id(),
                     ]);
@@ -260,10 +262,10 @@ class CashAdvanceReminders extends Component implements HasTable
                         'FD',
                         'Endorsement For FD',
                         'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
-                        $this->accounting,
-                        $record->disbursementVoucher->user->name,
-                        $this->accounting->id,
-                        $record->disbursementVoucher->user,
+                        $this->president,
+                        $this->auditor->user->name,
+                        $this->president->id,
+                        $this->auditor->user,
                         route('print.endorsement-for-fd', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
@@ -271,11 +273,51 @@ class CashAdvanceReminders extends Component implements HasTable
             Action::make('uploadFD')->label('Upload FD')->icon('ri-send-plane-fill')
                 ->button()
                 ->form([
-                    SpatieMediaLibraryFileUpload::make('attachments')
-                        ->multiple()
-                        ->reorderable()
+                   FileUpload::make('auditor_attachment')
+                        ->label('Upload FD')
+                        ->required()
+                        ->preserveFilenames()
+                        ->disk('public')
+                        ->directory('fd')
+                        ->acceptedFileTypes(['application/pdf']),
+                    DatePicker::make('auditor_deadline')
+                        ->label('Deadline')
+                        ->required()
+                        ->default(now())
+                        ->minDate(now()),
+                ])
+                ->action(function ($record, $data) {
+                    $record->auditor_attachment = $data['auditor_attachment'];
+                    $record->auditor_deadline = $data['auditor_deadline'];
+                    $record->status = 'On-Going';
+                    $record->step = 7;
+                    $record->user_id = Auth::id();
+                    $record->save();
+                    // Store history
+                    $record->caReminderStepHistories()->create([
+                        'step_data' => [
+                            'disbursement_voucher_id' => $record->disbursement_voucher_id,
+                            'status' => $record->status,
+                            'voucher_end_date' => $record->voucher_end_date,
+                            'liquidation_period_end_date' => $record->liquidation_period_end_date,
+                            'step' => $record->step,
+                            'is_sent' => $record->is_sent,
+                            'title' => $record->title,
+                            'message' => $record->message,
+                            'sent_at' => now(),
+                        ],
+                        'sender_name' => $this->auditor->user->name,
+                        'sent_at' => now(),
+                        'receiver_name' => $this->auditor->user->name,
+                        'type' => 'FD',
+                        // 'user_id' => Auth::id(),
+                    ]);
+                    $this->emit('historyCreated');
 
-                ])->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
+                    
+
+                })
+                ->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
             ViewAction::make('view')
                 ->label('Preview DV')
                 ->openUrlInNewTab()

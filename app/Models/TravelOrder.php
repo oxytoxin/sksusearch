@@ -143,4 +143,11 @@ class TravelOrder extends Model
             $query->where('is_approved', false);
         });
     }
+
+    public function getIsFullyApprovedAttribute()
+    {
+        return $this->signatories()->where('is_approved', false)->doesntExist();
+    }
+
+
 }
