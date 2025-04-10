@@ -165,6 +165,33 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function confirmApprove()
     {
+       //check first if there is a conflict in the schedule
+        $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) {
+            $query->where('status', 'Approved')->where('vehicle_id', $this->request_schedule->vehicle_id);
+        })
+        ->where('travel_date', $this->request_schedule->travel_dates)
+        ->where(function ($query) {
+            $query->where(function ($query) {
+                $query->where('time_from', '<', $this->request_schedule->time_to)
+                      ->where('time_to', '>', $this->request_schedule->time_from);
+            })->orWhere(function ($query) {
+                $query->where('time_from', '>=', $this->request_schedule->time_from)
+                      ->where('time_to', '<=', $this->request_schedule->time_to);
+            });
+        })
+        ->first();
+        if($conflict)
+        {
+            $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
+            $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
+            $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
+            $this->dialog()->error(
+                $title = 'Operation Failed',
+                $description = "The date {$date} - ({$time_from} to  {$time_to}) has a conflict in the approved schedules"
+            );
+            return;
+        }
+
         $this->request_schedule->status = 'Approved';
         $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
         $this->request_schedule->save();
