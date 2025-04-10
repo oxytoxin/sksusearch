@@ -172,11 +172,11 @@ class RequestVehicleShow extends Component implements HasForms
         ->where('travel_date', $this->request_schedule->travel_dates)
         ->where(function ($query) {
             $query->where(function ($query) {
-                $query->where('time_from', '<', $this->request_schedule->time_to)
-                      ->where('time_to', '>', $this->request_schedule->time_from);
+                $query->where('time_from', '<', $this->conflict->time_to)
+                      ->where('time_to', '>', $this->conflict->time_from);
             })->orWhere(function ($query) {
-                $query->where('time_from', '>=', $this->request_schedule->time_from)
-                      ->where('time_to', '<=', $this->request_schedule->time_to);
+                $query->where('time_from', '>=', $this->conflict->time_from)
+                      ->where('time_to', '<=', $this->conflict->time_to);
             });
         })
         ->first();
