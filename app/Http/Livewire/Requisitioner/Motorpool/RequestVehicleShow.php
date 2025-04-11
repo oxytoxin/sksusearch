@@ -165,32 +165,43 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function confirmApprove()
     {
-       //check first if there is a conflict in the schedule
-        $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) {
-            $query->where('status', 'Approved')->where('vehicle_id', $this->request_schedule->vehicle_id);
-        })
-        ->where('travel_date', $this->request_schedule->travel_dates)
-        ->first();
-        if($conflict)
-        {
+        $vehicleId = $this->assign_vehicle;
+
+        foreach ($this->request_schedule_date_and_time as $item) {
+            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId) {
+            $query->where('status', 'Approved')->where('vehicle_id', $vehicleId);
+            })
+            ->where('travel_date', $item->travel_date)
+            ->where(function ($query) use ($item) {
+            $query->whereBetween('time_from', [$item->time_from, $item->time_to])
+                  ->orWhereBetween('time_to', [$item->time_from, $item->time_to])
+                  ->orWhere(function ($query) use ($item) {
+                  $query->where('time_from', '<=', $item->time_from)
+                    ->where('time_to', '>=', $item->time_to);
+                  });
+            })
+            ->first();
+
+            if (!$conflict) {
+            $this->request_schedule->status = 'Approved';
+            $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
+            $this->request_schedule->save();
+            $this->dialog()->success(
+                $title = 'Success',
+                $description = 'Request for vehicle has been approved'
+            );
+            return redirect()->route('signatory.motorpool.signed');
+            } else {
             $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
             $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
             $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
             $this->dialog()->error(
                 $title = 'Operation Failed',
-                $description = "The date {$date} - ({$time_from} to  {$time_to}) has a conflict in the approved schedules"
+                $description = "The vehicle is unavailable on {$date} between {$time_from} and {$time_to} due to a conflict in the approved schedules."
             );
             return;
+            }
         }
-
-        $this->request_schedule->status = 'Approved';
-        $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
-        $this->request_schedule->save();
-        $this->dialog()->success(
-            $title = 'Success',
-            $description = 'Request for vehicle has been approved'
-        );
-        return redirect()->route('signatory.motorpool.signed');
     }
 
     public function rejectRequest($id)
