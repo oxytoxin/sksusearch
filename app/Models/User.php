@@ -22,7 +22,7 @@ class User extends Authenticatable implements FilamentUser
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -67,12 +67,17 @@ class User extends Authenticatable implements FilamentUser
 
     protected function name(): Attribute
     {
-        return new Attribute(get: fn ($value) => $this->employee_information->full_name);
+        return new Attribute(get: fn($value) => $this->employee_information->full_name);
     }
 
     public function canAccessFilament(): bool
     {
         return $this->email == 'sksusearch@sksu.edu.ph';
+    }
+
+    public function signature()
+    {
+        return $this->hasOne(Signature::class);
     }
 
     public function employee_information()

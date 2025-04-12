@@ -13,6 +13,17 @@ class HomeController extends Controller
         return redirect()->route('requisitioner.dashboard');
     }
 
+    public function dashboard()
+    {
+        if (auth()->user()->employee_information->contact_number == null) {
+            return redirect()->route('requisitioner.contact-number');
+        }
+        if (!auth()->user()->signature()->exists()) {
+            return redirect()->route('requisitioner.signature');
+        }
+        return view('dashboard');
+    }
+
     public function disbursement_voucher_view(DisbursementVoucher $disbursement_voucher)
     {
         return view('components.disbursement_vouchers.disbursement_voucher_view', [

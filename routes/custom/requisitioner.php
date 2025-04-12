@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Livewire\LiquidationReports\LiquidationReportsShow;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\CashAdvanceReminders;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCancelled;
@@ -22,20 +23,16 @@ use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleIndex;
 use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleCreate;
 use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleShow;
 use App\Http\Livewire\Requisitioner\Motorpool\VehicleRequestFormShow;
+use App\Http\Livewire\Requisitioner\PromptSignature;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
 ])->prefix('requisitioner')->name('requisitioner.')->group(function () {
-    Route::get('dashboard', function () {
-        if (auth()->user()->employee_information->contact_number == null) {
-            return redirect()->route('requisitioner.contact-number');
-        } else {
-            return view('dashboard');
-        }
-    })->name('dashboard');
+    Route::get('dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
     Route::get('/require-contact-number', PromptContactNumber::class)->name('contact-number');
+    Route::get('/require-signature', PromptSignature::class)->name('signature');
     Route::get('/transactions', TransactionsIndex::class)->name('transactions.index');
     Route::get('/travel-orders/create', TravelOrdersCreate::class)->name('travel-orders.create');
     Route::get('/travel-orders', TravelOrdersIndex::class)->name('travel-orders.index');
