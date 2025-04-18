@@ -13,6 +13,7 @@ use App\Http\Livewire\Reports\FormalManagementDemand;
 use App\Http\Livewire\Reports\FormalManagementReminder;
 use App\Http\Livewire\Signatory\TravelOrders\TravelOrdersIndex;
 use App\Http\Livewire\Reports\DisbursementVoucher;
+use App\Http\Livewire\Reports\EndorsementForFDFile;
 
 Route::middleware([
     'auth:sanctum',
@@ -50,6 +51,7 @@ Route::middleware([
 Route::get('formal-management-demand/{record}', FormalManagementDemand::class)->name('formal-management-demand');
 Route::get('formal-management-reminder/{record}', FormalManagementReminder::class)->name('formal-management-reminder');
 Route::get('endorsement-for-fd/{record}', EndorsementForFD::class)->name('endorsement-for-fd');
+Route::get('endorsement-for-fd-file/{record}', EndorsementForFDFile::class)->name('endorsement-for-fd-file');
 Route::get('show-cause-order/{record}', ShowCauseOrder::class)->name('show-cause-order');
 Route::get('disbursement-voucher/{record}', ShowCauseOrder::class)->name('disbursement-voucher');
 // Route::middleware(['check.voucher.subtype'])->group(function () {
