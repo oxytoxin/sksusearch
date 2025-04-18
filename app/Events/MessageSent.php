@@ -47,6 +47,7 @@ class MessageSent implements ShouldBroadcastNow
             'message' => $this->message->content,
             'sender' => $this->message->user->name,
             'created_at' => $this->message->created_at->toDateTimeString(),
+            
         ];
     }
 }
