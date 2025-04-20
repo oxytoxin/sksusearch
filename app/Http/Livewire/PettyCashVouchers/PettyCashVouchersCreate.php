@@ -49,7 +49,7 @@ class PettyCashVouchersCreate extends Component implements HasForms
                 ->required()
                 ->options(EmployeeInformation::pluck('full_name', 'user_id'))
                 ->reactive()
-                ->afterStateUpdated(fn ($set, $state) => $set('payee', EmployeeInformation::firstWhere('user_id', $state)?->full_name)),
+                ->afterStateUpdated(fn($set, $state) => $set('payee', EmployeeInformation::firstWhere('user_id', $state)?->full_name)),
             Select::make('signatory_id')->label('Signatory')->searchable()->required()->options(EmployeeInformation::pluck('full_name', 'user_id')),
             Grid::make(2)->schema([
                 TextInput::make('entity_name')->default('SKSU'),
@@ -86,6 +86,8 @@ class PettyCashVouchersCreate extends Component implements HasForms
         }
         DB::beginTransaction();
         $pcv_number = PettyCashVoucher::generateTrackingNumber($this->petty_cash_fund);
+        $amount = collect($this->data['particulars'])->sum('amount');
+
         $pcv = PettyCashVoucher::create([
             'custodian_id' => auth()->id(),
             'signatory_id' => $this->data['signatory_id'],
@@ -100,8 +102,11 @@ class PettyCashVouchersCreate extends Component implements HasForms
             'address' => $this->data['address'],
             'responsibility_center' => $this->data['responsibility_center'],
             'particulars' => collect($this->data['particulars'])->values(),
-            'amount_granted' => collect($this->data['particulars'])->sum('amount'),
+            'amount_granted' => $amount,
+            'amount_paid' => $amount < 0 ? $amount : 0,
+            'is_liquidated' => $amount < 0,
         ]);
+
         foreach ($pcv->particulars as $key => $particular) {
             $pcv->petty_cash_fund_records()->create([
                 'type' => PettyCashFundRecord::DISBURSEMENT,
@@ -132,7 +137,7 @@ class PettyCashVouchersCreate extends Component implements HasForms
 
     public function render()
     {
-        $this->data['grand_total'] = collect($this->data['particulars'])->sum(fn ($item) => $item['amount'] == '' ? 0 : $item['amount']);
+        $this->data['grand_total'] = collect($this->data['particulars'])->sum(fn($item) => $item['amount'] == '' ? 0 : $item['amount']);
         return view('livewire.petty-cash-vouchers.petty-cash-vouchers-create');
     }
 }
