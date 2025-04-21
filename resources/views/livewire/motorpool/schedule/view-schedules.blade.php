@@ -117,7 +117,7 @@
                         var modalBody = document.getElementById('modalBody');
                         const options = { month: 'long', day: 'numeric', year: 'numeric' };
                         const formattedDateFrom = info.event.start.toLocaleString('en-US', options);
-                        const formattedDateTo = info.event.end.toLocaleString('en-US', options);
+                        const formattedDateTo = info.event.end != null ? info.event.end.toLocaleString('en-US', options) : info.event.start.toLocaleString('en-US', options);
                         modalTitle.innerHTML = '<span class="font-bold">' + info.event.title + '</span>';
                         modalBody.innerHTML = '<div class="bg-primary-100 mt-3 p-3 rounded-md"><p>Date of Travel: ' + formattedDateFrom + ' - ' + formattedDateTo +
                             '</p><p>Time: ' + info.event.start.toLocaleTimeString() + ' - ' + info.event.end
