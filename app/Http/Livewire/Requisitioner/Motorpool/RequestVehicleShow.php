@@ -166,7 +166,7 @@ class RequestVehicleShow extends Component implements HasForms
     public function confirmApprove()
     {
         $vehicleId = $this->assign_vehicle;
-        $this->request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $id)->get();
+        $this->request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $this->request_schedule->id)->get();
         dd($this->request_schedule_date_and_time);
         foreach ($this->request_schedule_date_and_time as $item) {
             $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId) {
