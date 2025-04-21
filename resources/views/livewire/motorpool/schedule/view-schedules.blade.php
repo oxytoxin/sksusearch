@@ -115,13 +115,13 @@
                         var modal = document.getElementById('myModal');
                         var modalTitle = document.getElementById('modalTitle');
                         var modalBody = document.getElementById('modalBody');
+                        var end_time = info.event.end != null ? info.event.end.toLocaleTimeString() : info.event.start.toLocaleTimeString() 
                         const options = { month: 'long', day: 'numeric', year: 'numeric' };
                         const formattedDateFrom = info.event.start.toLocaleString('en-US', options);
                         const formattedDateTo = info.event.end != null ? info.event.end.toLocaleString('en-US', options) : info.event.start.toLocaleString('en-US', options);
                         modalTitle.innerHTML = '<span class="font-bold">' + info.event.title + '</span>';
                         modalBody.innerHTML = '<div class="bg-primary-100 mt-3 p-3 rounded-md"><p>Date of Travel: ' + formattedDateFrom + ' - ' + formattedDateTo +
-                            '</p><p>Time: ' + info.event.start.toLocaleTimeString() + ' - ' + info.event.end
-                            .toLocaleTimeString() + '</p><p>Purpose: ' + info.event.extendedProps.purpose +
+                            '</p><p>Time: ' + info.event.start.toLocaleTimeString() + ' - ' + end_time + '</p><p>Purpose: ' + info.event.extendedProps.purpose +
                                  '</p><p>Vehicle: ' + info.event.extendedProps.campus + ' - '+ info.event.extendedProps.vehicle + ' (' + info.event.extendedProps.plate_number + ') </p>'
                                  + '</p><p>Driver: ' + info.event.extendedProps.driver + '</p>';
                         modal.style.display = 'block';
