@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
+use App\Enums\ActivityDesignStatus;
 use Str;
 use App\Models\Mop;
 use App\Models\Mot;
@@ -16,6 +17,7 @@ use App\Models\ElectricityMeter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use App\Forms\Components\Flatpickr;
+use App\Models\ActivityDesign;
 use App\Models\DisbursementVoucher;
 use App\Models\EmployeeInformation;
 use Filament\Forms\Components\Card;
@@ -131,6 +133,31 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->options(VoucherSubType::with('voucher_type')->get()->map(fn($v) => ['id' => $v->id, 'name' => "{$v->voucher_type->name} - {$v->name}"])->pluck('name', 'id'))
                                 ->disabled()
                                 ->default($this->voucher_subtype->id),
+                            Select::make('activity_design_id')
+                                ->label('Activity Design')
+                                ->searchable()
+                                ->preload()
+                                ->visible(fn() => $this->voucher_subtype->id == VoucherSubType::ACTIVITY_DESIGN)
+                                ->required(fn() => $this->voucher_subtype->id == VoucherSubType::ACTIVITY_DESIGN)
+                                ->options(
+                                    ActivityDesign::where('status', ActivityDesignStatus::APPROVED)
+                                        ->where('requisitioner_id', auth()->id())
+                                        ->pluck('title', 'id')
+                                )
+                                ->reactive()
+                                ->afterStateUpdated(function ($set, $state) {
+                                    $ad = ActivityDesign::find($state);
+                                    $set('disbursement_voucher_particulars', [
+                                        [
+                                            'purpose' => $ad->title,
+                                            'responsibility_center' => '',
+                                            'mfo_pap' => '',
+                                            'amount' => $ad->total_amount,
+                                        ],
+                                    ]);
+                                    $set('activity_date_from', $ad->start_date);
+                                    $set('activity_date_to', $ad->end_date);
+                                }),
                             Select::make('travel_order_id')
                                 ->label('Travel Order')
                                 ->searchable()
