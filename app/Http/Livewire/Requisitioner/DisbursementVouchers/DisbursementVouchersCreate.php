@@ -96,6 +96,8 @@ class DisbursementVouchersCreate extends Component implements HasForms
 
     public $travel_order_id;
 
+    public $activity_design_id;
+
     public $disbursement_voucher_particulars = [];
 
     public $itinerary_entries = [];
@@ -141,6 +143,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
                                 ->required(fn() => $this->voucher_subtype->id == VoucherSubType::ACTIVITY_DESIGN)
                                 ->options(
                                     ActivityDesign::where('status', ActivityDesignStatus::APPROVED)
+                                        ->whereDoesntHave('disbursement_vouchers', fn($q) => $q->where('cancelled_at', null))
                                         ->where('requisitioner_id', auth()->id())
                                         ->pluck('title', 'id')
                                 )
@@ -889,6 +892,7 @@ class DisbursementVouchersCreate extends Component implements HasForms
             'mop_id' => filled($this->mop_id) ? $this->mop_id : null,
             'payee' => $this->payee,
             'travel_order_id' => $this->travel_order_id,
+            'activity_design_id' => $this->activity_design_id,
             'tracking_number' => $this->tracking_number,
             'submitted_at' => now(),
             'other_details' => $other_details,

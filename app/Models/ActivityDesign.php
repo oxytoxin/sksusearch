@@ -15,4 +15,9 @@ class ActivityDesign extends Model
         'end_date' => 'immutable_date',
         'status' => ActivityDesignStatus::class,
     ];
+
+    public function disbursement_vouchers()
+    {
+        return $this->hasMany(DisbursementVoucher::class);
+    }
 }
