@@ -81,7 +81,7 @@ class SentNotificationHistory extends Component implements HasTable
                ->label('View FD')
             //    ->modalContent(fn($record) => $record->type === 'FD' ? view('reports.endorsement-for-f-d', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
             //    ->modalWidth('4xl')
-                ->url(fn ($record) => route('endorsement-for-fd-file', ['record' => $record->caReminderStep->disbursementVoucher]))
+                ->url(fn ($record) => route('print.endorsement-for-fd-file', ['record' => $record->caReminderStep->disbursementVoucher]))
                ->button()
                ->color('primary')
                ->icon('heroicon-o-document-text')
