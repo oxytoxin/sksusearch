@@ -5,6 +5,7 @@ namespace App\Http\Livewire\WFP;
 use Livewire\Component;use App\Models\CategoryGroup;
 use App\Models\FundAllocation;
 use App\Models\CostCenter;
+use App\Models\SupplementalQuarter;
 use App\Models\WpfType;
 use WireUi\Traits\Actions;
 use Filament\Notifications\Notification;
@@ -23,6 +24,13 @@ class AddSupplementalFund extends Component
     public $amounts = [];
     public $programmed = [];
     public $balances = [];
+    public $supplemental_quarter;
+
+    //for 164
+    public $supplemental_allocation;
+    public $supplemental_allocation_description;
+
+
 
     public function mount($record, $wfpType)
     {
@@ -36,6 +44,7 @@ class AddSupplementalFund extends Component
         $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->wpf_type_id;
         $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->first()->initial_amount;
         $this->fund_description = $this->record->fundAllocations->first()->description;
+        $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
        // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
         foreach($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->get() as $wfp)
         {
