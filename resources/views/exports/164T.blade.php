@@ -13,7 +13,8 @@
                 <th class="border border-black">MFO Fee</th>
                 <th class="border border-black">Allocation</th>
                 <th class="border border-black">UACS Code</th>
-                <th class="border border-black">Account Title - Budget</th>
+                <th class="border border-black">Account Title</th>
+                <th class="border border-black">Allocated Budget</th>
                 <th class="border border-black">Programmed</th>
                 <th class="border border-black"></th>
                 {{-- <th class="border border-black">UACS Code</th>
@@ -44,6 +45,18 @@
                     <li>
                         <div class="flex justify-between">
                             <span>{{$ppmp->budget_name}}</span>
+                            {{-- <span>₱ {{number_format($ppmp->total_budget_per_uacs, 2)}}</span> --}}
+                        </div>
+                    </li>
+                </ul>
+                @endforeach
+            </td>
+            <td class="border border-black px-2">
+                @foreach ($ppmp_details->where('mfo_fee_id', $item->mfo_fee_id) as $ppmp)
+                <ul>
+                    <li>
+                        <div class="flex justify-between">
+                            {{-- <span>{{$ppmp->budget_name}}</span> --}}
                             <span>₱ {{number_format($ppmp->total_budget_per_uacs, 2)}}</span>
                         </div>
                     </li>

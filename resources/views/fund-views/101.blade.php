@@ -32,7 +32,7 @@
             <button @click="printOut($refs.printContainer.outerHTML);" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                 Print PRE
              </button>
-             <button wire:click="export161" type="button" class="flex hover:bg-green-600 p-2 bg-green-700 rounded-md font-light capitalize text-white text-sm">
+             <button wire:click="export101" type="button" class="flex hover:bg-green-600 p-2 bg-green-700 rounded-md font-light capitalize text-white text-sm">
                 Export Excel
              </button>
         </div>

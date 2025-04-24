@@ -31,9 +31,12 @@
     </div>
     <div x-show="showPrintable" class="bg-gray-50">
         @if($is_active)
-        <div class="flex justify-end p-4">
+        <div class="flex justify-end p-4 space-x-4">
             <button @click="printOut($refs.printContainer.outerHTML);" type="button" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                 Print PRE
+             </button>
+             <button wire:click="export163" type="button" class="flex hover:bg-green-600 p-2 bg-green-700 rounded-md font-light capitalize text-white text-sm">
+                Export Excel
              </button>
         </div>
         <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">
