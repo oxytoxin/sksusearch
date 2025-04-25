@@ -134,9 +134,7 @@ class FundAllocation extends Component implements HasTable
                 $record->fundAllocations()->update([
                     'is_locked' => true
                 ]);
-
                 Notification::make()->title('Operation Success')->body('Fund Successfully Locked')->success()->send();
-
             })
             ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()  && !$this->isPresident),
             ActionGroup::make([

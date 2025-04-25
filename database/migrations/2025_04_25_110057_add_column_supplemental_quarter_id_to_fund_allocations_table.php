@@ -13,11 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('disbursement_vouchers', 'activity_design_id')) {
-            Schema::table('disbursement_vouchers', function (Blueprint $table) {
-            $table->foreignId('activity_design_id')->nullable()->after('travel_order_id')->constrained();
-            });
-        }
+        Schema::table('fund_allocations', function (Blueprint $table) {
+            $table->foreignId('supplemental_quarter_id')->nullable()->after('wpf_type_id');
+        });
     }
 
     /**
@@ -27,8 +25,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('disbursement_vouchers', function (Blueprint $table) {
-            //
+        Schema::table('fund_allocations', function (Blueprint $table) {
+            $table->dropForeign(['supplemental_quarter_id']);
+            $table->dropColumn('supplemental_quarter_id');
         });
     }
 };

@@ -29,6 +29,8 @@ class AddSupplementalFund extends Component
     //for 164
     public $supplemental_allocation;
     public $supplemental_allocation_description;
+    public $balance_164;
+    public $sub_total_164;
 
 
 
@@ -68,6 +70,21 @@ class AddSupplementalFund extends Component
             return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
         });
 
+        $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
+
+    }
+
+    public function updatedSupplementalAllocation($value)
+    {
+        $this->validate([
+            'supplemental_allocation' => 'required|numeric|min:0',
+        ]);
+
+        $this->sub_total_164 = $this->balance_164 + $value;
+        if ($this->sub_total_164 < 0) {
+            $this->sub_total_164 = 0;
+        }
+        // $this->balance_164 = $this->fundInitialAmount - $this->sub_total_164;
     }
 
     public function calculateSubTotal($categoryGroupId)
@@ -151,6 +168,7 @@ class AddSupplementalFund extends Component
             FundAllocation::create([
                 'cost_center_id' => $this->record->id,
                 'wpf_type_id' => $this->selectedType,
+                'supplemental_quarter_id' => $this->supplemental_quarter->id,
                 'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
                 'category_group_id' => $categoryGroupId,
                 'initial_amount' => $amount,
@@ -164,6 +182,49 @@ class AddSupplementalFund extends Component
         Notification::make()->title('Successfully Saved')->success()->send();
         return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
     }
+
+    public function confirmSupplementalFund164()
+    {
+        $this->dialog()->confirm([
+            'title'       => 'Are you Sure?',
+            'description' => 'Do you really want to save this information?',
+            'acceptLabel' => 'Yes, save it',
+            'method'      => 'addSupplementalFund164',
+        ]);
+    }
+
+    public function addSupplementalFund164()
+    {
+         $this->validate([
+                'supplemental_allocation' => 'required|numeric|min:100',
+                'supplemental_allocation_description' => 'required'
+            ],
+            [
+                'supplemental_allocation.required' => 'The amount field is required',
+                'supplemental_allocation.numeric' => 'The amount field must be a number',
+                'supplemental_allocation.min' => 'The amount field must be at least 100',
+                'supplemental_allocation_description.required' => 'The description field is required'
+
+            ]);
+
+            FundAllocation::create([
+                'cost_center_id' => $this->record->id,
+                'wpf_type_id' => $this->selectedType,
+                'supplemental_quarter_id' => $this->supplemental_quarter->id,
+                'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
+                'initial_amount' => $this->supplemental_allocation,
+                'description' => $this->supplemental_allocation_description,
+                'is_supplemental' => 1,
+            ]);
+
+            Notification::make()->title('Successfully Saved')->success()->send();
+            return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
+
+
+        $this->record->has_supplemental = 1;
+        $this->record->save();
+    }
+
 
     public function render()
     {

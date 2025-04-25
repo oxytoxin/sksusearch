@@ -322,7 +322,7 @@
                                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                         <span class="text-gray-500 sm:text-sm">₱</span>
                                     </div>
-                                    <input wire:model="supplemental_allocation" type="number" name="price" id="price" class="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00" aria-describedby="price-currency">
+                                    <input wire:model.debounce.200ms="supplemental_allocation" type="number" name="price" id="price" class="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00" aria-describedby="price-currency">
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                         <span class="text-gray-500 sm:text-sm" id="price-currency">PHP</span>
                                     </div>
@@ -363,23 +363,23 @@
                         <tbody>
                             <tr class="border-b border-gray-200">
                                 <td class="max-w-0 py-3 pl-4 pr-3 text-sm sm:pl-0">
-                                  <div class="font-medium text-gray-900">{{$fund_description}}</div>
+                                  <div class="font-medium text-gray-900"><span class="font-bold">(WFP) - </span>{{$fund_description}}</div>
                                 </td>
                                 <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell"></td>
                                 <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell"></td>
-                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ number_format($fundInitialAmount, 2) }}</td>
-                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ number_format($fundInitialAmount, 2) }}</td>
-                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ number_format($fundInitialAmount, 2) }}</td>
+                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ number_format($balance_164, 2) }}</td>
+                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0"></td>
+                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0"></td>
                               </tr>
                               <tr class="border-b border-gray-200">
                                 <td class="max-w-0 py-3 pl-4 pr-3 text-sm sm:pl-0">
-                                  <div class="font-medium text-gray-900">{{$supplemental_allocation_description}}</div>
+                                  <div class="font-medium text-gray-900"><span class="font-bold">(Q1) - </span>{{$supplemental_allocation_description}}</div>
                                 </td>
                                 <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell"></td>
                                 <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell"></td>
-                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ number_format($fundInitialAmount, 2) }}</td>
-                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ number_format($fundInitialAmount, 2) }}</td>
-                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ number_format($fundInitialAmount, 2) }}</td>
+                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ number_format($balance_164, 2) }}</td>
+                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ $supplemental_allocation != null ? number_format($supplemental_allocation, 2) : number_format(0, 2) }}</td>
+                                <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ {{ number_format($sub_total_164, 2) }}</td>
                               </tr>
 
                         </tbody>
@@ -387,9 +387,9 @@
                           <tr>
                             <th scope="row" colspan="3" class="hidden pl-4 pr-3 pt-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">Total</th>
                             <th scope="row" class="pl-4 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 sm:hidden">Total</th>
-                            <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($fundInitialAmount, 2) }}</td>
-                            <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($fundInitialAmount, 2) }}</td>
-                            <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($fundInitialAmount, 2) }}</td>
+                            <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($balance_164, 2) }}</td>
+                            <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ $supplemental_allocation != null ? number_format($supplemental_allocation, 2) : number_format(0, 2) }}</td>
+                            <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($sub_total_164, 2) }}</td>
                           </tr>
                         </tfoot>
                       </table>
