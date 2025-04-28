@@ -45,5 +45,12 @@ class CostCenter extends Model
         return $this->hasMany(WpfPersonnel::class);
     }
 
+    public function hasSupplementalFund()
+    {
+        return $this->fundAllocations->contains(function ($allocation) {
+            return $allocation->is_supplemental == 1;
+        });
+    }
+
 
 }

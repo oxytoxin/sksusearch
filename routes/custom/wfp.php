@@ -30,6 +30,7 @@ use App\Http\Livewire\WFP\DeactivatedPricelists;
 use App\Http\Livewire\WFP\DevPage;
 use App\Http\Livewire\WFP\ViewAllocatedFund;
 use App\Http\Livewire\WFP\ViewRemarks;
+use App\Http\Livewire\WFP\ViewSupplementalFunds;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([
@@ -65,5 +66,6 @@ Route::middleware([
     Route::get('/deactivated-pricelists', DeactivatedPricelists::class)->name('deactivated-pricelists');
     Route::get('/view-remarks/{record}', ViewRemarks::class)->name('view-remarks');
     Route::get('/add-supplemental-fund/{record}/{wfpType}', AddSupplementalFund::class)->name('add-supplemental-fund');
+    Route::get('/view-supplemental-fund/{record}/{wfpType}', ViewSupplementalFunds::class)->name('view-supplemental-fund');
     Route::get('/dev-page', DevPage::class)->name('dev-page');
 });
