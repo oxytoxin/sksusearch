@@ -88,6 +88,54 @@ class ViewSupplementalFunds extends Component
         return $balance ?? 0;
     }
 
+    public function calculateSupplemental($categoryGroupId)
+    {
+        return $this->amounts[$categoryGroupId] ?? 0;
+    }
+
+    public function calculateTotalSupplemental()
+    {
+        return array_sum($this->amounts);
+    }
+
+    public function calculateSupplementalTotal($categoryGroupId)
+    {
+        // Return the amount associated with the given category group ID
+        $allocation = $this->allocations[$categoryGroupId] ?? 0;
+        $amount = $this->amounts[$categoryGroupId] ?? 0;
+        $programmed = $this->programmed[$categoryGroupId] ?? 0;
+        $balance = $amount - $programmed;
+        $sum = $allocation + $balance;
+        return $sum ?? 0;
+    }
+
+    public function calculateGrandTotal()
+    {
+        // Calculate the total of all amounts
+       // return array_sum($this->amounts) + array_sum($this->programmed);
+       $balance = array_sum($this->allocations) - array_sum($this->programmed);
+       $amount = array_sum($this->amounts);
+       return $balance + $amount;
+    }
+
+    public function calculateBalance($categoryGroupId)
+    {
+        // Return the difference between the initial amount and the amount associated with the given category group ID
+        return $this->allocations[$categoryGroupId] - $this->calculateSubTotal($categoryGroupId);
+    }
+
+    public function calculateTotal()
+    {
+        // Calculate the total of all amounts
+        return array_sum($this->allocations) - array_sum($this->programmed);
+    }
+
+    public function calculateTotalBalance()
+    {
+        // Calculate the total balance
+        return array_sum($this->allocations) - $this->calculateTotal();
+    }
+
     public function render()
     {
         return view('livewire.w-f-p.view-supplemental-funds');

@@ -12,7 +12,7 @@
     <div class="grid grid-cols-2 space-x-3">
 
           @if ($record->fundClusterWFP->id === 1 || $record->fundClusterWFP->id === 3)
-          {{-- <div class="col-span-1 lg:col-start-1">
+          <div class="col-span-1 lg:col-start-1">
             <h2 class="sr-only">Summary</h2>
             <div class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
                 <dl class="flex flex-wrap">
@@ -58,7 +58,7 @@
                   </dt>
                   <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->mfo->name}} - MFO</dd>
                 </div>
-                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
+                {{-- <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
                     <dt class="flex-none">
                       <span class="sr-only">Status</span>
                       <svg class="h-6 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -67,115 +67,7 @@
                       </svg>
                     </dt>
                     <dd class="text-sm font-medium leading-6 text-gray-900">{{$supplemental_quarter->name}} - Supplemental</dd>
-                  </div>
-                </dl>
-                <div class="mt-2 border-t border-gray-900/5 px-6 py-3">
-                    <span class="text-sm font-semibold">Add funds to each category group</span>
-                    <div class="px-4 sm:px-6 lg:px-8">
-                        <div class="mt-4 flow-root">
-                          <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                              <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                                <table class="min-w-full divide-y divide-gray-300">
-                                  <thead class="bg-gray-50">
-                                    <tr>
-                                      <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Category Group</th>
-                                      <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Amount</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody class="divide-y divide-gray-200 bg-white">
-                                    @forelse ($category_groups as $key => $item)
-                                    <tr>
-                                        <td class="whitespace-nowrap py-4 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{$item->name}}</td>
-                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
-                                          <div>
-                                              <div class="relative mt-2 rounded-md shadow-sm">
-                                              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                                  <span class="text-gray-500 sm:text-sm">₱</span>
-                                              </div>
-                                              <input type="number" name="price" id="price_{{ $item->id }}"
-                                              wire:model.lazy="amounts.{{ $item->id }}"
-                                              class="text-right block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00" aria-describedby="price-currency">
-                                              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                                  <span class="text-gray-500 sm:text-sm" id="price-currency">PHP</span>
-                                              </div>
-                                              @error('amounts.{{ $item->id }}') <span class="error">{{ $message }}</span> @enderror
-                                              </div>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    @empty
-                                      <tr>
-                                        <td colspan="2" class="text-center py-4 text-sm font-medium text-gray-900">No records found</td>
-                                      </tr>
-                                    @endforelse
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                  </div>
-            </div>
-          </div>
-
-          <div class="col-span-1 lg:col-start-2">
-            <h2 class="sr-only">Summary</h2>
-            <div class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
-                <dl class="flex flex-wrap">
-                <div class="mt-3 flex w-full flex-none gap-x-4 px-6 pt-3">
-                  <dt class="flex-none">
-                    <span class="sr-only">Client</span>
-                    <svg class="h-6 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" />
-                    </svg>
-                  </dt>
-                  <dd wire:ignore class="text-sm font-medium leading-6 text-gray-900">{{$record->office->head_employee?->full_name}} - Cost Center Head</dd>
-                </div>
-                <div class="mt-4 flex w-full flex-none gap-x-2 px-6">
-                    <dt class="flex-none">
-                      <span class="sr-only">Name</span>
-
-                        <svg class="h-6 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" >
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                      </svg>
-                    </dt>
-                    <dd class="text-sm leading-6 text-gray-500">
-                      <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->name}}</dd>
-                  </dd>
-                  </div>
-                <div class="mt-4 flex w-full flex-none gap-x-2 px-6">
-                  <dt class="flex-none">
-                    <span class="sr-only">Office</span>
-
-                      <svg class="h-6 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" >
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                    </svg>
-                  </dt>
-                  <dd class="text-sm leading-6 text-gray-500">
-                    <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->office->name}} - Office</dd>
-                </dd>
-                </div>
-                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
-                  <dt class="flex-none">
-                    <span class="sr-only">Status</span>
-                    <svg class="h-6 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
-                    </svg>
-                  </dt>
-                  <dd class="text-sm font-medium leading-6 text-gray-900">{{$record->mfo->name}} - MFO</dd>
-                </div>
-                <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
-                    <dt class="flex-none">
-                      <span class="sr-only">Status</span>
-                      <svg class="h-6 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
-                      </svg>
-                    </dt>
-                    <dd class="text-sm font-medium leading-6 text-gray-900">{{$supplemental_quarter->name}} - Supplemental</dd>
-                  </div>
+                  </div> --}}
                 </dl>
                 <div class="mt-2 border-t border-gray-900/5 px-6 py-6">
                     <span class="text-sm font-semibold">Summary</span>
@@ -232,7 +124,7 @@
                 </div>
 
             </div>
-          </div> --}}
+          </div>
 
           @elseif($record->fundClusterWFP->id === 2 || $record->fundClusterWFP->id === 4 || $record->fundClusterWFP->id === 5 || $record->fundClusterWFP->id === 6 || $record->fundClusterWFP->id === 7)
           <div class="col-span-1 lg:col-start-1 bg-gray-50 rounded-lg shadow-sm ring-1 ring-gray-900/5">
