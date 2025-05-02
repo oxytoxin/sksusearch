@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\FundAllocation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class CostCenter extends Model
 {
@@ -26,6 +27,11 @@ class CostCenter extends Model
     }
 
     public function fundAllocations()
+    {
+        return $this->hasMany(FundAllocation::class);
+    }
+
+    public function fund_allocations()
     {
         return $this->hasMany(FundAllocation::class);
     }
