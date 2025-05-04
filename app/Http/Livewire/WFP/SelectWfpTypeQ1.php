@@ -67,26 +67,25 @@ class SelectWfpTypeQ1 extends Component implements HasTable
         })
         ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
         ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->get();
-        
+        // dd($test->first()->fundAllocations()->where('is_supplemental', 1)->get());
 
     }
 
     protected function getTableQuery()
     {
-        $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
-        return CostCenter::query()->whereHas('fund_allocations', function($query) {
-            $query->where('id', 3173);
-        });
-
+        // $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
+        $query_test = CostCenter::query()->whereHas('fundAllocations', function ($query) {
+            $query->where('is_supplemental', 1);
+        })
+        ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
+        ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
+        return $query_test;
     }
 
     protected function getTableColumns()
     {
         return [
             Tables\Columns\TextColumn::make('name')
-            ->wrap()
-            ->searchable(),
-            Tables\Columns\TextColumn::make('fundAllocations.is_supplemental')
             ->wrap()
             ->searchable(),
             Tables\Columns\TextColumn::make('office.name')
@@ -103,18 +102,18 @@ class SelectWfpTypeQ1 extends Component implements HasTable
             ->label('MFO Fee')->searchable()->sortable(),
             Tables\Columns\TextColumn::make('fundAllocations.wpf_type_id')
             ->getStateUsing(function ($record) {
-                return $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()->wpfType->description;
+                return $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->first()->wpfType->description;
             })
             ->label('WFP Period'),
             Tables\Columns\TextColumn::make('fundAllocations.amount')
             ->label('Amount')
             ->formatStateUsing(function ($record) {
                 if($record->fundClusterWFP->id === 1 || $record->fundClusterWFP->id === 3) {
-                    $sum = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->sum('initial_amount');
+                    $sum = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->sum('initial_amount');
                     return '₱ '.number_format($sum, 2);
                 }else
                 {
-                    return '₱ '.number_format($record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->sum('initial_amount'), 2);
+                    return '₱ '.number_format($record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->sum('initial_amount'), 2);
 
                 }
             }),
@@ -128,15 +127,15 @@ class SelectWfpTypeQ1 extends Component implements HasTable
             ->label('Create WFP')
             ->button()
             ->icon('heroicon-o-plus')
-            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0]))
-            ->visible(fn ($record) => !$record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()->fundDrafts()->exists()),
-            Action::make('continue_draft')
-            ->label('Continue Draft')
-            ->color('warning')
-            ->button()
-            ->icon('heroicon-o-pencil')
-            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0]))
-            ->visible(fn ($record) => $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()->fundDrafts()->exists()),
+            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0, 'isSupplemental' => 1]))
+            ->visible(fn ($record) => $record->has_supplemental),
+            // Action::make('continue_draft')
+            // ->label('Continue Draft')
+            // ->color('warning')
+            // ->button()
+            // ->icon('heroicon-o-pencil')
+            // ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0]))
+            // ->visible(fn ($record) => $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()->fundDrafts()->exists()),
         ];
     }
 
@@ -155,10 +154,8 @@ class SelectWfpTypeQ1 extends Component implements HasTable
             ])
             ->query(function (Builder $query, array $data): Builder {
                 $this->data = $data;
-                return $query->whereDoesntHave('wfp', function($query) use ($data) {
-                    $query->where('wpf_type_id', $data['wfp_type']);
-                })->whereHas('fundAllocations', function($query) use ($data) {
-                    $query->where('wpf_type_id', $data['wfp_type']);
+                return $query->whereHas('fundAllocations', function($query) use ($data) {
+                    $query->where('wpf_type_id', $data['wfp_type'])->where('is_supplemental', 1);
                 });
             }),
             SelectFilter::make('mfo')

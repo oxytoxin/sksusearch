@@ -10,15 +10,6 @@
             <button class="mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300" @click="tab = 'q1'" :class="tab == 'q1' && 'bg-white -mt-2 text-primary-600'">
                 Supplemental Q1
             </button>
-            {{-- <button class="mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300" @click="tab = 'q1'" :class="tab == 'q1' && 'bg-white -mt-2 text-primary-600'">
-                Supplemental Q2
-            </button>
-            <button class="mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300" @click="tab = 'q1'" :class="tab == 'q1' && 'bg-white -mt-2 text-primary-600'">
-                Supplemental Q3
-            </button>
-            <button class="mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300" @click="tab = 'q1'" :class="tab == 'q1' && 'bg-white -mt-2 text-primary-600'">
-                Supplemental Q4
-            </button> --}}
         </div>
         <div class="origin-top-left bg-white p-4" x-show="tab === 'wfp'" :class="tab == 'wfp' && 'rounded-b-lg rounded-r-lg'" x-transition:enter='transform ease-out duration-200' x-transition:enter-start='scale-0' x-transition:enter-end='scale-100'>
             <div x-show="tab === 'wfp'" x-transition:enter='transition fade-in duration-700' x-transition:enter-start='opacity-0' x-transition:enter-end='opacity-100'>
@@ -137,39 +128,3 @@
     </div>
 </div>
 
-
-{{-- <div>
-    <div class="flex">
-        <h2 class="font-light capitalize text-primary-600">Select WFP</h2>
-    </div>
-    <div class="flex mt-20 min-h-screen">
-        <div>
-            @if ($types->count() <= 0)
-              <div class="text-center">
-                <h1 class="text-2xl font-bold text-gray-700">You have no fund allocations yet.</h1>
-              </div>
-            @else
-
-            <div class="flex space-x-5">
-                <div class="grid grid-cols-4 space-x-4">
-                    @foreach ($types as $item)
-                    <a href="{{ route('wfp.create-wfp', $item->costCenters->first()->id) }}" class="col-span-1 my-3 block max-w-sm p-6 bg-green-800 border border-green-700 rounded-lg shadow-lg hover:bg-green-700 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-50"> Fund {{$item->name}}</h5>
-                        <p class="font-normal text-gray-50 dark:text-gray-400">{{$wfp->description}}</p>
-                        @if ($item->fundAllocations->first()->fund_cluster_w_f_p_s_id === 1 || $item->fundAllocations->first()->fund_cluster_w_f_p_s_id === 3)
-                        <p class="font-normal text-gray-50 dark:text-gray-400">Amount: ₱ {{number_format($item->fundAllocations->where('cost_center_id',  $cost_center_id)->sum('initial_amount'), 2)}}</p>
-                        @else
-                        <p class="font-normal text-gray-50 dark:text-gray-400">Amount: ₱ {{number_format($item->fundAllocations->first()->initial_amount, 2)}}</p>
-                        @endif
-                    </a>
-                    </a>
-
-                    @endforeach
-                </div>
-
-              </div>
-
-            @endif
-          </div>
-    </div>
-  </div> --}}
