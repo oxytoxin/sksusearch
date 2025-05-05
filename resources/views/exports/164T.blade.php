@@ -4,7 +4,6 @@
             <th colspan="2" class="border border-black bg-gray-300">Receipts</th>
             <th colspan="3" class="border border-black bg-gray-300">Expenditure</th>
             <th class="border border-black bg-gray-300">Balance</th>
-            {{-- <th colspan="2" class="border border-black bg-gray-300">Corresponding Account Codes</th> --}}
         </tr>
     </thead>
     <tbody>
@@ -17,8 +16,6 @@
                 <th class="border border-black">Allocated Budget</th>
                 <th class="border border-black">Programmed</th>
                 <th class="border border-black"></th>
-                {{-- <th class="border border-black">UACS Code</th>
-                <th class="border border-black">Account Title</th> --}}
             </tr>
         </thead>
         @forelse($fund_allocation as $item)
@@ -45,7 +42,6 @@
                     <li>
                         <div class="flex justify-between">
                             <span>{{$ppmp->budget_name}}</span>
-                            {{-- <span>₱ {{number_format($ppmp->total_budget_per_uacs, 2)}}</span> --}}
                         </div>
                     </li>
                 </ul>
@@ -56,7 +52,6 @@
                 <ul>
                     <li>
                         <div class="flex justify-between">
-                            {{-- <span>{{$ppmp->budget_name}}</span> --}}
                             <span>₱ {{number_format($ppmp->total_budget_per_uacs, 2)}}</span>
                         </div>
                     </li>
