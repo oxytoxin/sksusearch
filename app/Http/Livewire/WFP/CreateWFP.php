@@ -214,7 +214,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         // $this->record = CostCenter::where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
         //     $query->where('wpf_type_id', $wfpType);
         // })->first();
-       
+
         if($isSupplemental)
         {
             $this->wfp_type = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->wpfType;
@@ -227,7 +227,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         }
 
         $this->costCenter = $this->record->where('office_id', auth()->user()->employee_information->office_id)->first();
-     
+
         $this->fund_description = $this->wfp_fund->fund_source;
         $this->form->fill();
         $this->global_index = 1;
@@ -254,7 +254,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         ];
                     })
                     ->toArray();
-    
+
                 }else{
                     $this->current_balance = $this->record->fundAllocations
                     ->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)
@@ -343,7 +343,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         ];
                     })->toArray();
                 }
-               
+
 
             }else{
                 $this->current_balance = [];
@@ -389,153 +389,305 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
 
         //if has draft
-        if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
+        if($isSupplemental)
         {
-            //1
-            $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                return $item->budget_category_id == 1;
-            })->map(function ($item) {
-                $this->supplies[] = [
-                'budget_category_id' => $item->budget_category_id,
-                'budget_category' => 'Supplies & Semi-Expendables',
-                'particular_id' => $item->particular_id,
-                'particular' => $item->particular,
-                'supply_code' => $item->supply_code,
-                'specifications' => $item->specifications,
-                'uacs' => $item->uacs,
-                'title_group' => $item->title_group,
-                'account_title_id' => $item->account_title_id,
-                'account_title' => $item->account_title,
-                'ppmp' => $item->ppmp,
-                'cost_per_unit' => $item->cost_per_unit,
-                'quantity' => json_decode($item->quantity, true),
-                'total_quantity' => $item->total_quantity,
-                'uom' => $item->uom,
-                'estimated_budget' => $item->estimated_budget,
-                'remarks' => $item->remarks,
-                ];
-            });
-            //2
-            $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                return $item->budget_category_id == 2;
-            })->map(function ($item) {
-                $this->mooe[] = [
-                'budget_category_id' => $item->budget_category_id,
-                'budget_category' => 'MOOE',
-                'particular_id' => $item->particular_id,
-                'particular' => $item->particular,
-                'supply_code' => $item->supply_code,
-                'specifications' => $item->specifications,
-                'uacs' => $item->uacs,
-                'title_group' => $item->title_group,
-                'account_title_id' => $item->account_title_id,
-                'account_title' => $item->account_title,
-                'ppmp' => $item->ppmp,
-                'cost_per_unit' => $item->cost_per_unit,
-                'quantity' => json_decode($item->quantity, true),
-                'total_quantity' => $item->total_quantity,
-                'uom' => $item->uom,
-                'estimated_budget' => $item->estimated_budget,
-                'remarks' => $item->remarks,
-                ];
-            });
-            //3
-            $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                return $item->budget_category_id == 3;
-            })->map(function ($item) {
-                $this->trainings[] = [
-                'budget_category_id' => $item->budget_category_id,
-                'budget_category' => 'Training & Seminar',
-                'particular_id' => $item->particular_id,
-                'particular' => $item->particular,
-                'supply_code' => $item->supply_code,
-                'specifications' => $item->specifications,
-                'uacs' => $item->uacs,
-                'title_group' => $item->title_group,
-                'account_title_id' => $item->account_title_id,
-                'account_title' => $item->account_title,
-                'ppmp' => $item->ppmp,
-                'cost_per_unit' => $item->cost_per_unit,
-                'quantity' => json_decode($item->quantity, true),
-                'total_quantity' => $item->total_quantity,
-                'uom' => $item->uom,
-                'estimated_budget' => $item->estimated_budget,
-                'remarks' => $item->remarks,
-                ];
-            });
-            //4
-            $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                return $item->budget_category_id == 4;
-            })->map(function ($item) {
-                $this->machines[] = [
-                'budget_category_id' => $item->budget_category_id,
-                'budget_category' => 'Machine & Equipment',
-                'particular_id' => $item->particular_id,
-                'particular' => $item->particular,
-                'supply_code' => $item->supply_code,
-                'specifications' => $item->specifications,
-                'uacs' => $item->uacs,
-                'title_group' => $item->title_group,
-                'account_title_id' => $item->account_title_id,
-                'account_title' => $item->account_title,
-                'ppmp' => $item->ppmp,
-                'cost_per_unit' => $item->cost_per_unit,
-                'quantity' => json_decode($item->quantity, true),
-                'total_quantity' => $item->total_quantity,
-                'uom' => $item->uom,
-                'estimated_budget' => $item->estimated_budget,
-                'remarks' => $item->remarks,
-                ];
-            });
-            //5
-            $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                return $item->budget_category_id == 5;
-            })->map(function ($item) {
-                $this->buildings[] = [
-                'budget_category_id' => $item->budget_category_id,
-                'budget_category' => 'Building & Structure',
-                'particular_id' => $item->particular_id,
-                'particular' => $item->particular,
-                'supply_code' => $item->supply_code,
-                'specifications' => $item->specifications,
-                'uacs' => $item->uacs,
-                'title_group' => $item->title_group,
-                'account_title_id' => $item->account_title_id,
-                'account_title' => $item->account_title,
-                'ppmp' => $item->ppmp,
-                'cost_per_unit' => $item->cost_per_unit,
-                'quantity' => json_decode($item->quantity, true),
-                'total_quantity' => $item->total_quantity,
-                'uom' => $item->uom,
-                'estimated_budget' => $item->estimated_budget,
-                'remarks' => $item->remarks,
-                ];
-            });
-             //6
-             $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                return $item->budget_category_id == 6;
-            })->map(function ($item) {
-                $this->ps[] = [
-                'budget_category_id' => $item->budget_category_id,
-                'budget_category' => 'PS',
-                'particular_id' => $item->particular_id,
-                'particular' => $item->particular,
-                'supply_code' => $item->supply_code,
-                'specifications' => $item->specifications,
-                'uacs' => $item->uacs,
-                'title_group' => $item->title_group,
-                'account_title_id' => $item->account_title_id,
-                'account_title' => $item->account_title,
-                'ppmp' => $item->ppmp,
-                'cost_per_unit' => $item->cost_per_unit,
-                'quantity' => json_decode($item->quantity, true),
-                'total_quantity' => $item->total_quantity,
-                'uom' => $item->uom,
-                'estimated_budget' => $item->estimated_budget,
-                'remarks' => $item->remarks,
-                ];
-            });
+            if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->exists())
+            {
+                //1
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 1;
+                })->map(function ($item) {
+                    $this->supplies[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'Supplies & Semi-Expendables',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                //2
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 2;
+                })->map(function ($item) {
+                    $this->mooe[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'MOOE',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                //3
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 3;
+                })->map(function ($item) {
+                    $this->trainings[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'Training & Seminar',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                //4
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 4;
+                })->map(function ($item) {
+                    $this->machines[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'Machine & Equipment',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                //5
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 5;
+                })->map(function ($item) {
+                    $this->buildings[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'Building & Structure',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                 //6
+                 $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 6;
+                })->map(function ($item) {
+                    $this->ps[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'PS',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+            }
+        }else{
+            if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
+            {
+                //1
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 1;
+                })->map(function ($item) {
+                    $this->supplies[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'Supplies & Semi-Expendables',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                //2
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 2;
+                })->map(function ($item) {
+                    $this->mooe[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'MOOE',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                //3
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 3;
+                })->map(function ($item) {
+                    $this->trainings[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'Training & Seminar',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                //4
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 4;
+                })->map(function ($item) {
+                    $this->machines[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'Machine & Equipment',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                //5
+                $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 5;
+                })->map(function ($item) {
+                    $this->buildings[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'Building & Structure',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+                 //6
+                 $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
+                    return $item->budget_category_id == 6;
+                })->map(function ($item) {
+                    $this->ps[] = [
+                    'budget_category_id' => $item->budget_category_id,
+                    'budget_category' => 'PS',
+                    'particular_id' => $item->particular_id,
+                    'particular' => $item->particular,
+                    'supply_code' => $item->supply_code,
+                    'specifications' => $item->specifications,
+                    'uacs' => $item->uacs,
+                    'title_group' => $item->title_group,
+                    'account_title_id' => $item->account_title_id,
+                    'account_title' => $item->account_title,
+                    'ppmp' => $item->ppmp,
+                    'cost_per_unit' => $item->cost_per_unit,
+                    'quantity' => json_decode($item->quantity, true),
+                    'total_quantity' => $item->total_quantity,
+                    'uom' => $item->uom,
+                    'estimated_budget' => $item->estimated_budget,
+                    'remarks' => $item->remarks,
+                    ];
+                });
+            }
         }
+
         //source of fund
         // if($this->wfp_fund->id > 3)
         // {
