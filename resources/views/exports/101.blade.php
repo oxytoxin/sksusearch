@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th colspan="2" class="border border-black bg-gray-300">Receipts</th>
-            <th colspan="3" class="border border-black bg-gray-300">Expenditure</th>
+            <th colspan="4" class="border border-black bg-gray-300">Expenditure</th>
             <th class="border border-black bg-gray-300">Balance</th>
         </tr>
         <tr>
