@@ -191,10 +191,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
      public $wfp_param;
 
      public $supplies_particular;
+     public $is_supplemental;
+     public $supplementa_id;
 
     public function mount($record, $wfpType, $isEdit, $isSupplemental)
     {
-
+        $this->is_supplemental = $isSupplemental;
         $costCenter_id = Wfp::where('id', $record)->first()?->cost_center_id;
         $this->wfp_param = $wfpType;
         if($isEdit === 1)

@@ -1,6 +1,6 @@
 <div class="space-y-2">
     <div class="flex justify-between items-center">
-        <h2 class="font-light capitalize text-primary-600">Add Supplemental Fund</h2>
+        <h2 class="font-light capitalize text-primary-600">View Supplemental Fund</h2>
 
         <a href="{{ route('wfp.fund-allocation', $record->fundClusterWFP->id) }}" class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-3">

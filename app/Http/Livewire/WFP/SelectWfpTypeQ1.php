@@ -36,6 +36,7 @@ class SelectWfpTypeQ1 extends Component implements HasTable
     public $wfp_type;
     public $fund_cluster;
     public $data = [];
+    protected $programmed = [];
 
     public function mount()
     {
@@ -109,12 +110,26 @@ class SelectWfpTypeQ1 extends Component implements HasTable
             ->label('Amount')
             ->formatStateUsing(function ($record) {
                 if($record->fundClusterWFP->id === 1 || $record->fundClusterWFP->id === 3) {
+
+
                     $sum = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->sum('initial_amount');
                     return '₱ '.number_format($sum, 2);
                 }else
                 {
-                    return '₱ '.number_format($record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->sum('initial_amount'), 2);
-
+                    foreach($record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->get() as $wfp)
+                    {
+                        foreach($wfp->wfpDetails as $allocation)
+                        {
+                        if (!isset($this->programmed[$allocation->category_group_id])) {
+                            $this->programmed[$allocation->category_group_id] = 0;
+                        }
+                        $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+                        }
+                    }
+                    $initial = $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()->initial_amount;
+                    $balance = $initial - array_sum($this->programmed);
+                    $total = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->sum('initial_amount') + $balance;
+                    return '₱ ' . number_format($total, 2);
                 }
             }),
         ];

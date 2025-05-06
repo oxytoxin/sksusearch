@@ -211,7 +211,7 @@
                                         $sumTotal = 0;
                                         $sumBalance = 0;
 
-                                        $sumAllocated = $record->fundAllocations->sum('initial_amount');
+                                        $sumAllocated = $is_supplemental ? $record->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') : $record->fundAllocations->sum('inital_amount');
                                         $sumTotal = array_sum(array_column($current_balance, 'current_total'));
                                         $sumBalance = $sumAllocated - $sumTotal;
                                     @endphp
