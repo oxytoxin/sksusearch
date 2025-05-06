@@ -349,7 +349,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
 
                 }else{
-                    dd('didto');
                     $this->current_balance = [];
                 }
             }else{
