@@ -13,7 +13,7 @@ use Filament\Tables\Actions\ViewAction;
 use App\Models\WpfPersonnel;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class WFPHistory extends Component implements HasTable
+class WfpHistoryQ1 extends Component implements HasTable
 {
     use InteractsWithTable;
     public $cost_centers;
@@ -34,7 +34,7 @@ class WFPHistory extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return Wfp::query()->where('is_supplemental', 0)->whereIn('cost_center_id', $this->cost_centers->pluck('id')->toArray())->with('user')
+        return Wfp::query()->where('is_supplemental', 1)->whereIn('cost_center_id', $this->cost_centers->pluck('id')->toArray())->with('user')
         ->orWhereHas('costCenter.wpfPersonnel', function ($query) {
             $query->where('user_id', Auth::user()->id)
                 ->orWhere('head_id', Auth::user()->id);
@@ -115,6 +115,6 @@ class WFPHistory extends Component implements HasTable
 
     public function render()
     {
-        return view('livewire.w-f-p.w-f-p-history');
+        return view('livewire.w-f-p.wfp-history-q1');
     }
 }

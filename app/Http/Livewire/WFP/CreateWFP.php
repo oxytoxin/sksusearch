@@ -3385,6 +3385,7 @@ public function clearPs()
                     'balance' => $sumBalance,
                     'program_allocated' => $sumTotal,
                     'total_allocated_fund' => $sumAllocated,
+                    'is_supplemental' => $this->is_supplemental,
                 ]);
 
                 foreach ($this->supplies as $item)
