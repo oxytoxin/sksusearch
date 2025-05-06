@@ -1063,7 +1063,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function calculateSuppliesTotalQuantity()
     {
         $cost_per_unit = $this->supplies_cost_per_unit == null  ? 0 : $this->supplies_cost_per_unit;
-        $this->supplies_total_quantity = array_sum($this->supplies_quantity);
+        $this->supplies_total_quantity = array_sum($this->supplies_quantity ?? [0]);
         $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
     }
 
