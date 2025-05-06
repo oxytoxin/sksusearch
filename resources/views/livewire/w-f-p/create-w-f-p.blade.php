@@ -180,7 +180,6 @@
                                             </td>
                                         </tr>
                                     @forelse ($current_balance as $key => $item)
-                                    @dump($current_balance)
                                     <tr class="border-t border-gray-300" x-show="opens">
                                         <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$current_balance[$key]['category_group']}}</td>
                                         <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3"></td>
@@ -217,6 +216,7 @@
                                         $sumBalance = $sumAllocated - $sumTotal;
                                     @endphp
                                         <tbody class="bg-white">
+                                            @dump($current_balance)
                                             <tr class="border-t border-gray-300">
                                                 <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">Total</td>
                                                 <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
