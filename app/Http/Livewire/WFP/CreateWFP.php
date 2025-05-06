@@ -1439,7 +1439,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function calculateMooeTotalQuantity()
     {
         $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
-        $this->mooe_total_quantity = array_sum($this->mooe_quantity);
+        $this->mooe_total_quantity = array_sum($this->mooe_quantity ?? [0]);
         $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
     }
 
@@ -1797,7 +1797,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function calculateTrainingTotalQuantity()
     {
         $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
-        $this->training_total_quantity = array_sum($this->training_quantity);
+        $this->training_total_quantity = array_sum($this->training_quantity ?? [0]);
         $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
     }
 
@@ -2152,7 +2152,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function calculateMachineTotalQuantity()
     {
         $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
-        $this->machine_total_quantity = array_sum($this->machine_quantity);
+        $this->machine_total_quantity = array_sum($this->machine_quantity ?? [0]);
         $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
     }
 
@@ -2509,7 +2509,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function calculateBuildingTotalQuantity()
     {
         $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
-        $this->building_total_quantity = array_sum($this->building_quantity);
+        $this->building_total_quantity = array_sum($this->building_quantity ?? [0]);
         $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
     }
 
