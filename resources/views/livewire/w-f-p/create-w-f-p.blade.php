@@ -216,7 +216,6 @@
                                         $sumBalance = $sumAllocated - $sumTotal;
                                     @endphp
                                         <tbody class="bg-white">
-                                            @dump($current_balance)
                                             <tr class="border-t border-gray-300">
                                                 <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">Total</td>
                                                 <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">₱ {{number_format($sumAllocated, 2)}}</td>
