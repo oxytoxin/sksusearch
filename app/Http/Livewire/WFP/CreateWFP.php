@@ -1116,7 +1116,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }
         }
 
-        $intEstimatedBudget = (int)str_replace(',', '', $this->supplies_estimated_budget);
+        $intEstimatedBudget = (float)str_replace(',', '', $this->supplies_estimated_budget);
         if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->exists())
         {
             $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first()->id;
@@ -1379,7 +1379,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }
         }
 
-        $intEstimatedBudget = (int)str_replace(',', '', $this->supplies_estimated_budget);
+        $intEstimatedBudget = (float)str_replace(',', '', $this->supplies_estimated_budget);
         if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
         {
             $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
@@ -1775,7 +1775,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
 
-            $intEstimatedBudget = (int)str_replace(',', '', $this->mooe_estimated_budget);
+            $intEstimatedBudget = (float)str_replace(',', '', $this->mooe_estimated_budget);
             if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->exists())
             {
                 $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first()->id;
@@ -2032,7 +2032,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
 
-            $intEstimatedBudget = (int)str_replace(',', '', $this->mooe_estimated_budget);
+            $intEstimatedBudget = (float)str_replace(',', '', $this->mooe_estimated_budget);
             if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
             {
                 $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
@@ -2399,7 +2399,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
 
-            $intEstimatedBudget = (int)str_replace(',', '', $this->training_estimated_budget);
+            $intEstimatedBudget = (float)str_replace(',', '', $this->training_estimated_budget);
             //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
             if($this->trainings != null)
             {
@@ -2653,7 +2653,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
 
-            $intEstimatedBudget = (int)str_replace(',', '', $this->training_estimated_budget);
+            $intEstimatedBudget = (float)str_replace(',', '', $this->training_estimated_budget);
             //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
             if($this->trainings != null)
             {
@@ -3016,7 +3016,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
 
-            $intEstimatedBudget = (int)str_replace(',', '', $this->machine_estimated_budget);
+            $intEstimatedBudget = (float)str_replace(',', '', $this->machine_estimated_budget);
             //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
             if($this->machines != null)
             {
@@ -3272,7 +3272,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
 
-            $intEstimatedBudget = (int)str_replace(',', '', $this->machine_estimated_budget);
+            $intEstimatedBudget = (float)str_replace(',', '', $this->machine_estimated_budget);
             //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
             if($this->machines != null)
             {
@@ -3638,7 +3638,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
 
-            $intEstimatedBudget = (int)str_replace(',', '', $this->building_estimated_budget);
+            $intEstimatedBudget = (float)str_replace(',', '', $this->building_estimated_budget);
             //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
             if($this->buildings != null)
             {
@@ -3893,7 +3893,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
 
-            $intEstimatedBudget = (int)str_replace(',', '', $this->building_estimated_budget);
+            $intEstimatedBudget = (float)str_replace(',', '', $this->building_estimated_budget);
             //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
             if($this->buildings != null)
             {
@@ -4258,7 +4258,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }
         }
 
-        $intEstimatedBudget = (int)str_replace(',', '', $this->ps_estimated_budget);
+        $intEstimatedBudget = (float)str_replace(',', '', $this->ps_estimated_budget);
         //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
         if($this->ps != null)
         {
@@ -4510,7 +4510,7 @@ if($this->wfp_fund->id === 2 || $this->wfp_fund->id === 4 || $this->wfp_fund->id
             }
         }
 
-        $intEstimatedBudget = (int)str_replace(',', '', $this->ps_estimated_budget);
+        $intEstimatedBudget = (float)str_replace(',', '', $this->ps_estimated_budget);
         //$draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->id;
         if($this->ps != null)
         {
@@ -5502,302 +5502,607 @@ public function clearPs()
 
     public function deleteSupply($index)
     {
-        if (isset($this->supplies[$index])) {
-            $budget = $this->supplies[$index]['estimated_budget'];
-            $title_group = $this->supplies[$index]['title_group'];
-            $particular_id = $this->supplies[$index]['particular_id'];
-            $uom = $this->supplies[$index]['uom'];
-            $remarks = $this->supplies[$index]['remarks'];
-            $supply_code = $this->supplies[$index]['supply_code'];
-            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
-            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
-            // $draft_item = FundDraftItem::whereHas('fundDraft')->where('particular_id', $particular_id)->where('uom', $uom)
-            // ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
-            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
-            foreach ($this->current_balance as $key => $item) {
-                if ($item['category_group_id'] === $title_group) {
-                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+        if($this->is_supplemental)
+        {
+            if (isset($this->supplies[$index])) {
+                $budget = $this->supplies[$index]['estimated_budget'];
+                $title_group = $this->supplies[$index]['title_group'];
+                $particular_id = $this->supplies[$index]['particular_id'];
+                $uom = $this->supplies[$index]['uom'];
+                $remarks = $this->supplies[$index]['remarks'];
+                $supply_code = $this->supplies[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::whereHas('fundDraft')->where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
 
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
-                        if($draft_amount)
-                        {
-                            $draft_amount->current_total -= $budget;
-                            $draft_amount->balance += $budget;
-                            $draft_amount->save();
-
-                            if($draft_amount->current_total <= 0)
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
+                            if($draft_amount)
                             {
-                                $draft_amount->delete();
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
+
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
                             }
+                            break;
                         }
-                        break;
                     }
                 }
+
+                $draft_item->delete();
+
+
+                // Remove the supply at the given index
+                unset($this->supplies[$index]);
+                // unset($this->current_balance[$key]);
+                // Reset the array indices to avoid undefined index issues
+                $this->supplies = array_values($this->supplies);
             }
+        }else{
+            if (isset($this->supplies[$index])) {
+                $budget = $this->supplies[$index]['estimated_budget'];
+                $title_group = $this->supplies[$index]['title_group'];
+                $particular_id = $this->supplies[$index]['particular_id'];
+                $uom = $this->supplies[$index]['uom'];
+                $remarks = $this->supplies[$index]['remarks'];
+                $supply_code = $this->supplies[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::whereHas('fundDraft')->where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
 
-            $draft_item->delete();
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
+                            if($draft_amount)
+                            {
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
+
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                $draft_item->delete();
 
 
-            // Remove the supply at the given index
-            unset($this->supplies[$index]);
-            // unset($this->current_balance[$key]);
-            // Reset the array indices to avoid undefined index issues
-            $this->supplies = array_values($this->supplies);
+                // Remove the supply at the given index
+                unset($this->supplies[$index]);
+                // unset($this->current_balance[$key]);
+                // Reset the array indices to avoid undefined index issues
+                $this->supplies = array_values($this->supplies);
+            }
         }
+
 
     }
 
     public function deleteMooe($index)
     {
-        if (isset($this->mooe[$index])) {
-            $budget = $this->mooe[$index]['estimated_budget'];
-            $title_group = $this->mooe[$index]['title_group'];
-            $particular_id = $this->mooe[$index]['particular_id'];
-            $uom = $this->mooe[$index]['uom'];
-            $remarks = $this->mooe[$index]['remarks'];
-            $supply_code = $this->mooe[$index]['supply_code'];
-            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
-            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
-            // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            // ->where('remarks', $remarks)->first();
-            //$wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
-            // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+        if($this->is_supplemental)
+        {
+            if (isset($this->mooe[$index])) {
+                $budget = $this->mooe[$index]['estimated_budget'];
+                $title_group = $this->mooe[$index]['title_group'];
+                $particular_id = $this->mooe[$index]['particular_id'];
+                $uom = $this->mooe[$index]['uom'];
+                $remarks = $this->mooe[$index]['remarks'];
+                $supply_code = $this->mooe[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                //$wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
-            foreach ($this->current_balance as $key => $item) {
-                if ($item['category_group_id'] === $title_group) {
-                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
 
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
 
-                        if($draft_amount)
-                        {
-                            $draft_amount->current_total -= $budget;
-                            $draft_amount->balance += $budget;
-                            $draft_amount->save();
-
-                            if($draft_amount->current_total <= 0)
+                            if($draft_amount)
                             {
-                                $draft_amount->delete();
-                            }
-                        }
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
 
-                        break;
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
                     }
                 }
-            }
 
-            $draft_item->delete();
-            // Remove the supply at the given index
-            unset($this->mooe[$index]);
-            // unset($this->current_balance[$index]);
-            // Reset the array indices to avoid undefined index issues
-            $this->mooe = array_values($this->mooe);
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->mooe[$index]);
+                // unset($this->current_balance[$index]);
+                // Reset the array indices to avoid undefined index issues
+                $this->mooe = array_values($this->mooe);
+            }
+        }else{
+            if (isset($this->mooe[$index])) {
+                $budget = $this->mooe[$index]['estimated_budget'];
+                $title_group = $this->mooe[$index]['title_group'];
+                $particular_id = $this->mooe[$index]['particular_id'];
+                $uom = $this->mooe[$index]['uom'];
+                $remarks = $this->mooe[$index]['remarks'];
+                $supply_code = $this->mooe[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                //$wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
+
+                            if($draft_amount)
+                            {
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
+
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->mooe[$index]);
+                // unset($this->current_balance[$index]);
+                // Reset the array indices to avoid undefined index issues
+                $this->mooe = array_values($this->mooe);
+            }
         }
+
     }
 
     public function deleteTraining($index)
     {
-        if (isset($this->trainings[$index])) {
-            $budget = $this->trainings[$index]['estimated_budget'];
-            $title_group = $this->trainings[$index]['title_group'];
-            $particular_id = $this->trainings[$index]['particular_id'];
-            $uom = $this->trainings[$index]['uom'];
-            $remarks = $this->trainings[$index]['remarks'];
-            $supply_code = $this->trainings[$index]['supply_code'];
-            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
-            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
-            // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            // ->where('remarks', $remarks)->first();
-            // $wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
-            // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
-            foreach ($this->current_balance as $key => $item) {
-                if ($item['category_group_id'] === $title_group) {
-                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+        if($this->is_supplemental)
+        {
+            if (isset($this->trainings[$index])) {
+                $budget = $this->trainings[$index]['estimated_budget'];
+                $title_group = $this->trainings[$index]['title_group'];
+                $particular_id = $this->trainings[$index]['particular_id'];
+                $uom = $this->trainings[$index]['uom'];
+                $remarks = $this->trainings[$index]['remarks'];
+                $supply_code = $this->trainings[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                // $wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
 
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
 
-                        if($draft_amount)
-                        {
-                            $draft_amount->current_total -= $budget;
-                            $draft_amount->balance += $budget;
-                            $draft_amount->save();
-
-                            if($draft_amount->current_total <= 0)
+                            if($draft_amount)
                             {
-                                $draft_amount->delete();
-                            }
-                        }
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
 
-                        break;
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
                     }
                 }
-            }
 
-            $draft_item->delete();
-            // Remove the supply at the given index
-            unset($this->trainings[$index]);
-            // unset($this->current_balance[$index]);
-            // Reset the array indices to avoid undefined index issues
-            $this->trainings = array_values($this->trainings);
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->trainings[$index]);
+                // unset($this->current_balance[$index]);
+                // Reset the array indices to avoid undefined index issues
+                $this->trainings = array_values($this->trainings);
+            }
+        }else{
+            if (isset($this->trainings[$index])) {
+                $budget = $this->trainings[$index]['estimated_budget'];
+                $title_group = $this->trainings[$index]['title_group'];
+                $particular_id = $this->trainings[$index]['particular_id'];
+                $uom = $this->trainings[$index]['uom'];
+                $remarks = $this->trainings[$index]['remarks'];
+                $supply_code = $this->trainings[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                // $wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
+
+                            if($draft_amount)
+                            {
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
+
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->trainings[$index]);
+                // unset($this->current_balance[$index]);
+                // Reset the array indices to avoid undefined index issues
+                $this->trainings = array_values($this->trainings);
+            }
         }
+
     }
 
     public function deleteMachine($index)
     {
-        if (isset($this->machines[$index])) {
-            $budget = $this->machines[$index]['estimated_budget'];
-            $title_group = $this->machines[$index]['title_group'];
-            $particular_id = $this->machines[$index]['particular_id'];
-            $uom = $this->machines[$index]['uom'];
-            $remarks = $this->machines[$index]['remarks'];
-            $supply_code = $this->machines[$index]['supply_code'];
-            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
-            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
-            // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            // ->where('remarks', $remarks)->first();
-            // $wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
-            // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+        if($this->is_supplemental)
+        {
+            if (isset($this->machines[$index])) {
+                $budget = $this->machines[$index]['estimated_budget'];
+                $title_group = $this->machines[$index]['title_group'];
+                $particular_id = $this->machines[$index]['particular_id'];
+                $uom = $this->machines[$index]['uom'];
+                $remarks = $this->machines[$index]['remarks'];
+                $supply_code = $this->machines[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                // $wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
 
-            foreach ($this->current_balance as $key => $item) {
-                if ($item['category_group_id'] === $title_group) {
-                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
 
-                        if($draft_amount)
-                        {
-                            $draft_amount->current_total -= $budget;
-                            $draft_amount->balance += $budget;
-                            $draft_amount->save();
-
-                            if($draft_amount->current_total <= 0)
+                            if($draft_amount)
                             {
-                                $draft_amount->delete();
-                            }
-                        }
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
 
-                        break;
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
                     }
                 }
-            }
 
-            $draft_item->delete();
-            // Remove the supply at the given index
-            unset($this->machines[$index]);
-            // unset($this->current_balance[$index]);
-            // Reset the array indices to avoid undefined index issues
-            $this->machines = array_values($this->machines);
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->machines[$index]);
+                // unset($this->current_balance[$index]);
+                // Reset the array indices to avoid undefined index issues
+                $this->machines = array_values($this->machines);
+            }
+        }else{
+            if (isset($this->machines[$index])) {
+                $budget = $this->machines[$index]['estimated_budget'];
+                $title_group = $this->machines[$index]['title_group'];
+                $particular_id = $this->machines[$index]['particular_id'];
+                $uom = $this->machines[$index]['uom'];
+                $remarks = $this->machines[$index]['remarks'];
+                $supply_code = $this->machines[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                // $wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+
+
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
+
+                            if($draft_amount)
+                            {
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
+
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->machines[$index]);
+                // unset($this->current_balance[$index]);
+                // Reset the array indices to avoid undefined index issues
+                $this->machines = array_values($this->machines);
+            }
         }
+
     }
 
     public function deleteBuilding($index)
     {
-        if (isset($this->buildings[$index])) {
-            $budget = $this->buildings[$index]['estimated_budget'];
-            $title_group = $this->buildings[$index]['title_group'];
-            $particular_id = $this->buildings[$index]['particular_id'];
-            $uom = $this->buildings[$index]['uom'];
-            $remarks = $this->buildings[$index]['remarks'];
-            $supply_code = $this->buildings[$index]['supply_code'];
-            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
-            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
-            // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            // ->where('remarks', $remarks)->first();
-            // $wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
-            // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+        if($this->is_supplemental)
+        {
+            if (isset($this->buildings[$index])) {
+                $budget = $this->buildings[$index]['estimated_budget'];
+                $title_group = $this->buildings[$index]['title_group'];
+                $particular_id = $this->buildings[$index]['particular_id'];
+                $uom = $this->buildings[$index]['uom'];
+                $remarks = $this->buildings[$index]['remarks'];
+                $supply_code = $this->buildings[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                // $wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
-            foreach ($this->current_balance as $key => $item) {
-                if ($item['category_group_id'] === $title_group) {
-                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
 
-                        if($draft_amount)
-                        {
-                            $draft_amount->current_total -= $budget;
-                            $draft_amount->balance += $budget;
-                            $draft_amount->save();
-
-                            if($draft_amount->current_total <= 0)
+                            if($draft_amount)
                             {
-                                $draft_amount->delete();
-                            }
-                        }
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
 
-                        break;
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
                     }
                 }
-            }
 
-            $draft_item->delete();
-            // Remove the supply at the given index
-            unset($this->buildings[$index]);
-            // unset($this->current_balance[$index]);
-            // Reset the array indices to avoid undefined index issues
-            $this->buildings = array_values($this->buildings);
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->buildings[$index]);
+                // unset($this->current_balance[$index]);
+                // Reset the array indices to avoid undefined index issues
+                $this->buildings = array_values($this->buildings);
+            }
+        }else{
+            if (isset($this->buildings[$index])) {
+                $budget = $this->buildings[$index]['estimated_budget'];
+                $title_group = $this->buildings[$index]['title_group'];
+                $particular_id = $this->buildings[$index]['particular_id'];
+                $uom = $this->buildings[$index]['uom'];
+                $remarks = $this->buildings[$index]['remarks'];
+                $supply_code = $this->buildings[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                // $wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
+
+                            if($draft_amount)
+                            {
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
+
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->buildings[$index]);
+                // unset($this->current_balance[$index]);
+                // Reset the array indices to avoid undefined index issues
+                $this->buildings = array_values($this->buildings);
+            }
         }
+
     }
 
     public function deletePs($index)
     {
-        if (isset($this->ps[$index])) {
-            $budget = $this->ps[$index]['estimated_budget'];
-            $title_group = $this->ps[$index]['title_group'];
-            $particular_id = $this->ps[$index]['particular_id'];
-            $uom = $this->ps[$index]['uom'];
-            $remarks = $this->ps[$index]['remarks'];
-            $supply_code = $this->ps[$index]['supply_code'];
-            $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
-            $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
-            ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
-            // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
-            // ->where('remarks', $remarks)->first();
-            // $wfp_draft_id = $draft_item->fund_draft_id;
-            $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
-            // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+        if($this->is_supplemental)
+        {
+            if (isset($this->ps[$index])) {
+                $budget = $this->ps[$index]['estimated_budget'];
+                $title_group = $this->ps[$index]['title_group'];
+                $particular_id = $this->ps[$index]['particular_id'];
+                $uom = $this->ps[$index]['uom'];
+                $remarks = $this->ps[$index]['remarks'];
+                $supply_code = $this->ps[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                // $wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
-            foreach ($this->current_balance as $key => $item) {
-                if ($item['category_group_id'] === $title_group) {
-                    if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                        $this->current_balance[$key]['current_total'] -= $budget;
-                        $this->current_balance[$key]['balance'] += $budget;
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
 
-                        if($draft_amount)
-                        {
-                            $draft_amount->current_total -= $budget;
-                            $draft_amount->balance += $budget;
-                            $draft_amount->save();
-
-                            if($draft_amount->current_total <= 0)
+                            if($draft_amount)
                             {
-                                $draft_amount->delete();
-                            }
-                        }
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
 
-                        break;
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
                     }
                 }
-            }
 
-            $draft_item->delete();
-            // Remove the supply at the given index
-            unset($this->ps);
-            // Reset the array indices to avoid undefined index issues
-            $this->ps = array_values($this->ps);
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->ps);
+                // Reset the array indices to avoid undefined index issues
+                $this->ps = array_values($this->ps);
+            }
+        }else{
+            if (isset($this->ps[$index])) {
+                $budget = $this->ps[$index]['estimated_budget'];
+                $title_group = $this->ps[$index]['title_group'];
+                $particular_id = $this->ps[$index]['particular_id'];
+                $uom = $this->ps[$index]['uom'];
+                $remarks = $this->ps[$index]['remarks'];
+                $supply_code = $this->ps[$index]['supply_code'];
+                $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+                $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
+                ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
+                // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
+                // ->where('remarks', $remarks)->first();
+                // $wfp_draft_id = $draft_item->fund_draft_id;
+                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
+
+                foreach ($this->current_balance as $key => $item) {
+                    if ($item['category_group_id'] === $title_group) {
+                        if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
+                            $this->current_balance[$key]['current_total'] -= $budget;
+                            $this->current_balance[$key]['balance'] += $budget;
+
+                            if($draft_amount)
+                            {
+                                $draft_amount->current_total -= $budget;
+                                $draft_amount->balance += $budget;
+                                $draft_amount->save();
+
+                                if($draft_amount->current_total <= 0)
+                                {
+                                    $draft_amount->delete();
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+                $draft_item->delete();
+                // Remove the supply at the given index
+                unset($this->ps);
+                // Reset the array indices to avoid undefined index issues
+                $this->ps = array_values($this->ps);
+            }
         }
+
     }
 
     public function refreshComponent()
