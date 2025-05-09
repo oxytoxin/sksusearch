@@ -2505,11 +2505,11 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'estimated_budget' => $intEstimatedBudget,
                     'remarks' => $this->training_remarks,
                 ];
-                if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->where('is_supplemental', 1)->first()->fundDrafts()->exists())
+                if($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->exists())
                 {
                     $draft_items = FundDraftItem::create(
                         [
-                            'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts->first()->id,
+                            'fund_draft_id' => $draft_id,
                             'budget_category_id' => 3,
                             'budget_category' => 'Trainings',
                             'particular_id' => $this->training_particular_id,
@@ -2641,8 +2641,8 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             ]);
                         }else{
                             $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_amounts->where('category_group_id', $item['category_group_id'])->first();
-                            $draft_amounts->current_total = $item['current_total'];
-                            $draft_amounts->balance = $item['balance'];
+                            $draft_amounts->current_total = $item['current_total'] ?? 0;
+                            $draft_amounts->balance = $item['balance'] ?? 0;
                             $draft_amounts->save();
                         }
 
