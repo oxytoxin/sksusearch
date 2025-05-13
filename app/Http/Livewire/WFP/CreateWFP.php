@@ -352,7 +352,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             ];
                         })->toArray();
                     }else{
-                        $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_amounts->map(function($allocation) {
+                        $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts->map(function($allocation) {
                             return [
                                 'category_group_id' => $allocation->category_group_id,
                                 'category_group' => $allocation->category_group,

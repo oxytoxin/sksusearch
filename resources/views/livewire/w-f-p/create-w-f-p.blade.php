@@ -214,6 +214,7 @@
                                         $balance = $wfp_balance;
                                         $totalAllocated = $record->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') + $balance;
                                         $sumAllocated = $is_supplemental ? $totalAllocated : $record->fundAllocations->sum('inital_amount');
+                                        @dump($current_balance);
                                         $sumTotal = array_sum(array_column($current_balance, 'current_total'));
                                         $sumBalance = $sumAllocated - $sumTotal;
                                     @endphp
