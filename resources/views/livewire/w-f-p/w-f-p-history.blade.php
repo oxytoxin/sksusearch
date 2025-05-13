@@ -27,6 +27,5 @@
                 <livewire:w-f-p.wfp-history-q1 />
             </div>
         </div>
-
     </div>
 </div>
