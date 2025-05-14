@@ -5587,16 +5587,18 @@ public function clearPs()
                 $remarks = $this->supplies[$index]['remarks'];
                 $supply_code = $this->supplies[$index]['supply_code'];
                 $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first();
+                $draft_amount = FundDraftAmount::where('fund_draft_id', $draft->id)->where('category_group_id', $title_group)->first();
                 $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
                 ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
                 // $draft_item = FundDraftItem::whereHas('fundDraft')->where('particular_id', $particular_id)->where('uom', $uom)
                 // ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
-                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                //$draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
                 foreach ($this->current_balance as $key => $item) {
                     if ($item['category_group_id'] === $title_group) {
                         if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-                            $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first()->id;
-                            $draft_amounts = FundDraftAmount::where('fund_draft_id', $draft_id)->where('category_group_id', $title_group)->first();
+
+
 
                             $this->current_balance[$key]['current_total'] -= $budget;
                             $this->current_balance[$key]['balance'] += $budget;
@@ -5687,12 +5689,14 @@ public function clearPs()
                 $remarks = $this->mooe[$index]['remarks'];
                 $supply_code = $this->mooe[$index]['supply_code'];
                 $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first();
+                $draft_amount = FundDraftAmount::where('fund_draft_id', $draft->id)->where('category_group_id', $title_group)->first();
                 $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
                 ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
                 // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
                 // ->where('remarks', $remarks)->first();
                 //$wfp_draft_id = $draft_item->fund_draft_id;
-                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                //$draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
                 foreach ($this->current_balance as $key => $item) {
@@ -5790,12 +5794,14 @@ public function clearPs()
                 $remarks = $this->trainings[$index]['remarks'];
                 $supply_code = $this->trainings[$index]['supply_code'];
                 $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first();
+                $draft_amount = FundDraftAmount::where('fund_draft_id', $draft->id)->where('category_group_id', $title_group)->first();
                 $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
                 ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
                 // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
                 // ->where('remarks', $remarks)->first();
                 // $wfp_draft_id = $draft_item->fund_draft_id;
-                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                //$draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
                 foreach ($this->current_balance as $key => $item) {
                     if ($item['category_group_id'] === $title_group) {
@@ -5837,12 +5843,14 @@ public function clearPs()
                 $remarks = $this->trainings[$index]['remarks'];
                 $supply_code = $this->trainings[$index]['supply_code'];
                 $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+                $draft = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first();
+                $draft_amount = FundDraftAmount::where('fund_draft_id', $draft->id)->where('category_group_id', $title_group)->first();
                 $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
                 ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
                 // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
                 // ->where('remarks', $remarks)->first();
                 // $wfp_draft_id = $draft_item->fund_draft_id;
-                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                //$draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
                 foreach ($this->current_balance as $key => $item) {
                     if ($item['category_group_id'] === $title_group) {
@@ -5891,12 +5899,14 @@ public function clearPs()
                 $remarks = $this->machines[$index]['remarks'];
                 $supply_code = $this->machines[$index]['supply_code'];
                 $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first();
+                $draft_amount = FundDraftAmount::where('fund_draft_id', $draft->id)->where('category_group_id', $title_group)->first();
                 $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
                 ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
                 // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
                 // ->where('remarks', $remarks)->first();
                 // $wfp_draft_id = $draft_item->fund_draft_id;
-                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                //$draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
 
@@ -5994,12 +6004,14 @@ public function clearPs()
                 $remarks = $this->buildings[$index]['remarks'];
                 $supply_code = $this->buildings[$index]['supply_code'];
                 $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first();
+                $draft_amount = FundDraftAmount::where('fund_draft_id', $draft->id)->where('category_group_id', $title_group)->first();
                 $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
                 ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
                 // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
                 // ->where('remarks', $remarks)->first();
                 // $wfp_draft_id = $draft_item->fund_draft_id;
-                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                //$draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
                 foreach ($this->current_balance as $key => $item) {
@@ -6095,12 +6107,14 @@ public function clearPs()
                 $remarks = $this->ps[$index]['remarks'];
                 $supply_code = $this->ps[$index]['supply_code'];
                 $fund_draft = $this->fund_allocations->where('is_supplemental', 1)->first()->fundDrafts->first();
+                $draft = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first();
+                $draft_amount = FundDraftAmount::where('fund_draft_id', $draft->id)->where('category_group_id', $title_group)->first();
                 $draft_item = $fund_draft->draft_items->where('title_group', $title_group)->where('particular_id', $particular_id)->where('uom', $uom)
                 ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
                 // $draft_item = FundDraftItem::where('particular_id', $particular_id)->where('uom', $uom)
                 // ->where('remarks', $remarks)->first();
                 // $wfp_draft_id = $draft_item->fund_draft_id;
-                $draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
+                //$draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
                 foreach ($this->current_balance as $key => $item) {
