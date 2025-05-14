@@ -31,7 +31,7 @@
                         <p class="mt-1 text-sm text-primary-500">Purpose:</p>
                         <p class="mt-1 whitespace-pre-line text-sm text-primary-500">{{ $travel_order->purpose }}</p>
 
-                        <div>
+                        {{-- <div>
                             <p class="mt-1 text-sm text-primary-500">Attachments:</p>
                             @forelse ($travel_order->attachments as $attachment)
                                 <div class="flex items-start gap-4">
@@ -43,7 +43,7 @@
                             @empty
                                 <p class="text-sm text-primary-500">No files attached.</p>
                             @endforelse
-                        </div>
+                        </div> --}}
                         @php
                             $proposed_itinerary = $travel_order
                                 ->itineraries()

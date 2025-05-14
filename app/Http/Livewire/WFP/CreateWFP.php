@@ -5595,7 +5595,9 @@ public function clearPs()
                 foreach ($this->current_balance as $key => $item) {
                     if ($item['category_group_id'] === $title_group) {
                         if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
-
+                            $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->first()->id;
+                            $draft_amounts = FundDraftAmount::where('fund_draft_id', $draft_id)->where('category_group_id', $categoryGroupId)->first();
+                            
                             $this->current_balance[$key]['current_total'] -= $budget;
                             $this->current_balance[$key]['balance'] += $budget;
                             if($draft_amount)
