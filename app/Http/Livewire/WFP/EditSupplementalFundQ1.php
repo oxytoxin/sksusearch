@@ -2,14 +2,17 @@
 
 namespace App\Http\Livewire\WFP;
 
-use App\Models\WpfType;
-use Livewire\Component;
+use Livewire\Component;use App\Models\CategoryGroup;
+use App\Models\FundAllocation;
 use App\Models\CostCenter;
-use App\Models\CategoryGroup;
 use App\Models\SupplementalQuarter;
+use App\Models\WpfType;
+use WireUi\Traits\Actions;
+use Filament\Notifications\Notification;
 
-class ViewSupplementalFunds extends Component
+class EditSupplementalFundQ1 extends Component
 {
+    use Actions;
     public $record;
     public $category_groups;
     public $category_groups_supplemental;
@@ -24,16 +27,17 @@ class ViewSupplementalFunds extends Component
     public $balances = [];
     public $supplemental_quarter;
 
+    //for 164
+    public $supplemental_allocation;
+    public $supplemental_allocation_description;
+    public $balance_164;
+    public $sub_total_164;
+    public $balance_164_q1;
+    public $fundAllocation;
 
-     //for 164
-     public $supplemental_allocation;
-     public $supplemental_allocation_description;
-     public $balance_164;
-     public $sub_total_164;
-     public $balance_164_q1;
-
-    public function mount($record, $wfpType)
+     public function mount($record, $wfpType)
     {
+
         $this->record = CostCenter::find($record);
         $this->category_groups = CategoryGroup::where('is_active', 1)->get();
         $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function($query) {
@@ -56,6 +60,10 @@ class ViewSupplementalFunds extends Component
             }
         }
 
+        foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
+            $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
+        }
+
         //supplemental
         foreach($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 1)->where('cost_center_id', $this->record->id)->get() as $wfp)
         {
@@ -68,10 +76,6 @@ class ViewSupplementalFunds extends Component
             }
         }
 
-        foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
-            $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
-        }
-
 
 
         //i want to get the balances from the allocations subtracted by the programmed, use map
@@ -79,12 +83,28 @@ class ViewSupplementalFunds extends Component
             return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
         });
 
+        $this->fundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->where('supplemental_quarter_id', 1)->first();
+
         $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
 
         $this->supplemental_allocation_description = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->description;
         $this->supplemental_allocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
         $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
         $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
+
+    }
+
+    public function updatedSupplementalAllocation($value)
+    {
+        $this->validate([
+            'supplemental_allocation' => 'required|numeric|min:0',
+        ]);
+
+        $this->sub_total_164 = $this->balance_164 + $value;
+        if ($this->sub_total_164 < 0) {
+            $this->sub_total_164 = 0;
+        }
+        // $this->balance_164 = $this->fundInitialAmount - $this->sub_total_164;
     }
 
     public function calculateSubTotal($categoryGroupId)
@@ -103,7 +123,7 @@ class ViewSupplementalFunds extends Component
         return $balance ?? 0;
     }
 
-    public function calculateSupplemental($categoryGroupId)
+     public function calculateSupplemental($categoryGroupId)
     {
         return $this->amounts[$categoryGroupId] ?? 0;
     }
@@ -133,7 +153,7 @@ class ViewSupplementalFunds extends Component
        return $balance + $amount;
     }
 
-    public function calculateBalance($categoryGroupId)
+     public function calculateBalance($categoryGroupId)
     {
         // Return the difference between the initial amount and the amount associated with the given category group ID
         return $this->allocations[$categoryGroupId] - $this->calculateSubTotal($categoryGroupId);
@@ -151,8 +171,88 @@ class ViewSupplementalFunds extends Component
         return array_sum($this->allocations) - $this->calculateTotal();
     }
 
+    public function confirmSupplementalFund()
+    {
+        $this->dialog()->confirm([
+            'title'       => 'Are you Sure?',
+            'description' => 'Do you really want to save this information?',
+            'acceptLabel' => 'Yes, save it',
+            'method'      => 'addSupplementalFund',
+        ]);
+    }
+
+    public function addSupplementalFund()
+    {
+        foreach($this->amounts as $categoryGroupId => $amount)
+        {
+            FundAllocation::create([
+                'cost_center_id' => $this->record->id,
+                'wpf_type_id' => $this->selectedType,
+                'supplemental_quarter_id' => $this->supplemental_quarter->id,
+                'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
+                'category_group_id' => $categoryGroupId,
+                'initial_amount' => $amount,
+                'is_supplemental' => 1,
+            ]);
+        }
+
+        $this->record->has_supplemental = 1;
+        $this->record->save();
+
+        Notification::make()->title('Successfully Saved')->success()->send();
+        return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
+    }
+
+    public function confirmUpdateSupplementalFund164()
+    {
+        $this->dialog()->confirm([
+            'title'       => 'Are you Sure?',
+            'description' => 'Do you really want to save this information?',
+            'acceptLabel' => 'Yes, save it',
+            'method'      => 'updateSupplementalFund164',
+        ]);
+    }
+
+    public function updateSupplementalFund164()
+    {
+         $this->validate([
+                'supplemental_allocation' => 'required|numeric|min:100',
+                'supplemental_allocation_description' => 'required'
+            ],
+            [
+                'supplemental_allocation.required' => 'The amount field is required',
+                'supplemental_allocation.numeric' => 'The amount field must be a number',
+                'supplemental_allocation.min' => 'The amount field must be at least 100',
+                'supplemental_allocation_description.required' => 'The description field is required'
+
+            ]);
+
+            // Update the existing fund allocation
+            $this->fundAllocation->update([
+                'initial_amount' => $this->supplemental_allocation,
+                'description' => $this->supplemental_allocation_description,
+            ]);
+
+            // FundAllocation::create([
+            //     'cost_center_id' => $this->record->id,
+            //     'wpf_type_id' => $this->selectedType,
+            //     'supplemental_quarter_id' => $this->supplemental_quarter->id,
+            //     'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
+            //     'initial_amount' => $this->supplemental_allocation,
+            //     'description' => $this->supplemental_allocation_description,
+            //     'is_supplemental' => 1,
+            // ]);
+
+            Notification::make()->title('Successfully Updated')->success()->send();
+            return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
+
+
+        $this->record->has_supplemental = 1;
+        $this->record->save();
+    }
+
     public function render()
     {
-        return view('livewire.w-f-p.view-supplemental-funds');
+        return view('livewire.w-f-p.edit-supplemental-fund-q1');
     }
 }

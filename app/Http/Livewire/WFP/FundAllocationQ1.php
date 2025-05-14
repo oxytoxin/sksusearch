@@ -25,10 +25,9 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ViewColumn;
 
-class FundAllocation extends Component implements HasTable
+class FundAllocationQ1 extends Component implements HasTable
 {
-    use InteractsWithTable;
-
+     use InteractsWithTable;
 
     public $wfp_type;
     public $fund_cluster;
@@ -36,7 +35,7 @@ class FundAllocation extends Component implements HasTable
     public $isPresident;
     public $data = [];
 
-    public function mount($filter)
+    public function mount()
     {
         $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
         if(session()->has('fund_cluster'))
@@ -60,12 +59,12 @@ class FundAllocation extends Component implements HasTable
         }
     }
 
-    protected function getTableQuery()
+     protected function getTableQuery()
     {
         return CostCenter::query()->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
     }
 
-    protected function getTableColumns()
+     protected function getTableColumns()
     {
         return [
             Tables\Columns\TextColumn::make('name')
@@ -107,7 +106,7 @@ class FundAllocation extends Component implements HasTable
         ];
     }
 
-    protected function getTableActions(): array
+     protected function getTableActions(): array
     {
         return [
             Action::make('allocate_fund')
@@ -175,24 +174,17 @@ class FundAllocation extends Component implements HasTable
                 ->color('success')
                 ->url(fn (CostCenter $record): string => route('wfp.view-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
                 ->visible(fn (CostCenter $record) => $record->wfp?->is_approved === 1 && $record->hasSupplementalFund()),
-                Action::make('edit_supplemental')
-                ->icon('ri-pencil-line')
-                ->label('Edit Supplemental Fund')
-                ->button()
-                ->color('warning')
-                ->url(fn (CostCenter $record): string => route('wfp.edit-supplemental-funds-q1', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-                ->visible(fn (CostCenter $record) => $record->wfp?->is_approved === 1 && $record->hasSupplementalFund()),
             ]),
 
         ];
     }
 
-    protected function getTableFiltersLayout(): ?string
+     protected function getTableFiltersLayout(): ?string
     {
         return Layout::AboveContent;
     }
 
-    protected function getTableFilters(): array
+     protected function getTableFilters(): array
     {
         return [
             Filter::make('wfp_type')
@@ -257,8 +249,9 @@ class FundAllocation extends Component implements HasTable
         $this->fund_cluster = $id;
         session(['fund_cluster' => $id]);
     }
+
     public function render()
     {
-        return view('livewire.w-f-p.fund-allocation');
+        return view('livewire.w-f-p.fund-allocation-q1');
     }
 }

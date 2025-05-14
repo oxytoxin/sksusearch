@@ -28,6 +28,7 @@ use App\Http\Livewire\WFP\WfpSubmissions;
 use App\Http\Livewire\WFP\WFPTypes;
 use App\Http\Livewire\WFP\DeactivatedPricelists;
 use App\Http\Livewire\WFP\DevPage;
+use App\Http\Livewire\WFP\EditSupplementalFundQ1;
 use App\Http\Livewire\WFP\ViewAllocatedFund;
 use App\Http\Livewire\WFP\ViewRemarks;
 use App\Http\Livewire\WFP\ViewSupplementalFunds;
@@ -67,5 +68,6 @@ Route::middleware([
     Route::get('/view-remarks/{record}', ViewRemarks::class)->name('view-remarks');
     Route::get('/add-supplemental-fund/{record}/{wfpType}', AddSupplementalFund::class)->name('add-supplemental-fund');
     Route::get('/view-supplemental-fund/{record}/{wfpType}', ViewSupplementalFunds::class)->name('view-supplemental-fund');
+    Route::get('/edit-supplemental-funds-q1/{record}/{wfpType}', EditSupplementalFundQ1::class)->name('edit-supplemental-funds-q1');
     Route::get('/dev-page', DevPage::class)->name('dev-page');
 });
