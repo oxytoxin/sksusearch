@@ -282,14 +282,17 @@
                     </div>
                     <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                         <div>
+                            @php
+                            $allocated = $isSupplemental ? $record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') : $record->costCenter->fundAllocations->sum('initial_amount');
+                            @endphp
                             <div class="flex justify-between space-x-3">
-                                <span>Allocated Fund: </span><span>₱ {{number_format($record->costCenter->fundAllocations->sum('initial_amount'), 2)}}</span>
+                                <span>Allocated Fund: </span><span>₱ {{number_format($allocated, 2)}}</span>
                             </div>
                             <div class="flex justify-between">
                                 <span>Program: </span><span>₱ {{number_format($program, 2)}}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span>Balance: </span><span>₱ {{number_format($balance, 2)}}</span>
+                                <span>Balance: </span><span>₱ {{number_format($allocated - $program, 2)}}</span>
                             </div>
                         </div>
                     </div>

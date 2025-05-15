@@ -9,13 +9,20 @@ class WfpReport extends Component
 {
     public $record;
     public $wfpDetails;
+    public $allocation;
     public $program;
     public $balance;
+    public $isSupplemental;
 
-    public function mount($record)
+    public function mount($record, $isSupplemental)
     {
-        $this->record = Wfp::find($record);
 
+        $this->isSupplemental = $isSupplemental;
+
+        if($isSupplemental)
+        {
+        $this->record = Wfp::where('id', $record)->where('is_supplemental', 1)->first();
+        $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount');
         $this->wfpDetails = $this->record->wfpDetails()->get();
         // $this->program = $this->wfpDetails->sum('estimated_budget');
         foreach($this->wfpDetails as $wfpDetail)
@@ -25,7 +32,18 @@ class WfpReport extends Component
         // $total_quantity = $this->wfpDetails->sum('total_quantity');
         // $cost_per_unit = $this->wfpDetails->sum('cost_per_unit');
         // $this->program = $total_quantity * $cost_per_unit;
-        $this->balance = $this->record->costCenter->fundAllocations->sum('initial_amount') - $this->program;
+        $this->balance = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') - $this->program;
+        }else{
+        $this->record = Wfp::where('id', $record)->where('is_supplemental', 0)->first();
+        $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+        $this->wfpDetails = $this->record->wfpDetails()->get();
+        foreach($this->wfpDetails as $wfpDetail)
+        {
+            $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
+        }
+        $this->balance = $this->allocation - $this->program;
+        }
+
     }
 
     public function redirectBack()
