@@ -66,8 +66,8 @@ Route::middleware([
     Route::get('/pricelist-document', PriceListDocument::class)->name('pricelist-document');
     Route::get('/deactivated-pricelists', DeactivatedPricelists::class)->name('deactivated-pricelists');
     Route::get('/view-remarks/{record}', ViewRemarks::class)->name('view-remarks');
-    Route::get('/add-supplemental-fund/{record}/{wfpType}', AddSupplementalFund::class)->name('add-supplemental-fund');
-    Route::get('/view-supplemental-fund/{record}/{wfpType}', ViewSupplementalFunds::class)->name('view-supplemental-fund');
-    Route::get('/edit-supplemental-funds-q1/{record}/{wfpType}', EditSupplementalFundQ1::class)->name('edit-supplemental-funds-q1');
+    Route::get('/add-supplemental-fund/{record}/{wfpType}/{isForwarded}', AddSupplementalFund::class)->name('add-supplemental-fund');
+    Route::get('/view-supplemental-fund/{record}/{wfpType}/{isForwarded}', ViewSupplementalFunds::class)->name('view-supplemental-fund');
+    Route::get('/edit-supplemental-funds-q1/{record}/{wfpType}/{isForwarded}', EditSupplementalFundQ1::class)->name('edit-supplemental-funds-q1');
     Route::get('/dev-page', DevPage::class)->name('dev-page');
 });

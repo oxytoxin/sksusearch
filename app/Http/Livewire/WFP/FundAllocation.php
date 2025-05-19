@@ -166,23 +166,31 @@ class FundAllocation extends Component implements HasTable
                 ->label('Add Supplemental Fund')
                 ->button()
                 ->color('success')
-                ->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
+                ->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 0]))
                 ->visible(fn (CostCenter $record) => $record->wfp?->is_approved === 1 && !$record->hasSupplementalFund()),
                 Action::make('view_supplemental')
                 ->icon('ri-eye-line')
                 ->label('View Supplemental Fund')
                 ->button()
                 ->color('success')
-                ->url(fn (CostCenter $record): string => route('wfp.view-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-                ->visible(fn (CostCenter $record) => $record->wfp?->is_approved === 1 && $record->hasSupplementalFund()),
+                ->url(fn (CostCenter $record): string => route('wfp.view-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => $record->wfp()->exists() ? 0 : 1]))
+                ->visible(fn (CostCenter $record) => ($record->wfp?->is_approved === 1 && $record->hasSupplementalFund()) || (!$record->wfp()->exists() && $record->hasSupplementalFund())),
                 Action::make('edit_supplemental')
                 ->icon('ri-pencil-line')
                 ->label('Edit Supplemental Fund')
                 ->button()
                 ->color('warning')
-                ->url(fn (CostCenter $record): string => route('wfp.edit-supplemental-funds-q1', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-                ->visible(fn (CostCenter $record) => $record->wfp?->is_approved === 1 && $record->hasSupplementalFund()),
+                ->url(fn (CostCenter $record): string => route('wfp.edit-supplemental-funds-q1', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => $record->wfp()->exists() ? 0 : 1]))
+                ->visible(fn (CostCenter $record) => ($record->wfp?->is_approved === 1 && $record->hasSupplementalFund()) || (!$record->wfp()->exists() && $record->hasSupplementalFund())),
             ]),
+            Action::make('forward_balance')
+                ->icon('ri-arrow-right-line')
+                ->label('Forward Balance')
+                ->button()
+                ->color('success')
+                ->requiresConfirmation()
+                ->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]))
+                ->visible(fn (CostCenter $record) => !$record->wfp()->where('is_supplemental', 0)->exists() && !$record->hasSupplementalFund()),
 
         ];
     }
@@ -213,6 +221,7 @@ class FundAllocation extends Component implements HasTable
                 ->label('WFP Status')
                 ->options([
                     20 => 'All',
+                    null => 'No WFP',
                     1 => 'Approved',
                     0 => 'Pending',
                     500 => 'Modification Request'
@@ -220,9 +229,14 @@ class FundAllocation extends Component implements HasTable
             ])
             ->query(function (Builder $query, array $data): Builder {
                 if($data['wfp_status'] != 20) {
-                    return $query->whereHas('wfp', function($query) use ($data) {
-                        $query->where('is_approved', $data['wfp_status']);
-                    });
+                    if($data['wfp_status'] == null) {
+                        return $query->whereDoesntHave('wfp');
+                    }else{
+                        return $query->whereHas('wfp', function($query) use ($data) {
+                            $query->where('is_approved', $data['wfp_status'])->where('is_supplemental', false);
+                        });
+                    }
+
                 }
                 return $query;
             }),

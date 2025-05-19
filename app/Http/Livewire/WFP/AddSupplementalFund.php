@@ -34,7 +34,7 @@ class AddSupplementalFund extends Component
 
 
 
-    public function mount($record, $wfpType)
+    public function mount($record, $wfpType, $isForwarded)
     {
 
         $this->record = CostCenter::find($record);
@@ -48,29 +48,56 @@ class AddSupplementalFund extends Component
         $this->fund_description = $this->record->fundAllocations->first()->description;
         $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
        // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
-        foreach($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->get() as $wfp)
+
+        if($isForwarded)
         {
-            foreach($wfp->wfpDetails as $allocation)
+            // foreach($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->get() as $wfp)
+            // {
+            //     foreach($wfp->wfpDetails as $allocation)
+            //     {
+            //     if (!isset($this->programmed[$allocation->category_group_id])) {
+            //         $this->programmed[$allocation->category_group_id] = 0;
+            //     }
+            //     $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+            //     }
+            // }
+
+            // foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
+            //     $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
+            // }
+
+
+
+            // $this->balances = collect($this->allocations)->map(function($allocation, $categoryGroupId) {
+            //     return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
+            // });
+
+            $this->balance_164 = $this->fundInitialAmount;
+        }else{
+            foreach($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->get() as $wfp)
             {
-            if (!isset($this->programmed[$allocation->category_group_id])) {
-                $this->programmed[$allocation->category_group_id] = 0;
+                foreach($wfp->wfpDetails as $allocation)
+                {
+                if (!isset($this->programmed[$allocation->category_group_id])) {
+                    $this->programmed[$allocation->category_group_id] = 0;
+                }
+                $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+                }
             }
-            $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+
+            foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
+                $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
             }
+
+
+
+            $this->balances = collect($this->allocations)->map(function($allocation, $categoryGroupId) {
+                return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
+            });
+
+            $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
         }
 
-        foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
-            $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
-        }
-
-
-
-        //i want to get the balances from the allocations subtracted by the programmed, use map
-        $this->balances = collect($this->allocations)->map(function($allocation, $categoryGroupId) {
-            return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
-        });
-
-        $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
 
     }
 
