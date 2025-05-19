@@ -42,7 +42,7 @@ class AddSupplementalFund extends Component
 
         if($isForwarded)
         {
-             $this->record = CostCenter::find($record);
+            $this->record = CostCenter::find($record);
             $this->category_groups = CategoryGroup::where('is_active', 1)->get();
             $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function($query) {
                 $query->where('cost_center_id', $this->record->id)->where('is_supplemental', 0)->where('initial_amount', '>', 0);
