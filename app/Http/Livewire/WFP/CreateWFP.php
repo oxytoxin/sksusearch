@@ -4891,7 +4891,8 @@ public function clearPs()
                 }
             }
         }else{
-            if(array_sum(array_column($this->current_balance, 'current_total')) > $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->sum('initial_amount'))
+            $with_balance = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->sum('initial_amount') + $this->wfp_balance;
+            if(array_sum(array_column($this->current_balance, 'current_total')) > $with_balance)
             {
                 $is_not_valid = true;
             }
@@ -5224,7 +5225,7 @@ public function clearPs()
                 }
             }
         }else{
-            if(array_sum(array_column($this->current_balance, 'current_total')) > $this->record->fundAllocations->where('is_supplemental', 1)->sum('initial_amount'))
+            if(array_sum(array_column($this->current_balance, 'current_total')) > $this->record->fundAllocations->sum('initial_amount'))
             {
                 $is_not_valid = true;
             }
