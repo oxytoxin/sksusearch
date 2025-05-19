@@ -210,7 +210,7 @@ class FundAllocation extends Component implements HasTable
                     return redirect()->route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]);
                 })
                 //->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]))
-                ->visible(fn (CostCenter $record) => !$record->wfp()->where('is_supplemental', 0)->exists() && !$record->hasSupplementalFund()),
+                ->visible(fn (CostCenter $record) => (!$record->wfp()->where('is_supplemental', 0)->exists() || $record->wfp()->where('is_supplemental', 0)->where('is_approved',  0)->exists()) && (!$record->hasSupplementalFund() && $record->fund_allocations()->exists())),
 
         ];
     }
