@@ -75,7 +75,7 @@ class AssignPersonnel extends Component implements HasTable
                     ->preload()
                     ->reactive()
                     ->options(fn ($get) => CostCenter::whereHas('fundAllocations', function ($query) {
-                        $query->where('is_locked', 1);
+                        $query->where('is_locked', 1)->where('is_supplemental', 1);
                     })->whereHas('office', function ($query) {
                         $query->where('id', auth()->user()->employee_information->office_id);
                     })->whereDoesntHave('wpfPersonnel')
