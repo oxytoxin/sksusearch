@@ -82,7 +82,7 @@ class RequestVehicleShow extends Component implements HasForms
                 ],
             ];
         }
-          //dd($data);
+        //dd($data);
 
         $this->date_and_time = $data;
         $this->request = RequestSchedule::find($request);
@@ -98,56 +98,56 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function storeData()
     {
-    $data = [];
+        $data = [];
 
-    foreach ($this->scheduleTimes as $scheduleTime) {
-        $date = $scheduleTime->travel_date;
-        $timeFrom = $scheduleTime->time_from;
-        $timeTo = $scheduleTime->time_to;
+        foreach ($this->scheduleTimes as $scheduleTime) {
+            $date = $scheduleTime->travel_date;
+            $timeFrom = $scheduleTime->time_from;
+            $timeTo = $scheduleTime->time_to;
 
-        // Generate a unique key for each time slot
-        $timeSlotKey = uniqid();
+            // Generate a unique key for each time slot
+            $timeSlotKey = uniqid();
 
-        $data['date'] = $date;
-        $data['time'][$timeSlotKey] = [
-            'time_from' => $timeFrom,
-            'time_to' => $timeTo,
-        ];
-    }
+            $data['date'] = $date;
+            $data['time'][$timeSlotKey] = [
+                'time_from' => $timeFrom,
+                'time_to' => $timeTo,
+            ];
+        }
 
-    // Do something with the $data array
-    // For example, you can save it to the database or perform any other operations.
+        // Do something with the $data array
+        // For example, you can save it to the database or perform any other operations.
 
-    //dd($data); // Display the data for testing purposes
+        //dd($data); // Display the data for testing purposes
     }
 
     protected function getFormSchema(): array
     {
         return [
             Repeater::make('date_and_time')
-            ->label('Assign time to each date')
-            ->schema([
-                DatePicker::make('date')
-                ->disabled()
-                ->reactive()
-                ->required(),
-                Repeater::make('time')
+                ->label('Assign time to each date')
                 ->schema([
-                    Grid::make(2)
-                    ->schema([
-                        Flatpickr::make('time_from')
-                        ->label('From')
-                        ->disableDate()
+                    DatePicker::make('date')
+                        ->disabled()
                         ->reactive()
                         ->required(),
-                        Flatpickr::make('time_to')
-                        ->label('To')
-                        ->disableDate()
-                        ->reactive()
-                        ->required(),
-                    ])
-                ])->createItemButtonLabel('Add time')
-            ])->reactive()->disableItemCreation(),
+                    Repeater::make('time')
+                        ->schema([
+                            Grid::make(2)
+                                ->schema([
+                                    Flatpickr::make('time_from')
+                                        ->label('From')
+                                        ->disableDate()
+                                        ->reactive()
+                                        ->required(),
+                                    Flatpickr::make('time_to')
+                                        ->label('To')
+                                        ->disableDate()
+                                        ->reactive()
+                                        ->required(),
+                                ])
+                        ])->createItemButtonLabel('Add time')
+                ])->reactive()->disableItemCreation(),
         ];
     }
 
@@ -160,7 +160,6 @@ class RequestVehicleShow extends Component implements HasForms
             'method'      => 'confirmApprove',
             'params'      => 'Saved',
         ]);
-
     }
 
     public function confirmApprove()
@@ -169,37 +168,45 @@ class RequestVehicleShow extends Component implements HasForms
         $this->request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $this->request_schedule->id)->get();
         foreach ($this->request_schedule_date_and_time as $item) {
             $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId) {
-            $query->where('status', 'Approved')->where('vehicle_id', $vehicleId);
+                $query->where('status', 'Approved')
+                    ->where(function ($query) use ($vehicleId) {
+                        $query->where('vehicle_id', $vehicleId)
+                            ->orWhere('driver_id', $this->request_schedule->driver_id);
+                    });
             })
-            ->where('travel_date', $item->travel_date)
-            ->where(function ($query) use ($item) {
-            $query->whereBetween('time_from', [$item->time_from, $item->time_to])
-                  ->orWhereBetween('time_to', [$item->time_from, $item->time_to])
-                  ->orWhere(function ($query) use ($item) {
-                  $query->where('time_from', '<=', $item->time_from)
-                    ->where('time_to', '>=', $item->time_to);
-                  });
-            })
-            ->first();
-
+                ->where('travel_date', $item->travel_date)
+                ->where(function ($query) use ($item) {
+                    $query->where(function ($q) use ($item) {
+                        $q->whereTime('time_from', '<=', $item->time_from)
+                            ->whereTime('time_to', '>', $item->time_from);
+                    })->orWhere(function ($q) use ($item) {
+                        $q->whereTime('time_from', '<', $item->time_to)
+                            ->whereTime('time_to', '>=', $item->time_to);
+                    })->orWhere(function ($q) use ($item) {
+                        $q->whereTime('time_from', '>=', $item->time_from)
+                            ->whereTime('time_to', '<=', $item->time_to);
+                    });
+                })
+                ->where('id', '!=', $item->id)
+                ->first();
             if (!$conflict) {
-            $this->request_schedule->status = 'Approved';
-            $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
-            $this->request_schedule->save();
-            $this->dialog()->success(
-                $title = 'Success',
-                $description = 'Request for vehicle has been approved'
-            );
-            return redirect()->route('signatory.motorpool.signed');
+                $this->request_schedule->status = 'Approved';
+                $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
+                $this->request_schedule->save();
+                $this->dialog()->success(
+                    $title = 'Success',
+                    $description = 'Request for vehicle has been approved'
+                );
+                return redirect()->route('signatory.motorpool.signed');
             } else {
-            $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
-            $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
-            $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
-            $this->dialog()->error(
-                $title = 'Operation Failed',
-                $description = "The vehicle is unavailable on {$date} between {$time_from} and {$time_to} due to a conflict in the approved schedules."
-            );
-            return;
+                $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
+                $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
+                $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
+                $this->dialog()->error(
+                    $title = 'Operation Failed',
+                    $description = "The vehicle is unavailable on {$date} between {$time_from} and {$time_to} due to a conflict in the approved schedules."
+                );
+                return;
             }
         }
     }
@@ -248,63 +255,59 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function confirmVehicle()
     {
-            DB::beginTransaction();
+        DB::beginTransaction();
 
-            $vehicleId = $this->assign_vehicle;
+        $vehicleId = $this->assign_vehicle;
 
-            foreach($this->request_schedule_date_and_time as $item)
-            {
-                $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId){
-                    $query->where('status', 'Approved')->where('vehicle_id', $vehicleId);
-                })
+        foreach ($this->request_schedule_date_and_time as $item) {
+            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId) {
+                $query->where('status', 'Approved')->where('vehicle_id', $vehicleId);
+            })
                 ->where('travel_date', $item->travel_date)
                 ->where(function ($query) use ($item) {
                     $query->where(function ($query) use ($item) {
                         $query->where('time_from', '<', $item->time_to)
-                              ->where('time_to', '>', $item->time_from);
+                            ->where('time_to', '>', $item->time_from);
                     })->orWhere(function ($query) use ($item) {
                         $query->where('time_from', '>=', $item->time_from)
-                              ->where('time_to', '<=', $item->time_to);
+                            ->where('time_to', '<=', $item->time_to);
                     });
                 })
                 ->first();
 
-                if(!$conflict)
-                {
-                    $this->request_schedule->vehicle_id = $this->assign_vehicle;
-                    $this->request_schedule->save();
-                    $item->vehicle_id = $this->assign_vehicle;
-                    $item->save();
+            if (!$conflict) {
+                $this->request_schedule->vehicle_id = $this->assign_vehicle;
+                $this->request_schedule->save();
+                $item->vehicle_id = $this->assign_vehicle;
+                $item->save();
 
-                    $this->dialog()->success(
-                        $title = 'Success',
-                        $description = 'Vehicle is assigned'
-                    );
-                    $this->assignVehicleModal = false;
-                    $this->emit('refreshComponent');
-                }else{
-                    $request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $this->request_schedule->id)->get();
-                    $vehicle = Vehicle::find($vehicleId);
-                    $date = Carbon::parse($request_schedule_date_and_time->travel_date)->format('F d, Y');
-                            $carbonDate = Carbon::createFromFormat('F d, Y', $date);
-                            $year = $carbonDate->year;
-                            $month = $carbonDate->month;
-                    Notification::make()->title('Operation Failed')->body("The vehicle {$vehicle->model} - ({$vehicle->plate_number}) has a conflict in the approved schedules")
-                            ->actions([
-                                Action::make('view')
-                                    ->button()
-                                    ->url(route('motorpool.view-schedule',  ['year' => $year, 'month' => $month, 'vehicle' => $vehicleId]), shouldOpenInNewTab: true),
-                            ])->persistent()
-                            ->danger()->send();
-                    // $this->dialog()->error(
-                    //     $title = 'Vehicle Unavailable',
-                    //     $description = 'Vehicle has an existing schedule with this records date and time.'
-                    // );
-                }
-
+                $this->dialog()->success(
+                    $title = 'Success',
+                    $description = 'Vehicle is assigned'
+                );
+                $this->assignVehicleModal = false;
+                $this->emit('refreshComponent');
+            } else {
+                $request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $this->request_schedule->id)->get();
+                $vehicle = Vehicle::find($vehicleId);
+                $date = Carbon::parse($request_schedule_date_and_time->travel_date)->format('F d, Y');
+                $carbonDate = Carbon::createFromFormat('F d, Y', $date);
+                $year = $carbonDate->year;
+                $month = $carbonDate->month;
+                Notification::make()->title('Operation Failed')->body("The vehicle {$vehicle->model} - ({$vehicle->plate_number}) has a conflict in the approved schedules")
+                    ->actions([
+                        Action::make('view')
+                            ->button()
+                            ->url(route('motorpool.view-schedule',  ['year' => $year, 'month' => $month, 'vehicle' => $vehicleId]), shouldOpenInNewTab: true),
+                    ])->persistent()
+                    ->danger()->send();
+                // $this->dialog()->error(
+                //     $title = 'Vehicle Unavailable',
+                //     $description = 'Vehicle has an existing schedule with this records date and time.'
+                // );
             }
-            DB::commit();
-
+        }
+        DB::commit();
     }
 
     public function changeVehicle($id)
@@ -330,25 +333,23 @@ class RequestVehicleShow extends Component implements HasForms
 
         $vehicleId = $this->change_vehicle;
 
-        foreach($this->request_schedule_date_and_time as $item)
-        {
-            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId){
+        foreach ($this->request_schedule_date_and_time as $item) {
+            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId) {
                 $query->where('status', 'Approved')->where('vehicle_id', $vehicleId);
             })
-            ->where('travel_date', $item->travel_date)
-            ->where(function ($query) use ($item) {
-                $query->where(function ($query) use ($item) {
-                    $query->where('time_from', '<', $item->time_to)
-                          ->where('time_to', '>', $item->time_from);
-                })->orWhere(function ($query) use ($item) {
-                    $query->where('time_from', '>=', $item->time_from)
-                          ->where('time_to', '<=', $item->time_to);
-                });
-            })
-            ->first();
+                ->where('travel_date', $item->travel_date)
+                ->where(function ($query) use ($item) {
+                    $query->where(function ($query) use ($item) {
+                        $query->where('time_from', '<', $item->time_to)
+                            ->where('time_to', '>', $item->time_from);
+                    })->orWhere(function ($query) use ($item) {
+                        $query->where('time_from', '>=', $item->time_from)
+                            ->where('time_to', '<=', $item->time_to);
+                    });
+                })
+                ->first();
 
-            if(!$conflict)
-            {
+            if (!$conflict) {
                 $this->request_schedule->vehicle_id = $this->change_vehicle;
                 $this->request_schedule->save();
                 $item->vehicle_id = $this->change_vehicle;
@@ -360,13 +361,12 @@ class RequestVehicleShow extends Component implements HasForms
                 );
                 $this->modifyVehicleModal = false;
                 $this->emit('refreshComponent');
-            }else{
+            } else {
                 $this->dialog()->error(
                     $title = 'Vehicle Unavailable',
                     $description = 'Vehicle has an existing schedule with this records date and time.'
                 );
             }
-
         }
         DB::commit();
     }
@@ -392,25 +392,23 @@ class RequestVehicleShow extends Component implements HasForms
 
         $driverId = $this->change_driver;
 
-        foreach($this->request_schedule_date_and_time as $item)
-        {
-            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($driverId){
+        foreach ($this->request_schedule_date_and_time as $item) {
+            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($driverId) {
                 $query->where('status', 'Approved')->where('driver_id', $driverId);
             })
-            ->where('travel_date', $item->travel_date)
-            ->where(function ($query) use ($item) {
-                $query->where(function ($query) use ($item) {
-                    $query->where('time_from', '<', $item->time_to)
-                          ->where('time_to', '>', $item->time_from);
-                })->orWhere(function ($query) use ($item) {
-                    $query->where('time_from', '>=', $item->time_from)
-                          ->where('time_to', '<=', $item->time_to);
-                });
-            })
-            ->first();
+                ->where('travel_date', $item->travel_date)
+                ->where(function ($query) use ($item) {
+                    $query->where(function ($query) use ($item) {
+                        $query->where('time_from', '<', $item->time_to)
+                            ->where('time_to', '>', $item->time_from);
+                    })->orWhere(function ($query) use ($item) {
+                        $query->where('time_from', '>=', $item->time_from)
+                            ->where('time_to', '<=', $item->time_to);
+                    });
+                })
+                ->first();
 
-            if(!$conflict)
-            {
+            if (!$conflict) {
                 $this->request_schedule->driver_id = $this->change_driver;
                 $this->request_schedule->save();
                 $item->save();
@@ -421,7 +419,7 @@ class RequestVehicleShow extends Component implements HasForms
                 );
                 $this->modifyDriverModal = false;
                 $this->emit('refreshComponent');
-            }else{
+            } else {
                 $this->dialog()->error(
                     $title = 'Driver Unavailable',
                     $description = 'Driver has an existing schedule with this records date and time.'
@@ -447,13 +445,13 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function confirmDriver()
     {
-            $this->request_schedule->driver_id = $this->assigned_driver;
-            $this->request_schedule->save();
-            $this->dialog()->success(
-                $title = 'Success',
-                $description = 'Driver is assigned'
-            );
-            return redirect()->route('motorpool.request.index');
+        $this->request_schedule->driver_id = $this->assigned_driver;
+        $this->request_schedule->save();
+        $this->dialog()->success(
+            $title = 'Success',
+            $description = 'Driver is assigned'
+        );
+        return redirect()->route('motorpool.request.index');
     }
 
     public function mergeDateAndTime($date_and_time)
@@ -491,7 +489,7 @@ class RequestVehicleShow extends Component implements HasForms
     public function updateTravelDates()
     {
         $dates_and_time = $this->mergeDateAndTime($this->date_and_time);
-        $this->request_schedule_date_and_time = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query){
+        $this->request_schedule_date_and_time = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) {
             $query->where('status', 'Approved')->where('vehicle_id', $this->request->vehicle_id);
         })->get();
         $existingDates = $this->request_schedule_date_and_time->pluck('travel_date')->toArray();
@@ -502,24 +500,22 @@ class RequestVehicleShow extends Component implements HasForms
         // }
         DB::beginTransaction();
         RequestScheduleTimeAndDate::where('request_schedule_id', $this->request->id)->delete();
-        foreach($this->request_schedule_date_and_time as $item)
-        {
-            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId){
+        foreach ($this->request_schedule_date_and_time as $item) {
+            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId) {
                 $query->where('status', 'Approved')->where('vehicle_id', $vehicleId);
             })
-            ->where('travel_date', $item->travel_date)
-            ->where(function ($query) use ($item) {
-                $query->where(function ($query) use ($item) {
-                    $query->where('time_from', '<', $item->time_to)
-                          ->where('time_to', '>', $item->time_from);
-                })->orWhere(function ($query) use ($item) {
-                    $query->where('time_from', '>=', $item->time_from)
-                          ->where('time_to', '<=', $item->time_to);
-                });
-            })
-            ->first();
-            if(!$conflict)
-            {
+                ->where('travel_date', $item->travel_date)
+                ->where(function ($query) use ($item) {
+                    $query->where(function ($query) use ($item) {
+                        $query->where('time_from', '<', $item->time_to)
+                            ->where('time_to', '>', $item->time_from);
+                    })->orWhere(function ($query) use ($item) {
+                        $query->where('time_from', '>=', $item->time_from)
+                            ->where('time_to', '<=', $item->time_to);
+                    });
+                })
+                ->first();
+            if (!$conflict) {
                 // Insert or update the remaining dates
                 foreach ($dates_and_time as $item) {
                     RequestScheduleTimeAndDate::updateOrCreate(
@@ -534,7 +530,7 @@ class RequestVehicleShow extends Component implements HasForms
                         ]
                     );
                 }
-            }else{
+            } else {
                 $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
                 $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
                 $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
@@ -544,9 +540,6 @@ class RequestVehicleShow extends Component implements HasForms
                 );
                 return;
             }
-
-
-
         }
         DB::commit();
 
@@ -561,15 +554,15 @@ class RequestVehicleShow extends Component implements HasForms
     public function render()
     {
         $this->driver_lists = EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))
-        ->whereHas('office', function ($query) {
-            return $query->where('campus_id', '=', auth()->user()->employee_information->office->campus_id);
-        })->get();
+            ->whereHas('office', function ($query) {
+                return $query->where('campus_id', '=', auth()->user()->employee_information->office->campus_id);
+            })->get();
         //$this->vehicles = Vehicle::where('campus_id', auth()->user()->employee_information->office->campus_id)->get();
         return view('livewire.requisitioner.motorpool.request-vehicle-show', [
-             'vehicles' =>  Vehicle::get(),
-             'vehicles_for_update' =>  Vehicle::whereNotIn('id', [$this->request->vehicle_id])->get(),
-             'drivers_for_update' =>  EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))->whereNotIn('id', [$this->request->driver_id])->get(),
-             'drivers' => $this->driver_lists,
+            'vehicles' =>  Vehicle::get(),
+            'vehicles_for_update' =>  Vehicle::whereNotIn('id', [$this->request->vehicle_id])->get(),
+            'drivers_for_update' =>  EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))->whereNotIn('id', [$this->request->driver_id])->get(),
+            'drivers' => $this->driver_lists,
         ]);
     }
 }
