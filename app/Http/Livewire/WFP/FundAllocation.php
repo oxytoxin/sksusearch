@@ -200,9 +200,9 @@ class FundAllocation extends Component implements HasTable
                         if($record->fundAllocations->first()->fundDrafts()->exists())
                         {
                             \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-                            $record->fundAllocations->fundDrafts->draft_items()->delete();
-                            $record->fundAllocations->fundDrafts->draft_amounts()->delete();
-                            $record->fundAllocations->fundDrafts()->delete();
+                            $record->fundAllocations->first()->fundDrafts->draft_items()->delete();
+                            $record->fundAllocations->first()->fundDrafts->draft_amounts()->delete();
+                            $record->fundAllocations->first()->fundDrafts()->delete();
                             \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
                         }
 
