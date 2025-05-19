@@ -191,26 +191,36 @@ class FundAllocation extends Component implements HasTable
                 ->requiresConfirmation()
                 ->modalHeading('Forward Balance')
                 ->modalSubheading(function (CostCenter $record) {
-                    $toBeForwarded =  $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->first()->initial_amount;
+                    if($record->fundAllocations()->exists())
+                    {
+                        $toBeForwarded =  $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->first()->initial_amount;
+                    }else{
+                        $toBeForwarded = 0;
+                    }
+
 
                     return 'The balance of ₱ '.number_format($toBeForwarded, 2).' will be forwarded. Are you sure you want to proceed?';
                 })
                 ->action(function (CostCenter $record) {
-
-                        if($record->fundAllocations->first()->fundDrafts()->exists())
+                        if($record->fundAllocations()->exists())
                         {
-                            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-                            $record->fundAllocations->first()->fundDrafts->draft_items()->delete();
-                            $record->fundAllocations->first()->fundDrafts->draft_amounts()->delete();
-                            $record->fundAllocations->first()->fundDrafts()->delete();
-                            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+                            if($record->fundAllocations->first()->fundDrafts()->exists())
+                                {
+                                    \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+                                    $record->fundAllocations->first()->fundDrafts->draft_items()->delete();
+                                    $record->fundAllocations->first()->fundDrafts->draft_amounts()->delete();
+                                    $record->fundAllocations->first()->fundDrafts()->delete();
+                                    \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+                                }
                         }
+
+
 
 
                     return redirect()->route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]);
                 })
                 //->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]))
-                ->visible(fn (CostCenter $record) => (!$record->wfp()->where('is_supplemental', 0)->exists() || $record->wfp()->where('is_supplemental', 0)->where('is_approved',  0)->exists()) && (!$record->hasSupplementalFund() && $record->fund_allocations()->exists())),
+                ->visible(fn (CostCenter $record) => (!$record->wfp()->where('is_supplemental', 0)->exists() || $record->wfp()->where('is_supplemental', 0)->where('is_approved',  0)->exists()) && (!$record->hasSupplementalFund())),
 
         ];
     }
