@@ -122,7 +122,7 @@ class SelectWfpTypeQ1 extends Component implements HasTable
 
 
                     $wfp = $record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->get();
-                    $wfpId = Wfp::find($record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->first()->id);
+                    $wfpId = Wfp::find($record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->where('is_supplemental', 0)->first()->id);
                     $wfpDetails = $wfpId->wfpDetails()->get();
                     $programmed = 0;
 
@@ -141,8 +141,8 @@ class SelectWfpTypeQ1 extends Component implements HasTable
                    // $initial = $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->first()->initial_amount;
                     //$balance = $initial - array_sum($this->programmed);
                     //$total = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->sum('initial_amount') + $balance;
-                    return $record->fundAllocations->where('is_supplemental', 0);
-                    //return '₱ ' . number_format($allocated, 2);
+                    //return $record->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+                    return '₱ ' . number_format($balance, 2);
                 }
             }),
         ];
