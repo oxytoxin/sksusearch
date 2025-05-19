@@ -189,7 +189,27 @@ class FundAllocation extends Component implements HasTable
                 ->button()
                 ->color('success')
                 ->requiresConfirmation()
-                ->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]))
+                ->modalHeading('Forward Balance')
+                ->modalSubheading(function (CostCenter $record) {
+                    $toBeForwarded =  $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->first()->initial_amount;
+
+                    return 'The balance of ₱ '.number_format($toBeForwarded, 2).' will be forwarded. Are you sure you want to proceed?';
+                })
+                ->action(function (CostCenter $record) {
+
+                        if($record->fundAllocations->first()->fundDrafts()->exists())
+                        {
+                            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+                            $record->fundAllocations->fundDrafts->draft_items()->delete();
+                            $record->fundAllocations->fundDrafts->draft_amounts()->delete();
+                            $record->fundAllocations->fundDrafts()->delete();
+                            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+                        }
+
+
+                    return redirect()->route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]);
+                })
+                //->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]))
                 ->visible(fn (CostCenter $record) => !$record->wfp()->where('is_supplemental', 0)->exists() && !$record->hasSupplementalFund()),
 
         ];
