@@ -367,7 +367,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }else{
                     //balance 164
                     $programmed = [];
-                    if ($record->wfp !== null)
+                    if ($this->record->wfp !== null)
                     {
                         foreach($this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->get() as $wfp)
                         {
