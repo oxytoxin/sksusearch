@@ -367,20 +367,26 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }else{
                     //balance 164
                     $programmed = [];
-                    
-                    foreach($this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->get() as $wfp)
+                    if ($record->wfp !== null)
                     {
-                        foreach($wfp->wfpDetails as $allocation)
+                        foreach($this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->get() as $wfp)
                         {
-                        if (!isset($programmed[$allocation->category_group_id])) {
-                            $programmed[$allocation->category_group_id] = 0;
+                            foreach($wfp->wfpDetails as $allocation)
+                            {
+                            if (!isset($programmed[$allocation->category_group_id])) {
+                                $programmed[$allocation->category_group_id] = 0;
+                            }
+                            $programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+                            }
                         }
-                        $programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
-                        }
+                        $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->initial_amount;
+                        $this->wfp_balance = $initial - array_sum($programmed);
+                        $this->current_balance = [];
+                    }else{
+                        $this->wfp_balance = $this->record->fundAllocations->where('is_supplemental', 1)->sum('initial_amount');
+                        $this->current_balance = [];
                     }
-                    $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->initial_amount;
-                    $this->wfp_balance = $initial - array_sum($programmed);
-                    $this->current_balance = [];
+
                 }
             }else{
                 if($this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts()->first()?->draft_amounts()->exists())
