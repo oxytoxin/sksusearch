@@ -63,7 +63,8 @@ class AddSupplementalFund extends Component
 
             $this->balance_164 = $this->fundInitialAmount;
         }else{
-
+            $this->record = CostCenter::find($record);
+             $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
 
             foreach($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->get() as $wfp)
             {
