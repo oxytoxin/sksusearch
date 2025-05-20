@@ -120,7 +120,6 @@ class ViewSupplementalFunds extends Component
             });
 
             $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
-
             $this->supplemental_allocation_description = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->description;
             $this->supplemental_allocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
             $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
