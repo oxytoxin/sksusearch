@@ -135,7 +135,7 @@ class SelectWfpTypeQ1 extends Component implements HasTable
                         $balance = $record->fundAllocations->sum('initial_amount') - $programmed;
                         return '₱ ' . number_format($balance, 2);
                     }else{
-                        $balance = $record->fundAllocations->sum('initial_amount')->where('is_supplemental', 1);
+                        $balance = $record->fundAllocations->where('is_supplemental', 1)->sum('initial_amount');
                         return '₱ ' . number_format($balance, 2);
                     }
 
