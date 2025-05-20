@@ -120,7 +120,7 @@ class SelectWfpTypeQ1 extends Component implements HasTable
                     $fund_allocation = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->first();
                     //$allocated = $fund_allocation->initial_amount;
 
-                    if($record->wfp->exists())
+                    if ($record->wfp !== null)
                     {
                         $wfp = $record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->get();
                         $wfpId = Wfp::find($record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->where('is_supplemental', 0)->first()->id);
