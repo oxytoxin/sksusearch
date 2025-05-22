@@ -123,23 +123,29 @@ class SelectWfpTypeQ1 extends Component implements HasTable
                     if ($record->wfp !== null)
                     {
                         $wfp = $record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->get();
-
                         $programmed = 0;
                         if($record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->where('is_supplemental', 0)->first() === null)
                         {
                             $balance = $record->fundAllocations->sum('initial_amount');
                              return '₱ ' . number_format($balance, 2);
                         }else{
-                            $wfpId = Wfp::find($record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->where('is_supplemental', 0)->first()->id);
-                            $wfpDetails = $wfpId->wfpDetails()->get();
-
-                            foreach($wfpDetails as $wfp)
+                            if($record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->where('is_supplemental', 0)->first()->is_approved === 0)
                             {
-                                $programmed += $wfp->total_quantity * $wfp->cost_per_unit;
+                                  $balance = $record->fundAllocations->where('is_supplemental', 1)->sum('initial_amount');
+                                  return '₱ ' . number_format($balance, 2);
+                            }else{
+                                $wfpId = Wfp::find($record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->where('is_supplemental', 0)->first()->id);
+                                $wfpDetails = $wfpId->wfpDetails()->get();
 
+                                foreach($wfpDetails as $wfp)
+                                {
+                                    $programmed += $wfp->total_quantity * $wfp->cost_per_unit;
+
+                                }
+                                $balance = $record->fundAllocations->sum('initial_amount') - $programmed;
+                                return '₱ ' . number_format($balance, 2);
                             }
-                            $balance = $record->fundAllocations->sum('initial_amount') - $programmed;
-                            return '₱ ' . number_format($balance, 2);
+
                         }
 
 

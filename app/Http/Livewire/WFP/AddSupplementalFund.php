@@ -32,11 +32,12 @@ class AddSupplementalFund extends Component
     public $balance_164;
     public $sub_total_164;
 
+    public $isForwarded = false;
+
 
 
     public function mount($record, $wfpType, $isForwarded)
     {
-
 
        // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
 
@@ -51,18 +52,23 @@ class AddSupplementalFund extends Component
 
             if($this->record->fund_allocations()->exists())
             {
+
             $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
             $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
             $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
             $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
+
+             $this->balance_164 = $this->fundInitialAmount;
+             $this->isForwarded = true;
             }else{
             $this->selectedType = 1;
             $this->fundInitialAmount = 0;
             $this->fund_description = 'No Fund Allocation';
             $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
+             $this->balance_164 = $this->fundInitialAmount;
             }
 
-            $this->balance_164 = $this->fundInitialAmount;
+
         }else{
             $this->record = CostCenter::find($record);
             $this->category_groups = CategoryGroup::where('is_active', 1)->get();
@@ -148,6 +154,7 @@ class AddSupplementalFund extends Component
 
     public function calculateTotalSupplemental()
     {
+
         return array_sum($this->amounts);
     }
 
@@ -245,12 +252,13 @@ class AddSupplementalFund extends Component
 
             ]);
 
+
             FundAllocation::create([
                 'cost_center_id' => $this->record->id,
                 'wpf_type_id' => $this->selectedType,
                 'supplemental_quarter_id' => $this->supplemental_quarter->id,
                 'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
-                'initial_amount' => $this->supplemental_allocation,
+                'initial_amount' => $this->isForwarded ? $this->supplemental_allocation + $this->balance_164 : $this->supplemental_allocation,
                 'description' => $this->supplemental_allocation_description,
                 'is_supplemental' => 1,
             ]);
