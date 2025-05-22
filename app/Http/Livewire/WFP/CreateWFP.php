@@ -330,17 +330,20 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     if($isSupplemental)
                     {
                         $programmed = [];
-                        foreach($this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->get() as $wfp)
+                        foreach($this->record->wfp->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->where('cost_center_id', $this->record->id)->get() as $wfp)
                         {
                             foreach($wfp->wfpDetails as $allocation)
                             {
                             if (!isset($programmed[$allocation->category_group_id])) {
                                 $programmed[$allocation->category_group_id] = 0;
                             }
+
                             $programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
                             }
                         }
-                        $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->initial_amount;
+
+
+                        $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->initial_amount;
                         $this->wfp_balance = $initial - array_sum($programmed);
                         $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_amounts->map(function($allocation) {
                             return [
