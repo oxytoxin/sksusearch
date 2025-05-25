@@ -694,8 +694,8 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Sultan Kudarat State University';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
-            ->where('is_supplemental', 1)->where('is_approved', 1);
+            $query->where('wpf_type_id', $this->selectedType)
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
