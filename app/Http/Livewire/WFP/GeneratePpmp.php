@@ -52,12 +52,14 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -77,7 +79,8 @@ class GeneratePpmp extends Component
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
@@ -144,13 +147,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 1)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -173,6 +178,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 1);
             });
@@ -211,13 +217,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 2)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -240,6 +248,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 2);
             });
@@ -277,13 +286,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 3)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -306,6 +317,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 3);
             });
@@ -343,13 +355,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 4)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -372,6 +386,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 4);
             });
@@ -409,13 +424,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 5)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -438,6 +455,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 5);
             });
@@ -475,13 +493,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 6)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1);
+            $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -504,6 +524,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 6);
             });
@@ -540,12 +561,14 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -565,7 +588,8 @@ class GeneratePpmp extends Component
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
@@ -631,13 +655,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 1)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -660,6 +686,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 1);
             });
@@ -697,13 +724,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 2)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -726,6 +755,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 2);
             });
@@ -763,13 +793,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 3)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -792,6 +824,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 3);
             });
@@ -829,13 +862,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 4)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -858,6 +893,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 4);
             });
@@ -895,13 +931,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 5)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -924,6 +962,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 5);
             });
@@ -961,13 +1000,15 @@ class GeneratePpmp extends Component
         ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
         ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
         ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        ->where('fund_allocations.is_supplemental', 1)
         ->where('m_f_o_s.id', 6)
         ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
         ->get();
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 3);
+            $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -990,6 +1031,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function ($query) {
                 $query->where('m_f_o_s_id', 6);
             });
@@ -1020,8 +1062,9 @@ class GeneratePpmp extends Component
         ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
+        ->where('is_supplemental', 1)
         ->where('wpf_type_id', $this->selectedType)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->whereHas('costCenter.wfp')
         ->get();
 
@@ -1030,13 +1073,15 @@ class GeneratePpmp extends Component
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
+            ->where('is_supplemental', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1112,10 +1157,11 @@ class GeneratePpmp extends Component
         ->join('campuses', 'offices.campus_id', '=', 'campuses.id') // Join campuses table
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
+        ->where('is_supplemental', 1)
         ->where('wpf_type_id', $this->selectedType)
         ->where('campuses.id', 1) // Filter by campus_id
         ->whereHas('costCenter.wfp')
-        ->groupBy('wpf_type_id', 'mfo_fees.id')
+        ->groupBy('wpf_type_id', 'mfo_fees.id','mfo_fees.name')
         ->get();
 
 
@@ -1125,6 +1171,7 @@ class GeneratePpmp extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                   ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1)
                   ->whereHas('costCenter', function ($query) {
                       $query->whereHas('office', function ($query) {
                           $query->whereHas('campus', function ($query) {
@@ -1140,7 +1187,8 @@ class GeneratePpmp extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
-                  ->where('fund_cluster_w_f_p_s_id', 2);
+                  ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1192,9 +1240,10 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('campuses.id', 2) // Filter by campus_id
         ->whereHas('costCenter.wfp')
-        ->groupBy('wpf_type_id', 'mfo_fees.id')
+        ->groupBy('wpf_type_id', 'mfo_fees.id','mfo_fees.name')
         ->get();
 
 
@@ -1204,6 +1253,7 @@ class GeneratePpmp extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                   ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1)
                   ->whereHas('costCenter', function ($query) {
                       $query->whereHas('office', function ($query) {
                           $query->whereHas('campus', function ($query) {
@@ -1219,7 +1269,8 @@ class GeneratePpmp extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
-                  ->where('fund_cluster_w_f_p_s_id', 2);
+                  ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1270,9 +1321,10 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('campuses.id', 3) // Filter by campus_id
         ->whereHas('costCenter.wfp')
-        ->groupBy('wpf_type_id', 'mfo_fees.id')
+        ->groupBy('wpf_type_id', 'mfo_fees.id','mfo_fees.name')
         ->get();
 
 
@@ -1282,6 +1334,7 @@ class GeneratePpmp extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                   ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1)
                   ->whereHas('costCenter', function ($query) {
                       $query->whereHas('office', function ($query) {
                           $query->whereHas('campus', function ($query) {
@@ -1297,7 +1350,8 @@ class GeneratePpmp extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
-                  ->where('fund_cluster_w_f_p_s_id', 2);
+                  ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1347,10 +1401,11 @@ class GeneratePpmp extends Component
         ->join('campuses', 'offices.campus_id', '=', 'campuses.id') // Join campuses table
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
+        ->where('is_supplemental', 1)
         ->where('wpf_type_id', $this->selectedType)
         ->where('campuses.id', 4) // Filter by campus_id
         ->whereHas('costCenter.wfp')
-        ->groupBy('wpf_type_id', 'mfo_fees.id')
+        ->groupBy('wpf_type_id', 'mfo_fees.id','mfo_fees.name')
         ->get();
 
 
@@ -1360,6 +1415,7 @@ class GeneratePpmp extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                   ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1)
                   ->whereHas('costCenter', function ($query) {
                       $query->whereHas('office', function ($query) {
                           $query->whereHas('campus', function ($query) {
@@ -1375,7 +1431,8 @@ class GeneratePpmp extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
-                  ->where('fund_cluster_w_f_p_s_id', 2);
+                  ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1425,10 +1482,11 @@ class GeneratePpmp extends Component
         ->join('campuses', 'offices.campus_id', '=', 'campuses.id') // Join campuses table
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
+        ->where('is_supplemental', 1)
         ->where('wpf_type_id', $this->selectedType)
         ->where('campuses.id', 5) // Filter by campus_id
         ->whereHas('costCenter.wfp')
-        ->groupBy('wpf_type_id', 'mfo_fees.id')
+        ->groupBy('wpf_type_id', 'mfo_fees.id','mfo_fees.name')
         ->get();
 
 
@@ -1438,6 +1496,7 @@ class GeneratePpmp extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                   ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1)
                   ->whereHas('costCenter', function ($query) {
                       $query->whereHas('office', function ($query) {
                           $query->whereHas('campus', function ($query) {
@@ -1453,7 +1512,8 @@ class GeneratePpmp extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
-                  ->where('fund_cluster_w_f_p_s_id', 2);
+                  ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1505,8 +1565,9 @@ class GeneratePpmp extends Component
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
         ->where('wpf_type_id', $this->selectedType)
         ->where('campuses.id', 6) // Filter by campus_id
+        ->where('is_supplemental', 1)
         ->whereHas('costCenter.wfp')
-        ->groupBy('wpf_type_id', 'mfo_fees.id')
+        ->groupBy('wpf_type_id', 'mfo_fees.id','mfo_fees.name')
         ->get();
 
 
@@ -1516,6 +1577,7 @@ class GeneratePpmp extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                   ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1)
                   ->whereHas('costCenter', function ($query) {
                       $query->whereHas('office', function ($query) {
                           $query->whereHas('campus', function ($query) {
@@ -1531,7 +1593,8 @@ class GeneratePpmp extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
-                  ->where('fund_cluster_w_f_p_s_id', 2);
+                  ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1582,9 +1645,10 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('campuses.id', 7) // Filter by campus_id
         ->whereHas('costCenter.wfp')
-        ->groupBy('wpf_type_id', 'mfo_fees.id')
+        ->groupBy('wpf_type_id', 'mfo_fees.id','mfo_fees.name')
         ->get();
 
 
@@ -1594,6 +1658,7 @@ class GeneratePpmp extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                   ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1)
                   ->whereHas('costCenter', function ($query) {
                       $query->whereHas('office', function ($query) {
                           $query->whereHas('campus', function ($query) {
@@ -1609,7 +1674,8 @@ class GeneratePpmp extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
-                  ->where('fund_cluster_w_f_p_s_id', 2);
+                  ->where('fund_cluster_w_f_p_s_id', 2)
+                  ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1660,20 +1726,23 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
         ->where('wpf_type_id', $this->selectedType)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->where('is_supplemental', 1)
+        ->groupBy('wpf_type_id','mfo_fees.id', 'mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1744,8 +1813,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 1)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id', 'mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -1753,6 +1823,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
             });
@@ -1760,7 +1831,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1805,9 +1877,10 @@ class GeneratePpmp extends Component
         ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
+        ->where('is_supplemental', 1)
         ->where('wpf_type_id', $this->selectedType)
         ->where('cost_centers.m_f_o_s_id', 2)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -1815,6 +1888,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
             });
@@ -1822,7 +1896,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1865,8 +1940,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 3)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -1874,6 +1950,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
             });
@@ -1881,7 +1958,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1924,8 +2002,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 4)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -1933,6 +2012,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
             });
@@ -1940,7 +2020,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1983,8 +2064,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 5)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -1992,6 +2074,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
             });
@@ -1999,7 +2082,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2042,8 +2126,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 4)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 6)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2051,6 +2136,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
             });
@@ -2058,7 +2144,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2103,19 +2190,22 @@ class GeneratePpmp extends Component
          ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
          ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
          ->where('wpf_type_id', $this->selectedType)
-         ->groupBy('wpf_type_id','mfo_fees.id')
+         ->where('is_supplemental', 1)
+         ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
          ->get();
 
          $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
          $this->total_allocated = $this->fund_allocation->sum('total_allocated');
          $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1);
          })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
          $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
          $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1);
          })
          ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
          ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2186,8 +2276,9 @@ class GeneratePpmp extends Component
          ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
          ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
          ->where('wpf_type_id', $this->selectedType)
+         ->where('is_supplemental', 1)
          ->where('cost_centers.m_f_o_s_id', 1)
-         ->groupBy('wpf_type_id','mfo_fees.id')
+         ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
          ->get();
 
          $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2195,6 +2286,7 @@ class GeneratePpmp extends Component
          $this->total_allocated = $this->fund_allocation->sum('total_allocated');
          $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
              $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1)
              ->whereHas('costCenter', function($query) {
                  $query->where('m_f_o_s_id', 1);
              });
@@ -2202,7 +2294,8 @@ class GeneratePpmp extends Component
          $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
          $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1);
          })
          ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
          ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2245,8 +2338,9 @@ class GeneratePpmp extends Component
          ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
          ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
          ->where('wpf_type_id', $this->selectedType)
+         ->where('is_supplemental', 1)
          ->where('cost_centers.m_f_o_s_id', 2)
-         ->groupBy('wpf_type_id','mfo_fees.id')
+         ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
          ->get();
 
          $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2254,6 +2348,7 @@ class GeneratePpmp extends Component
          $this->total_allocated = $this->fund_allocation->sum('total_allocated');
          $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
              $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1)
              ->whereHas('costCenter', function($query) {
                  $query->where('m_f_o_s_id', 2);
              });
@@ -2261,7 +2356,8 @@ class GeneratePpmp extends Component
          $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
          $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1);
          })
          ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
          ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2304,8 +2400,9 @@ class GeneratePpmp extends Component
          ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
          ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
          ->where('wpf_type_id', $this->selectedType)
+         ->where('is_supplemental', 1)
          ->where('cost_centers.m_f_o_s_id', 3)
-         ->groupBy('wpf_type_id','mfo_fees.id')
+         ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
          ->get();
 
          $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2313,6 +2410,7 @@ class GeneratePpmp extends Component
          $this->total_allocated = $this->fund_allocation->sum('total_allocated');
          $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
              $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1)
              ->whereHas('costCenter', function($query) {
                  $query->where('m_f_o_s_id', 3);
              });
@@ -2320,7 +2418,8 @@ class GeneratePpmp extends Component
          $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
          $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1);
          })
          ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
          ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2363,8 +2462,9 @@ class GeneratePpmp extends Component
          ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
          ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
          ->where('wpf_type_id', $this->selectedType)
+         ->where('is_supplemental', 1)
          ->where('cost_centers.m_f_o_s_id', 4)
-         ->groupBy('wpf_type_id','mfo_fees.id')
+         ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
          ->get();
 
          $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2372,6 +2472,7 @@ class GeneratePpmp extends Component
          $this->total_allocated = $this->fund_allocation->sum('total_allocated');
          $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
              $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1)
              ->whereHas('costCenter', function($query) {
                  $query->where('m_f_o_s_id', 4);
              });
@@ -2379,7 +2480,8 @@ class GeneratePpmp extends Component
          $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
          $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1);
          })
          ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
          ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2422,8 +2524,9 @@ class GeneratePpmp extends Component
          ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
          ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
          ->where('wpf_type_id', $this->selectedType)
+         ->where('is_supplemental', 1)
          ->where('cost_centers.m_f_o_s_id', 5)
-         ->groupBy('wpf_type_id','mfo_fees.id')
+         ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
          ->get();
 
          $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2431,6 +2534,7 @@ class GeneratePpmp extends Component
          $this->total_allocated = $this->fund_allocation->sum('total_allocated');
          $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
              $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1)
              ->whereHas('costCenter', function($query) {
                  $query->where('m_f_o_s_id', 5);
              });
@@ -2438,7 +2542,8 @@ class GeneratePpmp extends Component
          $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
          $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1);
          })
          ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
          ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2481,8 +2586,9 @@ class GeneratePpmp extends Component
          ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
          ->where('mfo_fees.fund_cluster_w_f_p_s_id', 7)
          ->where('wpf_type_id', $this->selectedType)
+         ->where('is_supplemental', 1)
          ->where('cost_centers.m_f_o_s_id', 6)
-         ->groupBy('wpf_type_id','mfo_fees.id')
+         ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
          ->get();
 
          $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2490,6 +2596,7 @@ class GeneratePpmp extends Component
          $this->total_allocated = $this->fund_allocation->sum('total_allocated');
          $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
              $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1)
              ->whereHas('costCenter', function($query) {
                  $query->where('m_f_o_s_id', 6);
              });
@@ -2497,7 +2604,8 @@ class GeneratePpmp extends Component
          $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
          $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7);
+             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
+             ->where('is_supplemental', 1);
          })
          ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
          ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2542,19 +2650,22 @@ class GeneratePpmp extends Component
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
             ->where('wpf_type_id', $this->selectedType)
-            ->groupBy('wpf_type_id','mfo_fees.id')
+            ->where('is_supplemental', 1)
+            ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
             ->get();
 
             $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
             $this->total_allocated = $this->fund_allocation->sum('total_allocated');
             $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1);
             })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
             $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1);
             })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2625,8 +2736,9 @@ class GeneratePpmp extends Component
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
             ->where('wpf_type_id', $this->selectedType)
+            ->where('is_supplemental', 1)
             ->where('cost_centers.m_f_o_s_id', 1)
-            ->groupBy('wpf_type_id','mfo_fees.id')
+            ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
             ->get();
 
             $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2634,6 +2746,7 @@ class GeneratePpmp extends Component
             $this->total_allocated = $this->fund_allocation->sum('total_allocated');
             $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1)
                 ->whereHas('costCenter', function($query) {
                     $query->where('m_f_o_s_id', 1);
                 });
@@ -2641,7 +2754,8 @@ class GeneratePpmp extends Component
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
             $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1);
             })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2684,8 +2798,9 @@ class GeneratePpmp extends Component
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
             ->where('wpf_type_id', $this->selectedType)
+            ->where('is_supplemental', 1)
             ->where('cost_centers.m_f_o_s_id', 2)
-            ->groupBy('wpf_type_id','mfo_fees.id')
+            ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
             ->get();
 
             $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2693,6 +2808,7 @@ class GeneratePpmp extends Component
             $this->total_allocated = $this->fund_allocation->sum('total_allocated');
             $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1)
                 ->whereHas('costCenter', function($query) {
                     $query->where('m_f_o_s_id', 2);
                 });
@@ -2700,7 +2816,8 @@ class GeneratePpmp extends Component
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
             $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1);
             })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2743,8 +2860,9 @@ class GeneratePpmp extends Component
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
             ->where('wpf_type_id', $this->selectedType)
+            ->where('is_supplemental', 1)
             ->where('cost_centers.m_f_o_s_id', 3)
-            ->groupBy('wpf_type_id','mfo_fees.id')
+            ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
             ->get();
 
             $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2752,6 +2870,7 @@ class GeneratePpmp extends Component
             $this->total_allocated = $this->fund_allocation->sum('total_allocated');
             $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1)
                 ->whereHas('costCenter', function($query) {
                     $query->where('m_f_o_s_id', 3);
                 });
@@ -2759,7 +2878,8 @@ class GeneratePpmp extends Component
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
             $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1);
             })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2802,8 +2922,9 @@ class GeneratePpmp extends Component
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
             ->where('wpf_type_id', $this->selectedType)
+            ->where('is_supplemental', 1)
             ->where('cost_centers.m_f_o_s_id', 4)
-            ->groupBy('wpf_type_id','mfo_fees.id')
+            ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
             ->get();
 
             $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2811,6 +2932,7 @@ class GeneratePpmp extends Component
             $this->total_allocated = $this->fund_allocation->sum('total_allocated');
             $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1)
                 ->whereHas('costCenter', function($query) {
                     $query->where('m_f_o_s_id', 4);
                 });
@@ -2818,7 +2940,8 @@ class GeneratePpmp extends Component
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
             $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1);
             })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2861,8 +2984,9 @@ class GeneratePpmp extends Component
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
             ->where('wpf_type_id', $this->selectedType)
+            ->where('is_supplemental', 1)
             ->where('cost_centers.m_f_o_s_id', 5)
-            ->groupBy('wpf_type_id','mfo_fees.id')
+            ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
             ->get();
 
             $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2870,6 +2994,7 @@ class GeneratePpmp extends Component
             $this->total_allocated = $this->fund_allocation->sum('total_allocated');
             $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1)
                 ->whereHas('costCenter', function($query) {
                     $query->where('m_f_o_s_id', 5);
                 });
@@ -2877,7 +3002,8 @@ class GeneratePpmp extends Component
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
             $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1);
             })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2920,8 +3046,9 @@ class GeneratePpmp extends Component
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', 5)
             ->where('wpf_type_id', $this->selectedType)
+            ->where('is_supplemental', 1)
             ->where('cost_centers.m_f_o_s_id', 6)
-            ->groupBy('wpf_type_id','mfo_fees.id')
+            ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
             ->get();
 
             $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -2929,6 +3056,7 @@ class GeneratePpmp extends Component
             $this->total_allocated = $this->fund_allocation->sum('total_allocated');
             $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
                 $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1)
                 ->whereHas('costCenter', function($query) {
                     $query->where('m_f_o_s_id', 6);
                 });
@@ -2936,7 +3064,8 @@ class GeneratePpmp extends Component
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
             $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5);
+                $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
+                ->where('is_supplemental', 1);
             })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2980,19 +3109,22 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
         ->where('wpf_type_id', $this->selectedType)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->where('is_supplemental', 1)
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3066,8 +3198,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 1)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -3075,6 +3208,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
             });
@@ -3082,7 +3216,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3125,8 +3260,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 2)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -3134,6 +3270,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
             });
@@ -3141,7 +3278,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3184,8 +3322,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 3)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -3193,6 +3332,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
             });
@@ -3200,7 +3340,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3243,8 +3384,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 4)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -3252,6 +3394,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
             });
@@ -3259,7 +3402,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3302,8 +3446,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 5)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -3311,6 +3456,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
             });
@@ -3318,7 +3464,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3361,8 +3508,9 @@ class GeneratePpmp extends Component
         ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
         ->where('mfo_fees.fund_cluster_w_f_p_s_id', 6)
         ->where('wpf_type_id', $this->selectedType)
+        ->where('is_supplemental', 1)
         ->where('cost_centers.m_f_o_s_id', 6)
-        ->groupBy('wpf_type_id','mfo_fees.id')
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
         ->get();
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -3370,6 +3518,7 @@ class GeneratePpmp extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1)
             ->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
             });
@@ -3377,7 +3526,8 @@ class GeneratePpmp extends Component
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6);
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
+            ->where('is_supplemental', 1);
         })
         ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
         ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
