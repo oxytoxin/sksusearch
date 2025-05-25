@@ -152,7 +152,7 @@
                         @forelse ($record->wfpDetails->where('budget_category_id', 2) as $item)
                         <tr class="border-t border-gray-300">
                             <td class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">{{$item->supply->categoryItemsBudget->uacs_code ?? 'none'}}</td>
-                            <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->categoryItemsBudget->name}}</td>
+                            <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->categoryItemsBudget->name ?? 'none'}}</td>
                             <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->particulars}}</td>
                             <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->supply->supply_code}}</td>
                             <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{$item->total_quantity}}</td>
