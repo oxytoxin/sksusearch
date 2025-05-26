@@ -395,6 +395,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     {
                         foreach($this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->get() as $wfp)
                         {
+
                             foreach($wfp->wfpDetails as $allocation)
                             {
                             if (!isset($programmed[$allocation->category_group_id])) {

@@ -283,7 +283,12 @@
                     <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                         <div>
                             @php
-                            $allocated = $isSupplemental ? $record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') : $record->costCenter->fundAllocations->sum('initial_amount');
+                            if($record->costCenter->wfp->where('is_supplemental', 0)->count() > 0)
+                            {
+                                $allocated = $isSupplemental ? $record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') + $balance : $record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+                            }else{
+                                $allocated = $isSupplemental ? $record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') : $record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+                            }
                             @endphp
                             <div class="flex justify-between space-x-3">
                                 <span>Allocated Fund: </span><span>₱ {{number_format($allocated, 2)}}</span>

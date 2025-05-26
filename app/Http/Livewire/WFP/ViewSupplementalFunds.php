@@ -38,6 +38,7 @@ class ViewSupplementalFunds extends Component
        // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
         if($isForwarded)
         {
+
             $this->record = CostCenter::find($record);
             $this->category_groups = CategoryGroup::where('is_active', 1)->get();
             $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function($query) {

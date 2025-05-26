@@ -24,15 +24,34 @@ class WfpReport extends Component
         $this->record = Wfp::where('id', $record)->where('is_supplemental', 1)->first();
         $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount');
         $this->wfpDetails = $this->record->wfpDetails()->get();
-        // $this->program = $this->wfpDetails->sum('estimated_budget');
         foreach($this->wfpDetails as $wfpDetail)
         {
             $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
         }
-        // $total_quantity = $this->wfpDetails->sum('total_quantity');
-        // $cost_per_unit = $this->wfpDetails->sum('cost_per_unit');
-        // $this->program = $total_quantity * $cost_per_unit;
-        $this->balance = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') - $this->program;
+
+
+
+        //old balance
+        if($this->record->costCenter->wfp->where('is_supplemental', 0)->count() > 0)
+        {
+                $record = Wfp::where('cost_center_id', $this->record->costCenter->id)
+                            ->where('is_supplemental', 0)
+                            ->first();
+                $allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+                $wfpDetails = $record->wfpDetails()->get();
+                $programmed = 0;
+                foreach($wfpDetails as $wfpDetail)
+                {
+                    $programmed += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
+                }
+
+                $this->balance = $allocation - $programmed;
+                //$this->balance = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') - $this->program;
+        }else{
+            $this->balance = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') - $this->program;
+        }
+
+
         }else{
         $this->record = Wfp::where('id', $record)->where('is_supplemental', 0)->first();
         $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
