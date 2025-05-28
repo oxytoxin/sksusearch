@@ -76,9 +76,9 @@ class ViewSupplementalFunds extends Component
             // $this->wfp_type = WpfType::all();
 
             $initialNonSupplementalFundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first();
-            $this->selectedType =  $initialNonSupplementalFundAllocation->wpf_type_id;
-            $this->fundInitialAmount = $initialNonSupplementalFundAllocation->initial_amount;
-            $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
+            $this->selectedType =  $initialNonSupplementalFundAllocation->wpf_type_id ?? null;
+            $this->fundInitialAmount = $initialNonSupplementalFundAllocation->initial_amount ?? 0;
+            $this->fund_description = 'No Fund Allocation';
             $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
 
             $workFinancialPlans = $this->record->wfp?->where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();
