@@ -25,99 +25,170 @@ class ViewSupplementalFunds extends Component
     public $supplemental_quarter;
 
 
-     //for 164
-     public $supplemental_allocation;
-     public $supplemental_allocation_description;
-     public $balance_164;
-     public $sub_total_164;
-     public $balance_164_q1;
+    //for 164
+    public $supplemental_allocation;
+    public $supplemental_allocation_description;
+    public $balance_164;
+    public $sub_total_164;
+    public $balance_164_q1;
+
+    public $allocations_non_suplemental;
 
     public function mount($record, $wfpType, $isForwarded)
     {
 
-       // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
-        if($isForwarded)
-        {
+        // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
+        if ($isForwarded) {
+            // $this->record = CostCenter::find($record);
+            // $this->category_groups = CategoryGroup::where('is_active', 1)->get();
+            // $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function ($query) {
+            //     $query->where('cost_center_id', $this->record->id)->where('is_supplemental', 0)->where('initial_amount', '>', 0);
+            // })->where('is_active', 1)->get();
+            // $this->wfp_type = WpfType::all();
 
-            $this->record = CostCenter::find($record);
-            $this->category_groups = CategoryGroup::where('is_active', 1)->get();
-            $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function($query) {
-                $query->where('cost_center_id', $this->record->id)->where('is_supplemental', 0)->where('initial_amount', '>', 0);
-            })->where('is_active', 1)->get();
-            $this->wfp_type = WpfType::all();
+            // if ($this->record->fund_allocations()->where('is_supplemental', 0)->exists()) {
+            //     $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
+            //     $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
+            //     $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
+            //     $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
 
-            if($this->record->fund_allocations()->where('is_supplemental', 0)->exists())
-            {
-            $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
-            $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
-            $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
+            //     $this->balance_164 = $this->fundInitialAmount;
+
+            //     $this->supplemental_allocation_description = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->description;
+            //     $this->supplemental_allocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
+            //     $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
+            //     $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
+            // } else {
+            //     $this->fundInitialAmount = 0;
+            //     $this->fund_description = 'No Fund Allocation';
+            //     $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
+
+            //     $this->balance_164 = $this->fundInitialAmount;
+            //     $this->supplemental_allocation_description = $this->record->fundAllocations->where('is_supplemental', 1)->first()->description;
+            //     $this->supplemental_allocation = $this->record->fundAllocations->where('is_supplemental', 1)->first()->initial_amount;
+            //     $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
+            //     $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
+            // }
+            $this->record = CostCenter::find($record)->load(['wfp']);
+            // $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function ($query) {
+            //     $query->where('cost_center_id', $this->record->id)->where('is_supplemental', 0)->where('initial_amount', '>', 0);
+            // })->where('is_active', 1)->get();
+            // $this->wfp_type = WpfType::all();
+
+            $initialNonSupplementalFundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first();
+            $this->selectedType =  $initialNonSupplementalFundAllocation->wpf_type_id ?? null;
+            $this->fundInitialAmount = $initialNonSupplementalFundAllocation->initial_amount ?? 0;
+            $this->fund_description = 'No Fund Allocation';
             $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
 
-            $this->balance_164 = $this->fundInitialAmount;
+            $workFinancialPlans = $this->record->wfp?->where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();
 
+            if ($workFinancialPlans) {
+                foreach ($workFinancialPlans->where('is_supplemental', 0) as $wfp) {
+                    foreach ($wfp->wfpDetails as $allocation) {
+                        if (!isset($this->programmed[$allocation->category_group_id])) {
+                            $this->programmed[$allocation->category_group_id] = 0;
+                        }
+                        $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+                    }
+                }
+
+                foreach ($workFinancialPlans->where('is_supplemental', 1) as $wfp) {
+                    foreach ($wfp->wfpDetails as $allocation) {
+                        if (!isset($this->programmed_supplemental[$allocation->category_group_id])) {
+                            $this->programmed_supplemental[$allocation->category_group_id] = 0;
+                        }
+                        $this->programmed_supplemental[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+                    }
+                }
+            }
+
+
+
+
+            $costCenterFundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
+
+            foreach ($costCenterFundAllocation->where('is_supplemental', 0) as $allocation) {
+                $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
+            }
+
+            foreach ($costCenterFundAllocation->where('is_supplemental', 1) as $allocation) {
+                $this->allocations_non_suplemental[$allocation->category_group_id] = $allocation->initial_amount;
+            }
+
+            $this->balances = collect($this->allocations)->map(function ($allocation, $categoryGroupId) {
+                return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
+            });
+
+            $this->category_groups = CategoryGroup::where('is_active', 1)->get()->map(function ($categoryGroup) {
+                return [
+                    'id' => $categoryGroup->id,
+                    'name' => $categoryGroup->name,
+                    'balance' => $this->calculateSubTotal($categoryGroup->id),
+                    'supplemental' => $this->calculateSupplemental($categoryGroup->id),
+                    'sub_total' => $this->calculateSubTotal($categoryGroup->id) + $this->calculateSupplemental($categoryGroup->id),
+                ];
+            });
+
+            $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
             $this->supplemental_allocation_description = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->description;
             $this->supplemental_allocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
             $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
             $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
-            }else{
-            $this->fundInitialAmount = 0;
-            $this->fund_description = 'No Fund Allocation';
-            $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
-
-            $this->balance_164 = $this->fundInitialAmount;
-            $this->supplemental_allocation_description = $this->record->fundAllocations->where('is_supplemental', 1)->first()->description;
-            $this->supplemental_allocation = $this->record->fundAllocations->where('is_supplemental', 1)->first()->initial_amount;
-            $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
-            $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
-            }
-
-
-
-
-
-        }else{
+        } else {
             $this->record = CostCenter::find($record);
-            $this->category_groups = CategoryGroup::where('is_active', 1)->get();
-            $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function($query) {
-                $query->where('cost_center_id', $this->record->id)->where('is_supplemental', 0)->where('initial_amount', '>', 0);
-            })->where('is_active', 1)->get();
-            $this->wfp_type = WpfType::all();
-            $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
-            $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
+            // $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function ($query) {
+            //     $query->where('cost_center_id', $this->record->id)->where('is_supplemental', 0)->where('initial_amount', '>', 0);
+            // })->where('is_active', 1)->get();
+            // $this->wfp_type = WpfType::all();
+
+            $initialNonSupplementalFundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first();
+            $this->selectedType =  $initialNonSupplementalFundAllocation->wpf_type_id;
+            $this->fundInitialAmount = $initialNonSupplementalFundAllocation->initial_amount;
             $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
             $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
-            foreach($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->where('cost_center_id', $this->record->id)->get() as $wfp)
-            {
-                foreach($wfp->wfpDetails as $allocation)
-                {
-                if (!isset($this->programmed[$allocation->category_group_id])) {
-                    $this->programmed[$allocation->category_group_id] = 0;
-                }
-                $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+
+            $workFinancialPlans = $this->record->wfp->where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();
+
+            foreach ($workFinancialPlans->where('is_supplemental', 0) as $wfp) {
+                foreach ($wfp->wfpDetails as $allocation) {
+                    if (!isset($this->programmed[$allocation->category_group_id])) {
+                        $this->programmed[$allocation->category_group_id] = 0;
+                    }
+                    $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
                 }
             }
 
-            //supplemental
-            foreach($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 1)->where('cost_center_id', $this->record->id)->get() as $wfp)
-            {
-                foreach($wfp->wfpDetails as $allocation)
-                {
+            foreach ($workFinancialPlans->where('is_supplemental', 1) as $wfp) {
+                foreach ($wfp->wfpDetails as $allocation) {
                     if (!isset($this->programmed_supplemental[$allocation->category_group_id])) {
                         $this->programmed_supplemental[$allocation->category_group_id] = 0;
                     }
                     $this->programmed_supplemental[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
                 }
             }
+            $costCenterFundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
 
-            foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
+            foreach ($costCenterFundAllocation->where('is_supplemental', 0) as $allocation) {
                 $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
             }
 
+            foreach ($costCenterFundAllocation->where('is_supplemental', 1) as $allocation) {
+                $this->allocations_non_suplemental[$allocation->category_group_id] = $allocation->initial_amount;
+            }
 
-
-            //i want to get the balances from the allocations subtracted by the programmed, use map
-            $this->balances = collect($this->allocations)->map(function($allocation, $categoryGroupId) {
+            $this->balances = collect($this->allocations)->map(function ($allocation, $categoryGroupId) {
                 return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
+            });
+
+            $this->category_groups = CategoryGroup::where('is_active', 1)->get()->map(function ($categoryGroup) {
+                return [
+                    'id' => $categoryGroup->id,
+                    'name' => $categoryGroup->name,
+                    'balance' => $this->calculateSubTotal($categoryGroup->id),
+                    'supplemental' => $this->calculateSupplemental($categoryGroup->id),
+                    'sub_total' => $this->calculateSubTotal($categoryGroup->id) + $this->calculateSupplemental($categoryGroup->id),
+                ];
             });
 
             $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
@@ -126,7 +197,6 @@ class ViewSupplementalFunds extends Component
             $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
             $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
         }
-
     }
 
     public function calculateSubTotal($categoryGroupId)
@@ -141,18 +211,18 @@ class ViewSupplementalFunds extends Component
         // }
         $amount = $this->allocations[$categoryGroupId] ?? 0;
         $programmed = $this->programmed[$categoryGroupId] ?? 0;
-        $balance = $amount - $programmed;
+        $balance =   $amount - $programmed;
         return $balance ?? 0;
     }
 
     public function calculateSupplemental($categoryGroupId)
     {
-        return $this->amounts[$categoryGroupId] ?? 0;
+        return $this->allocations_non_suplemental[$categoryGroupId] ?? 0;
     }
 
     public function calculateTotalSupplemental()
     {
-        return array_sum($this->amounts);
+        return empty($this->allocations_non_suplemental) ? 0 : array_sum($this->allocations_non_suplemental);
     }
 
     public function calculateSupplementalTotal($categoryGroupId)
@@ -161,7 +231,7 @@ class ViewSupplementalFunds extends Component
         $allocation = $this->allocations[$categoryGroupId] ?? 0;
         $amount = $this->amounts[$categoryGroupId] ?? 0;
         $programmed = $this->programmed[$categoryGroupId] ?? 0;
-        $balance = $amount - $programmed;
+        $balance =  $programmed - $amount;
         $sum = $allocation + $balance;
         return $sum ?? 0;
     }
@@ -169,10 +239,10 @@ class ViewSupplementalFunds extends Component
     public function calculateGrandTotal()
     {
         // Calculate the total of all amounts
-       // return array_sum($this->amounts) + array_sum($this->programmed);
-       $balance = array_sum($this->allocations) - array_sum($this->programmed);
-       $amount = array_sum($this->amounts);
-       return $balance + $amount;
+        // return array_sum($this->amounts) + array_sum($this->programmed);
+        $balance = array_sum($this->allocations) - array_sum($this->programmed);
+        $amount = empty($this->allocations_non_suplemental) ? 0 : array_sum($this->allocations_non_suplemental);
+        return $balance + $amount;
     }
 
     public function calculateBalance($categoryGroupId)
