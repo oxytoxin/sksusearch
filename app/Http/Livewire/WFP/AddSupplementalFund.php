@@ -98,7 +98,7 @@ class AddSupplementalFund extends Component
                 if (!isset($this->programmed[$allocation->category_group_id])) {
                     $this->programmed[$allocation->category_group_id] = 0;
                 }
-                $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+                    $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
                 }
             }
 
