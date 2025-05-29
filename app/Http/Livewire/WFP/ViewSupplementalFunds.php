@@ -32,7 +32,7 @@ class ViewSupplementalFunds extends Component
     public $sub_total_164;
     public $balance_164_q1;
 
-    public $allocations_non_suplemental;
+    public $allocations_suplemental;
 
     public function mount($record, $wfpType, $isForwarded)
     {
@@ -103,9 +103,6 @@ class ViewSupplementalFunds extends Component
                 }
             }
 
-
-
-
             $costCenterFundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
 
             foreach ($costCenterFundAllocation->where('is_supplemental', 0) as $allocation) {
@@ -113,7 +110,7 @@ class ViewSupplementalFunds extends Component
             }
 
             foreach ($costCenterFundAllocation->where('is_supplemental', 1) as $allocation) {
-                $this->allocations_non_suplemental[$allocation->category_group_id] = $allocation->initial_amount;
+                $this->allocations_suplemental[$allocation->category_group_id] = $allocation->initial_amount;
             }
 
             $this->balances = collect($this->allocations)->map(function ($allocation, $categoryGroupId) {
@@ -167,14 +164,14 @@ class ViewSupplementalFunds extends Component
                     $this->programmed_supplemental[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
                 }
             }
-            $costCenterFundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
 
+            $costCenterFundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
             foreach ($costCenterFundAllocation->where('is_supplemental', 0) as $allocation) {
                 $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
             }
 
             foreach ($costCenterFundAllocation->where('is_supplemental', 1) as $allocation) {
-                $this->allocations_non_suplemental[$allocation->category_group_id] = $allocation->initial_amount;
+                $this->allocations_suplemental[$allocation->category_group_id] = $allocation->initial_amount;
             }
 
             $this->balances = collect($this->allocations)->map(function ($allocation, $categoryGroupId) {
@@ -217,12 +214,12 @@ class ViewSupplementalFunds extends Component
 
     public function calculateSupplemental($categoryGroupId)
     {
-        return $this->allocations_non_suplemental[$categoryGroupId] ?? 0;
+        return $this->allocations_suplemental[$categoryGroupId] ?? 0;
     }
 
     public function calculateTotalSupplemental()
     {
-        return empty($this->allocations_non_suplemental) ? 0 : array_sum($this->allocations_non_suplemental);
+        return empty($this->allocations_suplemental) ? 0 : array_sum($this->allocations_suplemental);
     }
 
     public function calculateSupplementalTotal($categoryGroupId)
@@ -241,7 +238,7 @@ class ViewSupplementalFunds extends Component
         // Calculate the total of all amounts
         // return array_sum($this->amounts) + array_sum($this->programmed);
         $balance = array_sum($this->allocations) - array_sum($this->programmed);
-        $amount = empty($this->allocations_non_suplemental) ? 0 : array_sum($this->allocations_non_suplemental);
+        $amount = empty($this->allocations_suplemental) ? 0 : array_sum($this->allocations_suplemental);
         return $balance + $amount;
     }
 
