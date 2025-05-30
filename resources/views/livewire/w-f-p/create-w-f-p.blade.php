@@ -315,6 +315,7 @@
                                                         array_column($current_balance, 'current_total'),
                                                     );
                                                     $sumBalance = $sumAllocated - $sumTotal;
+
                                                 @endphp
                                             <tbody class="bg-white">
                                                 <tr class="border-t border-gray-300">
@@ -1478,28 +1479,41 @@
                                             <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                                                 <div>
                                                     @php
+                                                        // $sumAllocated = 0;
+                                                        // $sumTotal = 0;
+                                                        // $sumBalance = 0;
+
+                                                        // $balance = $wfp_balance;
+                                                        // $totalAllocated =
+                                                        //     $record->fundAllocations
+                                                        //         ->where('is_supplemental', 1)
+                                                        //         ->sum('initial_amount') + $balance;
+                                                        // $sumAllocated = $is_supplemental
+                                                        //     ? $totalAllocated
+                                                        //     : $record->fundAllocations->sum('inital_amount');
+                                                        // $sumTotal = array_sum(
+                                                        //     array_column($current_balance, 'current_total'),
+                                                        // );
+                                                        // $sumBalance = $sumAllocated - $sumTotal;
                                                         $sumAllocated = 0;
                                                         $sumTotal = 0;
                                                         $sumBalance = 0;
 
-                                                        $balance = $wfp_balance;
-                                                        $totalAllocated =
-                                                            $record->fundAllocations
-                                                                ->where('is_supplemental', 1)
-                                                                ->sum('initial_amount') + $balance;
-                                                        $sumAllocated = $is_supplemental
-                                                            ? $totalAllocated
-                                                            : $record->fundAllocations->sum('inital_amount');
+                                                        $sumAllocated = array_sum(
+                                                            array_column($current_balance, 'initial_amount'),
+                                                        );
                                                         $sumTotal = array_sum(
                                                             array_column($current_balance, 'current_total'),
                                                         );
                                                         $sumBalance = $sumAllocated - $sumTotal;
                                                     @endphp
                                                     <div class="flex justify-between space-x-3">
+                                                        {{-- TODO --}}
                                                         <span>Allocated Fund: </span><span>₱
                                                             {{ number_format($sumAllocated, 2) }}</span>
                                                     </div>
                                                     <div class="flex justify-between">
+                                                        {{-- TODO --}}
                                                         <span>Program: </span><span>₱
                                                             {{ number_format($sumTotal, 2) }}</span>
                                                     </div>
