@@ -197,6 +197,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public $programmed = [];
     public $programmed_supplemental = [];
+    public $draft_amounts = 0;
 
 
     public function mount($record, $wfpType, $isEdit, $isSupplemental)
@@ -241,26 +242,76 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if ($this->wfp_fund->id === 1 || $this->wfp_fund->id === 3) {
             if ($isSupplemental) {
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
-                    $initial_amount = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1);
-                    $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items;
-                    $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)
+                    // $initial_amount = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1);
+                    // $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items;
+                    // $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)
+                    //     ->filter(function ($allocation) {
+                    //         return $allocation->initial_amount != '0.00';
+                    //     })
+                    //     ->map(function ($allocation) use ($initial_amount, $draft_amounts) {
+                    //         return [
+                    //             'category_group_id' => $allocation->category_group_id,
+                    //             'category_group' => $allocation->categoryGroup->name,
+                    //             'initial_amount' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0,
+                    //             'current_total' => $draft_amounts->where('title_group', $allocation->category_group_id)->sum('estimated_budget') ?? 0,
+                    //             'balance' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0 - $draft_amounts->where('title_group', $allocation->category_group_id)->sum('estimated_budget') ?? 0,
+                    //         ];
+                    //     })
+                    //     ->toArray();
+
+                    // HERE DRAFT
+                    $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items()->get();
+                    if($draft_amounts){
+                        foreach($draft_amounts as $draft_amount){
+                            $this->draft_amounts += $draft_amount->estimated_budget;
+                        }
+                    }
+                     $workFinancialPlans = $this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();
+                     if($workFinancialPlans){
+                          foreach ($workFinancialPlans->where('is_supplemental', 0) as $wfp) {
+                            foreach ($wfp->wfpDetails as $allocation) {
+                                if (!isset($this->programmed[$allocation->category_group_id])) {
+                                    $this->programmed[$allocation->category_group_id] = 0;
+                                }
+                                $this->programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+                            }
+                        }
+                         foreach ($workFinancialPlans->where('is_supplemental', 1) as $wfp) {
+                            foreach ($wfp->wfpDetails as $allocation) {
+                                if (!isset($this->programmed_supplemental[$allocation->category_group_id])) {
+                                    $this->programmed_supplemental[$allocation->category_group_id] = 0;
+                                }
+                                $this->programmed_supplemental[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
+                            }
+                        }
+                     }
+                     $costCenterFundAllocations = $this->record->fundAllocations()->where('wpf_type_id', $wfpType)->get();
+                     $allocation_non_supplemental = [];
+                     foreach($costCenterFundAllocations->where('is_supplemental', 0) as $allocation) {
+                        $allocation_non_supplemental[$allocation->category_group_id] = $allocation->initial_amount;
+                     }
+                    $this->current_balance = $costCenterFundAllocations->where('is_supplemental', 1)
                         ->filter(function ($allocation) {
-                            return $allocation->initial_amount != '0.00';
+                            return $allocation->initial_amount > 0 && $allocation->categoryGroup?->is_active == 1;
                         })
-                        ->map(function ($allocation) use ($initial_amount, $draft_amounts) {
+                        ->map(function ($allocation) use($allocation_non_supplemental,$draft_amounts) {
+                            $sub = $allocation_non_supplemental[$allocation->category_group_id] ?? 0 + $allocation->initial_amount;
+
                             return [
                                 'category_group_id' => $allocation->category_group_id,
-                                'category_group' => $allocation->categoryGroup->name,
-                                'initial_amount' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0,
-                                'current_total' => $draft_amounts->where('title_group', $allocation->category_group_id)->sum('estimated_budget') ?? 0,
-                                'balance' => $initial_amount->where('category_group_id', $allocation->category_group_id)->first()->initial_amount ?? 0 - $draft_amounts->where('title_group', $allocation->category_group_id)->sum('estimated_budget') ?? 0,
+                                'category_group' => $allocation->categoryGroup?->name,
+                                'initial_amount' => ($sub - $this->programmed[$allocation->category_group_id] ?? 0) + $allocation->initial_amount,
+                                'current_total' => $this->draft_amounts,
+                                'balance' => $sub + $allocation->initial_amount - $this->programmed[$allocation->category_group_id] ?? 0,
+                                'sort_id' => $allocation->categoryGroup?->sort_id, // Adding sort_id for sorting
                             ];
                         })
+                        ->sortBy('sort_id') // Sort by sort_id
+                        ->values()
                         ->toArray();
                 } else {
-                    // HERE
+                    // HERE NON-DRAFT
                      $workFinancialPlans = $this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();
-
                      if($workFinancialPlans){
                           foreach ($workFinancialPlans->where('is_supplemental', 0) as $wfp) {
                             foreach ($wfp->wfpDetails as $allocation) {
