@@ -99,6 +99,7 @@
                                             <span class="sr-only">Edit</span>
                                           </th> --}}
                                             </tr>
+                                        </thead>
                                         <tbody class="bg-white">
                                             <tr class="border-t border-gray-300">
                                                 <td colspan="4"
@@ -195,7 +196,6 @@
                                                     ₱ {{ number_format($sumBalance, 2) }}</td>
                                             </tr>
                                         </tbody>
-                                        </thead>
                                     </table>
                                 </div>
                             @elseif($wfp_fund->id === 2 || $wfp_fund->id === 4 || $wfp_fund->id === 5 || $wfp_fund->id === 6 || $wfp_fund->id === 7)
