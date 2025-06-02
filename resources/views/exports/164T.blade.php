@@ -1,9 +1,9 @@
 <table class="w-full mt-4">
     <thead>
         <tr>
-            <th colspan="2" class="border border-black bg-gray-300">Receipts</th>
-            <th colspan="4" class="border border-black bg-gray-300">Expenditure</th>
-            <th class="border border-black bg-gray-300">Balance</th>
+            <th colspan="2" class="border border-black bg-gray-300" style="font-weight: bold">Receipts</th>
+            <th colspan="4" class="border border-black bg-gray-300" style="font-weight: bold">Expenditure</th>
+            <th class="border border-black bg-gray-300" style="font-weight: bold">Balance</th>
         </tr>
     </thead>
     <tbody>
@@ -102,6 +102,7 @@
             </div>
         </td>
         <td class="border border-black text-left font-semibold p-1" colspan="2"></td>
+        <td class="border border-black text-left font-semibold p-1"></td>
         <td class="border border-black text-right font-semibold px-2">
             <div class="flex justify-between">
                 {{-- <span>₱</span> --}}
