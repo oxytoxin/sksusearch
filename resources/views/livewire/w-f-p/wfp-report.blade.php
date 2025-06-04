@@ -119,7 +119,7 @@
                             <tr class="bg-gray-200">
                                 <td class="border border-gray-300">
                                     <span>Balance </span>
-                                    <span>- Q2 Supplemental Fund 2025-0001 </span>
+                                    <span>- {{ $record->wfpType->description }} </span>
                                 </td>
                                 <td style="text-align:right;" class="border w-[100px] border-gray-300">
                                     <span>{{ $history['total_balance'] }}</span>
