@@ -347,7 +347,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                 'category_group' => $allocation->categoryGroup?->name,
                                 'initial_amount' => ($sub - ($this->programmed[$allocation->category_group_id] ?? 0)) + $allocation->initial_amount,
                                 'current_total' => 0,
-                                'balance' => $sub + $allocation->initial_amount - $this->programmed[$allocation->category_group_id] ?? 0,
+                                'balance' => $sub + $allocation->initial_amount - ($this->programmed[$allocation->category_group_id] ?? 0),
                                 'sort_id' => $allocation->categoryGroup?->sort_id, // Adding sort_id for sorting
                             ];
                         })
