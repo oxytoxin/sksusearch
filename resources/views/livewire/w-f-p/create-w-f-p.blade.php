@@ -78,7 +78,7 @@
                 <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div class="grid grid-cols-3 space-x-24 min-w-full py-1 align-middle sm:px-6 lg:px-8">
                         <div class="col-span-1">
-                            @if ($wfp_fund->id === 1 || $wfp_fund->id === 3)
+                            @if (in_array($wfp_fund->id, [1, 3, 9]))
                                 <div x-data="{ open: true }" x-cloak>
                                     <table class="min-w-full">
                                         <thead class="bg-green-800">
@@ -699,7 +699,7 @@
                                                 @endphp
                                                 @forelse ($supplies as $item)
                                                     <tr class="border-t border-gray-300">
-                                                        @if ($wfp_fund->id === 1 || $wfp_fund->id === 3)
+                                                        @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
                                                                 class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
@@ -829,7 +829,7 @@
                                                 </tr>
                                                 @forelse ($mooe as $item)
                                                     <tr class="border-t border-gray-300">
-                                                        @if ($wfp_fund->id === 1 || $wfp_fund->id === 3)
+                                                        @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
                                                                 class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
@@ -959,7 +959,7 @@
                                                 </tr>
                                                 @forelse ($trainings as $item)
                                                     <tr class="border-t border-gray-300">
-                                                        @if ($wfp_fund->id === 1 || $wfp_fund->id === 3)
+                                                        @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
                                                                 class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
@@ -1090,7 +1090,7 @@
                                                 </tr>
                                                 @forelse ($machines as $item)
                                                     <tr class="border-t border-gray-300">
-                                                        @if ($wfp_fund->id === 1 || $wfp_fund->id === 3)
+                                                        @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
                                                                 class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
@@ -1220,7 +1220,7 @@
                                                 </tr>
                                                 @forelse ($buildings as $item)
                                                     <tr class="border-t border-gray-300">
-                                                        @if ($wfp_fund->id === 1 || $wfp_fund->id === 3)
+                                                        @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
                                                                 class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
@@ -1349,7 +1349,7 @@
                                                 </tr>
                                                 @forelse ($ps as $item)
                                                     <tr class="border-t border-gray-300">
-                                                        @if ($wfp_fund->id === 1 || $wfp_fund->id === 3)
+                                                        @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
                                                                 class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
