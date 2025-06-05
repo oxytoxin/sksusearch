@@ -14,7 +14,7 @@
     </div>
     <div class="grid grid-cols-2 space-x-3">
 
-        @if ($record->fundClusterWFP->id === 1 || $record->fundClusterWFP->id === 3)
+        @if (in_array($record->fundClusterWFP->id, [1, 3, 9]))
             <div class="col-span-1 lg:col-start-1">
                 <h2 class="sr-only">Summary</h2>
                 <div class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
