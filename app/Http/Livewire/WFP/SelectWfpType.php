@@ -94,7 +94,6 @@ class SelectWfpType extends Component implements HasTable
     protected function getTableQuery()
     {
         $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
-
         return CostCenter::query()->whereHas('fundAllocations', function ($query) {
             $query->where('is_locked', 1);
         })
@@ -150,13 +149,11 @@ class SelectWfpType extends Component implements HasTable
             Tables\Columns\TextColumn::make('fundAllocations.amount')
             ->label('Amount')
             ->formatStateUsing(function ($record) {
-                if($record->fundClusterWFP->id === 1 || $record->fundClusterWFP->id === 3) {
+                if(in_array($record->fundClusterWFP->id,[1,3,9])) {
                     $sum = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->sum('initial_amount');
                     return '₱ '.number_format($sum, 2);
-                }else
-                {
+                }else {
                     return '₱ '.number_format($record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->sum('initial_amount'), 2);
-
                 }
             }),
         ];

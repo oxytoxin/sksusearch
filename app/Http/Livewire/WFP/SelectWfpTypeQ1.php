@@ -111,7 +111,7 @@ class SelectWfpTypeQ1 extends Component implements HasTable
             Tables\Columns\TextColumn::make('fundAllocations.amount')
                 ->label('Amount')
                 ->formatStateUsing(function ($record) {
-                    if ($record->fundClusterWFP->id === 1 || $record->fundClusterWFP->id === 3) {
+                    if (in_array($record->fundClusterWFP->id,[1,3,9])) {
                         $sum1 = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->sum('initial_amount');
                         $sum2 = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->sum('initial_amount');
                         $subtotal = $sum1 + $sum2;

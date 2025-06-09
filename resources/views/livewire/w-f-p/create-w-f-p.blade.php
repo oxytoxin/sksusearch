@@ -157,7 +157,8 @@
                                                 <tr class="border-t border-gray-300">
                                                     <td
                                                         class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">
-                                                        No Record</td>
+                                                        No Record
+                                                    </td>
                                                     <td
                                                         class="text-center italic whitespace-nowrap px-3 py-2 text-sm text-gray-500">
                                                         No Record</td>
