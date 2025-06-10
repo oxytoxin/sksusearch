@@ -107,7 +107,6 @@
                                                     <button @click="open = !open"
                                                         class="text-sm font-semibold text-gray-500">
                                                         <span x-show="open">
-
                                                             <svg class="w-4 h-4 text-green-600"
                                                                 xmlns="http://www.w3.org/2000/svg" fill="none"
                                                                 viewBox="0 0 24 24" stroke-width="1.5"
@@ -128,7 +127,6 @@
                                                             </svg>
                                                         </span>
                                                     </button>
-
                                                 </td>
                                             </tr>
                                             @forelse ($current_balance as $item)

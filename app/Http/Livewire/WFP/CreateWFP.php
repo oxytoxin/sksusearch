@@ -197,7 +197,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public $programmed = [];
     public $programmed_supplemental = [];
-    public $draft_amounts = 0;
+    public $draft_amounts = [];
 
 
     public function mount($record, $wfpType, $isEdit, $isSupplemental)
@@ -262,8 +262,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     // HERE DRAFT
                     $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items()->get();
                     if($draft_amounts){
+                        //
                         foreach($draft_amounts as $draft_amount){
-                            $this->draft_amounts += $draft_amount->estimated_budget;
+                            if(!isset($this->draft_amounts[$draft_amount->title_group])){
+                                $this->draft_amounts[$draft_amount->title_group] = 0;
+                            }
+                            $this->draft_amounts[$draft_amount->title_group] += $draft_amount->estimated_budget;
                         }
                     }
                      $workFinancialPlans = $this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();
@@ -296,12 +300,11 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         })
                         ->map(function ($allocation) use($allocation_non_supplemental,$draft_amounts) {
                             $sub = $allocation_non_supplemental[$allocation->category_group_id] ?? 0 + $allocation->initial_amount;
-
                             return [
                                 'category_group_id' => $allocation->category_group_id,
                                 'category_group' => $allocation->categoryGroup?->name,
                                 'initial_amount' => ($sub - ($this->programmed[$allocation->category_group_id] ?? 0)) + $allocation->initial_amount,
-                                'current_total' => $this->draft_amounts,
+                                'current_total' => $this->draft_amounts[$allocation->category_group_id] ?? 0,
                                 'balance' => $sub + $allocation->initial_amount - ($this->programmed[$allocation->category_group_id] ?? 0),
                                 'sort_id' => $allocation->categoryGroup?->sort_id, // Adding sort_id for sorting
                             ];
