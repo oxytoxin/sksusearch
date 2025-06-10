@@ -29,8 +29,6 @@ class WfpReport extends Component
 
         if ($isSupplemental) {
             $this->record = Wfp::where('id', $record)->where('is_supplemental', 1)->first();
-            $cost_center = $this->record->costCenter;
-            $
             $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount');
 
             // ------------------------------------------------------------------
