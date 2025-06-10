@@ -33,7 +33,7 @@ class WfpReport extends Component
 
             // ------------------------------------------------------------------
             $this->history['add']= number_format($this->allocation,2);
-            $regular_allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->first()->initial_amount;
+            $regular_allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->first()?->initial_amount ?? 0;
             $this->history['regular_allocation'] = number_format( (int)$regular_allocation,2);
             // ------------------------------------------------------------------
 
