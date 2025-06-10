@@ -270,7 +270,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $this->draft_amounts[$draft_amount->title_group] += $draft_amount->estimated_budget;
                         }
                     }
-                     $workFinancialPlans = $this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();
+                     $workFinancialPlans = $this->record->wfp?->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();
                      if($workFinancialPlans){
                           foreach ($workFinancialPlans->where('is_supplemental', 0) as $wfp) {
                             foreach ($wfp->wfpDetails as $allocation) {
