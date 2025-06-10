@@ -173,7 +173,7 @@ class FundAllocation extends Component implements HasTable
                 ->label('View Supplemental Fund')
                 ->button()
                 ->color('success')
-                ->url(fn (CostCenter $record): string => route('wfp.view-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => $record->wfp()->exists() ? 0 : 1]))
+                ->url(fn (CostCenter $record): string => route('wfp.view-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => $record->wfp()->where('is_supplemental',0)->exists() ? 0 : 1]))
                 ->visible(fn (CostCenter $record) => ($record->wfp?->is_approved === 1 && $record->hasSupplementalFund()) || (!$record->wfp()->where('is_supplemental',1)->exists() && $record->hasSupplementalFund())),
                 Action::make('edit_supplemental')
                 ->icon('ri-pencil-line')
