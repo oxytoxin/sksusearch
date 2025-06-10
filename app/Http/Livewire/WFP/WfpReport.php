@@ -29,6 +29,8 @@ class WfpReport extends Component
 
         if ($isSupplemental) {
             $this->record = Wfp::where('id', $record)->where('is_supplemental', 1)->first();
+            $cost_center = $this->record->costCenter;
+            $
             $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount');
 
             // ------------------------------------------------------------------
@@ -42,7 +44,7 @@ class WfpReport extends Component
                 $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
             }
             //old balance
-            if ($this->record->costCenter->wfp->where('is_supplemental', 0)->count() > 0) {
+            if (Wfp::where('cost_center_id', $this->record->cost_center_id)->where('is_supplemental', 0)->count() > 0) {
                 $record = Wfp::where('cost_center_id', $this->record->costCenter->id)
                     ->where('is_supplemental', 0)
                     ->first();
