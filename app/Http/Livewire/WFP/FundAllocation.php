@@ -159,7 +159,7 @@ class FundAllocation extends Component implements HasTable
                 ->color('warning')
                 ->icon('ri-eye-line')
                 ->url(fn (CostCenter $record): string => route('wfp.view-allocated-funds', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-                ->visible(fn ($record) => $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident),
+                ->visible(fn ($record) => $record->fundAllocations()->where('is_supplemental',0)->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident),
                 //action for adding supplemental fund
                 Action::make('supplemental_fund')
                 ->icon('ri-money-dollar-circle-line')
@@ -174,7 +174,7 @@ class FundAllocation extends Component implements HasTable
                 ->button()
                 ->color('success')
                 ->url(fn (CostCenter $record): string => route('wfp.view-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => $record->wfp()->exists() ? 0 : 1]))
-                ->visible(fn (CostCenter $record) => ($record->wfp?->is_approved === 1 && $record->hasSupplementalFund()) || (!$record->wfp()->exists() && $record->hasSupplementalFund())),
+                ->visible(fn (CostCenter $record) => ($record->wfp?->is_approved === 1 && $record->hasSupplementalFund()) || (!$record->wfp()->where('is_supplemental',1)->exists() && $record->hasSupplementalFund())),
                 Action::make('edit_supplemental')
                 ->icon('ri-pencil-line')
                 ->label('Edit Supplemental Fund')
