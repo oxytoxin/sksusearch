@@ -173,7 +173,7 @@ class SelectWfpType extends Component implements HasTable
             ->color('warning')
             ->button()
             ->icon('heroicon-o-pencil')
-            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0]))
+            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0, 'isSupplemental' => 0]))
             ->visible(fn ($record) => $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->first()->fundDrafts()->exists()),
         ];
     }
