@@ -3051,7 +3051,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $this->machines[$key]['total_quantity'] = $this->machines[$key]['total_quantity'] += $this->machine_total_quantity;
                         $this->machines[$key]['estimated_budget'] = $this->machines[$key]['estimated_budget'] += $intEstimatedBudget;
                         $this->machines[$key]['quantity'] = array_map(function ($a, $b) {
-                            return $a + $b;
+                            return (int)$a + (int)$b;
                         }, $this->machines[$key]['quantity'], $this->machine_quantity);
 
                         $draft_items = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->machine_particular_id)->where('uom', $this->machine_uom)->where('remarks', $this->machine_remarks)->first();
