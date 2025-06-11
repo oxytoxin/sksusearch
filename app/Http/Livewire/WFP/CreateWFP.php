@@ -330,7 +330,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         ->toArray();
 
                     $this->programmed_non_supplemental = array_sum(array_diff_key($allocation_non_supplemental, array_flip(array_column($this->current_balance, 'category_group_id'))));
-                        dd($this->current_balance);
 
                 } else {
                     // HERE NON-DRAFT
