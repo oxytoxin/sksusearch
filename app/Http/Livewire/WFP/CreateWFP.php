@@ -5436,7 +5436,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 // ->where('remarks', $remarks)->where('supply_code', $supply_code)->first();
                 //$draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
                 foreach ($this->current_balance as $key => $item) {
-                    if ($item['category_group_id'] === $title_group) {
+                    if ($item && $item['category_group_id'] === $title_group) {
                         if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
 
 
@@ -5534,7 +5534,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
                 foreach ($this->current_balance as $key => $item) {
-                    if ($item['category_group_id'] === $title_group) {
+                    if ($item && $item['category_group_id'] === $title_group) {
                         if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
 
                             $this->current_balance[$key]['current_total'] -= $budget;
@@ -5632,7 +5632,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 //$draft_amount = $fund_draft->draft_amounts->where('category_group_id', $title_group)->where('fund_draft_id', $fund_draft->id)->first();
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
                 foreach ($this->current_balance as $key => $item) {
-                    if ($item['category_group_id'] === $title_group) {
+                    if ($item && $item['category_group_id'] === $title_group) {
                         if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
 
                             $this->current_balance[$key]['current_total'] -= $budget;
@@ -5733,7 +5733,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
 
                 foreach ($this->current_balance as $key => $item) {
-                    if ($item['category_group_id'] === $title_group) {
+                    if ($item && $item['category_group_id'] === $title_group) {
                         if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
                             $this->current_balance[$key]['current_total'] -= $budget;
                             $this->current_balance[$key]['balance'] += $budget;
@@ -5831,7 +5831,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
                 foreach ($this->current_balance as $key => $item) {
-                    if ($item['category_group_id'] === $title_group) {
+                    if ($item && $item['category_group_id'] === $title_group) {
                         if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
                             $this->current_balance[$key]['current_total'] -= $budget;
                             $this->current_balance[$key]['balance'] += $budget;
@@ -5928,7 +5928,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 // $draft_amount = FundDraftAmount::where('category_group_id', $title_group)->where('fund_draft_id', $wfp_draft_id)->first();
 
                 foreach ($this->current_balance as $key => $item) {
-                    if ($item['category_group_id'] === $title_group) {
+                    if ($item && $item['category_group_id'] === $title_group) {
                         if (isset($this->current_balance[$key]['current_total']) && is_numeric($this->current_balance[$key]['current_total'])) {
                             $this->current_balance[$key]['current_total'] -= $budget;
                             $this->current_balance[$key]['balance'] += $budget;
