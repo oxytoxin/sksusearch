@@ -297,28 +297,36 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         //
                         $allocation_non_supplemental[$allocation->category_group_id] = $allocation->initial_amount - ($this->programmed[$allocation->category_group_id] ?? 0);
                      }
+
+                     $allocation_supplemental = [];
+                     foreach($costCenterFundAllocations->where('is_supplemental', 1) as $allocation) {
+                        $allocation_supplemental[$allocation->category_group_id] = $allocation->initial_amount ;
+                     }
+
                     //
-                    $this->current_balance = $costCenterFundAllocations->where('is_supplemental', 1)
+                    $uniques = [];
+                    $this->current_balance = $costCenterFundAllocations
                         ->filter(function ($allocation) {
                             return $allocation->initial_amount > 0 && $allocation->categoryGroup?->is_active == 1;
                         })
-                        ->map(function ($allocation) use($allocation_non_supplemental,$draft_amounts) {
-                            $sub = $allocation_non_supplemental[$allocation->category_group_id] ?? 0 + $allocation->initial_amount;
-                            return [
-                                'category_group_id' => $allocation->category_group_id,
-                                'category_group' => $allocation->categoryGroup?->name,
-                                'initial_amount' => ($allocation_non_supplemental[$allocation->category_group_id] ?? 0) + $allocation->initial_amount,
-                                'current_total' => $this->draft_amounts[$allocation->category_group_id] ?? 0,
-                                'balance' => $sub + $allocation->initial_amount - ($this->programmed[$allocation->category_group_id] ?? 0),
-                                'sort_id' => $allocation->categoryGroup?->sort_id, // Adding sort_id for sorting
-                            ];
+                        ->map(function ($allocation) use($allocation_non_supplemental,$allocation_supplemental) {
+                                if((isset($allocation_supplemental[$allocation->category_group_id]) && $allocation->is_supplemental === 1) || (!isset($allocation_supplemental[$allocation->category_group_id]) && $allocation->is_supplemental === 0)){
+                                    $sub = $allocation_non_supplemental[$allocation->category_group_id] ?? 0 + $allocation->initial_amount;
+                                return [
+                                    'category_group_id' => $allocation->category_group_id,
+                                    'category_group' => $allocation->categoryGroup?->name,
+                                    'initial_amount' => $allocation->is_supplemental === 1 ? ($allocation_non_supplemental[$allocation->category_group_id] ?? 0) + $allocation->initial_amount : ($allocation_non_supplemental[$allocation->category_group_id] ?? 0),
+                                    'current_total' => $allocation->is_supplemental  === 1 ? ($this->draft_amounts[$allocation->category_group_id] ?? 0)  : 0,
+                                    'balance' => $sub + $allocation->initial_amount - ($this->programmed[$allocation->category_group_id] ?? 0),
+                                    'sort_id' => $allocation->categoryGroup?->sort_id, // Adding sort_id for sorting
+                                ];
+                                }
                         })
                         ->sortBy('sort_id') // Sort by sort_id
                         ->values()
                         ->toArray();
                     $this->programmed_non_supplemental = array_sum(array_diff_key($allocation_non_supplemental, array_flip(array_column($this->current_balance, 'category_group_id'))));
-                            //   dd($allocation_non_supplemental);
-                            //   dd($allocation_non_supplemental);
+
 
                 } else {
                     // HERE NON-DRAFT

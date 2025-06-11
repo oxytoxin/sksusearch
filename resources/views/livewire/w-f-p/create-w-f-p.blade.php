@@ -130,27 +130,29 @@
                                                 </td>
                                             </tr>
                                             @forelse ($current_balance as $item)
-                                                <tr class="border-t border-gray-300" x-show="!open">
-                                                    <td
-                                                        class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                        {{ $item['category_group'] }}</td>
-                                                    <td
-                                                        class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium text-gray-900 sm:pl-3">
-                                                        ₱
-                                                        {{ number_format($item['initial_amount'], 2) }}
-                                                    </td>
-                                                    <td
-                                                        class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{ $item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
-                                                        ₱ {{ number_format($item['current_total'], 2) }}</td>
-                                                    <td
-                                                        class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{ $item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
-                                                        ₱
-                                                        {{ number_format($item['initial_amount'] - $item['current_total'], 2) }}
-                                                    </td>
-                                                    {{-- <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
+                                                @if ($item)
+                                                    <tr class="border-t border-gray-300" x-show="!open">
+                                                        <td
+                                                            class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                                            {{ $item['category_group'] }}</td>
+                                                        <td
+                                                            class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium text-gray-900 sm:pl-3">
+                                                            ₱
+                                                            {{ number_format($item['initial_amount'], 2) }}
+                                                        </td>
+                                                        <td
+                                                            class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{ $item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
+                                                            ₱ {{ number_format($item['current_total'], 2) }}</td>
+                                                        <td
+                                                            class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{ $item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
+                                                            ₱
+                                                            {{ number_format($item['initial_amount'] - $item['current_total'], 2) }}
+                                                        </td>
+                                                        {{-- <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
                                             <a href="#" class="text-green-800 hover:text-green-700">View<span class="sr-only">, Lindsay Walton</span></a>
                                           </td> --}}
-                                                </tr>
+                                                    </tr>
+                                                @endif
                                             @empty
                                                 <tr class="border-t border-gray-300">
                                                     <td
@@ -173,9 +175,9 @@
                                                 $sumTotal = 0;
                                                 $sumBalance = 0;
 
-                                                $sumAllocated =
-                                                    array_sum(array_column($current_balance, 'initial_amount')) +
-                                                    $this->programmed_non_supplemental;
+                                                $sumAllocated = array_sum(
+                                                    array_column($current_balance, 'initial_amount'),
+                                                );
                                                 $sumTotal = array_sum(array_column($current_balance, 'current_total'));
                                                 $sumBalance = $sumAllocated - $sumTotal;
                                                 // $sumBalance = array_sum(array_column($current_balance, 'balance'));
