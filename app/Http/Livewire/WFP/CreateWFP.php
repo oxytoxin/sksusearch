@@ -1360,7 +1360,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $categoryGroupId = $this->supplies_category_attr->categoryGroups->id;
                 $found = false;
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         //if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -1407,7 +1407,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->supplies_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->supplies_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -1616,7 +1616,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         // if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -1655,7 +1655,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->supplies_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->supplies_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -1986,7 +1986,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         // if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -2032,7 +2032,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->mooe_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->mooe_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -2235,7 +2235,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         // if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -2274,7 +2274,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->mooe_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->mooe_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -2585,7 +2585,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                    if ($balance &&$balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         // if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -2631,7 +2631,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->training_category_attr->categoryGroups->id) {
+                    if ($balance &&$balance['category_group_id'] == $this->training_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -2832,7 +2832,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         // if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -2871,7 +2871,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->training_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->training_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -3182,7 +3182,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         // if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -3228,7 +3228,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->machine_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->machine_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -3430,7 +3430,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         // if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -3469,7 +3469,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->machine_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->machine_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -3780,7 +3780,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         //if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->exists())
@@ -3826,7 +3826,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->building_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->building_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -4028,7 +4028,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         //if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -4067,7 +4067,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->building_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->building_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -4380,7 +4380,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         //if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('is_supplemental', 1)->first()->fundDrafts()->exists())
@@ -4426,7 +4426,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->ps_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->ps_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
@@ -4627,7 +4627,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $found = false;
 
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $categoryGroupId) {
+                   if ($balance && $balance['category_group_id'] == $categoryGroupId) {
                         // $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $found = true;
                         //if(!$this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->exists())
@@ -4666,7 +4666,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
                 //add current_total to current balance from estimated budget
                 foreach ($this->current_balance as $key => $balance) {
-                    if ($balance['category_group_id'] == $this->ps_category_attr->categoryGroups->id) {
+                   if ($balance && $balance['category_group_id'] == $this->ps_category_attr->categoryGroups->id) {
                         $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                         $this->current_balance[$key]['balance'] -= $intEstimatedBudget;
                     }
