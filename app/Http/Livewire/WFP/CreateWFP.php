@@ -4764,9 +4764,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $this->global_index = 1;
             }
 
-            if ($this->wfp_fund->id === 1 || $this->wfp_fund->id === 3) {
+            if (in_array($this->wfp_fund->id,[1,3,9])) {
                 foreach ($this->current_balance as $balance) {
-                    if ($balance['initial_amount'] < $balance['current_total']) {
+                    if ($balance && $balance['initial_amount'] < $balance['current_total']) {
                         $is_not_valid = true;
                         break;
                     }
