@@ -47,7 +47,7 @@ class WfpSubmissions extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return Wfp::query()->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
+        return Wfp::query()->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->where('is_supplemental', 0);
     }
 
     protected function getTableColumns()
