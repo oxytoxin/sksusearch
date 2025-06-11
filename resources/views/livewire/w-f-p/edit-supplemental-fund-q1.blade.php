@@ -1,6 +1,6 @@
 <div class="space-y-2">
     <div class="flex justify-between items-center">
-        <h2 class="font-light capitalize text-primary-600">Add Supplemental Fund</h2>
+        <h2 class="font-light capitalize text-primary-600">Edit Supplemental Fund</h2>
 
         <a href="{{ route('wfp.fund-allocation', $record->fundClusterWFP->id) }}"
             class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
@@ -92,7 +92,7 @@
                         </div>
                     </dl>
                     <div class="mt-2 border-t border-gray-900/5 px-6 py-3">
-                        <span class="text-sm font-semibold">Add funds to each category group</span>
+                        <span class="text-sm font-semibold">Edit funds to each category group</span>
                         <div class="px-4 sm:px-6 lg:px-8">
                             <div class="mt-4 flow-root">
                                 <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -240,6 +240,7 @@
                                 - Supplemental</dd>
                         </div>
                     </dl>
+
                     <div class="mt-2 border-t border-gray-900/5 px-6 py-6">
                         <span class="text-sm font-semibold">Summary</span>
                         <div class="">
