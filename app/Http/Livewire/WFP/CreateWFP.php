@@ -197,7 +197,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public $programmed = [];
     public $programmed_supplemental = [];
-    public $programmed_non_supplemental = [];
+    public $programmed_non_supplemental = 0;
 
     public $draft_amounts = [];
 
