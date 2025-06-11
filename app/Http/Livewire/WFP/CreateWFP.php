@@ -197,6 +197,8 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public $programmed = [];
     public $programmed_supplemental = [];
+    public $programmed_non_supplemental = [];
+
     public $draft_amounts = [];
 
 
@@ -292,8 +294,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                      $costCenterFundAllocations = $this->record->fundAllocations()->where('wpf_type_id', $wfpType)->get();
                      $allocation_non_supplemental = [];
                      foreach($costCenterFundAllocations->where('is_supplemental', 0) as $allocation) {
-                        $allocation_non_supplemental[$allocation->category_group_id] = $allocation->initial_amount;
+                        //
+                        $allocation_non_supplemental[$allocation->category_group_id] = $allocation->initial_amount - ($this->programmed[$allocation->category_group_id] ?? 0);
                      }
+                    //
                     $this->current_balance = $costCenterFundAllocations->where('is_supplemental', 1)
                         ->filter(function ($allocation) {
                             return $allocation->initial_amount > 0 && $allocation->categoryGroup?->is_active == 1;
@@ -303,7 +307,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             return [
                                 'category_group_id' => $allocation->category_group_id,
                                 'category_group' => $allocation->categoryGroup?->name,
-                                'initial_amount' => ($sub - ($this->programmed[$allocation->category_group_id] ?? 0)),
+                                'initial_amount' => ($allocation_non_supplemental[$allocation->category_group_id] ?? 0) + $allocation->initial_amount,
                                 'current_total' => $this->draft_amounts[$allocation->category_group_id] ?? 0,
                                 'balance' => $sub + $allocation->initial_amount - ($this->programmed[$allocation->category_group_id] ?? 0),
                                 'sort_id' => $allocation->categoryGroup?->sort_id, // Adding sort_id for sorting
@@ -312,6 +316,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         ->sortBy('sort_id') // Sort by sort_id
                         ->values()
                         ->toArray();
+                    $this->programmed_non_supplemental = array_sum(array_diff_key($allocation_non_supplemental, array_flip(array_column($this->current_balance, 'category_group_id'))));
+                            //   dd($allocation_non_supplemental);
+                            //   dd($allocation_non_supplemental);
+
                 } else {
                     // HERE NON-DRAFT
                      $workFinancialPlans = $this->record->wfp?->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();

@@ -173,9 +173,9 @@
                                                 $sumTotal = 0;
                                                 $sumBalance = 0;
 
-                                                $sumAllocated = array_sum(
-                                                    array_column($current_balance, 'initial_amount'),
-                                                );
+                                                $sumAllocated =
+                                                    array_sum(array_column($current_balance, 'initial_amount')) +
+                                                    $this->programmed_non_supplemental;
                                                 $sumTotal = array_sum(array_column($current_balance, 'current_total'));
                                                 $sumBalance = $sumAllocated - $sumTotal;
                                                 // $sumBalance = array_sum(array_column($current_balance, 'balance'));
@@ -1509,7 +1509,7 @@
                                                     <div class="flex justify-between space-x-3">
                                                         {{-- TODO --}}
                                                         <span>Allocated Fund: </span><span>₱
-                                                            {{ number_format($sumAllocated, 2) }}</span>
+                                                            {{ number_format($sumAllocated + $programmed_non_supplemental, 2) }}</span>
                                                     </div>
                                                     <div class="flex justify-between">
                                                         {{-- TODO --}}
