@@ -163,28 +163,28 @@
                                     </div>
                                 </div>
                             </div>
-                            <div x-show="selectedTab === '164T / FHE'">
+                            <div x-show="selectedTab === '164 FHE / Tuition Fees'">
                                 @include('fund-views.164T') <!-- Include the view for tab 164T -->
                                 <div class="flex justify-center mt-10">
                                     <div wire:loading class="loader">
                                     </div>
                                 </div>
                             </div>
-                            <div x-show="selectedTab === '164T / Non-FHE'">
+                            <div x-show="selectedTab === '164 Non-FHE / Tuition Fees'">
                                 @include('fund-views.164TNonFHE') <!-- Include the view for tab 164T -->
                                 <div class="flex justify-center mt-10">
                                     <div wire:loading class="loader">
                                     </div>
                                 </div>
                             </div>
-                            <div x-show="selectedTab === '164OSF'">
+                            <div x-show="selectedTab === '164 FHE / Fiduciary - Other School Fees'">
                                 @include('fund-views.164OSF') <!-- Include the view for tab 164OSF -->
                                 <div class="flex justify-center mt-10">
                                     <div wire:loading class="loader">
                                     </div>
                                 </div>
                             </div>
-                            <div x-show="selectedTab === '164MF'">
+                            <div x-show="selectedTab === '164 Non-FHE / Fiduciary - Miscellaneous Fees'">
                                 @include('fund-views.164MF') <!-- Include the view for tab 164MF -->
                                 <div class="flex justify-center mt-10">
                                     <div wire:loading class="loader">
