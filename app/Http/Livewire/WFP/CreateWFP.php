@@ -5103,7 +5103,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
             //save data to database
             DB::beginTransaction();
-            if (!$is_not_valid) {
+            if ($is_not_valid) {
                 $sumAllocated = $this->record->fundAllocations->sum('initial_amount');
                 // $sumTotal = $this->record->fundAllocations
                 if ($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts()->first()->draft_items()->exists()) {
