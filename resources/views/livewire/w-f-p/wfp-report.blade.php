@@ -467,6 +467,9 @@
                                     <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
                                         {{ $item->categoryItem->name }}
                                     </td>
+                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                        {{ $item->supply->supply_code }}
+                                    </td>
                                     <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{ $item->total_quantity }}
                                     </td>
                                     <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{ $item->uom }}
