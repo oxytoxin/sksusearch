@@ -134,7 +134,8 @@
                                                     <tr class="border-t border-gray-300" x-show="!open">
                                                         <td
                                                             class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                            {{ $item['category_group'] }}</td>
+                                                            {{ $item['category_group'] }}
+                                                        </td>
                                                         <td
                                                             class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium text-gray-900 sm:pl-3">
                                                             ₱
@@ -702,31 +703,31 @@
                                                     <tr class="border-t border-gray-300">
                                                         @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
-                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
+                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['account_title'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['particular'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['remarks'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['supply_code'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['total_quantity'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }}">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }}">
                                                                 {{ $item['uom'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format($item['cost_per_unit'], 2) }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format((float) ($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}
                                                             </td>
                                                         @else
@@ -832,31 +833,33 @@
                                                     <tr class="border-t border-gray-300">
                                                         @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
-                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
-                                                                {{ $item['uacs'] }}</td>
+                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
+                                                                {{ $item['uacs'] }}
+
+                                                            </td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['account_title'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['particular'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['remarks'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['supply_code'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['total_quantity'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }}">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }}">
                                                                 {{ $item['uom'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format($item['cost_per_unit'], 2) }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format((float) ($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}
                                                             </td>
                                                         @else
@@ -962,31 +965,31 @@
                                                     <tr class="border-t border-gray-300">
                                                         @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
-                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
+                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['account_title'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['particular'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['remarks'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['supply_code'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['total_quantity'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }}">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }}">
                                                                 {{ $item['uom'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format($item['cost_per_unit'], 2) }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format((float) ($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}
                                                             </td>
                                                         @else
@@ -1093,31 +1096,31 @@
                                                     <tr class="border-t border-gray-300">
                                                         @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
-                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
+                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['account_title'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['particular'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['remarks'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['supply_code'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['total_quantity'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }}">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }}">
                                                                 {{ $item['uom'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format($item['cost_per_unit'], 2) }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format((float) ($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}
                                                             </td>
                                                         @else
@@ -1223,31 +1226,31 @@
                                                     <tr class="border-t border-gray-300">
                                                         @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
-                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
+                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['account_title'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['particular'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['remarks'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['supply_code'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['total_quantity'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }}">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }}">
                                                                 {{ $item['uom'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format($item['cost_per_unit'], 2) }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format((float) ($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}
                                                             </td>
                                                         @else
@@ -1352,31 +1355,31 @@
                                                     <tr class="border-t border-gray-300">
                                                         @if (in_array($wfp_fund->id, [1, 3, 9]))
                                                             <td
-                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
+                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                                 {{ $item['uacs'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['account_title'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['particular'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['remarks'] }}</td>
                                                             <td
-                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['supply_code'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-wrap">
                                                                 {{ $item['total_quantity'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }}">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }}">
                                                                 {{ $item['uom'] }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format($item['cost_per_unit'], 2) }}</td>
                                                             <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) ? 'text-gray-500' : 'text-red-600' }} text-right">
+                                                                class="whitespace-nowrap px-3 py-4 text-sm {{ in_array($item['title_group'], $fund_allocation_categories) || isset($draft_amounts[$item['title_group']]) ? 'text-gray-500' : 'text-red-600' }} text-right">
                                                                 {{ number_format((float) ($item['cost_per_unit'] * $item['total_quantity']), 2, '.', ',') }}
                                                             </td>
                                                         @else
