@@ -74,12 +74,19 @@ class AssignPersonnel extends Component implements HasTable
                     ->searchable()
                     ->preload()
                     ->reactive()
-                    ->options(fn ($get) => CostCenter::whereHas('fundAllocations', function ($query) {
-                        $query->where('is_locked', 0)->where('is_supplemental', 1);
-                    })->whereHas('office', function ($query) {
-                        $query->where('id', auth()->user()->employee_information->office_id);
-                    })->with('wpfPersonnel')
-                    ->where('fund_cluster_w_f_p_s_id', $get('fund_cluster_w_f_p_s_id'))->pluck('name', 'id'))
+                    ->options(fn ($get) => CostCenter::all()->pluck('name', 'id'))
+                    // Select::make('cost_center_id')
+                    // ->label('Cost Center')
+                    // ->required()
+                    // ->searchable()
+                    // ->preload()
+                    // ->reactive()
+                    // ->options(fn ($get) => CostCenter::whereHas('fundAllocations', function ($query) {
+                    //     $query->where('is_locked', 0)->where('is_supplemental', 1);
+                    // })->whereHas('office', function ($query) {
+                    //     $query->where('id', auth()->user()->employee_information->office_id);
+                    // })->with('wpfPersonnel')
+                    // ->where('fund_cluster_w_f_p_s_id', $get('fund_cluster_w_f_p_s_id'))->pluck('name', 'id'))
              ])
              ->action(function ($data) {
                 foreach ($data['user_id'] as $user_id) {
