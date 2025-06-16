@@ -1,7 +1,7 @@
 <div x-data>
     <div class="p-4">
         <div class="grid gap-2  justify-center">
-            <button @click="showPrintable = true" wire:click="sksuPre"
+            <button @click="showPrintable = true" wire:click="sksuPre(2)"
                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
                 SKSU 163 PRE
             </button>
@@ -107,7 +107,7 @@
                                 {{ json_encode($mergedDetails) }}
                             </div> --}}
 
-                            @if (str_replace(' ', '', strtolower($title)) === 'sultankudaratstateuniversity(pre)')
+                            @if ($showPre)
                                 {{-- @forelse($fund_allocation as $item) --}}
                                 @foreach ($mergedDetails as $mergedDetail)
                                     <tr>
