@@ -14,6 +14,8 @@ use App\Models\FundAllocation;
 
 class GeneratePpmp extends Component
 {
+
+    public $showPre = false;
     public $wfp_type;
     public $ppmp_details;
     public $is_active = false;
@@ -1098,6 +1100,66 @@ class GeneratePpmp extends Component
         ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
         ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
         ->get();
+
+        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
+        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
+        // ->groupBy('category_item_id')
+        // ->get();
+        // $this->total = WfpDetail::whereHas('wfp', function($query) {
+        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
+        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+    }
+
+    // PRE
+
+     public function sksuPre()
+    {
+        $this->is_active = true;
+        $this->title = 'Sultan Kudarat State University (PRE)';
+
+        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+        ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
+        ->where('is_supplemental', 0)
+        ->where('wpf_type_id', $this->selectedType)
+        ->groupBy('wpf_type_id','mfo_fees.id','mfo_fees.name')
+        ->whereHas('costCenter.wfp')
+        ->get();
+        // dd($this->fund_allocation);
+
+
+        $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
+
+        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
+            ->where('is_supplemental', 0);
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+        $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
+
+
+        $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
+            ->where('is_supplemental', 0);
+        })
+        ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+        ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+        ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+        ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+        ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+        ->select(
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+            'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+            'category_item_budgets.name as budget_name', // Include the related field in the select
+            'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+            \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+        )
+        ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+        ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+        ->get();
+        // dd($this->ppmp_details);
 
         // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
         //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 3);
