@@ -99,6 +99,7 @@
                                                 'total_budget_per_uacs' => $group->sum('total_budget_per_uacs'),
                                             ];
                                         })
+                                        ->sortByDesc('budget_uacs')
                                         ->values();
                                     // echo json_encode($mergedDetails);
                                 @endphp
