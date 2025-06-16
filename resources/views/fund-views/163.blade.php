@@ -3,7 +3,7 @@
         <div class="grid gap-2  justify-center">
             <button @click="showPrintable = true" wire:click="sksuPre"
                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
-                SKSU PRE
+                SKSU 163 PRE
             </button>
             <button @click="showPrintable = true" wire:click="sksuPpmp163"
                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
@@ -112,7 +112,7 @@
                                 @foreach ($mergedDetails as $mergedDetail)
                                     <tr>
                                         @if ($loop->first)
-                                            <td class="border border-black px-2">Total Allocation</td>
+                                            <td class="border border-black px-2">Total Receipts</td>
                                             <td class="border border-black px-2">
                                                 <div class="flex justify-between">
                                                     <span>₱</span>
@@ -130,8 +130,8 @@
                                         <td class="border border-black px-2">
                                             <div class="flex justify-between">
                                                 <span> {{ $mergedDetail['budget_name'] }}</span>
-                                                <span>₱
-                                                    {{ number_format($mergedDetail['total_budget_per_uacs'], 2) }}</span>
+                                                {{-- <span>₱
+                                                    {{ number_format($mergedDetail['total_budget_per_uacs'], 2) }}</span> --}}
                                             </div>
 
                                         </td>
@@ -139,15 +139,13 @@
                                             <div class="flex justify-between">
                                                 <span>₱</span>
                                                 <span>
-                                                    {{-- {{ number_format($fund_allocation->whereIn('mfo_fee_id', $mergedDetail['mfo_fee_id'])->sum('total_allocated'), 2) }} --}}
-                                                </span>
+                                                    {{ number_format($mergedDetail['total_budget_per_uacs'], 2) }}</span>
                                             </div>
                                         </td>
                                         <td class="border border-black px-2">
                                             <div class="flex justify-between">
-                                                <span>₱</span>
+                                                {{-- <span>₱</span> --}}
                                                 <span>
-                                                    {{-- {{ number_format($fund_allocation->whereIn('mfo_fee_id', $mergedDetail['mfo_fee_id'])->sum('total_allocated') - $mergedDetail['total_budget_per_uacs'], 2) }} --}} 0
                                                 </span>
                                             </div>
                                         </td>
