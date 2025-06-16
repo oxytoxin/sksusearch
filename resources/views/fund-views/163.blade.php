@@ -125,7 +125,7 @@
                                             </td>
                                         @endif
                                         <td class="border border-black px-2">
-                                            {{ $mergedDetail['total_budget_per_uacs'] }}
+                                            {{ $mergedDetail['budget_uacs'] }}
                                         </td>
                                         <td class="border border-black px-2">
                                             <div class="flex justify-between">
