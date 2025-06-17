@@ -28,19 +28,11 @@
         <div>
 
             @if (in_array($record->fundClusterWfp->id, [1, 3, 9]))
-                @if (request('isSupplemental') == 1)
-                    <div class="flex gap-2 items-center text-sm font-semibold">
-                        <span> Forwared Balance : </span>
-                        <div class="flex justify-between">
-                            <span>₱</span>
-                            <span>{{ $total_programmed === null ? 0 : number_format($forwarded_balance, 2) }}</span>
-                        </div>
-                    </div>
-                @endif
                 <table class="w-full mt-4">
                     <thead>
                         <tr>
-                            <th colspan="2" class="border border-black bg-gray-300">Receipts</th>
+                            <th colspan="{{ request('isSupplemental') == 1 ? 4 : 2 }}"
+                                class="border border-black bg-gray-300">Receipts</th>
                             <th colspan="3" class="border border-black bg-gray-300">Expenditure</th>
                             <th class="border border-black bg-gray-300">Balance</th>
                             {{-- <th colspan="2" class="border border-black bg-gray-300">Corresponding Account Codes</th> --}}
@@ -51,6 +43,10 @@
                             <tr>
                                 <th class="border border-black">Category Group</th>
                                 <th class="border border-black">Allocation</th>
+                                @if (request('isSupplemental') == 1)
+                                    <th class="border border-black">Forwared Balance</th>
+                                    <th class="border border-black">Total Allocation</th>
+                                @endif
                                 <th class="border border-black">UACS Code</th>
                                 <th class="border border-black">Account Title - Budget</th>
                                 <th class="border border-black">Programmed</th>
@@ -65,9 +61,43 @@
                                 <td class="border border-black px-2">
                                     <div class="flex justify-between">
                                         <span>₱</span>
-                                        <span>{{ number_format($item->initial_amount, 2) }}</span>
+                                        @if (request('isSupplemental') == 1)
+                                            @if ($item->is_supplemental == 1)
+                                                <span>{{ number_format($item->initial_amount, 2) }}</span>
+                                            @else
+                                                <span>0.00</span>
+                                            @endif
+                                        @else
+                                            <span>{{ number_format($item->initial_amount, 2) }}</span>
+                                        @endif
                                     </div>
                                 </td>
+                                @if (request('isSupplemental') == 1)
+                                    <td class="border border-black px-2">
+                                        @foreach ($forwarded_ppmp_details->where('category_group_id', $item->category_group_id) as $forwarded_ppmp_detail)
+                                            <ul>
+                                                <div class="flex justify-between">
+                                                    <span>{{ $forwarded_ppmp_detail->budget_name }} </span>
+                                                    <span>₱
+                                                        {{ $item->initial_amount == 0 ? '0.00' : number_format($forwarded_ppmp_detail->initial_amount - $sub_forwared_balance->where('category_group_id', $item->category_group_id)->sum('balance_amount'), 2) }}</span>
+                                                </div>
+                                            </ul>
+                                        @endforeach
+                                    </td>
+                                @endif
+                                @if (request('isSupplemental') == 1)
+                                    <td class="border border-black px-2">
+                                        @foreach ($forwarded_ppmp_details->where('category_group_id', $item->category_group_id) as $forwarded_ppmp_detail)
+                                            <ul>
+                                                <div class="flex justify-between">
+                                                    <span>{{ $forwarded_ppmp_detail->budget_name }} </span>
+                                                    <span>₱
+                                                        {{ $item->initial_amount == 0 ? '0.00' : number_format($item->initial_amount + ($forwarded_ppmp_detail->initial_amount - $sub_forwared_balance->where('category_group_id', $item->category_group_id)->sum('balance_amount')), 2) }}</span>
+                                                </div>
+                                            </ul>
+                                        @endforeach
+                                    </td>
+                                @endif
                                 <td class="border border-black px-2">
                                     @foreach ($ppmp_details->where('category_group_id', $item->category_group_id) as $ppmp)
                                         <ul>
@@ -81,7 +111,7 @@
                                     @foreach ($ppmp_details->where('category_group_id', $item->category_group_id) as $ppmp)
                                         <ul>
                                             <div class="flex justify-between">
-                                                <span>{{ $ppmp->budget_name }}</span>
+                                                <span>{{ $ppmp->budget_name }} </span>
                                                 <span>₱ {{ number_format($ppmp->total_budget_per_uacs, 2) }}</span>
                                             </div>
                                         </ul>
@@ -95,8 +125,16 @@
                                 </td>
                                 <td class="border border-black px-2">
                                     <div class="flex justify-between">
-                                        <span>₱</span>
-                                        <span>{{ number_format($item->initial_amount - $ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
+                                        <span>₱ </span>
+                                        @if (request('isSupplemental') == 1)
+                                            @if ($item->is_supplemental == 1)
+                                                <span>{{ $item->initial_amount == 0 ? number_format($ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget')) : number_format($item->initial_amount + ($forwarded_ppmp_detail->initial_amount - $sub_forwared_balance->where('category_group_id', $item->category_group_id)->sum('balance_amount')) - $ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
+                                            @else
+                                                <span>0.00</span>
+                                            @endif
+                                        @else
+                                            <span>{{ number_format($item->initial_amount - $ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
+                                        @endif
                                     </div>
                                 </td>
                                 {{-- <td class="border border-black px-2">
@@ -133,6 +171,22 @@
                                 <span>{{ $total_allocated === null ? 0 : number_format($total_allocated, 2) }}</span>
                             </div>
                         </td>
+                        @if (request('isSupplemental') == 1)
+                            <td class="border border-black text-right font-semibold px-2">
+                                <div class="flex justify-between">
+                                    <span>₱</span>
+                                    <span>{{ $total_programmed === null ? 0 : number_format($forwarded_balance, 2) }}</span>
+                                </div>
+                            </td>
+                        @endif
+                        @if (request('isSupplemental') == 1)
+                            <td class="border border-black text-right font-semibold px-2">
+                                <div class="flex justify-between">
+                                    <span>₱</span>
+                                    <span>{{ $total_programmed === null ? 0 : number_format($total_allocated + $forwarded_balance, 2) }}</span>
+                                </div>
+                            </td>
+                        @endif
                         <td class="border border-black text-left font-semibold p-1" colspan="2"></td>
                         <td class="border border-black text-right font-semibold px-2">
                             <div class="flex justify-between">
@@ -143,7 +197,16 @@
                         <td class="border border-black text-right font-semibold px-2">
                             <div class="flex justify-between">
                                 <span>₱</span>
-                                <span>{{ $total_programmed === null ? 0 : number_format($balance, 2) }}</span>
+                                @if (request('isSupplemental') == 1)
+                                    @php
+                                        $sub = $total_programmed === null ? 0 : $total_programmed->total_budget;
+
+                                        $total = $total_allocated + $forwarded_balance - $sub;
+                                    @endphp
+                                    <span>{{ $total_programmed === null ? 0 : number_format($total, 2) }}</span>
+                                @else
+                                    <span>{{ $total_programmed === null ? 0 : number_format($balance, 2) }}</span>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -194,7 +257,7 @@
                                         <ul>
                                             <li>
                                                 <div class="flex justify-between">
-                                                    <span>{{ $ppmp->budget_name }}</span>
+                                                    <span>{{ $ppmp->budget_name }} </span>
                                                     <span>₱ {{ number_format($ppmp->total_budget_per_uacs, 2) }}</span>
                                                 </div>
                                             </li>
