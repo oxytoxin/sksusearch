@@ -89,7 +89,7 @@ class WFPHistory extends Component implements HasTable
                 ->label('View PRE')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-pre', $record))
+                ->url(fn ($record): string => route('wfp.print-pre', ['record'=> $record, 'isSupplemental' => 0]))
                 ->visible(fn ($record) => $record->is_approved === 0 || $record->is_approved === 1),
             ]),
             Action::make('continue_draft')

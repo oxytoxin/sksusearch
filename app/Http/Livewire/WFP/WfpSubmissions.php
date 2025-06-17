@@ -101,7 +101,7 @@ class WfpSubmissions extends Component implements HasTable
                 ->label('View PRE')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-pre', $record))
+                ->url(fn ($record): string => route('wfp.print-pre', ['record'=> $record, 'isSupplemental' => 0]))
             ]),
             Action::make('approve')
             ->label('Approve WFP')

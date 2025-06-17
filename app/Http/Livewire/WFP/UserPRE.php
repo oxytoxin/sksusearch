@@ -21,7 +21,7 @@ class UserPRE extends Component
     public $title;
     public $fund_allocation;
 
-    public function mount($record)
+    public function mount($record,$isSupplemental)
     {
         $this->record = Wfp::find($record);
         $this->cost_center = $this->record->costCenter;
@@ -30,6 +30,7 @@ class UserPRE extends Component
         if($this->record->fundClusterWfp->id === 1 || $this->record->fundClusterWfp->id === 3)
         {
             $this->fund_allocation = FundAllocation::where('cost_center_id', $this->cost_center->id)->where('initial_amount', '>', 0)
+            ->where('is_supplemental', $isSupplemental)
             ->whereHas('costCenter', function($query) {
                 $query->where('id', $this->record->cost_center_id)
                 ->whereHas('wfp', function($query) {
@@ -38,8 +39,9 @@ class UserPRE extends Component
             })
             ->get();
 
-            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-                $query->where('cost_center_id', $this->record->cost_center_id)
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) use($isSupplemental) {
+                $query->where('is_supplemental', $isSupplemental)
+                ->where('cost_center_id', $this->record->cost_center_id)
                       ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
             })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
@@ -66,7 +68,7 @@ class UserPRE extends Component
 
         }else{
 
-            $this->fund_allocation = FundAllocation::whereHas('costCenter', function ($query) {
+            $this->fund_allocation = FundAllocation::where('is_supplemental', $isSupplemental)->whereHas('costCenter', function ($query) {
                 $query->where('id', $this->cost_center->id)
                       ->whereHas('mfoFee', function ($query) {
                           $query->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
@@ -94,8 +96,8 @@ class UserPRE extends Component
             // ->groupBy('cost_center_id', 'uacs', 'budget_id', 'item_name', 'budget_uacs', 'budget_name')
             // ->get();
 
-            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-                $query->where('cost_center_id', $this->record->cost_center_id)
+            $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) use($isSupplemental) {
+                $query->where('is_supplemental', $isSupplemental)->where('cost_center_id', $this->record->cost_center_id)
                       ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
             })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
@@ -115,10 +117,10 @@ class UserPRE extends Component
 
 
 
-
-            $this->total_allocated = FundAllocation::where('cost_center_id', $this->cost_center->id)->where('initial_amount', '>', 0)->sum('initial_amount');
-            $this->total_programmed = WfpDetail::whereHas('wfp', function($query) {
-                $query->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+            $this->total_allocated = FundAllocation::where('is_supplemental', $isSupplemental)->where('cost_center_id', $this->cost_center->id)
+                ->where('initial_amount', '>', 0)->sum('initial_amount');
+            $this->total_programmed = WfpDetail::whereHas('wfp', function($query)  use($isSupplemental) {
+                $query->where('is_supplemental', $isSupplemental)->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
             })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
         }

@@ -52,7 +52,7 @@ Route::middleware([
     Route::get('/wfp-pre', GeneratePpmp::class)->name('generate-ppmp');
     Route::get('/wfp-ppmp', GenerateWfpPpmp::class)->name('generate-wfp-ppmp');
     Route::get('/print-ppmp/{record}', WfpPpmp::class)->name('print-ppmp');
-    Route::get('/print-pre/{record}', UserPRE::class)->name('print-pre');
+    Route::get('/print-pre/{record}/{isSupplemental}', UserPRE::class)->name('print-pre');
     Route::get('/request-new-supply', RequestSupply::class)->name('request-supply');
     Route::get('/edit-supply-request/{record}', RequestSupplyEdit::class)->name('request-supply-edit');
     Route::get('/view-supply-request/{record}', ViewSupplyRequest::class)->name('request-supply-view');
