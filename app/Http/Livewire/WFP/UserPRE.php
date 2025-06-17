@@ -18,6 +18,9 @@ class UserPRE extends Component
     public $total_allocated;
     public $total_programmed;
     public $balance;
+
+    public $forwarded_balance = 0;
+
     public $title;
     public $fund_allocation;
 
@@ -68,6 +71,16 @@ class UserPRE extends Component
             })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
+            if($isSupplemental){
+               $sub_total_allocated = FundAllocation::where('cost_center_id', $this->cost_center->id)
+                ->where('is_supplemental', 0)
+                ->where('initial_amount', '>', 0)->sum('initial_amount');
+              $sub_forwared_balance  =  WfpDetail::whereHas('wfp', function($query)  {
+                $query->where('is_supplemental', 0)->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                    })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+                $this->forwarded_balance =  $sub_total_allocated - $sub_forwared_balance->total_budget;
+            }
+
         }else{
 
             $this->fund_allocation = FundAllocation::where('is_supplemental', $isSupplemental)->whereHas('costCenter', function ($query) {
@@ -115,8 +128,6 @@ class UserPRE extends Component
             )
             ->groupBy('cost_center_id', 'budget_uacs', 'budget_name')
             ->get();
-
-
 
 
             $this->total_allocated = FundAllocation::where('is_supplemental', $isSupplemental)->where('cost_center_id', $this->cost_center->id)
