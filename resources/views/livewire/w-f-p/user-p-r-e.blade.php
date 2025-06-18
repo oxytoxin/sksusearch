@@ -128,7 +128,7 @@
                                         <span>₱ </span>
                                         @if (request('isSupplemental') == 1)
                                             @if ($item->is_supplemental == 1)
-                                                <span>{{ $item->initial_amount == 0 ? number_format($ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget')) : number_format($item->initial_amount + ($forwarded_ppmp_detail->initial_amount - $sub_forwared_balance->where('category_group_id', $item->category_group_id)->sum('balance_amount')) - $ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
+                                                <span>{{ $item->initial_amount == 0 ? number_format($ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget')) : number_format($item->initial_amount + ($forwarded_ppmp_details->where('category_group_id', $item->category_group_id)->sum('initial_amount') - $sub_forwared_balance->where('category_group_id', $item->category_group_id)->sum('balance_amount')) - $ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
                                             @else
                                                 <span>0.00</span>
                                             @endif
