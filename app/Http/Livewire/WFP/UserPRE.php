@@ -28,6 +28,11 @@ class UserPRE extends Component
     public $title;
     public $fund_allocation;
 
+    public $_164 = [
+        'forwarded_balance'=>0,
+        'total_programmed'=>0
+    ];
+
     public function mount($record, $isSupplemental)
     {
         $this->record = Wfp::find($record);
@@ -121,14 +126,20 @@ class UserPRE extends Component
             })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
         } else {
-
             $this->fund_allocation = FundAllocation::where('is_supplemental', $isSupplemental)->whereHas('costCenter', function ($query) {
                 $query->where('id', $this->cost_center->id)
                     ->whereHas('mfoFee', function ($query) {
                         $query->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
                     });
             })->get();
-
+                if($isSupplemental){
+                     $temp_total_allocated = FundAllocation::where('is_supplemental', 0)->where('cost_center_id', $this->cost_center->id)
+                     ->where('initial_amount', '>', 0)->sum('initial_amount');
+                    $this->_164['total_programmed'] = WfpDetail::whereHas('wfp', function ($query)  {
+                        $query->where('is_supplemental', 0)->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                    })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+                    $this->_164['balance'] = $temp_total_allocated - $this->_164['total_programmed']->total_budget;
+                }
             // $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             //     $query->where('cost_center_id', $this->record->cost_center_id)
             //           ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
