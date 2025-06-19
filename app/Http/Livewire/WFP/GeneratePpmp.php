@@ -28,6 +28,8 @@ class GeneratePpmp extends Component
     public $total_programmed;
     public $balance;
 
+    public $is_q1 = false;
+
 
     public function mount()
     {
@@ -42,7 +44,6 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->showPre = false;
         $this->title = 'Sultan Kudarat State University';
-
 
         $this->fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id, category_groups.id as category_group_id,
