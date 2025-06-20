@@ -692,7 +692,7 @@
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-1 mb-1">
             <div class="col-span-1">
-            <label for="requested_account_title" class="block text-sm font-medium leading-6 text-gray-900">Account Title</label>
+            <label for="requested_account_title" class="block text-sm font-medium leading-6 text-gray-900">Account Title (Accounting)</label>
                 <div class="mt-2">
                     <select id="requested_account_title" wire:model="requested_account_title" name="requested_account_title" autocomplete="country-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         <option>Select One</option>
@@ -702,6 +702,22 @@
                     </select>
                 </div>
                 @error('requested_account_title')
+                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-1 mb-1">
+            <div class="col-span-1">
+            <label for="requested_account_title_budget" class="block text-sm font-medium leading-6 text-gray-900">Account Title (Budget)</label>
+                <div class="mt-2">
+                    <select id="requested_account_title_budget" wire:model="requested_account_title_budget" name="requested_account_title_budget" autocomplete="country-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                        <option>Select One</option>
+                        @foreach ($account_title_budgets as $item)
+                        <option value="{{$item->id}}">{{$item->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @error('requested_account_title_budget')
                 <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
             </div>

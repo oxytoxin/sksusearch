@@ -4,6 +4,7 @@ namespace App\Http\Livewire\WFP;
 
 use App\Models\BudgetCategory;
 use App\Models\CategoryGroup;
+use App\Models\CategoryItemBudget;
 use App\Models\CategoryItems;
 use App\Models\Supply;
 use DB;
@@ -31,10 +32,15 @@ class ViewSupplyRequest extends Component
     public $modify_supply_code;
     public $uacs_code;
     public $account_titles;
+
+    public $account_title_budgets ;
     public $title_groups;
     public $budget_categories;
     public $requested_budget_category;
     public $requested_account_title;
+
+    public $requested_account_title_budget;
+
     public $requested_category_group;
 
     use Actions;
@@ -44,6 +50,7 @@ class ViewSupplyRequest extends Component
         $this->record = WfpRequestedSupply::find($record);
         $this->budget_categories = BudgetCategory::all();
         $this->account_titles = CategoryItems::where('budget_category_id', $this->requested_budget_category)->get();
+        $this->account_title_budgets = CategoryItemBudget::where('budget_category_id', $this->requested_budget_category)->get();
         $this->title_groups = CategoryGroup::all();
     }
 
@@ -52,8 +59,10 @@ class ViewSupplyRequest extends Component
         if($value == null)
         {
             $this->account_titles = null;
+            $this->account_title_budgets = null;
         }else{
             $this->account_titles = CategoryItems::where('budget_category_id', $value)->get();
+            $this->account_title_budgets = CategoryItemBudget::where('budget_category_id', $value)->get();
         }
     }
 
@@ -64,6 +73,16 @@ class ViewSupplyRequest extends Component
             $this->uacs_code = null;
         }else{
             $this->uacs_code = CategoryItems::find($value)->uacs_code;
+        }
+    }
+
+    public function updatedRequestedAccountTitleBudget($value)
+    {
+        if($value == null)
+        {
+            $this->uacs_code = null;
+        }else{
+            $this->uacs_code = CategoryItemBudget::find($value)->uacs_code;
         }
     }
 
@@ -237,17 +256,20 @@ class ViewSupplyRequest extends Component
         $this->validate([
             'requested_budget_category' => 'required',
             'requested_account_title' => 'required',
+            'requested_account_title_budget' => 'required',
             'requested_category_group' => 'required',
         ],
         [
             'requested_budget_category.required' => 'The Budget Category field is required',
-            'requested_account_title.required' => 'The Account Title field is required',
+            'requested_account_title.required' => 'The Account Title (Accounting) field is required',
+            'requested_account_title_budget.required' => 'The Account Title (Budget) field is required',
             'requested_category_group.required' => 'The Category Group field is required',
         ]);
 
         DB::beginTransaction();
         $this->record->update([
             'category_item_id' => $this->requested_account_title,
+            'category_item_budget_id' => $this->requested_account_title_budget,
             'category_group_id' => $this->requested_category_group,
             'status' => 'Accounting Assigned Data',
             'is_approved_finance' => 1,
@@ -262,6 +284,7 @@ class ViewSupplyRequest extends Component
 
         Supply::create([
             'category_item_id' => $this->record->category_item_id,
+            'category_item_budget_id' => $this->record->category_item_budget_id,
             'category_group_id' => $this->record->category_group_id,
             'supply_code' => $this->record->supply_code,
             'particulars' => $this->record->particulars,
