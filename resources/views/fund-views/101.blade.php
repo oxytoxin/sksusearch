@@ -59,7 +59,9 @@
                     <table class="w-full mt-4">
                         <thead>
                             <tr>
-                                @if ($is_q1 && in_array($activeButton, ['sksuPpmp', 'gasPpmp']))
+                                @if (
+                                    $is_q1 &&
+                                        in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                     <th colspan="4" class="border border-black bg-gray-300">Receipts</th>
                                 @else
                                     <th colspan="2" class="border border-black bg-gray-300">Receipts</th>
@@ -74,7 +76,9 @@
                                 <tr>
                                     <th class="border border-black">Category Group</th>
                                     <th class="border border-black">Allocation</th>
-                                    @if ($is_q1 && in_array($activeButton, ['sksuPpmp', 'gasPpmp']))
+                                    @if (
+                                        $is_q1 &&
+                                            in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                         <th class="border border-black">Forwarded Balance</th>
                                         <th class="border border-black">Total Allocation</th>
                                     @endif
@@ -90,7 +94,9 @@
                                 <tr>
                                     <td class="border border-black px-2">{{ $item->categoryGroup?->name }}</td>
                                     <td class="border border-black px-2">
-                                        @if ($is_q1 && in_array($activeButton, ['sksuPpmp', 'gasPpmp']))
+                                        @if (
+                                            $is_q1 &&
+                                                in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                             <div class="flex justify-between">
                                                 <span>₱</span>
                                                 <span>{{ $item->is_supplemental ? number_format($item->total_allocated, 2) : '0.00' }}</span>
@@ -102,7 +108,9 @@
                                             </div>
                                         @endif
                                     </td>
-                                    @if ($is_q1 && in_array($activeButton, ['sksuPpmp', 'gasPpmp']))
+                                    @if (
+                                        $is_q1 &&
+                                            in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                         <td class="border border-black px-2">
                                             @if ($item->is_supplemental == 1)
                                                 <div class="flex justify-between">
@@ -156,7 +164,9 @@
                                         </div>
                                     </td>
                                     <td class="border border-black px-2">
-                                        @if ($is_q1 && in_array($activeButton, ['sksuPpmp', 'gasPpmp']))
+                                        @if (
+                                            $is_q1 &&
+                                                in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                             @if ($item->is_supplemental == 1)
                                                 <div class="flex justify-between">
                                                     <span>₱</span>
@@ -209,19 +219,21 @@
                                     <span>{{ $total_allocated === null ? 0 : number_format($total_allocated, 2) }}</span>
                                 </div>
                             </td>
-                            @if ($is_q1 && in_array($activeButton, ['sksuPpmp', 'gasPpmp']))
+                            @if (
+                                $is_q1 &&
+                                    in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                 <td class="border border-black text-left font-semibold p-1">
                                     <div class="flex justify-between">
-                                        <span>₱</span>
+                                        <span>₱ </span>
                                         <span>
-                                            {{ number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget'), 2) }}</span>
+                                            {{ $non_supplemental_fund_allocation->sum('total_allocated') > 0 ? number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget'), 2) : number_format($forwarded_ppmp_details->sum('total_budget'), 2) }}</span>
                                     </div>
                                 </td>
                                 <td class="border border-black text-left font-semibold p-1">
                                     <div class="flex justify-between">
                                         <span>₱</span>
                                         <span>
-                                            {{ number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0), 2) }}</span>
+                                            {{ $non_supplemental_fund_allocation->sum('total_allocated') > 0 ? number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0), 2) : number_format($forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0), 2) }}</span>
                                     </div>
                                 </td>
                             @endif
@@ -234,10 +246,12 @@
                                 </div>
                             </td>
                             <td class="border border-black text-right font-semibold px-2">
-                                @if ($is_q1 && in_array($activeButton, ['sksuPpmp', 'gasPpmp']))
+                                @if (
+                                    $is_q1 &&
+                                        in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                     <div class="flex justify-between">
                                         <span>₱</span>
-                                        <span>{{ number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0) + $total_programmed->total_budget, 2) }}</span>
+                                        <span>{{ $non_supplemental_fund_allocation->sum('total_allocated') > 0 ? number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0) + $total_programmed->total_budget, 2) : number_format($forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0) + $total_programmed->total_budget, 2) }}</span>
                                     </div>
                                 @else
                                     <div class="flex justify-between">
