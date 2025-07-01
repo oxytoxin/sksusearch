@@ -26,6 +26,9 @@ class GeneratePpmpQ1 extends Component
     public $fund_allocation;
     public $total_allocated;
     public $total_programmed;
+
+    public $non_supplemental_total_programmed;
+
     public $balance;
 
     public $is_q1 = true;
@@ -94,7 +97,6 @@ class GeneratePpmpQ1 extends Component
         $this->fund_allocation = $tem_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
             return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
         });
-
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)
@@ -775,7 +777,7 @@ class GeneratePpmpQ1 extends Component
     public function sksuPpmp161()
     {
         $this->is_active = true;
-        $this->showPre = false;
+         $this->showPre = true;
         $this->activeButton = 'sksuPpmp161';
         $this->title = 'Sultan Kudarat State University';
 
@@ -1501,20 +1503,25 @@ class GeneratePpmpQ1 extends Component
     {
         $this->is_active = true;
         $this->showPre = false;
-        $this->activeButton = 'none';
+        $this->activeButton = 'sksuPpmp163';
         $this->title = 'Sultan Kudarat State University';
 
-        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        $temp_fund_allocation = FundAllocation::selectRaw('wpf_type_id,is_supplemental, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', 2)
-            ->where('is_supplemental', 1)
             ->where('wpf_type_id', $this->selectedType)
-            ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name')
+            ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name', 'is_supplemental' )
             ->whereHas('costCenter.wfp')
             ->get();
 
+        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
 
+        $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
+            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+        });
+        // dd($this->fund_allocation);
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
@@ -1524,10 +1531,35 @@ class GeneratePpmpQ1 extends Component
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
+    $this->non_supplemental_total_programmed = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
+                ->where('is_supplemental', 0);
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
                 ->where('is_supplemental', 1);
+        })
+            ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
+            ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
+            ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
+            ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
+            ->join('cost_centers', 'wfps.cost_center_id', '=', 'cost_centers.id') // Join with the cost_centers table
+            ->select(
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
+                'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
+                'category_item_budgets.name as budget_name', // Include the related field in the select
+                'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
+                \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
+            )
+            ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
+            ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
+            ->get();
+
+        //
+        $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
+                ->where('is_supplemental', 0);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4614,19 +4646,26 @@ class GeneratePpmpQ1 extends Component
     {
         $this->is_active = true;
         $this->showPre = true;
-        $this->activeButton = 'none';
+        $this->activeButton = 'sksuPre';
         $this->title = 'Sultan Kudarat State University';
 
-        $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+        $tem_fund_allocation = FundAllocation::selectRaw('wpf_type_id,is_supplemental, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', $fundCluster)
-            ->where('is_supplemental', 1)
+            // ->where('is_supplemental', 1)
             ->where('wpf_type_id', $this->selectedType)
-            ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name')
+            ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name', 'is_supplemental')
             ->whereHas('costCenter.wfp')
             ->get();
-        // dd($this->fund_allocation);
+
+        $this->non_supplemental_fund_allocation = $tem_fund_allocation->where('is_supplemental', 0);
+        $supplemental_fund_allocation = $tem_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+
+        $this->fund_allocation = $tem_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
+            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+        });
+
 
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
@@ -4636,9 +4675,12 @@ class GeneratePpmpQ1 extends Component
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fundCluster)
                 ->where('is_supplemental', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
+
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
-
-
+        $this->non_supplemental_total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($fundCluster) {
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fundCluster)
+                ->where('is_supplemental', 0);
+        })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) use ($fundCluster) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fundCluster)
                 ->where('is_supplemental', 1);
@@ -4658,6 +4700,8 @@ class GeneratePpmpQ1 extends Component
             ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
             ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
             ->get();
+
+        // dd($this->non_supplemental_fund_allocation->sum('total_allocated') - $this->forwarded_ppmp_details->sum('total_budget'));
         // dd($this->ppmp_details);
 
         // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
