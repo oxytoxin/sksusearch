@@ -41,6 +41,7 @@ class UserPRE extends Component
 
         if (in_array($this->record->fundClusterWfp->id, [1, 3, 9])) {
             if ($isSupplemental) {
+
                 // for forwarded balance in suplemental
                 $this->forwarded_ppmp_details = FundAllocation::with(['categoryGroup'])->where('cost_center_id', $this->cost_center->id)
                     ->where('is_supplemental', 0)
@@ -96,7 +97,6 @@ class UserPRE extends Component
                     })
                     ->get();
             }
-            // dd($this->fund_allocation->toArray());
             $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) use ($isSupplemental) {
                 $query->where('is_supplemental', $isSupplemental)
                     ->where('cost_center_id', $this->record->cost_center_id)
@@ -118,6 +118,7 @@ class UserPRE extends Component
                 )
                 ->groupBy('cost_center_id', 'category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
                 ->get();
+                // dd($this->ppmp_details->toArray());
             $this->total_allocated = FundAllocation::where('cost_center_id', $this->cost_center->id)
                 ->where('is_supplemental', $isSupplemental)
                 ->where('initial_amount', '>', 0)->sum('initial_amount');

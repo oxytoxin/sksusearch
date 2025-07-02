@@ -55,6 +55,7 @@
                                 <th class="border border-black">Account Title</th> --}}
                             </tr>
                         </thead>
+                        {{-- @dump($fund_allocation) --}}
                         @forelse($fund_allocation as $item)
                             <tr>
                                 <td class="border border-black px-2">{{ $item->categoryGroup->name }}</td>
