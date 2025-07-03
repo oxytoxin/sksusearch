@@ -1523,7 +1523,7 @@ class GeneratePpmpQ1 extends Component
         });
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
-        $this->total_allocated = $this->fund_allocation->sum('total_allocated');
+        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($fcwpsId) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fcwpsId)
                 ->where('is_supplemental', 1);
@@ -3050,6 +3050,7 @@ class GeneratePpmpQ1 extends Component
     //164T-NonFHE
     public function sksuPpmp164TN()
     {
+        return $this->generateSksuppmp(7,'Sultan Kudarat State University');
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3140,6 +3141,7 @@ class GeneratePpmpQ1 extends Component
 
     public function gasPpmp164TN()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(7,1, 'General Admission and Support Services');
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3204,6 +3206,7 @@ class GeneratePpmpQ1 extends Component
 
     public function hesPpmp164TN()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(7,2,'Higher Education Services');
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3268,6 +3271,8 @@ class GeneratePpmpQ1 extends Component
 
     public function aesPpmp164TN()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(7,3,'Advanced Education Services');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3332,6 +3337,8 @@ class GeneratePpmpQ1 extends Component
 
     public function rdPpmp164TN()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(7,4,'Research and Development');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3396,6 +3403,8 @@ class GeneratePpmpQ1 extends Component
 
     public function extensionPpmp164TN()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(7,5,'Extension Services');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3460,6 +3469,8 @@ class GeneratePpmpQ1 extends Component
 
     public function lfPpmp164TN()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(7,6,'Local Fund Projects');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3526,6 +3537,7 @@ class GeneratePpmpQ1 extends Component
     //164OSF
     public function sksuPpmp164OSF()
     {
+        return $this->generateSksuppmp(5,'Sultan Kudarat State University');
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3616,6 +3628,7 @@ class GeneratePpmpQ1 extends Component
 
     public function gasPpmp164OSF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(5, 1, 'General Admission and Support Services');
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3680,6 +3693,8 @@ class GeneratePpmpQ1 extends Component
 
     public function hesPpmp164OSF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(5, 2, 'Higher Education Services');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3744,6 +3759,8 @@ class GeneratePpmpQ1 extends Component
 
     public function aesPpmp164OSF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(5, 3, 'Advanced Education Services');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3808,6 +3825,8 @@ class GeneratePpmpQ1 extends Component
 
     public function rdPpmp164OSF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(5, 4, 'Research and Development');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3872,6 +3891,8 @@ class GeneratePpmpQ1 extends Component
 
     public function extensionPpmp164OSF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(5, 5, 'Extension Services');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3936,6 +3957,8 @@ class GeneratePpmpQ1 extends Component
 
     public function lfPpmp164OSF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(5, 6, 'Local Fund Projects');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -4001,6 +4024,8 @@ class GeneratePpmpQ1 extends Component
     //164MF
     public function sksuPpmp164MF()
     {
+        return $this->generateSksuppmp(6, 'Sultan Kudarat State University');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -4090,6 +4115,8 @@ class GeneratePpmpQ1 extends Component
 
     public function gasPpmp164MF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(6, 1, 'General Admission and Support Services');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -4154,6 +4181,8 @@ class GeneratePpmpQ1 extends Component
 
     public function hesPpmp164MF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(6, 2, 'Higher Education Services');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -4218,6 +4247,9 @@ class GeneratePpmpQ1 extends Component
 
     public function aesPpmp164MF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(6, 3, 'Advanced Education Services');
+
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -4282,6 +4314,9 @@ class GeneratePpmpQ1 extends Component
 
     public function rdPpmp164MF()
     {
+
+        return $this->generateSksuppmpPerCostCenterMfo(6, 4, 'Research and Development');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -4346,6 +4381,8 @@ class GeneratePpmpQ1 extends Component
 
     public function extensionPpmp164MF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(6, 5, 'Extension Services');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -4410,6 +4447,8 @@ class GeneratePpmpQ1 extends Component
 
     public function lfPpmp164MF()
     {
+        return $this->generateSksuppmpPerCostCenterMfo(6, 6, 'Local Fund Projects');
+
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
