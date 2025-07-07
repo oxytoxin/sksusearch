@@ -525,7 +525,7 @@
                                     }
                                 @endphp
                                 <div class="flex justify-between space-x-3">
-                                    <span>Allocated Fund: </span><span>₱ {{ number_format($allocated, 2) }}</span>
+                                    <span>Allocated Fund : </span><span>₱ {{ number_format($allocated, 2) }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span>Program: </span><span>₱ {{ number_format($program, 2) }}</span>
