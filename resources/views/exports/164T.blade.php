@@ -1,117 +1,391 @@
 <table class="w-full mt-4">
     <thead>
         <tr>
-            <th colspan="2" class="border border-black bg-gray-300" style="font-weight: bold">Receipts</th>
-            <th colspan="4" class="border border-black bg-gray-300" style="font-weight: bold">Expenditure</th>
+            @if (
+                $is_q1 &&
+                    in_array($activeButton, [
+                        'sksuPre',
+                        'generateSksuppmp',
+                        'generateSksuppmpPerCostCenterMfo',
+                        'sksuPpmp163',
+                        'accessPpmp163',
+                        'generate163PerCampus',
+                    ]))
+                <th colspan="4" class="border border-black bg-gray-300" style="font-weight: bold">Receipts</th>
+            @else
+                <th colspan="2" class="border border-black bg-gray-300" style="font-weight: bold">Receipts</th>
+            @endif
+            <th colspan="3" class="border border-black bg-gray-300" style="font-weight: bold">Expenditure</th>
             <th class="border border-black bg-gray-300" style="font-weight: bold">Balance</th>
+            {{-- <th colspan="2" class="border border-black bg-gray-300">Corresponding Account Codes
+                            </th> --}}
         </tr>
     </thead>
     <tbody>
         <thead>
             <tr>
-                <th class="border border-black">MFO Fee</th>
-                <th class="border border-black">Allocation</th>
-                <th class="border border-black">UACS Code</th>
-                <th class="border border-black">Account Title</th>
-                <th class="border border-black">Allocated Budget</th>
-                <th class="border border-black">Programmed</th>
-                <th class="border border-black"></th>
+                <th width="40" class="border border-black">MFO Fee</th>
+                <th width="20" class="border border-black">Allocation</th>
+                @if (
+                    $is_q1 &&
+                        in_array($activeButton, [
+                            'sksuPre',
+                            'generateSksuppmp',
+                            'generateSksuppmpPerCostCenterMfo',
+                            'sksuPpmp163',
+                            'accessPpmp163',
+                            'generate163PerCampus',
+                        ]))
+                    <th width="20" class="border border-black">Forwarded Balance</th>
+                    <th width="20" class="border border-black">Total Allocation</th>
+                @endif
+                <th width="20" class="border border-black">UACS Code</th>
+                <th width="45" class="border border-black">Account Title </th>
+                <th width="20" class="border border-black">Budget </th>
+                <th width="20" class="border border-black">Programmed</th>
+                <th width="20" class="border border-black"></th>
+                {{-- <th class="border border-black">UACS Code</th>
+                                <th class="border border-black">Account Title</th> --}}
             </tr>
         </thead>
-        @forelse($fund_allocation as $item)
-            <tr>
-                <td class="border border-black px-2" width="20">{{ $item->name }}</td>
-                <td class="border border-black px-2" width="20">
-                    <div class="flex justify-between">
-                        {{-- <span>₱</span> --}}
-                        <span>{{ number_format($item->total_allocated, 2) }}</span>
-                    </div>
-                </td>
-                <td class="border border-black px-2" width="20">
-                    {{-- @foreach ($ppmp_details->where('mfo_fee_id', $item->mfo_fee_id) as $ppmp)
-                        <ul>
-                            <li>
-                                {{ $ppmp->budget_uacs ?? $ppmp->uacs }}
-                            </li>
-                        </ul>
-                    @endforeach --}}
-                </td>
-                <td class="border border-black px-2" width="20">
-                    {{-- @foreach ($ppmp_details->where('mfo_fee_id', $item->mfo_fee_id) as $ppmp)
-                        <ul>
-                            <li>
-                                <div class="flex justify-between">
-                                    <span>{{ $ppmp->budget_name }}</span>
-                                </div>
-                            </li>
-                        </ul>
-                    @endforeach --}}
-                </td>
-                <td class="border border-black px-2" width="20">
-                    {{-- @foreach ($ppmp_details->where('mfo_fee_id', $item->mfo_fee_id) as $ppmp)
-                        <ul>
-                            <li>
-                                <div class="flex justify-between">
-                                    <span>₱ {{ number_format($ppmp->total_budget_per_uacs, 2) }}</span>
-                                </div>
-                            </li>
-                        </ul>
-                    @endforeach --}}
-                </td>
-                <td class="border border-black px-2" width="20">
-                    <div class="flex justify-between">
-                        {{-- <span>₱</span> --}}
-                        <span>{{ number_format($ppmp_details->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_budget'), 2) }}</span>
-                    </div>
-                </td>
-                <td class="border border-black px-2" width="20">
-                    <div class="flex justify-between">
-                        {{-- <span>₱</span> --}}
-                        <span>{{ number_format($item->total_allocated - $ppmp_details->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_budget'), 2) }}</span>
-                    </div>
-                </td>
-            </tr>
-            @forelse ($ppmp_details->where('mfo_fee_id', $item->mfo_fee_id) as $ppmp)
+        @php
+            $mergedDetails = $ppmp_details
+                ->groupBy('budget_uacs')
+                ->map(function ($group) {
+                    return [
+                        'total_budget' => $group->sum('total_budget'),
+                        'budget_uacs' => $group->first()->budget_uacs,
+                        'budget_name' => $group->first()->budget_name,
+                        'mfo_fee_id' => null,
+                        'total_budget_per_uacs' => $group->sum('total_budget_per_uacs'),
+                    ];
+                })
+                ->sortByDesc('budget_uacs')
+                ->values();
+        @endphp
+        @if ($activeButton === 'sksuPre')
+            {{-- @forelse($fund_allocation as $item) --}}
+            @foreach ($mergedDetails as $mergedDetail)
                 <tr>
-                    <td class="border border-black px-2" width="20"></td>
-                    <td class="border border-black px-2" width="20"></td>
-                    <td class="border border-black px-2" width="20">
-                        {{ $ppmp->budget_uacs ?? $ppmp->uacs }}
+                    @if ($loop->first)
+                        <td class="border border-black px-2">Total Receipts</td>
+                        <td class="border border-black px-2">
+                            <div class="flex justify-between">
+
+                                <span>{{ number_format($fund_allocation->sum('total_allocated'), 2) }}</span>
+                            </div>
+                        </td>
+                        @if (
+                            $is_q1 &&
+                                in_array($activeButton, [
+                                    'sksuPre',
+                                    'generateSksuppmp',
+                                    'generateSksuppmpPerCostCenterMfo',
+                                    'sksuPpmp163',
+                                    'accessPpmp163',
+                                    'generate163PerCampus',
+                                ]))
+                            <td class="border border-black px-2">
+                                <div class="flex justify-between">
+
+                                    <span>{{ number_format(
+                                        $non_supplemental_fund_allocation->sum('total_allocated') - $non_supplemental_total_programmed->total_budget,
+                                        2,
+                                    ) }}</span>
+                                </div>
+                            </td>
+                            <td class="border border-black px-2">
+                                <div class="flex justify-between">
+                                    <span>{{ number_format(
+                                        $non_supplemental_fund_allocation->sum('total_allocated') -
+                                            $non_supplemental_total_programmed->total_budget +
+                                            $fund_allocation->sum('total_allocated'),
+                                        2,
+                                    ) }}</span>
+                                </div>
+                            </td>
+                        @endif
+                    @else
+                        <td class="border border-black px-2"></td>
+                        <td class="border border-black px-2">
+                        </td>
+                        @if (
+                            $is_q1 &&
+                                in_array($activeButton, [
+                                    'sksuPre',
+                                    'generateSksuppmp',
+                                    'generateSksuppmpPerCostCenterMfo',
+                                    'sksuPpmp163',
+                                    'accessPpmp163',
+                                    'generate163PerCampus',
+                                ]))
+                            <td class="border border-black px-2">
+                            </td>
+                            <td class="border border-black px-2">
+                            </td>
+                        @endif
+                    @endif
+                    <td class="border border-black px-2">
+                        {{ $mergedDetail['budget_uacs'] }}
                     </td>
-                    <td class="border border-black px-2" width="40">
-                        <span>{{ $ppmp->budget_name }}</span>
+                    <td class="border border-black px-2">
+                        <div class="flex justify-between">
+                            <span> {{ $mergedDetail['budget_name'] }}</span>
+                        </div>
                     </td>
-                    <td class="border border-black px-2" width="20">
-                        {{ number_format($ppmp->total_budget_per_uacs, 2) }}
+                    <td class="border border-black px-2">
+                        <div class="flex justify-between">
+                            <span>
+                                {{ number_format($mergedDetail['total_budget_per_uacs'], 2) }}</span>
+                        </div>
+                    </td>
+                    <td class="border border-black px-2">
+                        <div class="flex justify-between">
+                            {{-- <span></span> --}}
+                            <span>
+                            </span>
+                        </div>
                     </td>
                 </tr>
+            @endforeach
+        @else
+            @forelse($fund_allocation as $item)
+                <tr>
+                    <td class="border border-black px-2">{{ $item->categoryGroup?->name }}</td>
+                    <td class="border border-black px-2">
+                        @if (
+                            $is_q1 &&
+                                in_array($activeButton, [
+                                    'sksuPre',
+                                    'generateSksuppmp',
+                                    'generateSksuppmpPerCostCenterMfo',
+                                    'sksuPpmp163',
+                                    'accessPpmp163',
+                                    'generate163PerCampus',
+                                ]))
+                            <div class="flex justify-between">
+                                <span>{{ $item->is_supplemental ? number_format($item->total_allocated, 2) : '0.00' }}</span>
+                            </div>
+                        @else
+                            <div class="flex justify-between">
+
+                                <span>{{ number_format($item->total_allocated, 2) }}</span>
+                            </div>
+                        @endif
+                    </td>
+                    @if (
+                        $is_q1 &&
+                            in_array($activeButton, [
+                                'sksuPre',
+                                'generateSksuppmp',
+                                'generateSksuppmpPerCostCenterMfo',
+                                'sksuPpmp163',
+                                'accessPpmp163',
+                                'generate163PerCampus',
+                            ]))
+                        <td class="border border-black px-2">
+                            @if ($item->is_supplemental == 1)
+                                <div class="flex justify-between">
+                                    <span>{{ number_format(
+                                        $non_supplemental_fund_allocation->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_allocated') -
+                                            $forwarded_ppmp_details->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_budget'),
+                                        2,
+                                    ) }}</span>
+                                </div>
+                            @else
+                                <div class="flex justify-between">
+                                    <span>{{ number_format(
+                                        $item->total_allocated - $forwarded_ppmp_details->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_budget'),
+                                        2,
+                                    ) }}</span>
+                                </div>
+                            @endif
+                        </td>
+                        <td class="border border-black px-2">
+                            @if ($item->is_supplemental == 1)
+                                <div class="flex justify-between">
+                                    <span>{{ number_format(
+                                        $non_supplemental_fund_allocation->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_allocated') -
+                                            $forwarded_ppmp_details->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_budget') +
+                                            $item->total_allocated,
+                                        2,
+                                    ) }}</span>
+                                </div>
+                            @else
+                                <div class="flex justify-between">
+                                    <span>{{ number_format(
+                                        $item->total_allocated - $forwarded_ppmp_details->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_budget'),
+                                        2,
+                                    ) }}</span>
+                                </div>
+                            @endif
+                        </td>
+                    @endif
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="border border-black px-2">
+                        <div class="flex justify-between">
+                            <span>{{ number_format($ppmp_details->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_budget'), 2) }}</span>
+                        </div>
+                    </td>
+                    <td class="border border-black px-2">
+                        @if (
+                            $is_q1 &&
+                                in_array($activeButton, [
+                                    'sksuPre',
+                                    'generateSksuppmp',
+                                    'generateSksuppmpPerCostCenterMfo',
+                                    'sksuPpmp163',
+                                    'accessPpmp163',
+                                    'generate163PerCampus',
+                                ]))
+                            @if ($item->is_supplemental == 1)
+                                <div class="flex justify-between">
+                                    <span>{{ number_format(
+                                        $item->total_allocated - $ppmp_details->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_budget'),
+                                        2,
+                                    ) }}</span>
+                                </div>
+                            @else
+                                <div class="flex justify-between">
+                                    <span>0.00</span>
+                                </div>
+                            @endif
+                        @else
+                            <div class="flex justify-between">
+                                <span>{{ number_format(
+                                    $item->total_allocated - $ppmp_details->where('mfo_fee_id', $item->mfo_fee_id)->sum('total_budget'),
+                                    2,
+                                ) }}</span>
+                            </div>
+                        @endif
+                    </td>
+                </tr>
+                @foreach ($ppmp_details->where('mfo_fee_id', $item->mfo_fee_id) as $ppmp)
+                    <tr>
+                        @if (
+                            $is_q1 &&
+                                in_array($activeButton, [
+                                    'generate164MFO',
+                                    'generateSksuppmp',
+                                    'generateSksuppmpPerCostCenterMfo',
+                                    'sksuPpmp163',
+                                    'accessPpmp163',
+                                    'generate163PerCampus',
+                                ]))
+                            <td></td>
+                            <td></td>
+                        @endif
+                        <td></td>
+                        <td></td>
+                        <td class="border border-black px-2">
+                            {{ $ppmp->budget_uacs ?? $ppmp->uacs }}
+                        </td>
+                        <td class="border border-black px-2">
+                            {{ $ppmp->budget_name }}
+                        </td>
+                        <td class="border border-black px-2">
+                            {{ number_format($ppmp->total_budget_per_uacs, 2) }}
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                @endforeach
             @empty
+                <tr>
+                    <td class="border border-black text-center py-3 italic" colspan="3">
+                        No data available
+                    </td>
+                </tr>
             @endforelse
-        @empty
-            <tr>
-                <td class="border border-black text-center py-3 italic" colspan="3">No data available</td>
-            </tr>
-        @endforelse
+        @endif
     </tbody>
     <tr>
-        <td class="border border-black text-left font-semibold p-1" colspan="1">Grand Total</td>
+        <td class="border border-black text-left font-semibold p-1" colspan="1">Grand Total
+        </td>
         <td class="border border-black text-right font-semibold px-2">
             <div class="flex justify-between">
-                {{-- <span>₱</span> --}}
                 <span>{{ $total_allocated === null ? 0 : number_format($total_allocated, 2) }}</span>
             </div>
         </td>
-        <td class="border border-black text-left font-semibold p-1" colspan="2"></td>
-        <td class="border border-black text-left font-semibold p-1"></td>
+        @if (
+            $is_q1 &&
+                in_array($activeButton, [
+                    'generate164MFO',
+                    'generateSksuppmp',
+                    'generateSksuppmpPerCostCenterMfo',
+                    'sksuPpmp163',
+                    'accessPpmp163',
+                    'generate163PerCampus',
+                ]))
+            <td class="border border-black text-left font-semibold p-1">
+                <div class="flex justify-between">
+
+                    <span>
+                        {{ $non_supplemental_fund_allocation->sum('total_allocated') > 0
+                            ? number_format(
+                                $non_supplemental_fund_allocation->sum('total_allocated') - $non_supplemental_total_programmed->total_budget,
+                                2,
+                            )
+                            : number_format($non_supplemental_total_programmed->total_budget, 2) }}</span>
+                </div>
+            </td>
+            <td class="border border-black text-left font-semibold p-1">
+                <div class="flex justify-between">
+
+                    <span>
+                        {{ $non_supplemental_fund_allocation->sum('total_allocated') > 0
+                            ? number_format(
+                                $non_supplemental_fund_allocation->sum('total_allocated') -
+                                    $non_supplemental_total_programmed->total_budget +
+                                    ($total_allocated ?? 0),
+                                2,
+                            )
+                            : number_format($non_supplemental_total_programmed->total_budget + ($total_allocated ?? 0), 2) }}</span>
+                </div>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+        @elseif ($is_q1 && in_array($activeButton, ['sksuPre']))
+            <td class="border border-black text-left font-semibold p-1">
+                <div class="flex justify-between">
+
+                    <span>{{ number_format(
+                        $non_supplemental_fund_allocation->sum('total_allocated') - $non_supplemental_total_programmed->total_budget,
+                        2,
+                    ) }}</span>
+                </div>
+            </td>
+            <td class="border border-black text-left font-semibold p-1">
+                <div class="flex justify-between">
+
+                    <span>{{ number_format(
+                        $non_supplemental_fund_allocation->sum('total_allocated') -
+                            $non_supplemental_total_programmed->total_budget +
+                            $total_allocated,
+                        2,
+                    ) }}</span>
+                </div>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+        @else
+            <td class="border border-black text-left font-semibold p-1"></td>
+            <td class="border border-black text-left font-semibold p-1"></td>
+            <td class="border border-black text-left font-semibold p-1"></td>
+        @endif
         <td class="border border-black text-right font-semibold px-2">
             <div class="flex justify-between">
-                {{-- <span>₱</span> --}}
+
                 <span>{{ $total_programmed === null ? 0 : number_format($total_programmed->total_budget, 2) }}</span>
             </div>
         </td>
         <td class="border border-black text-right font-semibold px-2">
             <div class="flex justify-between">
-                {{-- <span>₱</span> --}}
+
                 <span>{{ $total_programmed === null ? 0 : number_format($balance, 2) }}</span>
             </div>
         </td>

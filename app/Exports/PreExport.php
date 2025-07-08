@@ -21,7 +21,18 @@ class PreExport implements FromView
     public $balance;
     public $selectedType;
 
-    public function __construct($selectedType, $fund_allocation, $ppmp_details, $total_allocated, $total_programmed, $balance)
+
+    public $is_q1 = false;
+    public $activeButton;
+
+    public $non_supplemental_fund_allocation;
+    public $forwarded_ppmp_details;
+
+    public $non_supplemental_total_programmed;
+
+    public $showPre = false;
+
+    public function __construct($selectedType, $fund_allocation, $ppmp_details, $total_allocated, $total_programmed, $balance,$non_supplemental_fund_allocation, $forwarded_ppmp_details,$non_supplemental_total_programmed, $is_q1 = false, $activeButton)
     {
         $this->fund_allocation = $fund_allocation;
         $this->ppmp_details = $ppmp_details;
@@ -29,37 +40,15 @@ class PreExport implements FromView
         $this->total_programmed = $total_programmed;
         $this->balance = $balance;
         $this->selectedType = $selectedType;
+        $this->is_q1 = $is_q1;
+        $this->activeButton = $activeButton;
+        $this->non_supplemental_fund_allocation = $non_supplemental_fund_allocation;
+        $this->forwarded_ppmp_details = $forwarded_ppmp_details;
+        $this->non_supplemental_total_programmed = $non_supplemental_total_programmed;
     }
 
     public function view(): View
     {
-        // $ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-        //     $query->where('fund_cluster_w_f_p_s_id', 1);
-        // })
-        // ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id')
-        // ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id')
-        // ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
-        // ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
-        // ->select(
-        //     'wfp_details.category_group_id as category_group_id',
-        //     'category_items.uacs_code as uacs',
-        //     'category_items.name as item_name',
-        //     \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
-        //     'category_item_budgets.uacs_code as budget_uacs',
-        //     'category_item_budgets.name as budget_name',
-        //     \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs')
-        // )
-        // ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
-        // ->get();
-
-        // $total_allocated = $this->fund_allocation->sum('total_allocated');
-
-        // $total_programmed = WfpDetail::whereHas('wfp', function($query) {
-        //     $query->where('fund_cluster_w_f_p_s_id', 1);
-        // })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
-
-        // $balance = $total_allocated - $total_programmed->total_budget;
-
         return view('exports.101', [
             'fund_allocation' => $this->fund_allocation,
             'ppmp_details' => $this->ppmp_details,
@@ -67,6 +56,12 @@ class PreExport implements FromView
             'total_programmed' => $this->total_programmed,
             'balance' => $this->balance,
             'selectedType' => $this->selectedType,
+            'activeButton' => $this->activeButton,
+            'is_q1' => $this->is_q1,
+            'non_supplemental_fund_allocation' => $this->non_supplemental_fund_allocation,
+            'forwarded_ppmp_details' => $this->forwarded_ppmp_details,
+            'showPre' => $this->showPre,
+            'non_supplemental_total_programmed' => $this->non_supplemental_total_programmed
         ]);
     }
 }

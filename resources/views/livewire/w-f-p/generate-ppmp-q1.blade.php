@@ -113,14 +113,14 @@
 
         <!-- Content for each tab -->
         <div x-cloak class="mt-4">
-            <div x-show="selectedTab === '101'">
+            <div wire:key='32131-101' x-show="selectedTab === '101'">
                 @include('fund-views.101') <!-- Include the view for tab 101 -->
                 <div class="flex justify-center mt-10">
                     <div wire:loading class="loader">
                     </div>
                 </div>
             </div>
-            <div x-show="selectedTab === '101 - Continuing'">
+            <div wire:key='CON-101' x-show="selectedTab === '101 - Continuing'">
                 @include('fund-views.101-continuing') <!-- Include the view for tab 101 -->
                 <div class="flex justify-center mt-10">
                     <div wire:loading class="loader">
