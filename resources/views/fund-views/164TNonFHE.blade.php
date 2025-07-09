@@ -180,7 +180,7 @@
                             @else
                                 @forelse($fund_allocation as $item)
                                     <tr>
-                                        <td class="border border-black px-2">{{ $item->categoryGroup?->name }}</td>
+                                        <td class="border border-black px-2">{{ $item->name }}</td>
                                         <td class="border border-black px-2">
                                             @if ($is_q1 && in_array($activeButton, ['sksuPre', 'generateSksuppmp', 'generateSksuppmpPerCostCenterMfo']))
                                                 <div class="flex justify-between">
