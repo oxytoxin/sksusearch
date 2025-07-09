@@ -71,7 +71,6 @@
                         <td class="border border-black px-2">Total Receipts</td>
                         <td class="border border-black px-2">
                             <div class="flex justify-between">
-
                                 <span>{{ number_format($fund_allocation->sum('total_allocated'), 2) }}</span>
                             </div>
                         </td>
@@ -87,7 +86,6 @@
                                 ]))
                             <td class="border border-black px-2">
                                 <div class="flex justify-between">
-
                                     <span>{{ number_format(
                                         $non_supplemental_fund_allocation->sum('total_allocated') - $non_supplemental_total_programmed->total_budget,
                                         2,
@@ -151,7 +149,7 @@
         @else
             @forelse($fund_allocation as $item)
                 <tr>
-                    <td class="border border-black px-2">{{ $item->categoryGroup?->name }}</td>
+                    <td class="border border-black px-2">{{ $item->name }}</td>
                     <td class="border border-black px-2">
                         @if (
                             $is_q1 &&
