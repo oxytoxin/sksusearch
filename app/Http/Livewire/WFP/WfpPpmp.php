@@ -38,13 +38,15 @@ class WfpPpmp extends Component
         $this->total_allocated = ($this->record->costCenter->fundAllocations()->where('is_supplemental', 0)->sum('initial_amount')-$programmed) +  $this->record->total_allocated_fund;
 
         $wfp = Wfp::where('cost_center_id', $this->record->cost_center_id)->where('is_supplemental', 1)->first();
-        $this->procurements = $wfp->wfpDetails()->with(['supply.categoryItemsBudget'])->whereHas('supply',function($query){$query->whereIn('category_item_budget_id',self::PROCUREMENT_IDS);})->get();
+        if($wfp){
+              $this->procurements = $wfp->wfpDetails()->with(['supply.categoryItemsBudget'])->whereHas('supply',function($query){$query->whereIn('category_item_budget_id',self::PROCUREMENT_IDS);})->get();
         if(count($this->procurements) > 0){
         $proc_programmed = 0;
          foreach ($this->procurements as $procurement) {
                $proc_programmed += $procurement->total_quantity * $procurement->cost_per_unit;
         }
             $this->program = $this->program + $proc_programmed;
+        }
         }
         // ->whereHas('supply',function($query){
         //     $query->whereIn('category_item_budget_id',self::PROCUREMENT_IDS);
