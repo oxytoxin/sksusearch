@@ -64,7 +64,6 @@
                 ->values();
         @endphp
         @if ($activeButton === 'sksuPre')
-            {{-- @forelse($fund_allocation as $item) --}}
             @foreach ($mergedDetails as $mergedDetail)
                 <tr>
                     @if ($loop->first)

@@ -35,68 +35,6 @@
                         Fund {{ $fund->name }}
                     </button>
                 @endforeach
-                {{-- <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                    :class="{
-                        'bg-green-500 text-white': selectedTab === '101',
-                        'text-gray-800 hover:text-green-700': selectedTab !== '101'
-                    }"
-                    @click.prevent="selectedTab = '101'; showPrintable = false">
-                    Fund {{ $fund->where('id', 1)->first()->name }}
-                </a>
-
-                <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                    :class="{
-                        'bg-green-500 text-white': selectedTab === '163',
-                        'text-gray-800 hover:text-green-700': selectedTab !== '163'
-                    }"
-                    @click.prevent="selectedTab = '163'; showPrintable = false">
-                    Fund {{ $fund->where('id', 2)->first()->name }}
-                </a>
-
-                <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                    :class="{
-                        'bg-green-500 text-white': selectedTab === '161',
-                        'text-gray-800 hover:text-green-700': selectedTab !== '161'
-                    }"
-                    @click.prevent="selectedTab = '161'; showPrintable = false">
-                    Fund {{ $fund->where('id', 3)->first()->name }}
-                </a>
-
-                <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                    :class="{
-                        'bg-green-500 text-white': selectedTab === '164T / FHE',
-                        'text-gray-800 hover:text-green-700': selectedTab !== '164T / FHE'
-                    }"
-                    @click.prevent="selectedTab = '164T / FHE'; showPrintable = false">
-                    Fund {{ $fund->where('id', 4)->first()->name }}
-                </a>
-
-                <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                    :class="{
-                        'bg-green-500 text-white': selectedTab === '164T / Non-FHE',
-                        'text-gray-800 hover:text-green-700': selectedTab !== '164T / Non-FHE'
-                    }"
-                    @click.prevent="selectedTab = '164T / Non-FHE'; showPrintable = false">
-                    Fund {{ $fund->where('id', 7)->first()->name }}
-                </a>
-
-                <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                    :class="{
-                        'bg-green-500 text-white': selectedTab === '164OSF',
-                        'text-gray-800 hover:text-green-700': selectedTab !== '164OSF'
-                    }"
-                    @click.prevent="selectedTab = '164OSF'; showPrintable = false">
-                    Fund {{ $fund->where('id', 5)->first()->name }}
-                </a>
-
-                <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                    :class="{
-                        'bg-green-500 text-white': selectedTab === '164MF',
-                        'text-gray-800 hover:text-green-700': selectedTab !== '164MF'
-                    }"
-                    @click.prevent="selectedTab = '164MF'; showPrintable = false">
-                    Fund {{ $fund->where('id', 6)->first()->name }}
-                </a> --}}
             </nav>
         </div>
         <div class="mt-5">

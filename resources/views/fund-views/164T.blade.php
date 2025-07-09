@@ -37,7 +37,7 @@
             </button>
         </div>
     </div>
-    <div wire:loading.remove>
+    <div>
         <div x-show="showPrintable" class="bg-gray-50">
             @if ($is_active)
                 <div class="flex justify-end p-4 space-x-4">

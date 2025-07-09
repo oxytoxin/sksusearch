@@ -16,6 +16,7 @@ class GeneratePpmpQ1 extends Component
 {
     public $showPre = false;
 
+    public $preId = null;
     public $wfp_type;
     public $ppmp_details;
     public $is_active = false;
@@ -165,6 +166,40 @@ class GeneratePpmpQ1 extends Component
                 break;
             case 'Local Fund Projects':
                 $this->lfPpmp();
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                break;
+        }
+    }
+
+      public function export101Con()
+    {
+        switch ($this->title) {
+            case 'Sultan Kudarat State University':
+                $this->sksuPpmp101Con();
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                break;
+            case 'General Admission and Support Services':
+                $this->gasPpmp101Con();
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                break;
+            case 'Higher Education Services':
+                $this->hesPpmp101Con();
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                break;
+            case 'Advanced Education Services':
+                $this->aesPpmp101Con();
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                break;
+            case 'Research and Development':
+                $this->rdPpmp101Con();
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                break;
+            case 'Extension Services':
+                $this->extensionPpmp101Con();
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                break;
+            case 'Local Fund Projects':
+                $this->lfPpmp101Con();
                 return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
         }
@@ -1765,6 +1800,10 @@ class GeneratePpmpQ1 extends Component
                 $this->sksuPpmp163();
                 return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
                 break;
+           case 'Sultan Kudarat State University PRE':
+                $this->sksuPre($this->preId);
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
+                break;
             case 'ACCESS Campus':
                 $this->accessPpmp163();
                 return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
@@ -2615,6 +2654,10 @@ class GeneratePpmpQ1 extends Component
                 $this->sksuPpmp164T();
                 return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
                 break;
+           case 'Sultan Kudarat State University PRE':
+                $this->sksuPre($this->preId);
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
+                break;
             case 'General Admission and Support Services':
                 $this->gasPpmp164T();
                 return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
@@ -3112,6 +3155,10 @@ class GeneratePpmpQ1 extends Component
                 $this->sksuPpmp164TN();
                 return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
                 break;
+           case 'Sultan Kudarat State University PRE':
+                $this->sksuPre($this->preId);
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
+                break;
             case 'General Admission and Support Services':
                 $this->gasPpmp164TN();
                 return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
@@ -3599,6 +3646,10 @@ class GeneratePpmpQ1 extends Component
                 $this->sksuPpmp164OSF();
                 return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
                 break;
+            case 'Sultan Kudarat State University PRE':
+                $this->sksuPre($this->preId);
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
+                break;
             case 'General Admission and Support Services':
                 $this->gasPpmp164OSF();
                 return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
@@ -4084,6 +4135,10 @@ class GeneratePpmpQ1 extends Component
         switch ($this->title) {
             case 'Sultan Kudarat State University':
                 $this->sksuPpmp164MF();
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
+                break;
+            case 'Sultan Kudarat State University PRE':
+                $this->sksuPre($this->preId);
                 return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
                 break;
             case 'General Admission and Support Services':
@@ -5048,7 +5103,8 @@ class GeneratePpmpQ1 extends Component
         $this->is_active = true;
         $this->showPre = true;
         $this->activeButton = 'sksuPre';
-        $this->title = 'Sultan Kudarat State University';
+        $this->title = 'Sultan Kudarat State University PRE';
+        $this->preId = $fundCluster;
 
         $tem_fund_allocation = FundAllocation::selectRaw('wpf_type_id,is_supplemental, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
