@@ -2891,7 +2891,7 @@ class GeneratePpmpQ1 extends Component
 
     public function rdPpmp164T()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(4,4,'Reasearch and Development');
+        return $this->generateSksuppmpPerCostCenterMfo(4,4,'Research and Development');
 
         // CODE BELOW IS NOT USE
         $this->is_active = true;
