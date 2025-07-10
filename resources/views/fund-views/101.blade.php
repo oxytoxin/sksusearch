@@ -92,7 +92,7 @@
                             </thead>
                             @forelse($fund_allocation as $item)
                                 <tr>
-                                    <td class="border border-black px-2">{{ $item->categoryGroup?->name }}</td>
+                                    <td class="border border-black px-2">{{ $item->name }}</td>
                                     <td class="border border-black px-2">
                                         @if (
                                             $is_q1 &&
@@ -119,7 +119,8 @@
                                                 </div>
                                             @else
                                                 <div class="flex justify-between">
-                                                    <span>₱ </span>
+                                                    <span>₱
+                                                        [{{ $item->total_allocated }}]</span>
                                                     <span>{{ number_format($item->total_allocated - $forwarded_ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
                                                 </div>
                                             @endif
@@ -264,42 +265,6 @@
                     </table>
 
 
-                    {{-- <table class="w-full mt-4">
-                    <thead>
-                        <tr>
-                            <th class="border border-black">UACS Code</th>
-                            <th class="border border-black">Account Title</th>
-                            <th class="border border-black">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($ppmp_details as $item)
-                        <tr>
-                            <td class="border border-black px-2">{{$item->categoryItem?->uacs_code}}</td>
-                            <td class="border border-black px-2">{{$item->categoryItem?->name}}</td>
-                            <td class="border border-black text-right px-2">
-                                <div class="flex justify-between">
-                                    <span>₱</span>
-                                    <span>{{number_format($item->total_budget, 2)}}</span>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td class="border border-black text-center py-3 italic" colspan="3">No data available</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                    <tr>
-                        <td class="border border-black text-left font-semibold p-1" colspan="2">Grand Total</td>
-                        <td class="border border-black text-right font-semibold px-2">
-                            <div class="flex justify-between">
-                                <span>₱</span>
-                                <span>{{$total === null ? 0 : number_format($total->total_budget, 2)}}</span>
-                            </div>
-                        </td>
-                    </tr>
-                </table> --}}
                 </div>
                 {{-- signatories --}}
                 @php
