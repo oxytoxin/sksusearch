@@ -512,7 +512,7 @@ class GeneratePpmp extends Component
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
             ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
             ->where('fund_allocations.is_supplemental', 0)
-            ->where('m_f_o_s.id', 6)
+            ->whereIn('m_f_o_s.id', [6,7])
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
             ->get();
 
@@ -536,7 +536,7 @@ class GeneratePpmp extends Component
                 'category_item_budgets.name as budget_name', // Include the related field in the select
                 \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs')
             )
-            ->where('cost_centers.m_f_o_s_id', 6)
+            ->whereIn('cost_centers.m_f_o_s_id', [6,7])
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
@@ -546,7 +546,7 @@ class GeneratePpmp extends Component
                 ->where('is_supplemental', 0)
                 ->where('is_approved', 1)
                 ->whereHas('costCenter', function ($query) {
-                    $query->where('m_f_o_s_id', 6);
+                    $query->whereIn('m_f_o_s_id', [6,7]);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
