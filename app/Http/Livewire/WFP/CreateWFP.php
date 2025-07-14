@@ -204,26 +204,35 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function mount($record, $wfpType, $isEdit, $isSupplemental)
     {
+
         $this->is_supplemental = $isSupplemental;
-        $costCenter_id = Wfp::where('id', $record)->first()?->cost_center_id;
+        $costCenter_id = Wfp::where('cost_center_id', $record)->first()?->cost_center_id;
         $this->wfp_param = $wfpType;
-        if ($isEdit === 1) {
-            $this->record = CostCenter::where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
-                $query->where('wpf_type_id', $wfpType);
-            })->first();
-        } elseif ($isSupplemental) {
-            $this->record = CostCenter::with(['fundAllocations'])
-                ->where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
-                    $query->where('wpf_type_id', $wfpType)->where('is_supplemental', 1);
+        if ($isEdit == 1) {
+             $this->record = CostCenter::with(['fundAllocations'])
+                ->where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
+                    $query->where('wpf_type_id', $wfpType)->where('is_supplemental', $this->is_supplemental);
                 })->first();
         } else {
             $this->record = CostCenter::where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
                 $query->where('wpf_type_id', $wfpType);
             })->first();
         }
-        // $this->record = CostCenter::where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
-        //     $query->where('wpf_type_id', $wfpType);
-        // })->first();
+
+        //  if ($isEdit === 1) {
+        //     $this->record = CostCenter::where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
+        //         $query->where('wpf_type_id', $wfpType);
+        //     })->first();
+        // } elseif ($isSupplemental) {
+        //     $this->record = CostCenter::with(['fundAllocations'])
+        //         ->where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
+        //             $query->where('wpf_type_id', $wfpType)->where('is_supplemental', 1);
+        //         })->first();
+        // } else {
+        //     $this->record = CostCenter::where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
+        //         $query->where('wpf_type_id', $wfpType);
+        //     })->first();
+        // }
 
         if ($isSupplemental) {
             $this->wfp_type = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->wpfType;
@@ -461,7 +470,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             })->toArray();
                         }
                     } else {
-                        $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) {
+                        $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) {
                             return [
                                 'category_group_id' => $allocation->category_group_id,
                                 'category_group' => $allocation->category_group,
@@ -493,9 +502,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     }
                 }
             } else {
-                if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
+                if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     if ($isSupplemental) {
-                        $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) {
+                        $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) {
                             return [
                                 'category_group_id' => $allocation->category_group_id,
                                 'category_group' => $allocation->category_group,
@@ -505,11 +514,16 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             ];
                         })->toArray();
                     } else {
-                        $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) {
+                         if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first() === null) {
+                                $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
+                            } else {
+                                $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->initial_amount;
+                            }
+                        $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) use ($initial) {
                             return [
                                 'category_group_id' => $allocation->category_group_id,
                                 'category_group' => $allocation->category_group,
-                                'initial_amount' => $allocation->initial_amount,
+                                'initial_amount' => $initial,
                                 'current_total' => $allocation->current_total,
                                 'balance' => $allocation->balance,
                             ];

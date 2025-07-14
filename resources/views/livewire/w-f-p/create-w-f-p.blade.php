@@ -310,9 +310,15 @@
                                                         $record->fundAllocations
                                                             ->where('is_supplemental', 1)
                                                             ->sum('initial_amount') + $balance;
-                                                    $sumAllocated = $is_supplemental
-                                                        ? $totalAllocated
-                                                        : $record->fundAllocations->sum('inital_amount');
+                                                    if($is_supplemental)
+                                                    {
+                                                        $sumAllocated = $totalAllocated;
+                                                    }else{
+                                                        $sumAllocated = $record->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+                                                    }
+                                                    // $sumAllocated = $is_supplemental
+                                                    //     ? $totalAllocated
+                                                    //     : $record->fundAllocations->where('is_supplemental', 0)->sum('inital_amount');
                                                     $sumTotal = array_sum(
                                                         array_column($current_balance, 'current_total'),
                                                     );
