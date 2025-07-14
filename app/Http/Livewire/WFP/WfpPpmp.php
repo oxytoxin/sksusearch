@@ -18,7 +18,7 @@ class WfpPpmp extends Component
 
     const PROCUREMENT_IDS = [67];
 
-    public function mount($record)
+    public function mount($record, $isSupplemental)
     {
         $this->record = Wfp::find($record);
         $this->wfpDetails = $this->record->wfpDetails()
@@ -29,7 +29,7 @@ class WfpPpmp extends Component
             $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
         }
 
-        $wfp = Wfp::where('cost_center_id', $this->record->cost_center_id)->where('is_supplemental', 0)->first();
+        $wfp = Wfp::where('cost_center_id', $this->record->cost_center_id)->where('is_supplemental', $isSupplemental)->first();
         $wfpDetails = $wfp->wfpDetails()->get();
                 $programmed = 0;
                 foreach ($wfpDetails as $wfpDetail) {
