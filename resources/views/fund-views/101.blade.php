@@ -120,7 +120,7 @@
                                             @else
                                                 <div class="flex justify-between">
                                                     <span>₱
-                                                        [{{ $item->total_allocated }}]</span>
+                                                        </span>
                                                     <span>{{ number_format($item->total_allocated - $forwarded_ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
                                                 </div>
                                             @endif

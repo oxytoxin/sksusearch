@@ -465,7 +465,7 @@
                                         {{ $item->supply->categoryItemsBudget->name ?? 'none' }}
                                     </td>
                                     <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->categoryItem->name }}
+                                        {{ $item->supply->particulars }}
                                     </td>
                                     <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
                                         {{ $item->supply->supply_code }}
