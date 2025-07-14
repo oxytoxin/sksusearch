@@ -360,15 +360,15 @@
                                     @endforeach
                                 </tr>
                             @empty
-                                @php
-                                    $ps_name = App\Models\BudgetCategory::where('id', 6)->first()->name;
-                                @endphp
                                 <tr class="border-t border-gray-200">
                                     <th colspan="21" scope="colgroup"
                                         class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">
                                         No Record</th>
                                 </tr>
                             @endforelse
+                            @php
+                                $ps_name = App\Models\BudgetCategory::where('id', 6)->first()->name;
+                            @endphp
                             <tr class="border-t border-gray-200">
                                 <th colspan="21" scope="colgroup"
                                     class="bg-yellow-100 py-2 pl-4 pr-3
