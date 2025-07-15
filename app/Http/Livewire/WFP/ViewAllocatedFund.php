@@ -18,6 +18,10 @@ class ViewAllocatedFund extends Component
     public $fund_description;
     public $amounts = [];
 
+    public $is_supplemental = false;
+
+   protected $queryString = ['is_supplemental'];
+
     public function mount($record, $wfpType)
     {
         $this->record = CostCenter::find($record);

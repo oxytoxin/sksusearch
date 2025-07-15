@@ -133,17 +133,30 @@
     </div>
 </div> --}}
 
-<div class="space-y-2">
+<div x-data="{ tab: 'wfp' }" x-cloak>
     <div class="flex justify-between items-center">
         <h2 class="font-light capitalize text-primary-600">Fund Allocation</h2>
     </div>
-    <div>
+    <div class="mt-2 inline-flex flex-row">
+        <button @class([
+            'mt-2 flex items-center gap-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300',
+            'bg-white -mt-2 text-primary-600' => $filter_is_supplemental === false,
+        ]) wire:click="$set('filter_is_supplemental',false)">
+            WFP
+        </button>
+        <button @class([
+            'mt-2 flex items-center gap-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300',
+            'bg-white -mt-2 text-primary-600' => $filter_is_supplemental === true,
+        ]) wire:click="$set('filter_is_supplemental',true)">
+            Supplemental Q1
+        </button>
+    </div>
+    <div class="bg-white rounded-b-lg rounded-tr-lg">
         @if ($wfp_type > 0)
             <div
                 @if ($fund_cluster) x-data="{ selectedTab: '{{ $fund_cluster }}' }"
             @else
              x-data="{ selectedTab: '1' }" @endif>
-
                 <div class="sm:hidden">
                     <label for="tabs" class="sr-only">Select a tab</label>
                     <select id="tabs" name="tabs"
@@ -164,7 +177,7 @@
                         ->get();
                 @endphp
                 <div class="hidden sm:block">
-                    <nav class="flex flex-row gap-3" aria-label="Tabs">
+                    <nav class="flex   p-3 flex-row gap-3" aria-label="Tabs">
                         @foreach ($fundClusterWfps as $fund)
                             <button wire:click="filter({{ $fund->id }})"
                                 class="rounded-md px-3 py-2 text-sm text-start font-medium w-auto"
@@ -176,63 +189,10 @@
                                 Fund {{ $fund->name }}
                             </button>
                         @endforeach
-
-                        {{-- <a wire:click="filter(2)" href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                            :class="{
-                                'bg-green-500 text-white': selectedTab === '2',
-                                'text-gray-800 hover:text-green-700': selectedTab !== '2'
-                            }"
-                            @click.prevent="selectedTab = '2'">
-                            Fund {{ $fund->where('id', 2)->first()->name }}
-                        </a>
-
-                        <a wire:click="filter(3)" href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                            :class="{
-                                'bg-green-500 text-white': selectedTab === '3',
-                                'text-gray-800 hover:text-green-700': selectedTab !== '3'
-                            }"
-                            @click.prevent="selectedTab = '3'">
-                            Fund {{ $fund->where('id', 3)->first()->name }}
-                        </a>
-
-                        <a wire:click="filter(4)" href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                            :class="{
-                                'bg-green-500 text-white': selectedTab === '4',
-                                'text-gray-800 hover:text-green-700': selectedTab !== '4'
-                            }"
-                            @click.prevent="selectedTab = '4'">
-                            Fund {{ $fund->where('id', 4)->first()->name }}
-                        </a>
-
-                        <a wire:click="filter(7)" href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                            :class="{
-                                'bg-green-500 text-white': selectedTab === '7',
-                                'text-gray-800 hover:text-green-700': selectedTab !== '7'
-                            }"
-                            @click.prevent="selectedTab = '7'">
-                            Fund {{ $fund->where('id', 7)->first()->name }}
-                        </a>
-
-                        <a wire:click="filter(5)" href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                            :class="{
-                                'bg-green-500 text-white': selectedTab === '5',
-                                'text-gray-800 hover:text-green-700': selectedTab !== '5'
-                            }"
-                            @click.prevent="selectedTab = '5'">
-                            Fund {{ $fund->where('id', 5)->first()->name }}
-                        </a>
-                        <a wire:click="filter(6)" href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                            :class="{
-                                'bg-green-500 text-white': selectedTab === '6',
-                                'text-gray-800 hover:text-green-700': selectedTab !== '6'
-                            }"
-                            @click.prevent="selectedTab = '6'">
-                            Fund {{ $fund->where('id', 6)->first()->name }}
-                        </a> --}}
                     </nav>
                 </div>
             </div>
-            <div class="mt-4">
+            <div class="p-4">
                 {{ $this->table }}
             </div>
         @else
