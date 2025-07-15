@@ -18,9 +18,9 @@
         "filament/filament": "^2.0",
         "filament/spatie-laravel-media-library-plugin": "^3.0",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^9.19",
+        "laravel/framework": "^10.0",
         "laravel/jetstream": "^2.12",
-        "laravel/sanctum": "^3.0",
+        "laravel/sanctum": "^3.3",
         "laravel/socialite": "^5.5",
         "laravel/tinker": "^2.7",
         "livewire/livewire": "^2.5",
@@ -41,7 +41,7 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0",
+        "spatie/laravel-ignition": "^2.0",
         "spatie/laravel-web-tinker": "^1.8"
     },
     "autoload": {
@@ -87,6 +87,6 @@
             "pestphp/pest-plugin": true
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
