@@ -7,6 +7,7 @@ use App\Models\CategoryGroup;
 use App\Models\FundAllocation;
 use App\Models\CostCenter;
 use App\Models\SupplementalQuarter;
+use App\Models\Wfp;
 use App\Models\WpfType;
 use WireUi\Traits\Actions;
 use Filament\Notifications\Notification;
@@ -111,7 +112,7 @@ class AddSupplementalFund extends Component
             }
 
 
-            foreach ($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->get() as $wfp) {
+            foreach (Wfp::where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->get() as $wfp) {
                 foreach ($wfp->wfpDetails as $allocation) {
                     if (!isset($this->programmed[$allocation->category_group_id])) {
                         $this->programmed[$allocation->category_group_id] = 0;
@@ -123,8 +124,6 @@ class AddSupplementalFund extends Component
             foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
                 $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
             }
-
-
 
             $this->balances = collect($this->allocations)->map(function ($allocation, $categoryGroupId) {
                 return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
