@@ -34,12 +34,12 @@ class TestController extends Controller
             $fileName = $request->input('fileName');
         }
 
-        return view('exports.cost-center-164', [
-            'cost_centers' => $cost_centers,
-            'total_allocated' => $total_allocated,
-            'total_programmed' => $total_programmed,
-            'total_balance' => $total_balance,
-        ]);
+        // return view('exports.cost-center-164', [
+        //     'cost_centers' => $cost_centers,
+        //     'total_allocated' => $total_allocated,
+        //     'total_programmed' => $total_programmed,
+        //     'total_balance' => $total_balance,
+        // ]);
 
         return Excel::download(new CostCenterPreExport($cost_centers, $total_allocated, $total_programmed->total_budget, $total_balance), $fileName . '.xlsx');
         } catch (\Throwable $th) {
