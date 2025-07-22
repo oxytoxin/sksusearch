@@ -1626,7 +1626,6 @@ class GeneratePpmpQ1 extends Component
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', $fcwpsId)
             ->where('wpf_type_id', $this->selectedType)
-            // ->where('is_supplemental', 1)
             ->where('cost_centers.m_f_o_s_id', $ccMfoId)
             ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name', 'is_supplemental')
             ->get();

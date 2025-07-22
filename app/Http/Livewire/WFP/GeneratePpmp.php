@@ -30,6 +30,8 @@ class GeneratePpmp extends Component
 
     public $is_q1 = false;
 
+    public $mfosId = null;
+
 
     public function mount()
     {
@@ -1875,6 +1877,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->showPre = false;
         $this->title = 'General Admission and Support Services';
+        $this->mfosId = 1;
 
         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -1943,6 +1946,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->showPre = false;
         $this->title = 'Higher Education Services';
+        $this->mfosId = 2;
 
         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -2008,6 +2012,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->showPre = false;
         $this->title = 'Advanced Education Services';
+        $this->mfosId = 3;
 
         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -2073,6 +2078,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->showPre = false;
         $this->title = 'Research and Development';
+        $this->mfosId = 4;
 
         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -2138,6 +2144,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->showPre = false;
         $this->title = 'Extension Services';
+        $this->mfosId = 5;
 
         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -2202,6 +2209,7 @@ class GeneratePpmp extends Component
         $this->is_active = true;
         $this->showPre = false;
         $this->title = 'Local Fund Projects';
+        $this->mfosId = 6;
 
         $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -2261,7 +2269,6 @@ class GeneratePpmp extends Component
         //     });
         // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
-
     //164T-NonFHE
     public function sksuPpmp164TN()
     {

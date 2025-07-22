@@ -41,6 +41,8 @@ Route::get('/test', function () {
     ]);
 });
 
+Route::get('/export/cost-center',App\Http\Controllers\TestController::class)->name('test.pre');
+
 
 Route::get('/attachments/{attachment}/download', [AttachmentsController::class, 'download'])->name('attachments.download');
 
