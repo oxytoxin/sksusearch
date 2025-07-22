@@ -17,16 +17,16 @@ class TestController extends Controller
     {
         try {
               $cost_centers = $this->getCostCenterWithFundAllocations($request);
-        $total_allocated = $cost_centers->sum('total_initial_amount');
-        $total_programmed = $this->getTotalProgrammed($request->input('is_supplemental'), $request->input('fund_cluster_w_f_p_s_id'), $request->input('wfp_type_id'), $request->input('m_f_o_s_id'));
-        $total_balance = $total_allocated - $total_programmed->total_budget;
+            $total_allocated = $cost_centers->sum('total_initial_amount');
+            $total_programmed = $this->getTotalProgrammed($request->input('is_supplemental'), $request->input('fund_cluster_w_f_p_s_id'), $request->input('wfp_type_id'), $request->input('m_f_o_s_id'));
+            $total_balance = $total_allocated - $total_programmed->total_budget;
 
-        $mfo_fee_ids =  $cost_centers->pluck('fund_allocations.*.mfo_fee_id')->flatten()->unique()->toArray();
-        $wfp_details = $this->getWfpDetails($request, $mfo_fee_ids);
-        foreach ($cost_centers as $cost_center) {
-            $cost_center->wfpDetails = $wfp_details->where('cost_center_id', $cost_center->id);
-            $cost_center->totalWfpDetails = $wfp_details->where('cost_center_id', $cost_center->id)->sum('total_budget_per_uacs');
-        }
+            $mfo_fee_ids =  $cost_centers->pluck('fund_allocations.*.mfo_fee_id')->flatten()->unique()->toArray();
+            $wfp_details = $this->getWfpDetails($request, $mfo_fee_ids);
+            foreach ($cost_centers as $cost_center) {
+                $cost_center->wfpDetails = $wfp_details->where('cost_center_id', $cost_center->id);
+                $cost_center->totalWfpDetails = $wfp_details->where('cost_center_id', $cost_center->id)->sum('total_budget_per_uacs');
+            }
 
         $fileName = date('Y-m-d') . 'export';
 
@@ -50,9 +50,10 @@ class TestController extends Controller
     public function getCostCenterWithFundAllocations(Request $request)
     {
         $temp_fund_allocations = FundAllocation::selectRaw('wpf_type_id,is_supplemental, mfo_fees.id as mfo_fee_id, mfo_fees.name as name,GROUP_CONCAT(cost_centers.id) as cost_center_ids,
-        GROUP_CONCAT(CONCAT(cost_centers.id, ":", initial_amount)) as cost_center_amounts')
+        GROUP_CONCAT(CONCAT(cost_centers.id, ":", initial_amount)) as cost_center_amounts, offices.name as office_name')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
+            ->join('offices', 'cost_centers.office_id', '=', 'offices.id') // Join offices table
             ->when($request->has('fund_cluster_w_f_p_s_id'), function ($query) use ($request) {
                 $query->where('mfo_fees.fund_cluster_w_f_p_s_id', $request->input('fund_cluster_w_f_p_s_id'));
             })
@@ -65,7 +66,7 @@ class TestController extends Controller
             ->when($request->has('is_supplemental'), function ($query) use ($request) {
                 $query->where('is_supplemental', $request->input('is_supplemental'));
             })
-            ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name', 'is_supplemental')
+            ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name', 'is_supplemental', 'offices.name')
             ->get()->map(function ($item) {
                 return [
                     'wpf_type_id' => $item->wpf_type_id,
@@ -73,9 +74,11 @@ class TestController extends Controller
                     'mfo_fee_id' => $item->mfo_fee_id,
                     'name' => $item->name,
                     'cost_center_amounts' => $item->cost_center_amounts,
-                    'cost_center_ids' => $item->cost_center_ids
+                    'cost_center_ids' => $item->cost_center_ids,
+                    'office_name' => $item->office_name
                 ];
             });
+
 
         $fund_allocations = [];
 

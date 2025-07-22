@@ -19,7 +19,7 @@
     <table style="width: 100%">
         <thead>
             <tr>
-                <th style="font-weight: bold" bgcolor="#82f5ac" width="40" colspan="2">Receipts</th>
+                <th style="font-weight: bold" bgcolor="#82f5ac" width="40" colspan="3">Receipts</th>
                 <th style="font-weight: bold" bgcolor="#82f5ac" width="80" colspan="3">Expenditure</th>
                 <th style="font-weight: bold" bgcolor="#82f5ac" width="40" colspan="2">Balance</th>
             </tr>
@@ -28,8 +28,12 @@
                     MFO Fee
                 </td>
                 <td>
+                    Office
+                </td>
+                <td>
                     Allocation
                 </td>
+
                 <td width="15">
                     UACS Code
                 </td>
@@ -58,6 +62,9 @@
                     <tr>
                         <td>
                             {{ $fund_allocation['name'] }}
+                        </td>
+                        <td>
+                            {{ $cost_center->office->name }}
                         </td>
                         <td>
                             {{ number_format($fund_allocation['initial_amount'], 2) }}
