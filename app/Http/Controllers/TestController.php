@@ -21,9 +21,7 @@ class TestController extends Controller
         $total_balance = $total_allocated - $total_programmed->total_budget;
 
         $mfo_fee_ids =  $cost_centers->pluck('fund_allocations.*.mfo_fee_id')->flatten()->unique()->toArray();
-
         $wfp_details = $this->getWfpDetails($request, $mfo_fee_ids);
-
         foreach ($cost_centers as $cost_center) {
             $cost_center->wfpDetails = $wfp_details->where('cost_center_id', $cost_center->id);
             $cost_center->totalWfpDetails = $wfp_details->where('cost_center_id', $cost_center->id)->sum('total_budget_per_uacs');
@@ -35,12 +33,12 @@ class TestController extends Controller
             $fileName = $request->input('fileName');
         }
 
-        // return view('exports.cost-center-164', [
-        //     'cost_centers' => $cost_centers,
-        //     'total_allocated' => $total_allocated,
-        //     'total_programmed' => $total_programmed,
-        //     'total_balance' => $total_balance,
-        // ]);
+        return view('exports.cost-center-164', [
+            'cost_centers' => $cost_centers,
+            'total_allocated' => $total_allocated,
+            'total_programmed' => $total_programmed,
+            'total_balance' => $total_balance,
+        ]);
 
         return Excel::download(new CostCenterPreExport($cost_centers, $total_allocated, $total_programmed->total_budget, $total_balance), $fileName . '.xlsx');
     }
@@ -118,9 +116,10 @@ class TestController extends Controller
     public function getWfpDetails(Request $request,array $mfo_fee_ids)
     {
         $data = WfpDetail::whereHas('wfp', function ($query) use ($request) {
-            $query->where('wpf_type_id', $request->input('wfp_type_id'))->where('fund_cluster_w_f_p_s_id', 4)
+            $query->where('wpf_type_id', $request->input('wfp_type_id'))
+                ->where('fund_cluster_w_f_p_s_id', $request->input('fund_cluster_w_f_p_s_id'))
                 ->where('is_supplemental', $request->input('is_supplemental'))
-                ->where('is_approved', $request->input('is_approved') ?? 1);
+                ->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
