@@ -69,8 +69,7 @@
                         <td>
                             {{ number_format($fund_allocation['initial_amount'], 2) }}
                         </td>
-                        <td colspan="2"></td>
-                        <td></td>
+                        <td colspan="3"></td>
                         <td>
                             {{ number_format($cost_center->wfpDetails->where('mfo_fee_id', $fund_allocation['mfo_fee_id'])->sum('total_budget_per_uacs'), 2) }}
                         </td>
@@ -80,6 +79,7 @@
                     </tr>
                     @foreach ($cost_center->wfpDetails->where('mfo_fee_id', $fund_allocation['mfo_fee_id']) as $wfpDetail)
                         <tr>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td>
