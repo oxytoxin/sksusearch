@@ -39,6 +39,7 @@ class GeneratePpmpQ1 extends Component
 
     public $activeButton = "none";
 
+    public $mfosId = null;
 
 
 

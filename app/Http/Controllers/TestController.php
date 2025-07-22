@@ -15,7 +15,8 @@ class TestController extends Controller
 
     public function __invoke(Request $request)
     {
-        $cost_centers = $this->getCostCenterWithFundAllocations($request);
+        try {
+              $cost_centers = $this->getCostCenterWithFundAllocations($request);
         $total_allocated = $cost_centers->sum('total_initial_amount');
         $total_programmed = $this->getTotalProgrammed($request->input('is_supplemental'), $request->input('fund_cluster_w_f_p_s_id'), $request->input('wfp_type_id'), $request->input('m_f_o_s_id'));
         $total_balance = $total_allocated - $total_programmed->total_budget;
@@ -33,14 +34,17 @@ class TestController extends Controller
             $fileName = $request->input('fileName');
         }
 
-        // return view('exports.cost-center-164', [
-        //     'cost_centers' => $cost_centers,
-        //     'total_allocated' => $total_allocated,
-        //     'total_programmed' => $total_programmed,
-        //     'total_balance' => $total_balance,
-        // ]);
+        return view('exports.cost-center-164', [
+            'cost_centers' => $cost_centers,
+            'total_allocated' => $total_allocated,
+            'total_programmed' => $total_programmed,
+            'total_balance' => $total_balance,
+        ]);
 
         return Excel::download(new CostCenterPreExport($cost_centers, $total_allocated, $total_programmed->total_budget, $total_balance), $fileName . '.xlsx');
+        } catch (\Throwable $th) {
+            return "No Data Found";
+        }
     }
 
     public function getCostCenterWithFundAllocations(Request $request)
