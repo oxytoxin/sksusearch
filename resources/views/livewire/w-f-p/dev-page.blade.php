@@ -24,8 +24,9 @@
                           <tbody class="divide-y divide-gray-500 bg-transparent">
                             @forelse ($cost_centers as $item)
                             <tr class="divide-x divide-gray-500">
-                                <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">
-                                   <a target="_blank" class="bg-green-600 rounded-md p-4 m-2 text-gray-50" href="{{route('wfp.print-wfp', $item->wfp->id)}}">View WFP</a>
+                                <td class="flex space-x-4 whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">
+                                   <a target="_blank" class="bg-green-600 rounded-md p-4 m-2 text-gray-50" href="{{route('wfp.print-wfp', ['record' => $item->wfp->id, 'isSupplemental' => 0])}}">View WFP</a>
+                                   <a target="_blank" class="bg-green-600 rounded-md p-4 m-2 text-gray-50" href="{{route('wfp.print-wfp', ['record' => $item->wfp->id, 'isSupplemental' => 1])}}">View WFP (Supplemental)</a>
                                 </td>
                                 <td class="whitespace-nowrap py-4 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-0">
                                     {{ $item->office->name }}
