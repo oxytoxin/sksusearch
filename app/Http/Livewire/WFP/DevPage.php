@@ -27,13 +27,13 @@ class DevPage extends Component
 
         $this->cost_centers = [];
 
-        $this->category_items = CategoryItems::whereIsActive(true)->get();
 
         $this->account_titles = CategoryItems::where('is_active', 1)
             ->where('uacs_code', 'like', '5%')
             ->get();
 
         $budget_account_titles = CategoryItemBudget::get();
+        $this->category_items = $budget_account_titles;
 
         $this->merged_titles = $this->account_titles->map(function ($item) use ($budget_account_titles) {
             $budget_item = $budget_account_titles->firstWhere('uacs_code', $item->uacs_code);
@@ -57,14 +57,10 @@ class DevPage extends Component
         if (!empty($this->supply_code) || !empty($this->category_item_budget_id)) {
             $this->cost_centers = CostCenter::whereHas('wfp', function ($query) {
                 $query->whereHas('wfpDetails', function ($query) {
-                    $query->when(!empty($this->supply_code), function ($query) {
-                        $query->whereHas('supply', function ($query) {
-                            $query->where('supply_code', $this->supply_code);
-                        });
-                    })
-                        ->when(!empty($this->category_item_budget_id), function ($query) {
-                            $query->where('category_item_id', $this->category_item_budget_id);
-                        });
+                     $query->whereHas('supply', function ($query) {
+                            $query->where('supply_code', $this->supply_code)
+                             ->orWhere('category_item_budget_id', $this->category_item_budget_id);
+                     });
                 });
             })->get();
         }
