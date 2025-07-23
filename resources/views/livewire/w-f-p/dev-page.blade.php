@@ -16,6 +16,13 @@
                                     {{ $category_item->name }}</option>
                             @endforeach
                         </select>
+                        <select name="fund_cluster_id" id="fund_cluster_id"
+                            wire:model.defer="fund_cluster_id">
+                            @foreach ($fund_clusters as $key => $fund_cluster)
+                                <option value="{{ $fund_cluster->id }}" wire:key="fund_cluster_{{ $key }}">
+                                    {{ $fund_cluster->name }}</option>
+                            @endforeach
+                        </select>
                         <button wire:click="generateCostCenters"
                             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Check</button>
                     </div>
