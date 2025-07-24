@@ -64,7 +64,7 @@
                             {{ $fund_allocation['name'] }}
                         </td>
                         <td>
-                            {{ $cost_center->office->name }}
+                            {{ $fund_allocation['office_name'] }}
                         </td>
                         <td>
                             {{ number_format($fund_allocation['initial_amount'], 2) }}
@@ -113,7 +113,7 @@
                 <td style="font-weight: bold">
                     {{ number_format($cost_centers->sum('total_initial_amount'), 2) }}
                 </td>
-                <td colspan="3"></td>
+                <td colspan="4"></td>
                 <td style="font-weight: bold">
                     {{ number_format($cost_centers->sum('totalWfpDetails'), 2) }}
                 </td>

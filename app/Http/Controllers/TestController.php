@@ -34,12 +34,14 @@ class TestController extends Controller
             $fileName = $request->input('fileName');
         }
 
-        // return view('exports.cost-center-164', [
-        //     'cost_centers' => $cost_centers,
-        //     'total_allocated' => $total_allocated,
-        //     'total_programmed' => $total_programmed,
-        //     'total_balance' => $total_balance,
-        // ]);
+       if(config('app.env') == 'local') {
+         return view('exports.cost-center-164', [
+            'cost_centers' => $cost_centers,
+            'total_allocated' => $total_allocated,
+            'total_programmed' => $total_programmed,
+            'total_balance' => $total_balance,
+        ]);
+       }
 
         return Excel::download(new CostCenterPreExport($cost_centers, $total_allocated, $total_programmed->total_budget, $total_balance), $fileName . '.xlsx');
         } catch (\Throwable $th) {
@@ -60,7 +62,7 @@ class TestController extends Controller
             ->when($request->has('wfp_type_id'), function ($query) use ($request) {
                 $query->where('wpf_type_id', $request->input('wfp_type_id'));
             })
-            ->when($request->has('m_f_o_s_id'), function ($query) use ($request) {
+            ->when($request->input('m_f_o_s_id'), function ($query) use ($request) {
                 $query->where('cost_centers.m_f_o_s_id', $request->input('m_f_o_s_id'));
             })
             ->when($request->has('is_supplemental'), function ($query) use ($request) {
@@ -93,7 +95,8 @@ class TestController extends Controller
                     'mfo_fee_id' => $fund_allocation['mfo_fee_id'],
                     'name' => $fund_allocation['name'],
                     'cost_center_id' => $cost_center_amount[0],
-                    'initial_amount' => $cost_center_amount[1]
+                    'initial_amount' => $cost_center_amount[1],
+                    'office_name' => $fund_allocation['office_name']
                 ];
             }
         }
@@ -114,8 +117,10 @@ class TestController extends Controller
                 ->where('fund_cluster_w_f_p_s_id', $fund_cluster_w_f_p_s_id)
                 ->where('is_supplemental', $is_supplemental)
                 ->where('is_approved', 1)
-                ->whereHas('costCenter', function ($query) use ($m_f_o_s_id) {
-                    $query->where('m_f_o_s_id', $m_f_o_s_id);
+                ->when($m_f_o_s_id, function ($query) use ($m_f_o_s_id) {
+                    $query->whereHas('costCenter', function ($query) use ($m_f_o_s_id) {
+                        $query->where('m_f_o_s_id', $m_f_o_s_id);
+                    });
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
@@ -142,7 +147,9 @@ class TestController extends Controller
                 DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
             )
             ->whereIn('cost_centers.mfo_fee_id', $mfo_fee_ids)
-            ->where('cost_centers.m_f_o_s_id', $request->input('m_f_o_s_id'))
+            ->when($request->input('m_f_o_s_id'), function ($query) use ($request) {
+                $query->where('cost_centers.m_f_o_s_id', $request->input('m_f_o_s_id'));
+            })
             ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id', 'cost_center_id')
             ->get();
         return $data;

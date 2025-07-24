@@ -1541,6 +1541,7 @@ class GeneratePpmpQ1 extends Component
         $this->showPre = false;
         $this->activeButton = 'generateSksuppmp';
         $this->title = 'Sultan Kudarat State University';
+        $this->mfosId = null;
 
         $temp_fund_allocation = FundAllocation::selectRaw('wpf_type_id,is_supplemental, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
