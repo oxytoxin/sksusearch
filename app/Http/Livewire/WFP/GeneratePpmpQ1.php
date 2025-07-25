@@ -39,6 +39,7 @@ class GeneratePpmpQ1 extends Component
 
     public $activeButton = "none";
 
+    public $mfosId = null;
 
 
 
@@ -1540,6 +1541,7 @@ class GeneratePpmpQ1 extends Component
         $this->showPre = false;
         $this->activeButton = 'generateSksuppmp';
         $this->title = 'Sultan Kudarat State University';
+        $this->mfosId = null;
 
         $temp_fund_allocation = FundAllocation::selectRaw('wpf_type_id,is_supplemental, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -1620,13 +1622,13 @@ class GeneratePpmpQ1 extends Component
         $this->showPre = false;
         $this->activeButton = 'generateSksuppmpPerCostCenterMfo';
         $this->title = $title;
+        $this->mfosId = $ccMfoId;
 
         $temp_fund_allocation = FundAllocation::selectRaw('wpf_type_id,is_supplemental, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_w_f_p_s_id', $fcwpsId)
             ->where('wpf_type_id', $this->selectedType)
-            // ->where('is_supplemental', 1)
             ->where('cost_centers.m_f_o_s_id', $ccMfoId)
             ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name', 'is_supplemental')
             ->get();

@@ -82,7 +82,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     TextInput::make("document_code")
                     ->label("Document Code")
                     ->columnSpan(2)
-                    ->mask(fn (TextInput\Mask $mask) => $mask->pattern('000-00-00-0000a'))
+                    ->mask(fn (TextInput\Mask $mask) => $mask->pattern('000-00-00-0000****************'))
                     ->unique('App\Models\LegacyDocument')
                     ->required(fn () => in_array($this->document_category,['1','2']))
                     ->visible(fn () => in_array($this->document_category,['1','2']))

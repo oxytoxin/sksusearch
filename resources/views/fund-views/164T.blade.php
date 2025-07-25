@@ -49,6 +49,11 @@
                         class="flex hover:bg-green-600 p-2 bg-green-700 rounded-md font-light capitalize text-white text-sm">
                         Export Excel
                     </button>
+                    <a type="button" target="_blank"
+                        href="/export/cost-center?is_supplemental={{ $is_q1 ? 1 : 0 }}&fund_cluster_w_f_p_s_id=4&wfp_type_id={{ $selectedType }}&m_f_o_s_id={{ $mfosId }}&fileName={{ str_replace(' ', '_', $title) }}.xlsx"
+                        class="flex hover:bg-green-600 p-2 bg-green-700 rounded-md font-light capitalize text-white text-sm">
+                        Cost Center Export
+                    </a>
                 </div>
                 <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">
                     <div class="text-center">

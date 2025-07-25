@@ -5,6 +5,7 @@ namespace App\Http\Livewire\WFP;
 use App\Models\CategoryItems;
 use App\Models\CategoryItemBudget;
 use App\Models\CostCenter;
+use App\Models\FundClusterWFP;
 use App\Models\Supply;
 use Livewire\Component;
 use WireUi\Traits\Actions;
@@ -18,49 +19,63 @@ class DevPage extends Component
     public $supplies;
     public $cost_centers;
     public $supply_code;
+    public $category_item_budget_id = null;
+
+    public $fund_cluster_id = null;
+
+    public $category_items = [];
+
+    public $fund_clusters = [];
+
 
     public function mount()
     {
 
         $this->cost_centers = [];
 
+
         $this->account_titles = CategoryItems::where('is_active', 1)
             ->where('uacs_code', 'like', '5%')
             ->get();
 
         $budget_account_titles = CategoryItemBudget::get();
+        $this->category_items = $budget_account_titles;
+
+        $this->fund_clusters = FundClusterWFP::where('id', '!=', 8)->get();
 
         $this->merged_titles = $this->account_titles->map(function ($item) use ($budget_account_titles) {
             $budget_item = $budget_account_titles->firstWhere('uacs_code', $item->uacs_code);
             return [
-            'id' => $item->id,
-            'budget_category_id' => $item->budget_category_id,
-            'budget_category' => $item->budgetCategory->name,
-            'category_item_uacs' => $item->uacs_code,
-            'category_item_name' => $item->name,
-            'budget_item_uacs' => $budget_item ? $budget_item->uacs_code : null,
-            'budget_item_name' => $budget_item ? $budget_item->name : null,
+                'id' => $item->id,
+                'budget_category_id' => $item->budget_category_id,
+                'budget_category' => $item->budgetCategory->name,
+                'category_item_uacs' => $item->uacs_code,
+                'category_item_name' => $item->name,
+                'budget_item_uacs' => $budget_item ? $budget_item->uacs_code : null,
+                'budget_item_name' => $budget_item ? $budget_item->name : null,
             ];
         });
 
 
         $this->supplies = Supply::whereNull('category_item_budget_id')->get();
-
     }
 
     public function generateCostCenters()
     {
-        if($this->supply_code)
-        {
+        if (!empty($this->supply_code) || !empty($this->category_item_budget_id)) {
             $this->cost_centers = CostCenter::whereHas('wfp', function ($query) {
                 $query->whereHas('wfpDetails', function ($query) {
-                    $query->whereHas('supply', function($query) {
-                        $query->where('supply_code', $this->supply_code);
+                    $query->whereHas('supply', function ($query) {
+                        $query->where('supply_code', $this->supply_code)
+                              ->orWhere('category_item_budget_id', $this->category_item_budget_id);
                     });
                 });
-            })->get();
+            })
+            ->whereHas('fundAllocations', function ($query) {
+                $query->where('fund_cluster_w_f_p_s_id', $this->fund_cluster_id);
+            }) // Add this line for the fundAllocations relationship
+            ->get();
         }
-
     }
 
     public function addCategoryBudget()
@@ -71,9 +86,9 @@ class DevPage extends Component
         });
         foreach ($missing_budget_categories as $missing_category) {
             CategoryItemBudget::create([
-            'uacs_code' => $missing_category->uacs_code,
-            'name' => $missing_category->name,
-            'budget_category_id' => $missing_category->budget_category_id,
+                'uacs_code' => $missing_category->uacs_code,
+                'name' => $missing_category->name,
+                'budget_category_id' => $missing_category->budget_category_id,
             ]);
         }
 
@@ -82,13 +97,13 @@ class DevPage extends Component
         $this->merged_titles = $this->account_titles->map(function ($item) {
             $budget_item = $this->budget_account_titles->firstWhere('uacs_code', $item->uacs_code);
             return [
-            'id' => $item->id,
-            'budget_category_id' => $item->budget_category_id,
-            'budget_category' => $item->budgetCategory->name,
-            'category_item_uacs' => $item->uacs_code,
-            'category_item_name' => $item->name,
-            'budget_item_uacs' => $budget_item ? $budget_item->uacs_code : null,
-            'budget_item_name' => $budget_item ? $budget_item->name : null,
+                'id' => $item->id,
+                'budget_category_id' => $item->budget_category_id,
+                'budget_category' => $item->budgetCategory->name,
+                'category_item_uacs' => $item->uacs_code,
+                'category_item_name' => $item->name,
+                'budget_item_uacs' => $budget_item ? $budget_item->uacs_code : null,
+                'budget_item_name' => $budget_item ? $budget_item->name : null,
             ];
         });
     }
