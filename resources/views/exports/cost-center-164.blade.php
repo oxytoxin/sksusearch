@@ -57,16 +57,15 @@
         <tbody>
             @foreach ($cost_centers as $cost_center)
                 <tr>
-                    <td bgcolor="#cccccc">
-                        {{ $cost_center->name }}
-                    </td>
                     <td bgcolor="#cccccc" colspan="100%">
                     </td>
                 </tr>
                 @foreach ($cost_center->fund_allocations as $fund_allocation)
                     <tr>
                         <td>
-
+                            @if ($loop->first)
+                                {{ $cost_center->name }}
+                            @endif
                         </td>
                         <td>
                             {{ $fund_allocation['name'] }}
