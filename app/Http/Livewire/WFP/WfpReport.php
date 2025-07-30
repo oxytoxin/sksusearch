@@ -19,7 +19,8 @@ class WfpReport extends Component
         'less' => 0,
         'balance' => 0,
         'add' => 0,
-        'total_balance' => 0
+        'total_balance' => 0,
+        'description' => ''
     ];
 
     public function mount($record, $isSupplemental)
@@ -28,13 +29,19 @@ class WfpReport extends Component
         $this->isSupplemental = $isSupplemental;
 
         if ($isSupplemental) {
-            $this->record = Wfp::with('costCenter')->where('id', $record)->where('is_supplemental', 1)->first();
+            $this->record = Wfp::with(['costCenter','wfpType'])->where('id', $record)->where('is_supplemental', 1)->first();
+
             abort_unless($this->record, 404, 'Cost Center not found');
+
+            $this->history['description'] = 'Supplemental Work and Financial Plan For Year 2025 - Q1';
+
             $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount');
 
             // ------------------------------------------------------------------
             $this->history['add']= number_format($this->allocation,2);
-            $regular_allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->first()?->initial_amount ?? 0;
+            $regular_allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+
+            // dd($this->record->costCenter->fundAllocations->where('is_supplemental', 0)->first());
             $this->history['regular_allocation'] = number_format( (int)$regular_allocation,2);
             // ------------------------------------------------------------------
 
@@ -66,7 +73,8 @@ class WfpReport extends Component
                 $this->balance = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') - $this->program;
             }
         } else {
-            $this->record = Wfp::where('id', $record)->where('is_supplemental', 0)->first();
+            $this->record = Wfp::with(['costCenter','wfpType'])->where('id', $record)->where('is_supplemental', 0)->first();
+            $this->history['description'] = $record->wfpType->description;
             $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
             $this->wfpDetails = $this->record->wfpDetails()->get();
             foreach ($this->wfpDetails as $wfpDetail) {

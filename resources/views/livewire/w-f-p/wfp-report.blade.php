@@ -22,7 +22,7 @@
             <p class="text-2xl font-medium">
                 Work & Financial Plan (WFP)
             </p>
-            <p class="text-md font-normal">{{ $record->wfpType->description }}</p>
+            <p class="text-md font-normal">{{ $history['description'] }}</p>
         </div>
         <div class="flex justify-between">
             <!-- Left Side -->
