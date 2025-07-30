@@ -516,22 +516,56 @@ class GeneratePpmpQ1 extends Component
         $this->showPre = false;
         $this->activeButton = 'rdPpmp';
         $this->title = 'Research and Development';
+        $temp_fund_allocation = collect([]);
+         FundAllocation::with([
+                'categoryGroup','costCenter'=> ['wfp','mfo']
+            ])
+            ->whereHas('costCenter', function ($query) {
+                $query->where('m_f_o_s_id', 4);
+            })
+            ->where('fund_cluster_w_f_p_s_id', 1)
+            ->where('wpf_type_id', $this->selectedType)
+            ->where('initial_amount', '>', 0)
+            ->get()->each(function ($allocation) use (&$temp_fund_allocation) {
+                $entry = collect($temp_fund_allocation)
+                        ->where('category_group_id', $allocation->category_group_id)
+                        ->where('is_supplemental', $allocation->is_supplemental)
+                        ->where('wpf_type_id', $allocation->wpf_type_id)
+                        ->where('initial_amount', $allocation->initial_amount)
+                        ->first();
+                if($entry) {
+                    $entry->total_allocated += $allocation->initial_amount;
+                } else {
+                    $temp_fund_allocation[] = (object)[
+                        'category_group_id' => $allocation->category_group_id,
+                        'is_supplemental' => $allocation->is_supplemental,
+                        'wpf_type_id' => $allocation->wpf_type_id,
+                        'initial_amount' => $allocation->initial_amount,
+                        'total_allocated' => $allocation->initial_amount,
+                        'name' => $allocation->categoryGroup->name,
+                        'categoryGroup' => $allocation->categoryGroup,
+                        'costCenter' => $allocation->costCenter,
+                        'mfo_fee_id' => $allocation->costCenter->mfo_fee_id
+                    ];
+                }
+            });
 
-        $temp_fund_allocation = FundAllocation::selectRaw(
-            'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
-        )
-            ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
-            ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
-            ->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
-            ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
-            ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
-            ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
-            ->where('m_f_o_s.id', 4)
-            ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
-            ->get();
+        // $temp_fund_allocation = FundAllocation::selectRaw(
+        //     'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
+        //     category_groups.name as name,SUM(fund_allocations.initial_amount) as total_allocated, GROUP_CONCAT(CONCAT(cost_centers.id, " - ",fund_allocations.initial_amount,":", fund_allocations.wpf_type_id,":", fund_allocations.is_supplemental)) as initial_amount'
+        //  )
+        //     ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
+        //     ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+        //     ->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
+        //     ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
+        //     ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
+        //     ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
+        //     ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
+        //     // ->where('fund_allocations.is_supplemental', 1)
+        //     ->where('m_f_o_s.id', 4)
+        //     ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental','initial_amount')
+        //     ->get();
+
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)
