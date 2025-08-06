@@ -61,74 +61,76 @@
             </div>
 
             <!-- Right Side -->
-            <div class="p-6 flex-col justify-end text-sm w-1/4 font-medium divide-y-2 divide-gray-800">
-                <!-- Add your content for the right side here -->
-                <div class="py-2">
-                    <span class="text-right font-semibold">Status:</span>
-                    @if ($record->is_approved === 0)
-                        <span class="text-center">Pending</span>
-                    @elseif($record->is_approved === 1)
-                        <span class="text-center">Approved</span>
-                    @else
-                        <span class="text-center">For Modification</span>
-                    @endif
-
-                </div>
-                @if ($record->is_approved === 1)
+            @if ($isSupplemental)
+                <div class="p-6 flex-col justify-end text-sm w-1/4 font-medium divide-y-2 divide-gray-800">
+                    <!-- Add your content for the right side here -->
                     <div class="py-2">
-                        <span class="text-left font-semibold">Date Approved:</span>
-                        <span
-                            class="text-center">{{ Carbon\Carbon::parse($record->updated_at)->format('F d, Y h:i A') }}</span>
+                        <span class="text-right font-semibold">Status:</span>
+                        @if ($record->is_approved === 0)
+                            <span class="text-center">Pending</span>
+                        @elseif($record->is_approved === 1)
+                            <span class="text-center">Approved</span>
+                        @else
+                            <span class="text-center">For Modification</span>
+                        @endif
+
                     </div>
-                @endif
-                <div class="divide-y divide-gray-00">
-                    <table class="w-full">
-                        <tbody class=" ">
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Regular Allocation</span>
-                                </td>
-                                <td style="text-align:right;" class="border border-gray-300">
-                                    <span>{{ $history['regular_allocation'] }}</span>
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Less: WFP for 2025</span>
-                                </td>
-                                <td style="text-align:right;" class="border border-gray-300">
-                                    <span>{{ $history['less'] }}</span>
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Balance</span>
-                                </td>
-                                <td style="text-align:right;" class="border border-gray-300">
-                                    <span>{{ $history['balance'] }}</span>
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Add: Supplemental Q1</span>
-                                </td>
-                                <td style="text-align:right;" class="border border-gray-300">
-                                    <span>{{ $history['add'] }}</span>
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Balance </span>
-                                    <span>- {{ $record->wfpType->description }} </span>
-                                </td>
-                                <td style="text-align:right;" class="border w-[100px] border-gray-300">
-                                    <span>{{ $history['total_balance'] }}</span>
-                                </td>
-                            </tr>
-                    </table>
+                    @if ($record->is_approved === 1)
+                        <div class="py-2">
+                            <span class="text-left font-semibold">Date Approved:</span>
+                            <span
+                                class="text-center">{{ Carbon\Carbon::parse($record->updated_at)->format('F d, Y h:i A') }}</span>
+                        </div>
+                    @endif
+                    <div class="divide-y divide-gray-00">
+                        <table class="w-full">
+                            <tbody class=" ">
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Regular Allocation</span>
+                                    </td>
+                                    <td style="text-align:right;" class="border border-gray-300">
+                                        <span>{{ $history['regular_allocation'] }}</span>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Less: WFP for 2025</span>
+                                    </td>
+                                    <td style="text-align:right;" class="border border-gray-300">
+                                        <span>{{ $history['less'] }}</span>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Balance</span>
+                                    </td>
+                                    <td style="text-align:right;" class="border border-gray-300">
+                                        <span>{{ $history['balance'] }}</span>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Add: Supplemental Q1</span>
+                                    </td>
+                                    <td style="text-align:right;" class="border border-gray-300">
+                                        <span>{{ $history['add'] }}</span>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Balance </span>
+                                        <span>- {{ $record->wfpType->description }} </span>
+                                    </td>
+                                    <td style="text-align:right;" class="border w-[100px] border-gray-300">
+                                        <span>{{ $history['total_balance'] }}</span>
+                                    </td>
+                                </tr>
+                        </table>
+                    </div>
+                    <!-- Add more fields as needed -->
                 </div>
-                <!-- Add more fields as needed -->
-            </div>
+            @endif
         </div>
 
 
