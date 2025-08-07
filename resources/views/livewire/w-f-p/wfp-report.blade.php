@@ -61,27 +61,27 @@
             </div>
 
             <!-- Right Side -->
-            @if ($isSupplemental)
-                <div class="p-6 flex-col justify-end text-sm w-1/4 font-medium divide-y-2 divide-gray-800">
-                    <!-- Add your content for the right side here -->
-                    <div class="py-2">
-                        <span class="text-right font-semibold">Status:</span>
-                        @if ($record->is_approved === 0)
-                            <span class="text-center">Pending</span>
-                        @elseif($record->is_approved === 1)
-                            <span class="text-center">Approved</span>
-                        @else
-                            <span class="text-center">For Modification</span>
-                        @endif
-
-                    </div>
-                    @if ($record->is_approved === 1)
-                        <div class="py-2">
-                            <span class="text-left font-semibold">Date Approved:</span>
-                            <span
-                                class="text-center">{{ Carbon\Carbon::parse($record->updated_at)->format('F d, Y h:i A') }}</span>
-                        </div>
+            <div class="p-6 flex-col justify-end text-sm w-1/4 font-medium divide-y-2 divide-gray-800">
+                <!-- Add your content for the right side here -->
+                <div class="py-2">
+                    <span class="text-right font-semibold">Status:</span>
+                    @if ($record->is_approved === 0)
+                        <span class="text-center">Pending</span>
+                    @elseif($record->is_approved === 1)
+                        <span class="text-center">Approved</span>
+                    @else
+                        <span class="text-center">For Modification</span>
                     @endif
+
+                </div>
+                @if ($record->is_approved === 1)
+                    <div class="py-2">
+                        <span class="text-left font-semibold">Date Approved:</span>
+                        <span
+                            class="text-center">{{ Carbon\Carbon::parse($record->updated_at)->format('F d, Y h:i A') }}</span>
+                    </div>
+                @endif
+                @if ($isSupplemental)
                     <div class="divide-y divide-gray-00">
                         <table class="w-full">
                             <tbody class=" ">
@@ -128,9 +128,9 @@
                                 </tr>
                         </table>
                     </div>
-                    <!-- Add more fields as needed -->
-                </div>
-            @endif
+                @endif
+                <!-- Add more fields as needed -->
+            </div>
         </div>
 
 
