@@ -41,6 +41,8 @@ class WfpReport extends Component
             $this->history['add']= number_format($this->allocation,2);
             $regular_allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
 
+            // dd($this->record->costCenter);
+
             // dd($this->record->costCenter->fundAllocations->where('is_supplemental', 0)->first());
             $this->history['regular_allocation'] = number_format( (int)$regular_allocation,2);
             // ------------------------------------------------------------------
@@ -51,6 +53,7 @@ class WfpReport extends Component
             }
             //old balance
             if (Wfp::where('cost_center_id', $this->record->cost_center_id)->where('is_supplemental', 0)->count() > 0) {
+
                 $record = Wfp::where('cost_center_id', $this->record->costCenter->id)
                     ->where('is_supplemental', 0)
                     ->first();
@@ -71,6 +74,13 @@ class WfpReport extends Component
                 //$this->balance = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') - $this->program;
             } else {
                 $this->balance = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') - $this->program;
+                $allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+                $programmed = 0;
+
+                // ------------------------------------------------------------------
+                 $this->history['less'] = number_format($programmed,2);
+                 $this->history['balance'] = number_format($regular_allocation - $programmed,2);
+                $this->history['total_balance'] = number_format($this->allocation + ($regular_allocation - $programmed),2);
             }
         } else {
             $this->record = Wfp::with(['costCenter','wfpType'])->where('id', $record)->where('is_supplemental', 0)->first();
