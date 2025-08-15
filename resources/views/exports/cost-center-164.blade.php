@@ -19,11 +19,14 @@
     <table style="width: 100%">
         <thead>
             <tr>
-                <th style="font-weight: bold" bgcolor="#82f5ac" width="40" colspan="3">Receipts</th>
+                <th style="font-weight: bold" bgcolor="#82f5ac" width="40" colspan="4">Receipts</th>
                 <th style="font-weight: bold" bgcolor="#82f5ac" width="80" colspan="3">Expenditure</th>
                 <th style="font-weight: bold" bgcolor="#82f5ac" width="40" colspan="2">Balance</th>
             </tr>
             <tr>
+                <td>
+                    Cost Center
+                </td>
                 <td>
                     MFO Fee
                 </td>
@@ -55,11 +58,15 @@
             @foreach ($cost_centers as $cost_center)
                 <tr>
                     <td bgcolor="#cccccc" colspan="100%">
-                        {{ $cost_center->name }}
                     </td>
                 </tr>
                 @foreach ($cost_center->fund_allocations as $fund_allocation)
                     <tr>
+                        <td>
+                            @if ($loop->first)
+                                {{ $cost_center->name }}
+                            @endif
+                        </td>
                         <td>
                             {{ $fund_allocation['name'] }}
                         </td>
@@ -79,6 +86,7 @@
                     </tr>
                     @foreach ($cost_center->wfpDetails->where('mfo_fee_id', $fund_allocation['mfo_fee_id']) as $wfpDetail)
                         <tr>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>

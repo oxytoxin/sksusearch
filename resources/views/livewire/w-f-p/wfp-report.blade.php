@@ -22,7 +22,7 @@
             <p class="text-2xl font-medium">
                 Work & Financial Plan (WFP)
             </p>
-            <p class="text-md font-normal">{{ $record->wfpType->description }}</p>
+            <p class="text-md font-normal">{{ $history['description'] }}</p>
         </div>
         <div class="flex justify-between">
             <!-- Left Side -->
@@ -81,52 +81,54 @@
                             class="text-center">{{ Carbon\Carbon::parse($record->updated_at)->format('F d, Y h:i A') }}</span>
                     </div>
                 @endif
-                <div class="divide-y divide-gray-00">
-                    <table class="w-full">
-                        <tbody class=" ">
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Regular Allocation</span>
-                                </td>
-                                <td style="text-align:right;" class="border border-gray-300">
-                                    <span>{{ $history['regular_allocation'] }}</span>
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Less: WFP for 2025</span>
-                                </td>
-                                <td style="text-align:right;" class="border border-gray-300">
-                                    <span>{{ $history['less'] }}</span>
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Balance</span>
-                                </td>
-                                <td style="text-align:right;" class="border border-gray-300">
-                                    <span>{{ $history['balance'] }}</span>
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Add: Supplemental Q1</span>
-                                </td>
-                                <td style="text-align:right;" class="border border-gray-300">
-                                    <span>{{ $history['add'] }}</span>
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-200">
-                                <td class="border border-gray-300">
-                                    <span>Balance </span>
-                                    <span>- {{ $record->wfpType->description }} </span>
-                                </td>
-                                <td style="text-align:right;" class="border w-[100px] border-gray-300">
-                                    <span>{{ $history['total_balance'] }}</span>
-                                </td>
-                            </tr>
-                    </table>
-                </div>
+                @if ($isSupplemental)
+                    <div class="divide-y divide-gray-00">
+                        <table class="w-full">
+                            <tbody class=" ">
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Regular Allocation</span>
+                                    </td>
+                                    <td style="text-align:right;" class="border border-gray-300">
+                                        <span>{{ $history['regular_allocation'] }}</span>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Less: WFP for 2025</span>
+                                    </td>
+                                    <td style="text-align:right;" class="border border-gray-300">
+                                        <span>{{ $history['less'] }}</span>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Balance</span>
+                                    </td>
+                                    <td style="text-align:right;" class="border border-gray-300">
+                                        <span>{{ $history['balance'] }}</span>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Add: Supplemental Q1</span>
+                                    </td>
+                                    <td style="text-align:right;" class="border border-gray-300">
+                                        <span>{{ $history['add'] }}</span>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-200">
+                                    <td class="border border-gray-300">
+                                        <span>Balance </span>
+                                        <span>- {{ $record->wfpType->description }} </span>
+                                    </td>
+                                    <td style="text-align:right;" class="border w-[100px] border-gray-300">
+                                        <span>{{ $history['total_balance'] }}</span>
+                                    </td>
+                                </tr>
+                        </table>
+                    </div>
+                @endif
                 <!-- Add more fields as needed -->
             </div>
         </div>
