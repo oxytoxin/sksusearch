@@ -213,7 +213,7 @@ class FundAllocationQ1 extends Component implements HasTable
             ->query(function (Builder $query, array $data): Builder {
                 if($data['wfp_status'] != 20) {
                     return $query->whereHas('wfp', function($query) use ($data) {
-                        $query->where('is_approved', $data['wfp_status']);
+                        $query->where('wpf_type_id', $this->data['wfp_type'])->where('is_approved', $data['wfp_status']);
                     });
                 }
                 return $query;

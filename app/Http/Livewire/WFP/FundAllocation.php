@@ -38,7 +38,8 @@ class FundAllocation extends Component implements HasTable
 
     public $filter_is_supplemental = false;
 
-    protected $queryString = ['filter_is_supplemental'];
+    public $supplementalQuaterId = null;
+    protected $queryString = ['filter_is_supplemental', 'supplementalQuaterId'];
 
     public function mount($filter)
     {
@@ -59,7 +60,11 @@ class FundAllocation extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return CostCenter::query()->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
+        return CostCenter::query()
+            ->with(['fundAllocations','wfp'=> function($query){
+                $query->where('wpf_type_id',$this->data['wfp_type']);
+            }])
+            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
     }
 
     protected function getTableColumns()
@@ -92,6 +97,7 @@ class FundAllocation extends Component implements HasTable
                     if (in_array($record->fundClusterWFP->id, [1, 3, 9])) {
                         $sum = $record->fundAllocations->where('cost_center_id', $record->id)
                             ->where('is_supplemental', $this->filter_is_supplemental)
+                            ->where('supplemental_quarter_id', $this->supplementalQuaterId)
                             ->where('wpf_type_id', $this->data['wfp_type'])->sum('initial_amount');
                         return '₱ ' . number_format($sum, 2);
                     } else {
@@ -115,10 +121,10 @@ class FundAllocation extends Component implements HasTable
                 ->button()
                 ->url(fn(CostCenter $record): string => $this->filter_is_supplemental ? route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 0]) : route('wfp.allocate-funds', $record))
                 ->requiresConfirmation()
-                ->visible(function($record) {
-                    if($this->filter_is_supplemental){
-                        return $record->wfp?->is_approved === 1 && !$record->hasSupplementalFund();
-                    }else{
+                ->visible(function ($record) {
+                    if ($this->filter_is_supplemental) {
+                        return $record->wfp()->first()?->is_approved === 1 && !$record->fundAllocations()->where('supplemental_quarter_id', $this->supplementalQuaterId)->where('wpf_type_id', $this->data['wfp_type'])->exists();
+                    } else {
                         return !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$this->isPresident;
                     }
                 }),
@@ -128,9 +134,9 @@ class FundAllocation extends Component implements HasTable
                 ->button()
                 ->color('warning')
                 ->url(fn(CostCenter $record): string => route('wfp.edit-allocate-funds', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-                ->visible(function($record) {
-                    if(!$this->filter_is_supplemental){
-                       return $record->fundAllocations()->whereIsSupplemental(0)->whereIsLocked(false)->exists()  &&  $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()  && !$this->isPresident;
+                ->visible(function ($record) {
+                    if (!$this->filter_is_supplemental) {
+                        return $record->fundAllocations()->whereIsSupplemental(0)->whereIsLocked(false)->exists()  &&  $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', true)->exists()  && !$this->isPresident;
                     }
                     return false;
                 }),
@@ -158,14 +164,13 @@ class FundAllocation extends Component implements HasTable
                         $record->fundAllocations()->update([
                             'is_locked' => false
                         ]);
-
                         Notification::make()->title('Operation Success')->body('Fund Successfully Unlocked')->success()->send();
                     })
-                    ->visible(function($record){
-                        if($this->filter_is_supplemental){
+                    ->visible(function ($record) {
+                        if ($this->filter_is_supplemental) {
                             return $record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->where('is_locked', false)->exists()  && !$this->isPresident  || $record->fundAllocations()->first() == false;
-                        }else{
-                            return  $record->fundAllocations()->whereIsSupplemental(0)->where('wpf_type_id', $this->data['wfp_type'])->whereIsLocked(true)->exists()  && !$this->isPresident ;
+                        } else {
+                            return  $record->fundAllocations()->whereIsSupplemental(0)->where('wpf_type_id', $this->data['wfp_type'])->whereIsLocked(true)->exists()  && !$this->isPresident;
                         }
                     }),
                 ViewAction::make('view_allocation')
@@ -174,10 +179,10 @@ class FundAllocation extends Component implements HasTable
                     ->color('warning')
                     ->icon('ri-eye-line')
                     ->url(fn(CostCenter $record): string => $this->filter_is_supplemental ? route('wfp.view-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => $record->wfp()->where('is_supplemental', 0)->exists() ? 0 : 1]) : route('wfp.view-allocated-funds', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-                    ->visible(function($record) {
-                        if($this->filter_is_supplemental) {
-                            return ($record->wfp?->is_approved === 1 && $record->hasSupplementalFund()) || (!$record->wfp()->where('is_supplemental', 1)->exists() && $record->hasSupplementalFund());
-                        }else{
+                    ->visible(function ($record) {
+                        if ($this->filter_is_supplemental) {
+                            return ($record->wfp()->first()?->is_approved=== 1 && $record->hasSupplementalFund()) || (!$record->wfp()->where('is_supplemental', 1)->exists() && $record->hasSupplementalFund());
+                        } else {
                             return  $record->fundAllocations()->where('is_supplemental', 0)->where('wpf_type_id', $this->data['wfp_type'])->whereIsLocked(true)->exists()   && !$this->isPresident;
                         }
                     }),
@@ -203,7 +208,7 @@ class FundAllocation extends Component implements HasTable
                     ->button()
                     ->color('warning')
                     ->url(fn(CostCenter $record): string => route('wfp.edit-supplemental-funds-q1', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => $record->wfp()->where('is_supplemental', 0)->exists() ? 0 : 1]))
-                    ->visible(fn(CostCenter $record) => $this->filter_is_supplemental && ($record->wfp?->is_approved === 1 && $record->hasSupplementalFund()) || (!$record->wfp()->exists() && $record->hasSupplementalFund())),
+                    ->visible(fn(CostCenter $record) => $this->filter_is_supplemental && ($record->wfp()->first()?->is_approved === 1 && $record->hasSupplementalFund()) || (!$record->wfp()->exists() && $record->hasSupplementalFund())),
             ]),
             Action::make('forward_balance')
                 ->icon('ri-arrow-right-line')
@@ -236,10 +241,6 @@ class FundAllocation extends Component implements HasTable
                             \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
                         }
                     }
-
-
-
-
                     return redirect()->route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]);
                 })
                 //->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isForwarded' => 1]))
@@ -283,10 +284,12 @@ class FundAllocation extends Component implements HasTable
                 ->query(function (Builder $query, array $data): Builder {
                     if ($data['wfp_status'] != 20) {
                         if ($data['wfp_status'] == null) {
-                            return $query->whereDoesntHave('wfp');
+                            return $query->whereDoesntHave('wfp',function($query){
+                                $query->where('wpf_type_id', $this->data['wfp_type']);
+                            });
                         } else {
                             return $query->whereHas('wfp', function ($query) use ($data) {
-                                $query->where('is_approved', $data['wfp_status'])->where('is_supplemental', false);
+                                $query->where('wpf_type_id', $this->data['wfp_type'])->where('is_approved', $data['wfp_status'])->where('is_supplemental', false);
                             });
                         }
                     }

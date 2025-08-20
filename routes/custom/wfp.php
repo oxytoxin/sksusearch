@@ -39,7 +39,9 @@ Route::middleware([
     config('jetstream.auth_session'),
 ])->prefix('wfp')->name('wfp.')->group(function () {
     Route::get('/wfp-types', WFPTypes::class)->name('wfp-types');
-    Route::get('/fund-allocation/{filter?}', FundAllocation::class)->name('fund-allocation');
+    // Route::get('/fund-allocation/{filter?}', FundAllocation::class)->name('fund-allocation');
+    Route::view('/fund-allocation/{filter?}', 'fund-allocations')->name('fund-allocation');
+
     Route::get('/assign-personnel', AssignPersonnel::class)->name('assign-personnel');
     Route::get('/create-wfp/{record}/{wfpType}/{isEdit}/{isSupplemental}', CreateWFP::class)->name('create-wfp');
     Route::get('/select-wfp', SelectWfpType::class)->name('select-wfp');
@@ -48,7 +50,9 @@ Route::middleware([
     Route::get('/edit-allocate-funds/{record}/{wfpType}', EditAllocateFunds::class)->name('edit-allocate-funds');
     Route::get('/view-allocated-funds/{record}/{wfpType}', ViewAllocatedFund::class)->name('view-allocated-funds');
     Route::get('/print-wfp/{record}/{isSupplemental}', WfpReport::class)->name('print-wfp');
-    Route::get('/wfp-submissions/{filter?}', WfpSubmissions::class)->name('wfp-submissions');
+    // Route::get('/wfp-submissions/{filter?}', WfpSubmissions::class)->name('wfp-submissions');
+    Route::view('/wfp-submissions/{filter?}', 'wfp-submissions')->name('wfp-submissions');
+
     Route::get('/wfp-pre', GeneratePpmp::class)->name('generate-ppmp');
     Route::get('/wfp-ppmp', GenerateWfpPpmp::class)->name('generate-wfp-ppmp');
     Route::get('/print-ppmp/{record}/{isSupplemental}', WfpPpmp::class)->name('print-ppmp');

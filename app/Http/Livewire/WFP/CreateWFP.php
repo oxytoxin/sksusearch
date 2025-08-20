@@ -4813,7 +4813,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $sumTotal = array_sum(array_column($this->current_balance, 'current_total'));
                 }
                 $sumBalance = $sumAllocated - $sumTotal;
-
                 //if wfp already exist
                 if ($this->record->wfp()->where('wpf_type_id', $this->wfp_type->id)->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', $this->wfp_fund->id)->exists()) {
                     $wfp = $this->record->wfp()->where('wpf_type_id', $this->wfp_type->id)->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', $this->wfp_fund->id)->first();

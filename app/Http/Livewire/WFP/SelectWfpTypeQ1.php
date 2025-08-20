@@ -76,7 +76,9 @@ class SelectWfpTypeQ1 extends Component implements HasTable
     protected function getTableQuery()
     {
         // $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
-        $query_test = CostCenter::query()->with(['fundAllocations','wfp','wfp.wfpDetails','fundClusterWFP','mfo','mfoFee','office'])
+        $query_test = CostCenter::query()->with(['fundAllocations','wfp'=>function($query){
+            $query->where('wpf_type_id',  $this->user_wfp_id);
+        },'wfp.wfpDetails','fundClusterWFP','mfo','mfoFee','office'])
         ->whereHas('fundAllocations', function ($query) {
             $query->where('is_supplemental', 1);
         })

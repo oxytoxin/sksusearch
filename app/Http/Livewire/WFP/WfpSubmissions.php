@@ -26,6 +26,9 @@ class WfpSubmissions extends Component implements HasTable
     public $fund_cluster;
     public $isPresident;
 
+    public $supplementalQuaterId = null;
+   protected $queryString = ['supplementalQuaterId'];
+
     public function mount($filter)
     {
         $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;

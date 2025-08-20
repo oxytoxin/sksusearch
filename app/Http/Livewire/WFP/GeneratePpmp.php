@@ -63,7 +63,7 @@ class GeneratePpmp extends Component
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 1)
                 ->where('is_supplemental', 0)
                 ->where('is_approved', 1);
         })
@@ -85,7 +85,7 @@ class GeneratePpmp extends Component
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 1)
                 ->where('is_supplemental', 0)
                 ->where('is_approved', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -161,7 +161,7 @@ class GeneratePpmp extends Component
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 1)
                 ->where('is_supplemental', 0)
                 ->where('is_approved', 1);
         })
@@ -185,7 +185,7 @@ class GeneratePpmp extends Component
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)
+            $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 1)
                 ->where('is_supplemental', 0)
                 ->where('is_approved', 1)
                 ->whereHas('costCenter', function ($query) {

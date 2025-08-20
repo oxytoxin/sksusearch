@@ -43,7 +43,7 @@ class CostCenter extends Model
 
     public function wfp()
     {
-        return $this->hasOne(Wfp::class);
+        return $this->hasMany(Wfp::class);
     }
 
     public function wpfPersonnel()
