@@ -508,20 +508,30 @@
                         <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                             <div>
                                 @php
-                                    if ($record->costCenter->wfp->where('is_supplemental', 0)->count() > 0) {
+                                    if (
+                                        $record->costCenter->wfp
+                                            ->where('is_supplemental', 0)
+                                            ->where('wpf_type_id', $record->wpf_type_id)
+                                            ->count() > 0
+                                    ) {
                                         $allocated = $isSupplemental
                                             ? $record->costCenter->fundAllocations
+                                                    ->where('wpf_type_id', $record->wpf_type_id)
+
                                                     ->where('is_supplemental', 1)
                                                     ->sum('initial_amount') + $balance
                                             : $record->costCenter->fundAllocations
+                                                ->where('wpf_type_id', $record->wpf_type_id)
                                                 ->where('is_supplemental', 0)
                                                 ->sum('initial_amount');
                                     } else {
                                         $allocated = $isSupplemental
                                             ? $record->costCenter->fundAllocations
+                                                ->where('wpf_type_id', $record->wpf_type_id)
                                                 ->where('is_supplemental', 1)
                                                 ->sum('initial_amount')
                                             : $record->costCenter->fundAllocations
+                                                ->where('wpf_type_id', $record->wpf_type_id)
                                                 ->where('is_supplemental', 0)
                                                 ->sum('initial_amount');
                                     }
