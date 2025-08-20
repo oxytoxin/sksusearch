@@ -24,6 +24,7 @@ use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleCreate;
 use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleShow;
 use App\Http\Livewire\Requisitioner\Motorpool\VehicleRequestFormShow;
 use App\Http\Livewire\Requisitioner\PromptSignature;
+use App\Http\Livewire\Requisitioner\TutorialIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware([
@@ -34,6 +35,7 @@ Route::middleware([
     Route::get('/require-contact-number', PromptContactNumber::class)->name('contact-number');
     Route::get('/require-signature', PromptSignature::class)->name('signature');
     Route::get('/transactions', TransactionsIndex::class)->name('transactions.index');
+    Route::get('/tutorials', TutorialIndex::class)->name('tutorials.index');
     Route::get('/travel-orders/create', TravelOrdersCreate::class)->name('travel-orders.create');
     Route::get('/travel-orders', TravelOrdersIndex::class)->name('travel-orders.index');
     Route::get('/travel-orders/{travel_order}', TravelOrdersShow::class)->name('travel-orders.show');

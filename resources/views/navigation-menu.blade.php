@@ -26,6 +26,9 @@
                     <x-jet-nav-link href="{{ route('requisitioner.transactions.index') }}" :active="request()->routeIs('requisitioner.transactions.index')">
                         {{ __('Transactions') }}
                     </x-jet-nav-link>
+                     <x-jet-nav-link href="{{ route('requisitioner.tutorials.index') }}" :active="request()->routeIs('requisitioner.tutorials.index')">
+                        {{ __('Tutorials') }}
+                    </x-jet-nav-link>
                 </div>
             </div>
 
