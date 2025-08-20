@@ -75,18 +75,20 @@ class PettyCashVouchersCreate extends Component implements HasForms
     {
         $this->form->validate();
         $this->petty_cash_fund->refresh();
-        if ($this->petty_cash_fund->latest_petty_cash_fund_record?->running_balance < $this->data['grand_total']) {
+        $balance = $this->petty_cash_fund->latest_petty_cash_fund_record?->running_balance ?? 0;
+        $amount = collect($this->data['particulars'])->sum('amount');
+
+        if ($balance < $this->data['grand_total']) {
             Notification::make()->title('Insufficient petty cash fund balance.')->danger()->send();
             return;
         }
 
-        if (collect($this->data['particulars'])->sum('amount') > $this->petty_cash_fund->voucher_limit) {
+        if ($amount > $this->petty_cash_fund->voucher_limit) {
             Notification::make()->title('Petty cash voucher is above voucher limit.')->danger()->send();
             return;
         }
         DB::beginTransaction();
         $pcv_number = PettyCashVoucher::generateTrackingNumber($this->petty_cash_fund);
-        $amount = collect($this->data['particulars'])->sum('amount');
 
         $pcv = PettyCashVoucher::create([
             'custodian_id' => auth()->id(),
@@ -103,18 +105,19 @@ class PettyCashVouchersCreate extends Component implements HasForms
             'responsibility_center' => $this->data['responsibility_center'],
             'particulars' => collect($this->data['particulars'])->values(),
             'amount_granted' => $amount,
-            'amount_paid' => $amount < 0 ? $amount : 0,
+            'amount_paid' => min($amount, 0),
             'is_liquidated' => $amount < 0,
         ]);
-
         foreach ($pcv->particulars as $key => $particular) {
+            $new_balance = floatval($balance) - floatval($particular['amount']);
             $pcv->petty_cash_fund_records()->create([
                 'type' => PettyCashFundRecord::DISBURSEMENT,
                 'nature_of_payment' => $particular['name'],
                 'amount' => $particular['amount'],
                 'petty_cash_fund_id' => $this->petty_cash_fund->id,
-                'running_balance' => (PettyCashFundRecord::wherePettyCashFundId($this->petty_cash_fund->id)->latest()->first()?->running_balance ?? 0) - $particular['amount'],
+                'running_balance' => $new_balance,
             ]);
+            $balance = $new_balance;
         }
         DB::commit();
         Notification::make()->title('Petty Cash Voucher request created.')->success()->send();
