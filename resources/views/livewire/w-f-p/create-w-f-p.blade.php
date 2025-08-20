@@ -308,13 +308,16 @@
                                                     $balance = $wfp_balance;
                                                     $totalAllocated =
                                                         $record->fundAllocations
+                                                            ->where('wpf_type_id', $wfp_type->id)
                                                             ->where('is_supplemental', 1)
                                                             ->sum('initial_amount') + $balance;
-                                                    if($is_supplemental)
-                                                    {
+                                                    if ($is_supplemental) {
                                                         $sumAllocated = $totalAllocated;
-                                                    }else{
-                                                        $sumAllocated = $record->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+                                                    } else {
+                                                        $sumAllocated = $record->fundAllocations
+                                                            ->where('wpf_type_id', $wfp_type->id)
+                                                            ->where('is_supplemental', 0)
+                                                            ->sum('initial_amount');
                                                     }
                                                     // $sumAllocated = $is_supplemental
                                                     //     ? $totalAllocated

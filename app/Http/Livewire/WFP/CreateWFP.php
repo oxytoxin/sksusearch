@@ -428,8 +428,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         } else {
             //164
             if ($isSupplemental) {
+
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     if ($isSupplemental) {
+
                         $programmed = [];
                         if ($this->record->wfp != null) {
                             foreach ($this->record->wfp->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->where('cost_center_id', $this->record->id)->get() as $wfp) {
@@ -502,6 +504,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     }
                 }
             } else {
+
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     if ($isSupplemental) {
                         $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) {
@@ -514,6 +517,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             ];
                         })->toArray();
                     } else {
+
                          if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first() === null) {
                                 $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
                             } else {
