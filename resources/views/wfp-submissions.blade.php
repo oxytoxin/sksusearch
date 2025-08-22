@@ -19,16 +19,31 @@
                       WFP
                   </a>
                   @foreach ($quarters as $item)
-                      <a wire:key='{{ $item->id }}'
-                          href="/wfp/wfp-submissions/1?supplementalQuaterId={{ $item->id }}"
-                          @class([
-                              'mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300 ',
-                              'bg-white -mt-2 text-primary-600' =>
-                                  $item->id == request()->input('supplementalQuaterId'),
-                          ])>
-                          {{ $item->name }}
-                      </a>
+                      @if (config('features.VERSION') === '10.0.0.1')
+                          <a wire:key='{{ $item->id }}'
+                              href="/wfp/wfp-submissions/1?supplementalQuaterId={{ $item->id }}"
+                              @class([
+                                  'mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300 ',
+                                  'bg-white -mt-2 text-primary-600' =>
+                                      $item->id == request()->input('supplementalQuaterId'),
+                              ])>
+                              {{ $item->name }}
+                          </a>
+                      @else
+                          @if ($loop->first)
+                              <a wire:key='{{ $item->id }}'
+                                  href="/wfp/wfp-submissions/1?supplementalQuaterId={{ $item->id }}"
+                                  @class([
+                                      'mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300 ',
+                                      'bg-white -mt-2 text-primary-600' =>
+                                          $item->id == request()->input('supplementalQuaterId'),
+                                  ])>
+                                  {{ $item->name }}
+                              </a>
+                          @endif
+                      @endif
                   @endforeach
+
               </div>
               @if (!request()->has('supplementalQuaterId'))
                   <div class="origin-top-left bg-white p-4 rounded-b-lg rounded-r-lg">
