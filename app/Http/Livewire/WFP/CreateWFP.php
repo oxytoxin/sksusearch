@@ -520,15 +520,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
                          if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first() === null) {
                                 $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
-                            } else {
+                         } else {
                                 $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->initial_amount;
-                            }
+                       }
                         $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) use ($initial) {
                             return [
                                 'category_group_id' => $allocation->category_group_id,
                                 'category_group' => $allocation->category_group,
                                 'initial_amount' => $initial,
-                                'current_total' => $allocation->current_total,
+                                'current_total' => $allocation->current_total ,
                                 'balance' => $allocation->balance,
                             ];
                         })->toArray();
@@ -5105,7 +5105,8 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $this->global_index = 1;
             }
 
-            if ($this->wfp_fund->id === 1 || $this->wfp_fund->id === 3) {
+            if ($this->wfp_fund->id === 1 || $this->wfp_fund->id === 3 ) {
+
                 foreach ($this->current_balance as $balance) {
                     if ($balance['initial_amount'] < $balance['current_total']) {
                         $is_not_valid = true;
@@ -5113,7 +5114,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     }
                 }
             } else {
-                if (array_sum(array_column($this->current_balance, 'current_total')) > $this->record->fundAllocations->sum('initial_amount')) {
+                if (array_sum(array_column($this->current_balance, 'current_total')) > $this->record->fundAllocations->where('wpf_type_id',$this->wfp_param)->sum('initial_amount')) {
                     $is_not_valid = true;
                 }
             }
