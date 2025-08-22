@@ -85,7 +85,7 @@ class WfpReport extends Component
         } else {
             $this->record = Wfp::with(['costCenter','wfpType'])->where('id', $record)->where('is_supplemental', 0)->first();
             $this->history['description'] = $record ? $this->record->wfpType->description : '';
-            $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
+            $this->allocation = $this->record->costCenter->fundAllocations->where('wpf_type_id', $this->record->wpf_type_id)->where('is_supplemental', 0)->sum('initial_amount');
             $this->wfpDetails = $this->record->wfpDetails()->get();
             foreach ($this->wfpDetails as $wfpDetail) {
                 $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;

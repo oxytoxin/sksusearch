@@ -26,6 +26,10 @@ class WfpSubmissionsQ1 extends Component implements HasTable
     public $fund_cluster;
     public $isPresident;
 
+    public $supplementalQuaterId = null;
+
+     protected $queryString = ['supplementalQuaterId'];
+
      public function mount()
      {
         $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
@@ -47,7 +51,11 @@ class WfpSubmissionsQ1 extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return Wfp::query()->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->where('is_supplemental', 1);
+        return Wfp::query()
+            ->when(!is_null($this->supplementalQuaterId), function (Builder $query) {
+                return $query->where('supplemental_quarter_id', $this->supplementalQuaterId);
+            })
+            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->where('is_supplemental', 1);
     }
 
      protected function getTableColumns()
