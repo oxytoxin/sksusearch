@@ -118,8 +118,8 @@ class SelectWfpTypeQ1 extends Component implements HasTable
                         $sum2 = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->sum('initial_amount');
                         $subtotal = $sum1 + $sum2;
                         $programmed = 0;
-                         $workFinancialPlans = $record->wfp?->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->get();
-
+                        if(count($record->wfp)>0){
+                             $workFinancialPlans = $record->wfp?->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->get();
                          if($workFinancialPlans) {
                               foreach ($workFinancialPlans->where('is_supplemental', 0) as $wfp) {
                                 foreach ($wfp->wfpDetails as $allocation) {
@@ -127,12 +127,11 @@ class SelectWfpTypeQ1 extends Component implements HasTable
                                 }
                             }
                          }
+                        }
                         return '₱ ' . number_format($subtotal - $programmed, 2);
                     } else {
-                        $allocated = $record->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
-                        $fund_allocation = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->first();
-                        //$allocated = $fund_allocation->initial_amount;
-
+                        $allocated = $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->sum('initial_amount');
+                        $fund_allocation = $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->first();
                         if ($record->wfp !== null) {
                             $wfp = $record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->get();
                             $programmed = 0;
