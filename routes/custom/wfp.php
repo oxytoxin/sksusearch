@@ -44,7 +44,7 @@ Route::middleware([
 
     Route::get('/assign-personnel', AssignPersonnel::class)->name('assign-personnel');
     Route::get('/create-wfp/{record}/{wfpType}/{isEdit}/{isSupplemental}', CreateWFP::class)->name('create-wfp');
-    Route::get('/select-wfp', SelectWfpType::class)->name('select-wfp');
+    Route::view('/select-wfp', 'select-wfp-type')->name('select-wfp');
     Route::get('/wfp-history', WFPHistory::class)->name('wfp-history');
     Route::get('/allocate-funds/{record}', AllocateFunds::class)->name('allocate-funds');
     Route::get('/edit-allocate-funds/{record}/{wfpType}', EditAllocateFunds::class)->name('edit-allocate-funds');

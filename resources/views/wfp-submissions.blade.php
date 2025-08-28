@@ -14,29 +14,29 @@
                   <a href="/wfp/wfp-submissions/1" @class([
                       'mt-2 flex items-center gap-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300',
                       'bg-white -mt-2 text-primary-600' => !request()->has(
-                          'supplementalQuaterId'),
+                          'supplementalQuarterId'),
                   ])>
                       WFP
                   </a>
                   @foreach ($quarters as $item)
                       @if (config('features.VERSION') === '10.0.0.1')
                           <a wire:key='{{ $item->id }}'
-                              href="/wfp/wfp-submissions/1?supplementalQuaterId={{ $item->id }}"
+                              href="/wfp/wfp-submissions/1?supplementalQuarterId={{ $item->id }}"
                               @class([
                                   'mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300 ',
                                   'bg-white -mt-2 text-primary-600' =>
-                                      $item->id == request()->input('supplementalQuaterId'),
+                                      $item->id == request()->input('supplementalQuarterId'),
                               ])>
                               {{ $item->name }}
                           </a>
                       @else
                           @if ($loop->first)
                               <a wire:key='{{ $item->id }}'
-                                  href="/wfp/wfp-submissions/1?supplementalQuaterId={{ $item->id }}"
+                                  href="/wfp/wfp-submissions/1?supplementalQuarterId={{ $item->id }}"
                                   @class([
                                       'mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300 ',
                                       'bg-white -mt-2 text-primary-600' =>
-                                          $item->id == request()->input('supplementalQuaterId'),
+                                          $item->id == request()->input('supplementalQuarterId'),
                                   ])>
                                   {{ $item->name }}
                               </a>
@@ -45,7 +45,7 @@
                   @endforeach
 
               </div>
-              @if (!request()->has('supplementalQuaterId'))
+              @if (!request()->has('supplementalQuarterId'))
                   <div class="origin-top-left bg-white p-4 rounded-b-lg rounded-r-lg">
                       @livewire('w-f-p.wfp-submissions', ['filter' => request()->input('filter')])
                   </div>

@@ -13,7 +13,6 @@
         </a>
     </div>
     <div class="grid grid-cols-2 space-x-3">
-
         @if (in_array($record->fundClusterWFP->id, [1, 3, 9]))
             <div class="col-span-1 lg:col-start-1">
                 <h2 class="sr-only">Summary</h2>

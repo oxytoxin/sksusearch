@@ -39,6 +39,10 @@ class SelectWfpTypeQ1 extends Component implements HasTable
     public $data = [];
     protected $programmed = [];
 
+    public $supplementalQuarterId = null;
+
+    protected $queryString = ['supplementalQuarterId'];
+
     public function mount()
     {
         $isOfficeHead = auth()->user()->employee_information->office?->head_employee?->id == auth()->user()->employee_information->id;
@@ -56,32 +60,16 @@ class SelectWfpTypeQ1 extends Component implements HasTable
         } else {
             $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
         }
-
-
-        $this->types = FundClusterWFP::whereHas('costCenters', function ($query) {
-            $query->where('office_id', $this->office_id)->whereHas('fundAllocations', function ($query) {
-                $query->where('wpf_type_id',  $this->user_wfp_id);
-            });
-        })->get();
-
-        $test = CostCenter::whereHas('fundAllocations', function ($query) {
-            $query->where('is_supplemental', 1);
-        })
-            ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
-            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->get();
-        // dd($test->first()->fundAllocations()->where('is_supplemental', 1)->get());
-
     }
 
     protected function getTableQuery()
     {
-        // $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
-        $query_test = CostCenter::query()->with(['fundAllocations','wfp'=>function($query){
-            $query->where('wpf_type_id',  $this->user_wfp_id);
-        },'wfp.wfpDetails','fundClusterWFP','mfo','mfoFee','office'])
-        ->whereHas('fundAllocations', function ($query) {
-            $query->where('is_supplemental', 1);
-        })
+        $query_test = CostCenter::query()->with(['fundAllocations', 'wfp' => function ($query) {
+            $query->where('wpf_type_id',  $this->data['wfp_type'])->with('wfpDetails');
+        }, 'fundClusterWFP', 'mfo', 'mfoFee', 'office'])
+            ->whereHas('fundAllocations', function ($query) {
+                $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
+            })
             ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
             ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
         return $query_test;
@@ -107,26 +95,26 @@ class SelectWfpTypeQ1 extends Component implements HasTable
                 ->label('MFO Fee')->searchable()->sortable(),
             Tables\Columns\TextColumn::make('fundAllocations.wpf_type_id')
                 ->getStateUsing(function ($record) {
-                    return $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->first()->wpfType->description;
+                    return $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->wpfType->description;
                 })
                 ->label('WFP Period'),
             Tables\Columns\TextColumn::make('fundAllocations.amount')
                 ->label('Amount')
                 ->formatStateUsing(function ($record) {
-                    if (in_array($record->fundClusterWFP->id,[1,3,9])) {
-                        $sum1 = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->sum('initial_amount');
-                        $sum2 = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->sum('initial_amount');
+                    if (in_array($record->fundClusterWFP->id, [1, 3, 9])) {
+                        $sum1 = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('supplemental_quarter_id', '!=', null)->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId)->sum('initial_amount');
+                        $sum2 = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('supplemental_quarter_id', null)->where('is_supplemental', 0)->sum('initial_amount');
                         $subtotal = $sum1 + $sum2;
                         $programmed = 0;
-                        if(count($record->wfp)>0){
-                             $workFinancialPlans = $record->wfp?->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->get();
-                         if($workFinancialPlans) {
-                              foreach ($workFinancialPlans->where('is_supplemental', 0) as $wfp) {
-                                foreach ($wfp->wfpDetails as $allocation) {
-                                    $programmed += ($allocation->total_quantity * $allocation->cost_per_unit);
+                        if (count($record->wfp) > 0) {
+                            $workFinancialPlans = $record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id);
+                            if ($workFinancialPlans) {
+                                foreach ($workFinancialPlans->where('is_supplemental', 0) as $wfp) {
+                                    foreach ($wfp->wfpDetails as $allocation) {
+                                        $programmed += ($allocation->total_quantity * $allocation->cost_per_unit);
+                                    }
                                 }
                             }
-                         }
                         }
                         return '₱ ' . number_format($subtotal - $programmed, 2);
                     } else {
@@ -169,15 +157,15 @@ class SelectWfpTypeQ1 extends Component implements HasTable
                 ->label('Create WFP')
                 ->button()
                 ->icon('heroicon-o-plus')
-                ->url(fn($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0, 'isSupplemental' => 1]))
-                ->visible(fn($record) => !$record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->first()->fundDrafts()->exists()),
+                ->url(fn($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0, 'isSupplemental' => 1,'supplementalQuarterId' => $this->supplementalQuarterId]))
+                ->visible(fn($record) => !$record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('supplemental_quarter_id',$this->supplementalQuarterId)->first()->fundDrafts()->exists()),
             Action::make('continue_draft')
                 ->label('Continue Draft')
                 ->color('warning')
                 ->button()
                 ->icon('heroicon-o-pencil')
                 ->url(fn($record): string => route('wfp.create-wfp', ['record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0, 'isSupplemental' => 1]))
-                ->visible(fn($record) => $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 1)->first()->fundDrafts()->exists()),
+                ->visible(fn($record) => $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('supplemental_quarter_id',$this->supplementalQuarterId)->first()->fundDrafts()->exists()),
         ];
     }
 
