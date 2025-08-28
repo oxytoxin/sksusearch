@@ -53,7 +53,9 @@ Route::middleware([
     // Route::get('/wfp-submissions/{filter?}', WfpSubmissions::class)->name('wfp-submissions');
     Route::view('/wfp-submissions/{filter?}', 'wfp-submissions')->name('wfp-submissions');
 
-    Route::get('/wfp-pre', GeneratePpmp::class)->name('generate-ppmp');
+    // Route::get('/wfp-pre', GeneratePpmp::class)->name('generate-ppmp');
+    Route::view('/wfp-pre','generate-ppmp')->name('generate-ppmp');
+
     Route::get('/wfp-ppmp', GenerateWfpPpmp::class)->name('generate-wfp-ppmp');
     Route::get('/print-ppmp/{record}/{isSupplemental}', WfpPpmp::class)->name('print-ppmp');
     Route::get('/print-pre/{record}/{isSupplemental}', UserPRE::class)->name('print-pre');

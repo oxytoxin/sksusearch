@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\WFP;
 
+use App\Actions\Wpf\GetFundAllocationByMfo;
 use DB;
 use App\Models\Wfp;
 use App\Models\MfoFee;
@@ -41,10 +42,13 @@ class GeneratePpmpQ1 extends Component
 
     public $mfosId = null;
 
+    public $supplementalQuarterId = null;
 
+    protected $queryString = ['supplementalQuarterId'];
 
-    public function mount()
+    public function mount($supplementalQuarterId)
     {
+        $this->supplementalQuarterId = $supplementalQuarterId;
         $this->wfp_types = WpfType::all();
         $this->selectedType = 1;
     }
@@ -60,7 +64,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 1)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -80,13 +84,18 @@ class GeneratePpmpQ1 extends Component
 
         $tem_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id, fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
-            ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
+            ->where('fund_allocations.wpf_type_id', $this->selectedType)
+            ->when($this->supplementalQuarterId === 1,function($query){
+                $query->where('supplemental_quarter_id',null)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId);
+            })->when($this->supplementalQuarterId>1,function($query){
+                $query->where('supplemental_quarter_id',$this->supplementalQuarterId)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId - 1);
+            }) // Explicit table name
             ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
             // ->where('fund_allocations.is_supplemental', 1 // Explicit table name)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
@@ -94,15 +103,19 @@ class GeneratePpmpQ1 extends Component
 
 
         $this->non_supplemental_fund_allocation = $tem_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $tem_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        $supplemental_fund_allocation = $tem_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $tem_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -120,22 +133,12 @@ class GeneratePpmpQ1 extends Component
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
-        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->sum('total_allocated');
+        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
-
-
-        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-        //     $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 1)->where('is_approved', 1);
-        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        // ->groupBy('category_item_id')
-        // ->get();
-        // $this->total = WfpDetail::whereHas('wfp', function($query) {
-        //     $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 1)->where('is_approved', 1);
-        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     public function export101()
@@ -143,65 +146,65 @@ class GeneratePpmpQ1 extends Component
         switch ($this->title) {
             case 'Sultan Kudarat State University':
                 $this->sksuPpmp();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'General Admission and Support Services':
                 $this->gasPpmp();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Higher Education Services':
                 $this->hesPpmp();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Advanced Education Services':
                 $this->aesPpmp();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Research and Development':
                 $this->rdPpmp();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Extension Services':
                 $this->extensionPpmp();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Local Fund Projects':
                 $this->lfPpmp();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
         }
     }
 
-      public function export101Con()
+    public function export101Con()
     {
         switch ($this->title) {
             case 'Sultan Kudarat State University':
                 $this->sksuPpmp101Con();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'General Admission and Support Services':
                 $this->gasPpmp101Con();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Higher Education Services':
                 $this->hesPpmp101Con();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Advanced Education Services':
                 $this->aesPpmp101Con();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Research and Development':
                 $this->rdPpmp101Con();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Extension Services':
                 $this->extensionPpmp101Con();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
             case 'Local Fund Projects':
                 $this->lfPpmp101Con();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '101-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '101-' . $this->title . '.xlsx');
                 break;
         }
     }
@@ -216,23 +219,29 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id, fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,fund_allocations.supplemental_quarter_id as supplemental_quarter_id'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
-            ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
+            ->where('fund_allocations.wpf_type_id', $this->selectedType)
             ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
             ->where('m_f_o_s.id', 1)
-            ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
+            ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental','supplemental_quarter_id')
             ->get();
 
         $this->forwarded_ppmp_details =  $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+            if ($this->supplementalQuarterId == 1) {
+                $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
+                    ->where('is_supplemental', 0)->where('is_approved', 1);
+            } else {
+                $query->where('fund_cluster_w_f_p_s_id', 1)
+                    ->where('wpf_type_id', $this->selectedType)
+                    ->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                    ->where('is_supplemental', 1)->where('is_approved', 1);
+            }
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -251,10 +260,12 @@ class GeneratePpmpQ1 extends Component
             ->where('cost_centers.m_f_o_s_id', 1)
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
+
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)
+                ->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -273,39 +284,33 @@ class GeneratePpmpQ1 extends Component
             ->where('cost_centers.m_f_o_s_id', 1)
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+             if($this->supplementalQuarterId == 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id == $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id != $this->supplementalQuarterId);
+            }
         });
-
 
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 1);
-                });
+                })->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
-
-        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
-        //     $query->where('m_f_o_s_id', 1);
-        //     });
-        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        // ->groupBy('category_item_id')
-        // ->get();
-        // $this->total = WfpDetail::whereHas('wfp', function($query) {
-        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
-        //     $query->where('m_f_o_s_id', 1);
-        //     });
-        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
-
     }
 
     public function hesPpmp()
@@ -318,23 +323,34 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
-            ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.wpf_type_id', $this->selectedType)
+            ->when($this->supplementalQuarterId === 1,function($query){
+                $query->where('supplemental_quarter_id',null)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId);
+            })->when($this->supplementalQuarterId>1,function($query){
+                $query->where('supplemental_quarter_id',$this->supplementalQuarterId)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId - 1);
+            }) // Explicit table name
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 2)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+            if ($this->supplementalQuarterId == 1) {
+                $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
+                    ->where('is_supplemental', 0)->where('is_approved', 1);
+            } else {
+                $query->where('fund_cluster_w_f_p_s_id', 1)
+                    ->where('wpf_type_id', $this->selectedType)
+                    ->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                    ->where('is_supplemental', 1)->where('is_approved', 1);
+            }
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -357,7 +373,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -378,11 +394,20 @@ class GeneratePpmpQ1 extends Component
             ->get();
 
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
 
@@ -390,7 +415,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 2);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -420,23 +445,34 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
-            ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.wpf_type_id', $this->selectedType)
+            ->when($this->supplementalQuarterId === 1,function($query){
+                $query->where('supplemental_quarter_id',null)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId);
+            })->when($this->supplementalQuarterId>1,function($query){
+                $query->where('supplemental_quarter_id',$this->supplementalQuarterId)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId - 1);
+            }) // Explicit table name
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 3)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+            if ($this->supplementalQuarterId == 1) {
+                $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
+                    ->where('is_supplemental', 0)->where('is_approved', 1);
+            } else {
+                $query->where('fund_cluster_w_f_p_s_id', 1)
+                    ->where('wpf_type_id', $this->selectedType)
+                    ->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                    ->where('is_supplemental', 1)->where('is_approved', 1);
+            }
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -458,7 +494,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -478,18 +514,27 @@ class GeneratePpmpQ1 extends Component
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 3);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -519,23 +564,34 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
-            ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.wpf_type_id', $this->selectedType)
+            ->when($this->supplementalQuarterId === 1,function($query){
+                $query->where('supplemental_quarter_id',null)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId);
+            })->when($this->supplementalQuarterId>1,function($query){
+                $query->where('supplemental_quarter_id',$this->supplementalQuarterId)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId - 1);
+            }) // Explicit table name
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 4)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+            if ($this->supplementalQuarterId == 1) {
+                $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
+                    ->where('is_supplemental', 0)->where('is_approved', 1);
+            } else {
+                $query->where('fund_cluster_w_f_p_s_id', 1)
+                    ->where('wpf_type_id', $this->selectedType)
+                    ->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                    ->where('is_supplemental', 1)->where('is_approved', 1);
+            }
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -558,7 +614,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -578,17 +634,26 @@ class GeneratePpmpQ1 extends Component
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 4);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -618,23 +683,34 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
-            ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.wpf_type_id', $this->selectedType)
+            ->when($this->supplementalQuarterId === 1,function($query){
+                $query->where('supplemental_quarter_id',null)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId);
+            })->when($this->supplementalQuarterId>1,function($query){
+                $query->where('supplemental_quarter_id',$this->supplementalQuarterId)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId - 1);
+            }) // Explicit table name
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 5)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+            if ($this->supplementalQuarterId == 1) {
+                $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
+                    ->where('is_supplemental', 0)->where('is_approved', 1);
+            } else {
+                $query->where('fund_cluster_w_f_p_s_id', 1)
+                    ->where('wpf_type_id', $this->selectedType)
+                    ->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                    ->where('is_supplemental', 1)->where('is_approved', 1);
+            }
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -656,7 +732,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -676,18 +752,27 @@ class GeneratePpmpQ1 extends Component
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 5);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -717,23 +802,34 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 1)
-            ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
-            ->whereIn('m_f_o_s.id' ,[6,7])
+            ->where('fund_allocations.wpf_type_id', $this->selectedType)
+            ->when($this->supplementalQuarterId === 1,function($query){
+                $query->where('supplemental_quarter_id',null)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId);
+            })->when($this->supplementalQuarterId>1,function($query){
+                $query->where('supplemental_quarter_id',$this->supplementalQuarterId)->orWhere('supplemental_quarter_id',$this->supplementalQuarterId - 1);
+            }) // Explicit table name
+            ->where('fund_allocations.initial_amount', '>', 0)
+            ->whereIn('m_f_o_s.id', [6, 7])
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+            if ($this->supplementalQuarterId == 1) {
+                $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
+                    ->where('is_supplemental', 0)->where('is_approved', 1);
+            } else {
+                $query->where('fund_cluster_w_f_p_s_id', 1)
+                    ->where('wpf_type_id', $this->selectedType)
+                    ->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                    ->where('is_supplemental', 1)->where('is_approved', 1);
+            }
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -749,7 +845,7 @@ class GeneratePpmpQ1 extends Component
                 'category_item_budgets.name as budget_name', // Include the related field in the select
                 \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs')
             )
-            ->whereIn('cost_centers.m_f_o_s_id', [6,7])
+            ->whereIn('cost_centers.m_f_o_s_id', [6, 7])
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
@@ -757,7 +853,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -773,15 +869,24 @@ class GeneratePpmpQ1 extends Component
                 'category_item_budgets.name as budget_name', // Include the related field in the select
                 \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs')
             )
-            ->whereIn('cost_centers.m_f_o_s_id', [6,7])
+            ->whereIn('cost_centers.m_f_o_s_id', [6, 7])
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
 
@@ -789,8 +894,8 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 1)->where('wpf_type_id', $this->selectedType)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
-                    $query->whereIn('m_f_o_s_id', [6,7]);
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
+                    $query->whereIn('m_f_o_s_id', [6, 7]);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
@@ -819,21 +924,20 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -854,7 +958,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -873,18 +977,27 @@ class GeneratePpmpQ1 extends Component
             ->get();
 
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
@@ -903,31 +1016,31 @@ class GeneratePpmpQ1 extends Component
         switch ($this->title) {
             case 'Sultan Kudarat State University':
                 $this->sksuPpmp161();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '161-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '161-' . $this->title . '.xlsx');
                 break;
             case 'General Admission and Support Services':
                 $this->gasPpmp161();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '161-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '161-' . $this->title . '.xlsx');
                 break;
             case 'Higher Education Services':
                 $this->hesPpmp161();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '161-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '161-' . $this->title . '.xlsx');
                 break;
             case 'Advanced Education Services':
                 $this->aesPpmp161();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '161-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '161-' . $this->title . '.xlsx');
                 break;
             case 'Research and Development':
                 $this->rdPpmp161();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '161-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '161-' . $this->title . '.xlsx');
                 break;
             case 'Extension Services':
                 $this->extensionPpmp161();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '161-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '161-' . $this->title . '.xlsx');
                 break;
             case 'Local Fund Projects':
                 $this->lfPpmp161();
-                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '161-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '161-' . $this->title . '.xlsx');
                 break;
         }
     }
@@ -941,7 +1054,7 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -949,15 +1062,14 @@ class GeneratePpmpQ1 extends Component
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 1)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -980,7 +1092,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1000,18 +1112,27 @@ class GeneratePpmpQ1 extends Component
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
                 ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 1);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -1041,7 +1162,7 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -1049,15 +1170,14 @@ class GeneratePpmpQ1 extends Component
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 2)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1080,7 +1200,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1101,18 +1221,27 @@ class GeneratePpmpQ1 extends Component
             ->get();
 
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
                 ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 2);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -1142,7 +1271,7 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -1150,15 +1279,14 @@ class GeneratePpmpQ1 extends Component
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 3)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1181,7 +1309,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1201,18 +1329,27 @@ class GeneratePpmpQ1 extends Component
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
                 ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 3);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -1242,7 +1379,7 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -1250,15 +1387,14 @@ class GeneratePpmpQ1 extends Component
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 4)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1281,7 +1417,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1302,18 +1438,27 @@ class GeneratePpmpQ1 extends Component
             ->get();
 
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
                 ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 4);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -1343,7 +1488,7 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -1351,15 +1496,14 @@ class GeneratePpmpQ1 extends Component
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 5)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1382,7 +1526,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1403,18 +1547,27 @@ class GeneratePpmpQ1 extends Component
             ->get();
 
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
                 ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 5);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -1444,7 +1597,7 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -1452,15 +1605,14 @@ class GeneratePpmpQ1 extends Component
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 3)
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->where('m_f_o_s.id', 6)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1482,7 +1634,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
-                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1502,11 +1654,20 @@ class GeneratePpmpQ1 extends Component
             ->groupBy('category_group_id', 'uacs', 'item_name', 'budget_uacs', 'budget_name')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
 
@@ -1514,7 +1675,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 3)
                 ->where('is_supplemental', 1)->where('wpf_type_id', $this->selectedType)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 6);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -1552,7 +1713,12 @@ class GeneratePpmpQ1 extends Component
             ->whereHas('costCenter.wfp')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
         $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('mfo_fee_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
@@ -1560,21 +1726,21 @@ class GeneratePpmpQ1 extends Component
         });
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
-        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->sum('total_allocated');
+        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($fcwpsId) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fcwpsId)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->non_supplemental_total_programmed = WfpDetail::whereHas('wfp', function ($query)  use ($fcwpsId) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fcwpsId)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query)  use ($fcwpsId) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fcwpsId)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1595,7 +1761,7 @@ class GeneratePpmpQ1 extends Component
         //
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query)  use ($fcwpsId) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fcwpsId)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1633,7 +1799,12 @@ class GeneratePpmpQ1 extends Component
             ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name', 'is_supplemental')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
         $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('mfo_fee_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
@@ -1645,19 +1816,19 @@ class GeneratePpmpQ1 extends Component
 
 
 
-        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->sum('total_allocated');
+        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($fcwpsId, $ccMfoId) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fcwpsId)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query)  use ($ccMfoId) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query)  use ($ccMfoId) {
                     $query->where('m_f_o_s_id', $ccMfoId);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
-         $this->non_supplemental_total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($fcwpsId, $ccMfoId) {
+        $this->non_supplemental_total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($fcwpsId, $ccMfoId) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fcwpsId)
-                ->where('is_supplemental', 0)->where('is_approved',1)
+                ->where('is_supplemental', 0)->where('is_approved', 1)
                 ->whereHas('costCenter', function ($query)  use ($ccMfoId) {
                     $query->where('m_f_o_s_id', $ccMfoId);
                 });
@@ -1665,7 +1836,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) use ($fcwpsId) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fcwpsId)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1686,7 +1857,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) use ($fcwpsId) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fcwpsId)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1724,29 +1895,38 @@ class GeneratePpmpQ1 extends Component
             ->whereHas('costCenter.wfp')
             ->get();
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->non_supplemental_total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1767,7 +1947,7 @@ class GeneratePpmpQ1 extends Component
         //
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1800,35 +1980,35 @@ class GeneratePpmpQ1 extends Component
         switch ($this->title) {
             case 'Sultan Kudarat State University':
                 $this->sksuPpmp163();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '163-' . $this->title . '.xlsx');
                 break;
-           case 'Sultan Kudarat State University PRE':
+            case 'Sultan Kudarat State University PRE':
                 $this->sksuPre($this->preId);
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '163-' . $this->title . '.xlsx');
                 break;
             case 'ACCESS Campus':
                 $this->accessPpmp163();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '163-' . $this->title . '.xlsx');
                 break;
             case 'Tacurong Campus':
                 $this->tacurongPpmp163();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '163-' . $this->title . '.xlsx');
                 break;
             case 'Isulan Campus':
                 $this->isulanPpmp163();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '163-' . $this->title . '.xlsx');
                 break;
             case 'Kalamansig Campus':
                 $this->kalamansigPpmp163();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '163-' . $this->title . '.xlsx');
                 break;
             case 'Lutayan Campus':
                 $this->lutayanPpmp163();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '163-' . $this->title . '.xlsx');
                 break;
             case 'Bagumbayan Campus':
                 $this->bagumbayanPpmp163();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '163-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '163-' . $this->title . '.xlsx');
                 break;
         }
     }
@@ -1856,7 +2036,12 @@ class GeneratePpmpQ1 extends Component
 
 
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
         $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('mfo_fee_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
@@ -1865,12 +2050,12 @@ class GeneratePpmpQ1 extends Component
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
-        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->sum('total_allocated');
+        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($campusId) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) use ($campusId) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) use ($campusId) {
                     $query->whereHas('office', function ($query) use ($campusId) {
                         $query->whereHas('campus', function ($query) use ($campusId) {
                             $query->where('id', $campusId); // Filter by campus_id
@@ -1885,7 +2070,7 @@ class GeneratePpmpQ1 extends Component
         $this->non_supplemental_total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($campusId) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 0)->where('is_approved',1)
+                ->where('is_supplemental', 0)->where('is_approved', 1)
                 ->whereHas('costCenter', function ($query) use ($campusId) {
                     $query->whereHas('office', function ($query) use ($campusId) {
                         $query->whereHas('campus', function ($query) use ($campusId) {
@@ -1901,7 +2086,7 @@ class GeneratePpmpQ1 extends Component
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1925,7 +2110,7 @@ class GeneratePpmpQ1 extends Component
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -1972,7 +2157,12 @@ class GeneratePpmpQ1 extends Component
 
 
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
         $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('mfo_fee_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
@@ -1981,12 +2171,12 @@ class GeneratePpmpQ1 extends Component
 
         $mfo_ids = $this->fund_allocation->pluck('mfo_fee_id')->toArray();
 
-        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->sum('total_allocated');
+        $this->total_allocated = $this->fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->whereHas('office', function ($query) {
                         $query->whereHas('campus', function ($query) {
                             $query->where('id', 1); // Filter by campus_id
@@ -2001,7 +2191,7 @@ class GeneratePpmpQ1 extends Component
         $this->non_supplemental_total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 0)->where('is_approved',1)
+                ->where('is_supplemental', 0)->where('is_approved', 1)
                 ->whereHas('costCenter', function ($query) {
                     $query->whereHas('office', function ($query) {
                         $query->whereHas('campus', function ($query) {
@@ -2017,7 +2207,7 @@ class GeneratePpmpQ1 extends Component
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2041,7 +2231,7 @@ class GeneratePpmpQ1 extends Component
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2111,7 +2301,7 @@ class GeneratePpmpQ1 extends Component
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->whereHas('office', function ($query) {
                         $query->whereHas('campus', function ($query) {
                             $query->where('id', 2); // Filter by campus_id
@@ -2127,7 +2317,7 @@ class GeneratePpmpQ1 extends Component
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2196,7 +2386,7 @@ class GeneratePpmpQ1 extends Component
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->whereHas('office', function ($query) {
                         $query->whereHas('campus', function ($query) {
                             $query->where('id', 3); // Filter by campus_id
@@ -2212,7 +2402,7 @@ class GeneratePpmpQ1 extends Component
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2281,7 +2471,7 @@ class GeneratePpmpQ1 extends Component
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->whereHas('office', function ($query) {
                         $query->whereHas('campus', function ($query) {
                             $query->where('id', 4); // Filter by campus_id
@@ -2297,7 +2487,7 @@ class GeneratePpmpQ1 extends Component
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2366,7 +2556,7 @@ class GeneratePpmpQ1 extends Component
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->whereHas('office', function ($query) {
                         $query->whereHas('campus', function ($query) {
                             $query->where('id', 5); // Filter by campus_id
@@ -2382,7 +2572,7 @@ class GeneratePpmpQ1 extends Component
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2451,7 +2641,7 @@ class GeneratePpmpQ1 extends Component
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->whereHas('office', function ($query) {
                         $query->whereHas('campus', function ($query) {
                             $query->where('id', 6); // Filter by campus_id
@@ -2467,7 +2657,7 @@ class GeneratePpmpQ1 extends Component
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2536,7 +2726,7 @@ class GeneratePpmpQ1 extends Component
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->whereHas('office', function ($query) {
                         $query->whereHas('campus', function ($query) {
                             $query->where('id', 7); // Filter by campus_id
@@ -2552,7 +2742,7 @@ class GeneratePpmpQ1 extends Component
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
                 ->where('fund_cluster_w_f_p_s_id', 2)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2614,14 +2804,14 @@ class GeneratePpmpQ1 extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2654,42 +2844,42 @@ class GeneratePpmpQ1 extends Component
         switch ($this->title) {
             case 'Sultan Kudarat State University':
                 $this->sksuPpmp164T();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164T-' . $this->title . '.xlsx');
                 break;
-           case 'Sultan Kudarat State University PRE':
+            case 'Sultan Kudarat State University PRE':
                 $this->sksuPre($this->preId);
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164T-' . $this->title . '.xlsx');
                 break;
             case 'General Admission and Support Services':
                 $this->gasPpmp164T();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164T-' . $this->title . '.xlsx');
                 break;
             case 'Higher Education Services':
                 $this->hesPpmp164T();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164T-' . $this->title . '.xlsx');
                 break;
             case 'Advanced Education Services':
                 $this->aesPpmp164T();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164T-' . $this->title . '.xlsx');
                 break;
             case 'Research and Development':
                 $this->rdPpmp164T();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164T-' . $this->title . '.xlsx');
                 break;
             case 'Extension Services':
                 $this->extensionPpmp164T();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164T-' . $this->title . '.xlsx');
                 break;
             case 'Local Fund Projects':
                 $this->lfPpmp164T();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164T-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164T-' . $this->title . '.xlsx');
                 break;
         }
     }
 
     public function gasPpmp164T()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(4,1,'General Admission and Support Services');
+        return $this->generateSksuppmpPerCostCenterMfo(4, 1, 'General Admission and Support Services');
 
         // CODE BELOW IS NOT USER
         $this->is_active = true;
@@ -2713,15 +2903,15 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 1);
-                });
+                })->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2759,7 +2949,7 @@ class GeneratePpmpQ1 extends Component
 
     public function hesPpmp164T()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(4,2,'Higher Education Services');
+        return $this->generateSksuppmpPerCostCenterMfo(4, 2, 'Higher Education Services');
 
         // CODE BELOW IS NOT USE
         $this->is_active = true;
@@ -2783,7 +2973,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 2);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -2791,7 +2981,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2826,7 +3016,7 @@ class GeneratePpmpQ1 extends Component
 
     public function aesPpmp164T()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(4,3,'Advanced Education Services');
+        return $this->generateSksuppmpPerCostCenterMfo(4, 3, 'Advanced Education Services');
 
         // CODE BELOW IS NOT USE
         $this->is_active = true;
@@ -2850,7 +3040,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 3);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -2858,7 +3048,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2893,7 +3083,7 @@ class GeneratePpmpQ1 extends Component
 
     public function rdPpmp164T()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(4,4,'Research and Development');
+        return $this->generateSksuppmpPerCostCenterMfo(4, 4, 'Research and Development');
 
         // CODE BELOW IS NOT USE
         $this->is_active = true;
@@ -2917,7 +3107,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 4);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -2925,7 +3115,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -2960,7 +3150,7 @@ class GeneratePpmpQ1 extends Component
 
     public function extensionPpmp164T()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(4,5,'Extension Services');
+        return $this->generateSksuppmpPerCostCenterMfo(4, 5, 'Extension Services');
 
         // CODE BELOW IS NOT USE
         $this->is_active = true;
@@ -2984,7 +3174,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 5);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -2992,7 +3182,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3027,7 +3217,7 @@ class GeneratePpmpQ1 extends Component
 
     public function lfPpmp164T()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(4,6,'Local Fund Projects');
+        return $this->generateSksuppmpPerCostCenterMfo(4, 6, 'Local Fund Projects');
 
         // CODE BELOW IS NOT USE
         $this->is_active = true;
@@ -3051,7 +3241,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 6);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3059,7 +3249,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 4)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3095,7 +3285,7 @@ class GeneratePpmpQ1 extends Component
     //164T-NonFHE
     public function sksuPpmp164TN()
     {
-        return $this->generateSksuppmp(7,'Sultan Kudarat State University');
+        return $this->generateSksuppmp(7, 'Sultan Kudarat State University');
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3116,13 +3306,13 @@ class GeneratePpmpQ1 extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3155,42 +3345,42 @@ class GeneratePpmpQ1 extends Component
         switch ($this->title) {
             case 'Sultan Kudarat State University':
                 $this->sksuPpmp164TN();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NFHE-' . $this->title . '.xlsx');
                 break;
-           case 'Sultan Kudarat State University PRE':
+            case 'Sultan Kudarat State University PRE':
                 $this->sksuPre($this->preId);
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NFHE-' . $this->title . '.xlsx');
                 break;
             case 'General Admission and Support Services':
                 $this->gasPpmp164TN();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NFHE-' . $this->title . '.xlsx');
                 break;
             case 'Higher Education Services':
                 $this->hesPpmp164TN();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NFHE-' . $this->title . '.xlsx');
                 break;
             case 'Advanced Education Services':
                 $this->aesPpmp164TN();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NFHE-' . $this->title . '.xlsx');
                 break;
             case 'Research and Development':
                 $this->rdPpmp164TN();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NFHE-' . $this->title . '.xlsx');
                 break;
             case 'Extension Services':
                 $this->extensionPpmp164TN();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NFHE-' . $this->title . '.xlsx');
                 break;
             case 'Local Fund Projects':
                 $this->lfPpmp164TN();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NFHE-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NFHE-' . $this->title . '.xlsx');
                 break;
         }
     }
 
     public function gasPpmp164TN()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(7,1, 'General Admission and Support Services');
+        return $this->generateSksuppmpPerCostCenterMfo(7, 1, 'General Admission and Support Services');
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3212,15 +3402,15 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 1);
-                });
+                })->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3255,7 +3445,7 @@ class GeneratePpmpQ1 extends Component
 
     public function hesPpmp164TN()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(7,2,'Higher Education Services');
+        return $this->generateSksuppmpPerCostCenterMfo(7, 2, 'Higher Education Services');
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3277,7 +3467,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 2);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3285,7 +3475,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3320,7 +3510,7 @@ class GeneratePpmpQ1 extends Component
 
     public function aesPpmp164TN()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(7,3,'Advanced Education Services');
+        return $this->generateSksuppmpPerCostCenterMfo(7, 3, 'Advanced Education Services');
 
         $this->is_active = true;
         $this->showPre = false;
@@ -3343,7 +3533,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 3);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3351,7 +3541,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3386,7 +3576,7 @@ class GeneratePpmpQ1 extends Component
 
     public function rdPpmp164TN()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(7,4,'Research and Development');
+        return $this->generateSksuppmpPerCostCenterMfo(7, 4, 'Research and Development');
 
         $this->is_active = true;
         $this->showPre = false;
@@ -3409,7 +3599,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 4);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3417,7 +3607,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3452,7 +3642,7 @@ class GeneratePpmpQ1 extends Component
 
     public function extensionPpmp164TN()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(7,5,'Extension Services');
+        return $this->generateSksuppmpPerCostCenterMfo(7, 5, 'Extension Services');
 
         $this->is_active = true;
         $this->showPre = false;
@@ -3475,7 +3665,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 5);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3483,7 +3673,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3518,7 +3708,7 @@ class GeneratePpmpQ1 extends Component
 
     public function lfPpmp164TN()
     {
-        return $this->generateSksuppmpPerCostCenterMfo(7,6,'Local Fund Projects');
+        return $this->generateSksuppmpPerCostCenterMfo(7, 6, 'Local Fund Projects');
 
         $this->is_active = true;
         $this->showPre = false;
@@ -3541,7 +3731,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 6);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3549,7 +3739,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3586,7 +3776,7 @@ class GeneratePpmpQ1 extends Component
     //164OSF
     public function sksuPpmp164OSF()
     {
-        return $this->generateSksuppmp(5,'Sultan Kudarat State University');
+        return $this->generateSksuppmp(5, 'Sultan Kudarat State University');
         $this->is_active = true;
         $this->showPre = false;
         $this->activeButton = 'none';
@@ -3606,13 +3796,13 @@ class GeneratePpmpQ1 extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3646,35 +3836,35 @@ class GeneratePpmpQ1 extends Component
         switch ($this->title) {
             case 'Sultan Kudarat State University':
                 $this->sksuPpmp164OSF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NOSF-' . $this->title . '.xlsx');
                 break;
             case 'Sultan Kudarat State University PRE':
                 $this->sksuPre($this->preId);
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NOSF-' . $this->title . '.xlsx');
                 break;
             case 'General Admission and Support Services':
                 $this->gasPpmp164OSF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NOSF-' . $this->title . '.xlsx');
                 break;
             case 'Higher Education Services':
                 $this->hesPpmp164OSF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NOSF-' . $this->title . '.xlsx');
                 break;
             case 'Advanced Education Services':
                 $this->aesPpmp164OSF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NOSF-' . $this->title . '.xlsx');
                 break;
             case 'Research and Development':
                 $this->rdPpmp164OSF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NOSF-' . $this->title . '.xlsx');
                 break;
             case 'Extension Services':
                 $this->extensionPpmp164OSF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NOSF-' . $this->title . '.xlsx');
                 break;
             case 'Local Fund Projects':
                 $this->lfPpmp164OSF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164NOSF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164NOSF-' . $this->title . '.xlsx');
                 break;
         }
     }
@@ -3703,15 +3893,15 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 1);
-                });
+                })->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3769,7 +3959,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 2);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3777,7 +3967,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3835,7 +4025,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 3);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3843,7 +4033,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3901,7 +4091,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 4);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3909,7 +4099,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -3967,7 +4157,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 5);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -3975,7 +4165,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4033,7 +4223,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 6);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -4041,7 +4231,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4098,13 +4288,13 @@ class GeneratePpmpQ1 extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4137,35 +4327,35 @@ class GeneratePpmpQ1 extends Component
         switch ($this->title) {
             case 'Sultan Kudarat State University':
                 $this->sksuPpmp164MF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164MF-' . $this->title . '.xlsx');
                 break;
             case 'Sultan Kudarat State University PRE':
                 $this->sksuPre($this->preId);
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164MF-' . $this->title . '.xlsx');
                 break;
             case 'General Admission and Support Services':
                 $this->gasPpmp164MF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164MF-' . $this->title . '.xlsx');
                 break;
             case 'Higher Education Services':
                 $this->hesPpmp164MF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164MF-' . $this->title . '.xlsx');
                 break;
             case 'Advanced Education Services':
                 $this->aesPpmp164MF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164MF-' . $this->title . '.xlsx');
                 break;
             case 'Research and Development':
                 $this->rdPpmp164MF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164MF-' . $this->title . '.xlsx');
                 break;
             case 'Extension Services':
                 $this->extensionPpmp164MF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164MF-' . $this->title . '.xlsx');
                 break;
             case 'Local Fund Projects':
                 $this->lfPpmp164MF();
-                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance,$this->non_supplemental_fund_allocation,$this->forwarded_ppmp_details,$this->non_supplemental_total_programmed,$this->is_q1,$this->activeButton), '164MF-' . $this->title . '.xlsx');
+                return \Excel::download(new PreExport164T($this->selectedType, $this->fund_allocation, $this->ppmp_details, $this->total_allocated, $this->total_programmed, $this->balance, $this->non_supplemental_fund_allocation, $this->forwarded_ppmp_details, $this->non_supplemental_total_programmed, $this->is_q1, $this->activeButton), '164MF-' . $this->title . '.xlsx');
                 break;
         }
     }
@@ -4195,15 +4385,15 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 1);
-                });
+                })->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4261,7 +4451,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 2);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -4269,7 +4459,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4328,7 +4518,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 3);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -4336,7 +4526,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4395,7 +4585,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 4);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -4403,7 +4593,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4461,7 +4651,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 5);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -4469,7 +4659,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4527,7 +4717,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 6);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -4535,7 +4725,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4592,22 +4782,21 @@ class GeneratePpmpQ1 extends Component
 
         $temp_fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id,fund_allocations.is_supplemental, category_groups.id as category_group_id,
-                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
             ->where('fund_allocations.fund_cluster_w_f_p_s_id', 9)
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-            ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-            // ->where('fund_allocations.is_supplemental', 1)
+            ->where('fund_allocations.initial_amount', '>', 0)
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name', 'fund_allocations.is_supplemental')
             ->get();
 
 
         $this->forwarded_ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4627,7 +4816,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4646,18 +4835,27 @@ class GeneratePpmpQ1 extends Component
             ->get();
 
 
-        $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        if ($this->supplementalQuarterId == 1) {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 0);
+        } else {
+            $this->non_supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId - 1)
+                ->where('is_supplemental', 1);
+        }
+        $supplemental_fund_allocation = $temp_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $temp_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
 
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
@@ -4683,7 +4881,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id, category_groups.id as category_group_id,
-                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -4700,7 +4898,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4724,9 +4922,9 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 1);
-                });
+                })->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
@@ -4755,7 +4953,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id, category_groups.id as category_group_id,
-                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -4772,7 +4970,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4796,7 +4994,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 2);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -4826,7 +5024,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id, category_groups.id as category_group_id,
-                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -4843,7 +5041,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4867,7 +5065,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 3);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -4897,7 +5095,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id, category_groups.id as category_group_id,
-                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -4914,7 +5112,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -4938,7 +5136,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 4);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -4968,7 +5166,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id, category_groups.id as category_group_id,
-                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -4985,7 +5183,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -5009,7 +5207,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 5);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -5039,7 +5237,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->fund_allocation = FundAllocation::selectRaw(
             'fund_allocations.wpf_type_id, category_groups.id as category_group_id,
-                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
+                category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated,CONCAT("Q",fund_allocations.supplemental_quarter_id) as quarter'
         )
             ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
@@ -5056,7 +5254,7 @@ class GeneratePpmpQ1 extends Component
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -5080,7 +5278,7 @@ class GeneratePpmpQ1 extends Component
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) {
             $query->where('fund_cluster_w_f_p_s_id', 9)
                 ->where('is_supplemental', 1)
-                ->where('is_approved',1)->whereHas('costCenter', function ($query) {
+                ->where('is_approved', 1)->whereHas('costCenter', function ($query) {
                     $query->where('m_f_o_s_id', 6);
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
@@ -5119,10 +5317,14 @@ class GeneratePpmpQ1 extends Component
             ->get();
 
         $this->non_supplemental_fund_allocation = $tem_fund_allocation->where('is_supplemental', 0);
-        $supplemental_fund_allocation = $tem_fund_allocation->where('is_supplemental', 1)->pluck('category_group_id')->toArray();
+        $supplemental_fund_allocation = $tem_fund_allocation->where('is_supplemental', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId)->pluck('category_group_id')->toArray();
 
         $this->fund_allocation = $tem_fund_allocation->filter(function ($allocation) use ($supplemental_fund_allocation) {
-            return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+              if($this->supplementalQuarterId=== 1){
+                return $allocation->is_supplemental || (!in_array($allocation->category_group_id, $supplemental_fund_allocation) && $allocation->is_supplemental == 0);
+            }else{
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId || (!in_array($allocation->category_group_id,$supplemental_fund_allocation) && $allocation->supplemental_quarter_id !== $this->supplementalQuarterId);
+            }
         });
 
 
@@ -5132,17 +5334,17 @@ class GeneratePpmpQ1 extends Component
         $this->total_allocated = $this->fund_allocation->sum('total_allocated');
         $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($fundCluster) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fundCluster)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
 
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
         $this->non_supplemental_total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($fundCluster) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fundCluster)
-                ->where('is_supplemental', 0)->where('is_approved',1);
+                ->where('is_supplemental', 0)->where('is_approved', 1);
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) use ($fundCluster) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', $fundCluster)
-                ->where('is_supplemental', 1)->where('is_approved',1);
+                ->where('is_supplemental', 1)->where('is_approved', 1)->where('supplemental_quarter_id', $this->supplementalQuarterId);
         })
             ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
             ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table

@@ -98,8 +98,8 @@
                                             $is_q1 &&
                                                 in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                             <div class="flex justify-between">
-                                                <span>₱</span>
-                                                <span>{{ $item->is_supplemental ? number_format($item->total_allocated, 2) : '0.00' }}</span>
+                                                <span>₱ </span>
+                                                <span>{{ $item->supplmental_quarter_id == $supplementalQuarterId ? number_format($item->total_allocated, 2) : number_format($item->total_allocated, 2) }}</span>
                                             </div>
                                         @else
                                             <div class="flex justify-between">
@@ -112,7 +112,7 @@
                                         $is_q1 &&
                                             in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                         <td class="border border-black px-2">
-                                            @if ($item->is_supplemental == 1)
+                                            @if ($item->supplmental_quarter_id == $supplementalQuarterId)
                                                 <div class="flex justify-between">
                                                     <span>₱ </span>
                                                     <span>{{ number_format($non_supplemental_fund_allocation->where('category_group_id', $item->category_group_id)->sum('total_allocated') - $forwarded_ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
@@ -120,13 +120,13 @@
                                             @else
                                                 <div class="flex justify-between">
                                                     <span>₱
-                                                        </span>
+                                                    </span>
                                                     <span>{{ number_format($item->total_allocated - $forwarded_ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
                                                 </div>
                                             @endif
                                         </td>
                                         <td class="border border-black px-2">
-                                            @if ($item->is_supplemental == 1)
+                                            @if ($item->supplmental_quarter_id == $supplementalQuarterId)
                                                 <div class="flex justify-between">
                                                     <span>₱ </span>
                                                     <span>{{ number_format($non_supplemental_fund_allocation->where('category_group_id', $item->category_group_id)->sum('total_allocated') - $forwarded_ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget') + $item->total_allocated, 2) }}</span>
@@ -134,7 +134,7 @@
                                             @else
                                                 <div class="flex justify-between">
                                                     <span>₱ </span>
-                                                    <span>{{ number_format($item->total_allocated - $forwarded_ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
+                                                    <span>{{ number_format($item->total_allocated - $forwarded_ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget') + $item->total_allocated, 2) }}</span>
                                                 </div>
                                             @endif
                                         </td>
@@ -168,17 +168,10 @@
                                         @if (
                                             $is_q1 &&
                                                 in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
-                                            @if ($item->is_supplemental == 1)
-                                                <div class="flex justify-between">
-                                                    <span>₱</span>
-                                                    <span>{{ number_format($item->total_allocated - $ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
-                                                </div>
-                                            @else
-                                                <div class="flex justify-between">
-                                                    <span>₱</span>
-                                                    <span>0.00</span>
-                                                </div>
-                                            @endif
+                                            <div class="flex justify-between">
+                                                <span>₱ </span>
+                                                <span>{{ number_format($item->total_allocated - $forwarded_ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget') + $item->total_allocated - $ppmp_details->where('category_group_id', $item->category_group_id)->sum('total_budget'), 2) }}</span>
+                                            </div>
                                         @else
                                             <div class="flex justify-between">
                                                 <span>₱</span>
@@ -227,7 +220,11 @@
                                     <div class="flex justify-between">
                                         <span>₱ </span>
                                         <span>
-                                            {{ $non_supplemental_fund_allocation->sum('total_allocated') > 0 ? number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget'), 2) : number_format($forwarded_ppmp_details->sum('total_budget'), 2) }}</span>
+                                            @if ($non_supplemental_fund_allocation->sum('total_allocated') > 0)
+                                                {{ number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget'), 2) }}
+                                            @else
+                                                {{ number_format($forwarded_ppmp_details->sum('total_budget'), 2) }}
+                                            @endif
                                     </div>
                                 </td>
                                 <td class="border border-black text-left font-semibold p-1">
@@ -243,7 +240,8 @@
                             <td class="border border-black text-right font-semibold px-2">
                                 <div class="flex justify-between">
                                     <span>₱</span>
-                                    <span>{{ $total_programmed === null ? 0 : number_format($total_programmed->total_budget, 2) }}</span>
+                                    <span>
+                                        {{ $total_programmed === null ? 0 : number_format($total_programmed->total_budget, 2) }}</span>
                                 </div>
                             </td>
                             <td class="border border-black text-right font-semibold px-2">
@@ -251,8 +249,14 @@
                                     $is_q1 &&
                                         in_array($activeButton, ['sksuPpmp', 'gasPpmp', 'hesPpmp', 'aesPpmp', 'rdPpmp', 'extensionPpmp', 'lfPpmp']))
                                     <div class="flex justify-between">
-                                        <span>₱</span>
-                                        <span>{{ $non_supplemental_fund_allocation->sum('total_allocated') > 0 ? number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0) + $total_programmed->total_budget, 2) : number_format($forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0) + $total_programmed->total_budget, 2) }}</span>
+                                        <span>₱ </span>
+                                        <span>
+                                            @if ($non_supplemental_fund_allocation->sum('total_allocated') > 0)
+                                                {{ number_format($non_supplemental_fund_allocation->sum('total_allocated') - $forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0) - $total_programmed->total_budget, 2) }}
+                                            @else
+                                                {{ number_format($forwarded_ppmp_details->sum('total_budget') + ($total_allocated ?? 0) + $total_programmed->total_budget, 2) }}
+                                            @endif
+                                        </span>
                                     </div>
                                 @else
                                     <div class="flex justify-between">
