@@ -80,7 +80,7 @@ class WfpHistoryQ1 extends Component implements HasTable
                 ->label('View WFP')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 1]))
+                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 1,'supplementalQuarterId'=>$this->supplementalQuarterId]))
                 ->visible(fn ($record) => $record->is_approved === 0 || $record->is_approved === 1),
                 Action::make('view ppmp')
                 ->label('View PPMP')
