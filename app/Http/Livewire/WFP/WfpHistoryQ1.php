@@ -18,6 +18,9 @@ class WfpHistoryQ1 extends Component implements HasTable
     use InteractsWithTable;
     public $cost_centers;
 
+    public $supplementalQuarterId= null;
+    protected $queryString = ['supplementalQuarterId'];
+
     public function mount()
     {
         $has_personnel = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->first();
@@ -37,7 +40,7 @@ class WfpHistoryQ1 extends Component implements HasTable
         return Wfp::query()->with(['user','costCenter.wpfPersonnel'=>function ($query) {
             $query->where('user_id', Auth::user()->id)
                 ->orWhere('head_id', Auth::user()->id);
-        }])->where('is_supplemental', '=', 1)
+        }])->where('supplemental_quarter_id', $this->supplementalQuarterId)
         ->whereIn('cost_center_id', $this->cost_centers->pluck('id')->toArray());
     }
 
@@ -97,7 +100,7 @@ class WfpHistoryQ1 extends Component implements HasTable
             ->color('warning')
             ->button()
             ->icon('heroicon-o-pencil')
-            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record->cost_center_id, 'wfpType' => $record->wpf_type_id, 'isEdit' => 1, 'isSupplemental' => 1]))
+            ->url(fn ($record): string => route('wfp.create-wfp', ['record' => $record->cost_center_id, 'wfpType' => $record->wpf_type_id, 'isEdit' => 1, 'isSupplemental' => 1,'supplementalQuarterId'=>$this->supplementalQuarterId]))
             ->visible(fn ($record) => $record->is_approved === 500),
             ViewAction::make('view_remarks')
             ->label('View Remarks')

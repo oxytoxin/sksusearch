@@ -19,29 +19,15 @@
                       WFP
                   </a>
                   @foreach ($quarters as $item)
-                      @if (config('features.VERSION') === '10.0.0.1')
-                          <a wire:key='{{ $item->id }}'
-                              href="/wfp/wfp-submissions/1?supplementalQuarterId={{ $item->id }}"
-                              @class([
-                                  'mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300 ',
-                                  'bg-white -mt-2 text-primary-600' =>
-                                      $item->id == request()->input('supplementalQuarterId'),
-                              ])>
-                              {{ $item->name }}
-                          </a>
-                      @else
-                          @if ($loop->first)
-                              <a wire:key='{{ $item->id }}'
-                                  href="/wfp/wfp-submissions/1?supplementalQuarterId={{ $item->id }}"
-                                  @class([
-                                      'mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300 ',
-                                      'bg-white -mt-2 text-primary-600' =>
-                                          $item->id == request()->input('supplementalQuarterId'),
-                                  ])>
-                                  {{ $item->name }}
-                              </a>
-                          @endif
-                      @endif
+                      <a wire:key='{{ $item->id }}'
+                          href="/wfp/wfp-submissions/1?supplementalQuarterId={{ $item->id }}"
+                          @class([
+                              'mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300 ',
+                              'bg-white -mt-2 text-primary-600' =>
+                                  $item->id == request()->input('supplementalQuarterId'),
+                          ])>
+                          {{ $item->name }}
+                      </a>
                   @endforeach
 
               </div>

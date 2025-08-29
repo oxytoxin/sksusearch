@@ -14,6 +14,10 @@ class WfpReport extends Component
     public $balance;
     public $isSupplemental;
 
+    public $supplementalQuarterId = null;
+    public $wfpType = null;
+    protected $queryString = ['supplementalQuarterId','wfpType'];
+
     public $history = [
         'regular_allocation' => 0,
         'less' => 0,
@@ -23,14 +27,19 @@ class WfpReport extends Component
         'description' => ''
     ];
 
+    public $current = [
+        'allocated_fund' => 0,
+        'balance' => 0,
+        'programmed' => 0
+    ];
+
     public function mount($record, $isSupplemental)
     {
 
         $this->isSupplemental = $isSupplemental;
 
         if ($isSupplemental) {
-            $this->record = Wfp::with(['costCenter','wfpType'])->where('id', $record)->where('is_supplemental', 1)->first();
-
+            $this->record = Wfp::with(['costCenter','wfpType'])->where('id', $record)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first();
             abort_unless($this->record, 404, 'Cost Center not found');
 
             $this->history['description'] = 'Supplemental Work and Financial Plan For Year 2025 - Q1';
@@ -51,18 +60,27 @@ class WfpReport extends Component
             foreach ($this->wfpDetails as $wfpDetail) {
                 $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
             }
-            //old balance
-            if (Wfp::where('cost_center_id', $this->record->cost_center_id)->where('is_supplemental', 0)->count() > 0) {
 
-                $record = Wfp::where('cost_center_id', $this->record->costCenter->id)
-                    ->where('is_supplemental', 0)
-                    ->first();
-                $allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
-                $wfpDetails = $record->wfpDetails()->get();
+            $wfps = Wfp::with('wfpDetails')->where('wpf_type_id', $this->wfpType)->where('cost_center_id', $this->record->costCenter->id)
+                    ->where(function ($query) {
+                        $query->where('is_supplemental', 0)
+                       ->orWhere('supplemental_quarter_id','<=',$this->supplementalQuarterId);
+                         })
+                    ->get();
+            //old balance
+            if (Wfp::where('cost_center_id', $this->record->cost_center_id)->where('is_supplemental', 0)->orWhere('supplemental_quarter_id','<',$this->supplementalQuarterId)->count() > 0) {
+                $record = $wfps->filter(function($wfp){
+                    return $wfp->is_supplemental === 0 || $wfp->supplemental_quarter_id < $this->supplementalQuarterId;
+                });
+                $allocation = $this->record->costCenter->fundAllocations->filter(function($allocation){
+                    return $allocation->is_supplemental === 0 || $allocation->supplemental_quarter_id < $this->supplementalQuarterId;
+                })->sum('initial_amount');
                 $programmed = 0;
-                foreach ($wfpDetails as $wfpDetail) {
+               foreach ($record as $item) {
+                 foreach ($item->wfpDetails as $wfpDetail) {
                     $programmed += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
                 }
+               }
                 // ------------------------------------------------------------------
                  $this->history['less'] = number_format($programmed,2);
                  $this->history['balance'] = number_format($regular_allocation - $programmed,2);
@@ -81,6 +99,17 @@ class WfpReport extends Component
                  $this->history['less'] = number_format($programmed,2);
                  $this->history['balance'] = number_format($regular_allocation - $programmed,2);
                 $this->history['total_balance'] = number_format($this->allocation + ($regular_allocation - $programmed),2);
+            }
+
+            $total_current_and_prev_allocation = $this->record->costCenter->fundAllocations->filter(function ($allocation){
+                return $allocation->is_supplemental === 0 || $allocation->supplemental_quarter_id <= $this->supplementalQuarterId;
+            })->sum('initial_amount');
+
+            $total_current_and_prev_wfp = 0;
+            foreach($wfps as $wfp){
+                foreach ($wfp->wfpDetails as $wfpDetail) {
+                    $total_current_and_prev_wfp += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
+                }
             }
         } else {
             $this->record = Wfp::with(['costCenter','wfpType'])->where('id', $record)->where('is_supplemental', 0)->first();

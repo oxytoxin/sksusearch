@@ -30,6 +30,10 @@ class WfpSubmissionsQ1 extends Component implements HasTable
 
      protected $queryString = ['supplementalQuarterId'];
 
+     public $data = [
+        'wfp_type_id' => 1,
+     ];
+
      public function mount()
      {
         $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
@@ -55,7 +59,7 @@ class WfpSubmissionsQ1 extends Component implements HasTable
             ->when(!is_null($this->supplementalQuarterId), function (Builder $query) {
                 return $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
             })
-            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->where('is_supplemental', 1);
+            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
     }
 
      protected function getTableColumns()
@@ -99,7 +103,7 @@ class WfpSubmissionsQ1 extends Component implements HasTable
                 ->label('View WFP')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 1])),
+                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 1,'supplementalQuarterId'=>$this->supplementalQuarterId,'wfpType' => $this->data['wfp_type_id']])),
                 Action::make('view ppmp')
                 ->label('View PPMP')
                 ->button()
@@ -165,6 +169,7 @@ class WfpSubmissionsQ1 extends Component implements HasTable
             ])
             ->query(function (Builder $query, array $data): Builder {
                 if (!empty($data['wfp_type'])) {
+                    $this->data['wfp_type_id'] = $data['wfp_type'];
                     return $query->where('wpf_type_id', $data['wfp_type']);
                 }
                 return $query; // Return the original query if "All" is selected
