@@ -121,12 +121,14 @@ class SelectWfpTypeQ1 extends Component implements HasTable
                         }
                         return '₱ ' . number_format($subtotal - $programmed, 2);
                     } else {
-                        $allocated = $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->sum('initial_amount');
-                        $fund_allocation = $record->fundAllocations->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->first();
-                        if ($record->wfp !== null) {
-                            $wfp = $record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('is_supplemental', 0)->get();
+                        $sum1 = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('supplemental_quarter_id', '!=', null)->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId)->sum('initial_amount');
+                        $sum2 = $record->fundAllocations->where('cost_center_id', $record->id)->where('wpf_type_id', $this->data['wfp_type'])->where('supplemental_quarter_id', null)->where('is_supplemental', 0)->sum('initial_amount');
+                        if (count($record->wfp) > 0) {
+                            $wfp = $record->wfp->filter(function ($wfp) {
+                                return $wfp->is_supplemental === 0 || $wfp->supplemental_quarter_id < $this->supplementalQuarterId;
+                            });
                             $programmed = 0;
-                            if ($record->wfp->where('wpf_type_id', $this->data['wfp_type'])->where('cost_center_id', $record->id)->where('is_supplemental', 0)->first() === null) {
+                            if (count($wfp) > 0) {
                                 $balance = $record->fundAllocations->sum('initial_amount');
                                 return '₱ ' . number_format($balance, 2);
                             } else {
