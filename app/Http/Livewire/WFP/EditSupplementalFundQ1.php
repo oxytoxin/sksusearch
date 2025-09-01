@@ -95,7 +95,7 @@ class EditSupplementalFundQ1 extends Component
             $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
             $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
             $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
-            foreach ($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->where('cost_center_id', $this->record->id)->get() as $wfp) {
+            foreach ($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->where('cost_center_id', $this->record->id) as $wfp) {
                 foreach ($wfp->wfpDetails as $allocation) {
                     if (!isset($this->programmed[$allocation->category_group_id])) {
                         $this->programmed[$allocation->category_group_id] = 0;
@@ -109,7 +109,7 @@ class EditSupplementalFundQ1 extends Component
             }
 
             //supplemental
-            foreach ($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 1)->where('cost_center_id', $this->record->id)->get() as $wfp) {
+            foreach ($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 1)->where('cost_center_id', $this->record->id) as $wfp) {
                 foreach ($wfp->wfpDetails as $allocation) {
                     if (!isset($this->programmed_supplemental[$allocation->category_group_id])) {
                         $this->programmed_supplemental[$allocation->category_group_id] = 0;
