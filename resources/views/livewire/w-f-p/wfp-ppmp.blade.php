@@ -47,10 +47,6 @@
                         <span class="text-left font-semibold">MFO Fee: </span>
                         <span class="text-center">{{ $record->costCenter->mfoFee->name }}</span>
                     </div>
-                    {{-- <div class="py-2">
-                    <span class="text-left font-semibold">If miscellaneous/fiduciary fee, please specify: </span>
-                    <span class="text-center">{{$record->confirm_fund_source ?? 'N/A'}}</span>
-                </div> --}}
                 @endif
                 <div class="py-2">
                     <span class="text-left font-semibold">Cost Center: </span>
@@ -458,8 +454,7 @@
                                 @php
                                     $all =
                                         $current['regular_allocation'] +
-                                        $history['regular_allocation'] -
-                                        $history['regular_programmed'];
+                                        ($history['regular_allocation'] - $history['regular_programmed']);
                                     $prog = $current['regular_programmed'];
                                 @endphp
                                 <div class="flex justify-between space-x-3">

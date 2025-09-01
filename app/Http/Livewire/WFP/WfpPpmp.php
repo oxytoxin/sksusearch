@@ -49,24 +49,28 @@ class WfpPpmp extends Component
             $this->supplementalQuarter = SupplementalQuarter::where('id', $this->supplementalQuarterId)->first();
         }
         $this->fundAllocations = FundAllocation::where('cost_center_id', $this->costCenterId)->where('wpf_type_id', $this->wfpType)->where(function($query) use ($isSupplemental){
-                 $query->where('is_supplemental',0)->orWhere(function($q){
+                if($isSupplemental){
+                     $query->where('is_supplemental',0)->orWhere(function($q){
                     $q->whereNotNull('supplemental_quarter_id')
                        ->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
                  });
-        })->get();
+                }else{
+                    $query->where('is_supplemental',0);
+                }
+            })->get();
 
         $this->current['regular_allocation'] = $this->fundAllocations->sum('initial_amount');
 
         $workFinancialPlans = Wfp::with(['wfpDetails'])
             ->where('cost_center_id', $this->costCenterId)->where(function ($query) use ($record, $isSupplemental) {
-               if($isSupplemental){
-                 $query->where('is_supplemental',0)->orWhere(function($q){
-                    $q->whereNotNull('supplemental_quarter_id')
-                       ->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
-                 });
-               }else{
-                  $query->where('is_supplemental',0);
-               }
+                 if($isSupplemental){
+                    $query->where('is_supplemental',0)->orWhere(function($q){
+                        $q->whereNotNull('supplemental_quarter_id')
+                        ->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
+                    });
+                 }else{
+                    $query->where('is_supplemental',0);
+                 }
             })->get();
 
         $this->record = $workFinancialPlans->where('id', $record)->first();
@@ -77,7 +81,9 @@ class WfpPpmp extends Component
             });
        }
 
+
         $this->wfpDetails = $this->record->wfpDetails->where('is_ppmp',1);
+
         foreach ($this->wfpDetails as $wfpDetail) {
             // PPMP ONLY
             $this->current['regular_programmed'] += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
@@ -85,21 +91,14 @@ class WfpPpmp extends Component
 
         foreach($this->oldRecords as $oldRecord) {
             foreach ($oldRecord->wfpDetails as $wfpDetail) {
-                // ALL
                 $this->history['regular_programmed'] += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
             }
         }
 
-        $total_programmed = $this->current['regular_programmed'] + $this->history['regular_programmed'];
-
-        $this->total_allocated = $this->current['regular_allocation'] - $total_programmed;
-
         $proc_programmed = 0;
 
         if (count($this->oldRecords) > 0) {
-            // $this->record->wfpDetails->whereHas('supply', function ($query) {
-            //     $query->whereIn('category_item_budget_id', self::PROCUREMENT_IDS);
-            // });
+
             $this->procurements = $this->record->wfpDetails->filter(function($wfpDetail) {
                 return in_array($wfpDetail->supply->category_item_budget_id, self::PROCUREMENT_IDS);
             });
