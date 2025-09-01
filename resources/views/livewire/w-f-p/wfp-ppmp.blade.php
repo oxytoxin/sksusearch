@@ -22,7 +22,10 @@
             <p class="text-2xl font-medium">
                 Project Procurement Management Plan (PPMP)
             </p>
-            <p class="text-md font-normal">{{ $record->wfpType->description }}</p>
+            <p class="text-md font-normal">{{ $record->wfpType->description }} @if ($supplementalQuarter)
+                    - {{ $supplementalQuarter->name }}
+                @endif
+            </p>
         </div>
         <div class="flex justify-between">
             <!-- Left Side -->
@@ -452,15 +455,23 @@
                         </div>
                         <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                             <div>
+                                @php
+                                    $all =
+                                        $current['regular_allocation'] +
+                                        $history['regular_allocation'] -
+                                        $history['regular_programmed'];
+                                    $prog = $current['regular_programmed'];
+                                @endphp
                                 <div class="flex justify-between space-x-3">
                                     <span>Allocated Fund : </span><span>₱
-                                        {{ number_format($total_allocated, 2) }}</span>
+                                        {{ number_format($all, 2) }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span>Program: </span><span>₱ {{ number_format($program, 2) }}</span>
+                                    <span>Program: </span><span>₱
+                                        {{ number_format($prog, 2) }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span>Balance: </span><span>₱ {{ number_format($balance, 2) }}</span>
+                                    <span>Balance: </span><span>₱ {{ number_format($all - $prog, 2) }}</span>
                                 </div>
                             </div>
                         </div>

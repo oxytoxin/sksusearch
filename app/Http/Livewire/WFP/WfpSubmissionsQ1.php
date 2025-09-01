@@ -108,7 +108,7 @@ class WfpSubmissionsQ1 extends Component implements HasTable
                 ->label('View PPMP')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-ppmp', ['record' => $record, 'isSupplemental' => 1])),
+                ->url(fn ($record): string => route('wfp.print-ppmp', ['record' => $record, 'isSupplemental' => 1,'wfpType' => $this->data['wfp_type_id'],'costCenterId' => $record->cost_center_id,'supplementalQuarterId'=> $this->supplementalQuarterId])),
                 Action::make('view pre')
                 ->label('View PRE')
                 ->button()

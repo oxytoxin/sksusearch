@@ -27,22 +27,27 @@ class WfpReport extends Component
         'balance' => 0,
         'add' => 0,
         'total_balance' => 0,
-        'description' => ''
+        'description' => '',
     ];
 
     public $current = [
         'regular_allocation' => 0,
         'total_allocation' => 0,
         'balance' => 0,
-        'regular_programmed' => 0
+        'regular_programmed' => 0,
     ];
 
+    public $currentSupplementalQuarter = null;
+    public $prevSupplementalQuarter = null;
     public function mount($record, $isSupplemental)
     {
 
         $this->isSupplemental = $isSupplemental;
         $wfpType = WpfType::find($this->wfpType);
-        $supplementalQuarter = SupplementalQuarter::find($this->supplementalQuarterId);
+        $this->currentSupplementalQuarter = SupplementalQuarter::find($this->supplementalQuarterId);
+        if ($this->supplementalQuarterId > 1) {
+            $this->prevSupplementalQuarter = SupplementalQuarter::find($this->supplementalQuarterId - 1);
+        }
         // WFP SHOULD EXIST
         abort_unless(!empty($wfpType), 404);
 
@@ -82,7 +87,6 @@ class WfpReport extends Component
 
         // HISTORY
         $this->history['description'] = "{$wfpType->description}";
-
         $regular_allocation = $this->record->costCenter->fundAllocations->filter(function ($allocation) use ($record) {
             return $allocation->is_supplemental === 0 || ($allocation->supplemental_quarter_id < $this->supplementalQuarterId && $allocation->supplemental_quarter_id !== null);
         })->sum('initial_amount');
@@ -103,23 +107,23 @@ class WfpReport extends Component
 
 
         //HISTORY
-            $programmed = 0;
-           if($isSupplemental){
-             foreach ($this->oldRecords as $item) {
+        $programmed = 0;
+        if ($isSupplemental) {
+            foreach ($this->oldRecords as $item) {
                 foreach ($item->wfpDetails as $wfpDetail) {
                     $this->history['regular_programmed'] += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
                 }
             }
-           }
-            // ------------------------------------------------------------------
-            $this->history['less'] = $programmed;
-            $this->history['balance'] = $this->history['regular_allocation'] - $this->history['regular_programmed'];
-            $this->history['total_balance'] = number_format($this->allocation + ($regular_allocation - $programmed), 2);
+        }
+        // ------------------------------------------------------------------
+        $this->history['less'] = $programmed;
+        $this->history['balance'] = $this->history['regular_allocation'] - $this->history['regular_programmed'];
+        $this->history['total_balance'] = number_format($this->allocation + ($regular_allocation - $programmed), 2);
 
-            // ------------------------------------------------------------------
-            $this->balance = $this->oldRecords->sum('initial_amount') - $programmed;
-            $this->current['total_allocation'] =  $this->current['regular_allocation'] + $this->history['balance'];
-            $this->current['balance'] =  $this->current['total_allocation'] - $this->current['regular_programmed'];
+        // ------------------------------------------------------------------
+        $this->balance = $this->oldRecords->sum('initial_amount') - $programmed;
+        $this->current['total_allocation'] =  $this->current['regular_allocation'] + $this->history['balance'];
+        $this->current['balance'] =  $this->current['total_allocation'] - $this->current['regular_programmed'];
 
 
 
