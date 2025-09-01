@@ -227,23 +227,17 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         });
                 })->first();
         } else {
-            $this->record = CostCenter::with(['fundAllocations' => function ($query) {
-                $query->when(!is_null($this->supplementalQuarterId), function ($query) {
-                    if ($this->supplementalQuarterId == 1) {
-                        $query->where(function ($q) {
-                            $q->where('supplemental_quarter_id', $this->supplementalQuarterId)
-                                ->orWhere('is_supplemental', 0);
+            $this->record = CostCenter::with([ 'wfp' => function ($query) use ($wfpType) {
+            $query->where('wpf_type_id',  $wfpType)->with('wfpDetails');
+            },'fundAllocations' => function ($query) {
+                    $query->when(!is_null($this->supplementalQuarterId), function ($query) {
+                        $query->where('is_supplemental',0)->orWhere(function($query){
+                            $query->where('supplemental_quarter_id','!=',null)->where('supplemental_quarter_id','<=',$this->supplementalQuarterId);
                         });
-                    } else {
-                        $query->where(function ($q) {
-                            $q->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId)
-                                ->orWhere('is_supplemental', 0);
-                        });
-                    }
-                });
-            }])->where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
-                $query->where('wpf_type_id', $wfpType);
-            })->first();
+                    });
+                }])->where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
+                    $query->where('wpf_type_id', $wfpType);
+                })->first();
         }
 
         abort_unless($this->record, 404, 'Record not found.');
@@ -277,10 +271,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             $this->draft_amounts[$draft_amount->title_group] += $draft_amount->estimated_budget;
                         }
                     }
-                    $workFinancialPlans = $this->record->wfp()->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->with(['wfpDetails'])->get();
+                    $workFinancialPlans = $this->record->wfp->filter(function($wfp) {
+                        return $wfp->is_supplemental === 0 || $wfp->supplemental_quarter_id < $this->supplementalQuarterId;
+                    });
+
                     if ($workFinancialPlans) {
                         $all_prev_programmed = $workFinancialPlans->filter(function ($allocation) {
-                            return $allocation->is_supplemental === 0 || $allocation->supplemental_quarter_id < (int) $this->supplementalQuarterId;
+                            return $allocation->is_supplemental === 0 || ($allocation->supplemental_quarter_id < $this->supplementalQuarterId && $allocation->supplemental_quarter_id !== null);
                         });
                         foreach ($all_prev_programmed as $wfp) {
                             foreach ($wfp->wfpDetails as $allocation) {
@@ -322,13 +319,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                 $current_and_prev_allocation += $allocation->initial_amount;
                             }
                             $total_programmed_draft = isset($this->draft_amounts[$allocation->category_group_id]) ? $this->draft_amounts[$allocation->category_group_id] :0;
+
                             if($total_programmed_draft === 0){
                                 $total_programmed = isset($this->programmed[$allocation->category_group_id]) ? $this->programmed[$allocation->category_group_id] : 0;
                             }else{
                                 $total_programmed = 0;
                             }
-
-
                             if ($allocation->supplemental_quarter_id === $this->supplementalQuarterId) {
                                 return [
                                     'category_group_id' => $allocation->category_group_id,
@@ -460,7 +456,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     if ($isSupplemental) {
-
                         $programmed = [];
                         if ($this->record->wfp != null) {
                             foreach ($this->record->wfp->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->where('cost_center_id', $this->record->id)->get() as $wfp) {

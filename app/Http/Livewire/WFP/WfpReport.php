@@ -2,7 +2,9 @@
 
 namespace App\Http\Livewire\WFP;
 
+use App\Models\SupplementalQuarter;
 use App\Models\Wfp;
+use App\Models\WpfType;
 use Livewire\Component;
 
 class WfpReport extends Component
@@ -17,9 +19,10 @@ class WfpReport extends Component
     public $supplementalQuarterId = null;
     public $wfpType = null;
     protected $queryString = ['supplementalQuarterId','wfpType'];
-
+    public $oldRecords = [];
     public $history = [
         'regular_allocation' => 0,
+        'regular_programmed' => 0,
         'less' => 0,
         'balance' => 0,
         'add' => 0,
@@ -28,67 +31,83 @@ class WfpReport extends Component
     ];
 
     public $current = [
-        'allocated_fund' => 0,
+        'regular_allocation' => 0,
+        'total_allocation' => 0,
         'balance' => 0,
-        'programmed' => 0
+        'regular_programmed' => 0
     ];
 
     public function mount($record, $isSupplemental)
     {
 
         $this->isSupplemental = $isSupplemental;
+        $wfpType = WpfType::find($this->wfpType);
+        $supplementalQuarter = SupplementalQuarter::find($this->supplementalQuarterId);
+        // WFP SHOULD EXIST
+        abort_unless(!empty($wfpType),404);
 
         if ($isSupplemental) {
-            $this->record = Wfp::with(['costCenter','wfpType'])->where('id', $record)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first();
-            abort_unless($this->record, 404, 'Cost Center not found');
+            // RETRIEVE OLD AND CURRENT WFP
+            $workFinalcialPlans = Wfp::with(['costCenter'=>[
+                'fundAllocations'=> function ($query)  {
+                $query->where('wpf_type_id', $this->wfpType)->where(function($q){
+                    $q->where('is_supplemental',0)->orWhere(function($query){
+                     $query->where('supplemental_quarter_id','!=',null)->where('supplemental_quarter_id','<=',$this->supplementalQuarterId);
+                    });
+                });
+            }
+            ],'wfpType','wfpDetails'])
+                ->where('is_supplemental',0)
+                ->orWhere(function($query) {
+                    $query->where('supplemental_quarter_id','!=',null)->where('supplemental_quarter_id','<=',$this->supplementalQuarterId);
+                })->get();
+            $this->record = $workFinalcialPlans->where('id', $record)->first();
 
-            $this->history['description'] = 'Supplemental Work and Financial Plan For Year 2025 - Q1';
+            $this->oldRecords = $workFinalcialPlans->where('cost_center_id',$this->record->cost_center_id)->filter(function ($wfp) use ($record) {
+                return ($wfp->supplemental_quarter_id < $this->supplementalQuarterId && $wfp->supplemental_quarter_id !== null) || $wfp->is_supplemental === 0;
+            });
 
-            $this->allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount');
 
-            // ------------------------------------------------------------------
+            // HISTORY
+            $this->history['description'] = "{$wfpType->description}";
+
+             $regular_allocation = $this->record->costCenter->fundAllocations->filter(function ($allocation) use ($record) {
+                return $allocation->is_supplemental === 0 || ($allocation->supplemental_quarter_id < $this->supplementalQuarterId && $allocation->supplemental_quarter_id !== null);
+            })->sum('initial_amount');
+            $this->history['regular_allocation'] =$regular_allocation;
             $this->history['add']= number_format($this->allocation,2);
-            $regular_allocation = $this->record->costCenter->fundAllocations->where('is_supplemental', 0)->sum('initial_amount');
 
-            // dd($this->record->costCenter);
-
-            // dd($this->record->costCenter->fundAllocations->where('is_supplemental', 0)->first());
-            $this->history['regular_allocation'] = number_format( (int)$regular_allocation,2);
+            // ------------------------------------------------------------------
+            // CUTTENT
+            $this->allocation = $this->record->costCenter->fundAllocations->where('supplemental_quarter_id', $this->supplementalQuarterId)->where('is_supplemental', 1)->sum('initial_amount');
+            $this->current['regular_allocation'] = $this->allocation;
             // ------------------------------------------------------------------
 
-            $this->wfpDetails = $this->record->wfpDetails()->get();
+            $this->wfpDetails = $this->record->wfpDetails;
             foreach ($this->wfpDetails as $wfpDetail) {
                 $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
             }
+            $this->current['regular_programmed'] = $this->program;
 
-            $wfps = Wfp::with('wfpDetails')->where('wpf_type_id', $this->wfpType)->where('cost_center_id', $this->record->costCenter->id)
-                    ->where(function ($query) {
-                        $query->where('is_supplemental', 0)
-                       ->orWhere('supplemental_quarter_id','<=',$this->supplementalQuarterId);
-                         })
-                    ->get();
-            //old balance
-            if (Wfp::where('cost_center_id', $this->record->cost_center_id)->where('is_supplemental', 0)->orWhere('supplemental_quarter_id','<',$this->supplementalQuarterId)->count() > 0) {
-                $record = $wfps->filter(function($wfp){
-                    return $wfp->is_supplemental === 0 || $wfp->supplemental_quarter_id < $this->supplementalQuarterId;
-                });
-                $allocation = $this->record->costCenter->fundAllocations->filter(function($allocation){
-                    return $allocation->is_supplemental === 0 || $allocation->supplemental_quarter_id < $this->supplementalQuarterId;
-                })->sum('initial_amount');
+
+            //HISTORY
+            if (count($this->oldRecords) > 0) {
                 $programmed = 0;
-               foreach ($record as $item) {
+               foreach ($this->oldRecords as $item) {
                  foreach ($item->wfpDetails as $wfpDetail) {
-                    $programmed += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
-                }
+                    $this->history['regular_programmed'] += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
+                  }
                }
                 // ------------------------------------------------------------------
-                 $this->history['less'] = number_format($programmed,2);
-                 $this->history['balance'] = number_format($regular_allocation - $programmed,2);
+                 $this->history['less'] = $programmed;
+                 $this->history['balance'] = $this->history['regular_allocation'] - $this->history['regular_programmed'];
                 $this->history['total_balance'] = number_format($this->allocation + ($regular_allocation - $programmed),2);
 
                  // ------------------------------------------------------------------
+                $this->balance = $this->oldRecords->sum('initial_amount') - $programmed;
+                $this->current['total_allocation'] =  $this->current['regular_allocation'] + $this->history['balance'];
+                $this->current['balance'] =  $this->current['total_allocation'] - $this->current['regular_programmed'];
 
-                $this->balance = $allocation - $programmed;
                 //$this->balance = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') - $this->program;
             } else {
                 $this->balance = $this->record->costCenter->fundAllocations->where('is_supplemental', 1)->sum('initial_amount') - $this->program;
@@ -106,7 +125,7 @@ class WfpReport extends Component
             })->sum('initial_amount');
 
             $total_current_and_prev_wfp = 0;
-            foreach($wfps as $wfp){
+            foreach($workFinalcialPlans as $wfp){
                 foreach ($wfp->wfpDetails as $wfpDetail) {
                     $total_current_and_prev_wfp += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
                 }

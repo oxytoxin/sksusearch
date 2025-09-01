@@ -90,7 +90,7 @@
                                         <span>Regular Allocation</span>
                                     </td>
                                     <td style="text-align:right;" class="border border-gray-300">
-                                        <span>{{ $history['regular_allocation'] }}</span>
+                                        <span>{{ number_format($history['regular_allocation'], 2) }}</span>
                                     </td>
                                 </tr>
                                 <tr class="bg-gray-200">
@@ -98,7 +98,7 @@
                                         <span>Less: WFP for 2025</span>
                                     </td>
                                     <td style="text-align:right;" class="border border-gray-300">
-                                        <span>{{ $history['less'] }}</span>
+                                        <span>{{ number_format($history['regular_programmed'], 2) }}</span>
                                     </td>
                                 </tr>
                                 <tr class="bg-gray-200">
@@ -106,7 +106,7 @@
                                         <span>Balance</span>
                                     </td>
                                     <td style="text-align:right;" class="border border-gray-300">
-                                        <span>{{ $history['balance'] }}</span>
+                                        <span>{{ number_format($history['balance'], 2) }}</span>
                                     </td>
                                 </tr>
                                 <tr class="bg-gray-200">
@@ -114,16 +114,16 @@
                                         <span>Add: Supplemental Q1</span>
                                     </td>
                                     <td style="text-align:right;" class="border border-gray-300">
-                                        <span>{{ $history['add'] }}</span>
+                                        <span>{{ number_format($current['regular_allocation'], 2) }}</span>
                                     </td>
                                 </tr>
                                 <tr class="bg-gray-200">
                                     <td class="border border-gray-300">
                                         <span>Balance </span>
-                                        <span>- {{ $record->wfpType->description }} </span>
+                                        <span>- {{ $history['description'] }} </span>
                                     </td>
                                     <td style="text-align:right;" class="border w-[100px] border-gray-300">
-                                        <span>{{ $history['total_balance'] }}</span>
+                                        <span>{{ number_format($current['total_allocation'], 2) }}</span>
                                     </td>
                                 </tr>
                         </table>
@@ -537,13 +537,15 @@
                                     }
                                 @endphp
                                 <div class="flex justify-between space-x-3">
-                                    <span>Allocated Fund : </span><span>₱ {{ number_format($allocated, 2) }}</span>
+                                    <span>Allocated Fund : </span><span>₱
+                                        {{ number_format($current['total_allocation'], 2) }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span>Program: </span><span>₱ {{ number_format($program, 2) }}</span>
+                                    <span>Program: </span><span>₱
+                                        {{ number_format($current['regular_programmed'], 2) }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span>Balance: </span><span>₱ {{ number_format($allocated - $program, 2) }}</span>
+                                    <span>Balance: </span><span>₱ {{ number_format($current['balance'], 2) }}</span>
                                 </div>
                             </div>
                         </div>
