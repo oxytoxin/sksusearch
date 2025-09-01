@@ -71,16 +71,6 @@
                             </dt>
                             <dd class="text-sm font-medium leading-6 text-gray-900">{{ $record->mfo->name }} - MFO</dd>
                         </div>
-                        {{-- <div class="mt-4 flex w-full flex-none gap-x-4 px-6">
-                    <dt class="flex-none">
-                      <span class="sr-only">Status</span>
-                      <svg class="h-6 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
-                      </svg>
-                    </dt>
-                    <dd class="text-sm font-medium leading-6 text-gray-900">{{$supplemental_quarter->name}} - Supplemental</dd>
-                  </div> --}}
                     </dl>
                     <div class="mt-2 border-t border-gray-900/5 px-6 py-6">
                         <span class="text-sm font-semibold">Summary</span>
@@ -131,7 +121,7 @@
                                                 <td
                                                     class="hidden px-3 py-3 text-left text-sm text-gray-500 sm:table-cell">
                                                     {{-- ₱
-                                                    {{ number_format($this->calculateSupplementalTotal($item->id), 2) }} --}}
+                                            {{ number_format($this->calculateSupplementalTotal($item->id), 2) }} --}}
                                                     ₱ {{ number_format($item['sub_total'], 2) }}
 
                                                 </td>
@@ -234,36 +224,7 @@
                     </dt>
                     <dd class="text-sm font-medium leading-6 text-gray-900">{{ $record->mfo->name }} - MFO</dd>
                 </div>
-
-
                 <div class=" px-6 py-3">
-                    {{-- <span class="text-sm font-semibold">Please add an amount</span>
-                <div class="px-4 sm:px-6 lg:px-8">
-                    <div class="mt-4 flow-root">
-                      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                          <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                                <div>
-                                    <div class="relative rounded-md shadow-sm">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <span class="text-gray-500 sm:text-sm">₱</span>
-                                    </div>
-                                    <input wire:model.debounce.200ms="supplemental_allocation" type="number" name="price" id="price" class="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00" aria-describedby="price-currency">
-                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                        <span class="text-gray-500 sm:text-sm" id="price-currency">PHP</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @error('supplemental_allocation') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
-                        <div class="py-3">
-                            <textarea wire:model.debounce.200ms="supplemental_allocation_description" id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Description"></textarea>
-                            @error('supplemental_allocation_description') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
-                        </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div> --}}
                 </div>
                 <div class="mt-2 border-t border-gray-900/5 px-6 py-6">
                     <span class="text-sm font-semibold">Summary</span>
@@ -280,7 +241,7 @@
                                     <tr>
                                         <th scope="col"
                                             class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
-                                            Description</th>
+                                            Description </th>
                                         <th scope="col"
                                             class="hidden px-3 py-3.5 text-right text-sm font-semibold text-gray-900 sm:table-cell">
                                         </th>
@@ -296,61 +257,50 @@
                                         <th scope="col"
                                             class="py-3.5 pl-24 pr-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">
                                             Sub Total</th>
-                                        {{-- <th scope="col" class="py-3.5 pl-24 pr-4 text-right text-sm font-semibold text-gray-900 sm:pr-0"></th> --}}
+                                        {{-- <th scope="col"
+                                        class="py-3.5 pl-24 pr-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">
+                                    </th> --}}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b border-gray-200">
-                                        <td class="max-w-0 py-3 pl-4 pr-3 text-sm sm:pl-0">
-                                            <div class="font-medium text-gray-900"><span class="font-bold">(WFP) -
-                                                </span>{{ $fund_description }}</div>
-                                        </td>
-                                        <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell">
-                                        </td>
-                                        <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell">
-                                        </td>
-                                        <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱
-                                            {{ number_format($balance_164, 2) }}</td>
-                                        <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱
-                                            {{ $supplemental_allocation != null ? number_format($supplemental_allocation, 2) : number_format(0, 2) }}
-                                        </td>
-                                        <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱
-                                            {{ number_format($sub_total_164, 2) }}</td>
-                                    </tr>
-                                    {{-- Q1 --}}
-                                    <tr class="border-b border-gray-200">
-                                        <td class="max-w-0 py-3 pl-4 pr-3 text-sm sm:pl-0">
-                                            <div class="font-medium text-gray-900"><span class="font-bold">(Q1) -
-                                                </span>{{ $supplemental_allocation_description }}</div>
-                                        </td>
-                                        <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell">
-                                        </td>
-                                        <td class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell">
-                                        </td>
-                                        <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱
-                                            {{ number_format($balance_164_q1, 2) }}</td>
-                                        <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ 0</td>
-                                        <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱ 0</td>
-                                        {{-- add edit button --}}
-                                        {{-- <td class="ml-5 hidden py-3 text-right text-sm text-gray-500 sm:table-cell">
-                                    <button wire:click="editSupplementalFund164" class="flex hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-                                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487a2.25 2.25 0 0 1 3.182 3.182l-1.414 1.414m-3.182-3.182L7.5 12l-.75 3.75L12 16.5l7.362-7.362zM21 21H3" />
-                                        </svg>
-                                      Edit
-                                    </button>
-                                </td> --}}
-                                    </tr>
-
+                                    @foreach ($supplementals as $item)
+                                        <tr class="border-b border-gray-200">
+                                            <td class="max-w-0 py-3 pl-4 pr-3 text-sm sm:pl-0">
+                                                <div class="font-medium text-gray-900"><span class="font-bold">
+                                                    </span>{{ $item['description'] }}</div>
+                                            </td>
+                                            <td
+                                                class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell">
+                                            </td>
+                                            <td
+                                                class="hidden px-3 py-3 text-right text-sm text-gray-500 sm:table-cell">
+                                            </td>
+                                            <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱
+                                                {{ number_format($item['balance'], 2) }}</td>
+                                            <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱
+                                                {{ $supplemental_allocation != null ? number_format($item['current_allocation'], 2) : number_format(0, 2) }}
+                                            </td>
+                                            <td class="py-3 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">₱
+                                                {{ number_format($item['total_allocations'], 2) }}</td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                                 <tfoot>
                                     {{-- <tr>
-                            <th scope="row" colspan="3" class="hidden pl-4 pr-3 pt-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">Total</th>
-                            <th scope="row" class="pl-4 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 sm:hidden">Total</th>
-                            <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($balance_164, 2) }}</td>
-                            <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ $supplemental_allocation != null ? number_format($supplemental_allocation, 2) : number_format(0, 2) }}</td>
-                            <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱ {{ number_format($sub_total_164, 2) }}</td>
-                          </tr> --}}
+                                    <th scope="row" colspan="3"
+                                        class="hidden pl-4 pr-3 pt-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">
+                                        Total</th>
+                                    <th scope="row"
+                                        class="pl-4 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 sm:hidden">
+                                        Total</th>
+                                    <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱
+                                        {{ number_format($balance_164, 2) }}</td>
+                                    <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱
+                                        {{ $supplemental_allocation != null ? number_format($supplemental_allocation, 2)
+                                        : number_format(0, 2) }}</td>
+                                    <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">₱
+                                        {{ number_format($sub_total_164, 2) }}</td>
+                                </tr> --}}
                                 </tfoot>
                             </table>
                         </div>
@@ -364,13 +314,16 @@
 
             </div>
             {{-- <div class="flex justify-end mt-2 space-x-3">
-                <button wire:click="confirmSupplementalFund164" class="flex hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                      </svg>
-                    Submit
-                </button>
-            </div> --}}
+            <button wire:click="confirmSupplementalFund164"
+                class="flex hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                Submit
+            </button>
+        </div> --}}
         @endif
     </div>
 </div>

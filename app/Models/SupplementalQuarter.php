@@ -9,4 +9,9 @@ class SupplementalQuarter extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    public function fundAllocations()
+    {
+        return $this->hasMany(FundAllocation::class);
+    }
 }
