@@ -35,4 +35,9 @@ class FundAllocation extends Model
     {
         return $this->hasMany(FundDraft::class, 'fund_allocation_id');
     }
+
+    public function supplementalQuarter()
+    {
+        return $this->belongsTo(SupplementalQuarter::class);
+    }
 }
