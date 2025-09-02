@@ -118,9 +118,8 @@ class AddSupplementalFund extends Component
                 })->where('initial_amount', '>', 0);
             })->where('is_active', 1)->get();
             $this->wfp_type = WpfType::all();
-
             if ($this->record->fund_allocations()->exists()) {
-                $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
+                $this->selectedType = $wfpType;
                 $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
                 $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
 
