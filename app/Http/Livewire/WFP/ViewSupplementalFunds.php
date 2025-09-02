@@ -165,27 +165,38 @@ class ViewSupplementalFunds extends Component
                             $current_programmed += $wfpDetails->total_quantity * $wfpDetails->cost_per_unit;
                         }
                     }
-                  $current_allocation = $this->record->wfp->where('is_supplemental', 0)->sum('total_allocated_fund');
+                    $current_allocation = $this->record->wfp->where('is_supplemental', 0)->sum('total_allocated_fund');
+                    $current_balance =  $current_allocation - $current_programmed;
+                    $next_allocation = $this->record->fundAllocations->filter(function ($a) {
+                        return $a->supplemental_quarter_id === 1;
+                    })->sum('initial_amount');
+                    $total_allocation =  $next_allocation + $current_balance;
+                } else {
 
-                  $current_balance =  $current_allocation - $current_programmed;
-                  $next_allocation = $this->record->wfp->where('is_supplemental', 1)->sum('total_allocated_fund');
-                  $total_allocation =  $next_allocation + $current_balance;
-                }else{
-                  foreach ($this->record->wfp->filter(function($w) {
-                    return $w->supplemental_quarter_id <= $this->supplementalQuarterId;
-                  }) as $wfp) {
-                     foreach ($wfp->wfpDetails as $wfpDetails) {
+                    foreach (
+                        $this->record->wfp->filter(function ($w) use ($fund) {
+                            return ($w->supplemental_quarter_id <= $fund->supplemental_quarter_id && $w->supplemental_quarter_id  === null) || $w->is_supplemental === 0;
+                        }) as $wfp
+                    ) {
+                        foreach ($wfp->wfpDetails as $wfpDetails) {
                             $current_programmed += $wfpDetails->total_quantity * $wfpDetails->cost_per_unit;
                         }
                     }
-                  $current_allocation = $this->record->wfp->filter(function($w) {
-                        return $w->supplemental_quarter_id <= $this->supplementalQuarterId;
-                     })->sum('total_allocated_fund');
-                   $current_balance = $current_allocation - $current_programmed;
 
-                   $next_allocation =  $this->record->wfp->where('supplemental_quarter_id', $this->supplementalQuarterId + 1)->sum('total_allocated_fund');
+                    $current_allocation = $this->record->fundAllocations->filter(function ($w) use ($fund) {
+                        return $w->supplemental_quarter_id <= $fund->supplemental_quarter_id;
+                    })->sum('initial_amount');
 
-                   $total_balance = $next_allocation + $current_balance;
+
+                    $current_balance = $current_allocation - $current_programmed;
+
+
+
+                    $next_allocation =  $this->record->fundAllocations->filter(function ($a) use ($fund) {
+                        return $a->supplemental_quarter_id === (int) $fund->supplemental_quarter_id + 1;
+                    })->sum('initial_amount');
+
+                    $total_allocation = $next_allocation + $current_balance;
                 }
 
                 $q_name = "WFP";
@@ -195,11 +206,12 @@ class ViewSupplementalFunds extends Component
 
                 $this->supplementals[] = [
                     'description' => $_wfpType->description . " - " . $q_name,
-                    'balance' => $current_balance ,
+                    'balance' => $current_balance,
                     'current_allocation' => $next_allocation,
                     'total_allocations' => $total_allocation,
                 ];
             }
+
             $initialNonSupplementalFundAllocation = $this->record->fundAllocations->where('is_supplemental', 0)->first();
             $this->selectedType =  $initialNonSupplementalFundAllocation->wpf_type_id;
             $this->fundInitialAmount = $initialNonSupplementalFundAllocation->initial_amount;
