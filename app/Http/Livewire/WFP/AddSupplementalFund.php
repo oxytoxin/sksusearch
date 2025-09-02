@@ -105,24 +105,27 @@ class AddSupplementalFund extends Component
 
             $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
         } else {
-            $this->record = CostCenter::find($record);
+            $this->record = CostCenter::find($record)->load(['fundAllocations']);
             $this->category_groups = CategoryGroup::where('is_active', 1)->get();
             $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function ($query) {
                 $query->where('cost_center_id', $this->record->id)
                 ->when(!is_null($this->supplementalQuarterId), function ($query) {
                     if($this->supplementalQuarterId == 1 ){
-                    $query->where('is_supplemental', 0);
+                        $query->where('is_supplemental', 0);
                     }else{
-                      $query->where('supplemental_quarter_id', (int)$this->supplementalQuarterId -1 );
+                        $query->where('supplemental_quarter_id', (int)$this->supplementalQuarterId -1 );
                     }
                 })->where('initial_amount', '>', 0);
-            })->where('is_active', 1)->get();
+            })
+            ->where('is_active', 1)->get();
             $this->wfp_type = WpfType::all();
-            if ($this->record->fund_allocations()->exists()) {
+            if (count($this->record->fundAllocations)>0) {
                 $this->selectedType = $wfpType;
-                $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
+                $this->fundInitialAmount = $this->record->fundAllocations
+                            ->where('wpf_type_id', $this->selectedType)
+                            ->where('is_supplemental', 0)
+                            ->first()->initial_amount;
                 $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
-
             } else {
                 $this->selectedType = 1;
                 $this->fundInitialAmount = 0;
