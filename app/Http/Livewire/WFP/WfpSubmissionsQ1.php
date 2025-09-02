@@ -26,9 +26,13 @@ class WfpSubmissionsQ1 extends Component implements HasTable
     public $fund_cluster;
     public $isPresident;
 
-    public $supplementalQuaterId = null;
+    public $supplementalQuarterId = null;
 
-     protected $queryString = ['supplementalQuaterId'];
+     protected $queryString = ['supplementalQuarterId'];
+
+     public $data = [
+        'wfp_type_id' => 1,
+     ];
 
      public function mount()
      {
@@ -52,10 +56,10 @@ class WfpSubmissionsQ1 extends Component implements HasTable
     protected function getTableQuery()
     {
         return Wfp::query()
-            ->when(!is_null($this->supplementalQuaterId), function (Builder $query) {
-                return $query->where('supplemental_quarter_id', $this->supplementalQuaterId);
+            ->when(!is_null($this->supplementalQuarterId), function (Builder $query) {
+                return $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
             })
-            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)->where('is_supplemental', 1);
+            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
     }
 
      protected function getTableColumns()
@@ -99,12 +103,12 @@ class WfpSubmissionsQ1 extends Component implements HasTable
                 ->label('View WFP')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 1])),
+                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 1,'supplementalQuarterId'=>$this->supplementalQuarterId,'wfpType' => $this->data['wfp_type_id'],'costCenter'=> $record->cost_center_id])),
                 Action::make('view ppmp')
                 ->label('View PPMP')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-ppmp', ['record' => $record, 'isSupplemental' => 1])),
+                ->url(fn ($record): string => route('wfp.print-ppmp', ['record' => $record, 'isSupplemental' => 1,'wfpType' => $this->data['wfp_type_id'],'costCenterId' => $record->cost_center_id,'supplementalQuarterId'=> $this->supplementalQuarterId])),
                 Action::make('view pre')
                 ->label('View PRE')
                 ->button()
@@ -165,6 +169,7 @@ class WfpSubmissionsQ1 extends Component implements HasTable
             ])
             ->query(function (Builder $query, array $data): Builder {
                 if (!empty($data['wfp_type'])) {
+                    $this->data['wfp_type_id'] = $data['wfp_type'];
                     return $query->where('wpf_type_id', $data['wfp_type']);
                 }
                 return $query; // Return the original query if "All" is selected

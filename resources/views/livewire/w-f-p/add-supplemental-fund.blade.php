@@ -19,10 +19,6 @@
                 <h2 class="sr-only">Summary</h2>
                 <div class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
                     <dl class="flex flex-wrap">
-                        {{-- <div class="flex-auto pl-6 pt-4">
-                      <dt class="text-sm font-semibold leading-6 text-gray-900">Fund - {{$record->fundClusterWFP->name}}</dt>
-                      <dd class="mt-1 text-base font-semibold leading-6 text-gray-900"></dd>
-                    </div> --}}
                         <div class="mt-3 flex w-full flex-none gap-x-4 px-6 pt-3">
                             <dt class="flex-none">
                                 <span class="sr-only">Client</span>

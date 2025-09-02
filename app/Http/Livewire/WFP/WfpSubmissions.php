@@ -26,8 +26,8 @@ class WfpSubmissions extends Component implements HasTable
     public $fund_cluster;
     public $isPresident;
 
-    public $supplementalQuaterId = null;
-   protected $queryString = ['supplementalQuaterId'];
+    public $supplementalQuarterId = null;
+   protected $queryString = ['supplementalQuarterId'];
 
     public function mount($filter)
     {
@@ -94,12 +94,12 @@ class WfpSubmissions extends Component implements HasTable
                 ->label('View WFP')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 0])),
+                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 0,'wfpType' => $record->wpf_type_id])),
                 Action::make('view ppmp')
                 ->label('View PPMP')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-ppmp', ['record' => $record, 'isSupplemental' => 0])),
+                ->url(fn ($record): string => route('wfp.print-ppmp', ['record' => $record, 'isSupplemental' => 0,'costCenterId' => $record->cost_center_id,'wfpType' => $record->wpf_type_id])),
                 Action::make('view pre')
                 ->label('View PRE')
                 ->button()

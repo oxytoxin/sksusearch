@@ -35,6 +35,10 @@ class FundAllocationQ1 extends Component implements HasTable
     public $isPresident;
     public $data = [];
 
+    public $supplementQuarterId = null;
+
+    protected $queryString = ['supplementQuarterId'];
+
     public function mount()
     {
         $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
@@ -113,7 +117,9 @@ class FundAllocationQ1 extends Component implements HasTable
             ->icon('ri-money-dollar-circle-line')
             ->label('Allocate Fund')
             ->button()
-            ->url(fn (CostCenter $record): string => route('wfp.allocate-funds', $record))
+            ->url(function($record) {
+                return route('wfp.allocate-funds', ['record'=>$record,'supplementalQuarterId' => $this->supplementalQuarterId]);
+            })
             ->requiresConfirmation()
             ->visible(fn ($record) => !$record->fundAllocations()->where('wpf_type_id', $this->data['wfp_type'])->exists() && !$this->isPresident),
             Action::make('edit_fund')
@@ -166,14 +172,14 @@ class FundAllocationQ1 extends Component implements HasTable
                 ->button()
                 ->color('success')
                 ->url(fn (CostCenter $record): string => route('wfp.add-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-                ->visible(fn (CostCenter $record) => $record->wfp?->is_approved === 1 && !$record->hasSupplementalFund()),
+                ->visible(fn (CostCenter $record) => $record->wfp()->where('supplemental_quarter_id',$this->supplementQuarterId)->first()?->is_approved === 1 && !$record->hasSupplementalFund()),
                 Action::make('view_supplemental')
                 ->icon('ri-eye-line')
                 ->label('View Supplemental Fund')
                 ->button()
                 ->color('success')
                 ->url(fn (CostCenter $record): string => route('wfp.view-supplemental-fund', ['record' => $record, 'wfpType' => $this->data['wfp_type']]))
-                ->visible(fn (CostCenter $record) => $record->wfp?->is_approved === 1 && $record->hasSupplementalFund()),
+                ->visible(fn (CostCenter $record) => $record->wfp()->where('supplemental_quarter_id',$this->supplementQuarterId)->first()?->is_approved === 1 && $record->hasSupplementalFund()),
             ]),
 
         ];

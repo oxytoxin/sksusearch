@@ -36,10 +36,15 @@ class AddSupplementalFund extends Component
 
     public $isForwarded = false;
 
+    public $supplementalQuarterId = null;
+
+    protected $queryString = ['supplementalQuarterId'];
+
 
 
     public function mount($record, $wfpType, $isForwarded)
     {
+        $this->supplemental_quarter = SupplementalQuarter::where('id',$this->supplementalQuarterId)->first();
 
         // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
 
@@ -47,7 +52,15 @@ class AddSupplementalFund extends Component
             $this->record = CostCenter::find($record);
             $this->category_groups = CategoryGroup::where('is_active', 1)->get();
             $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function ($query) {
-                $query->where('cost_center_id', $this->record->id)->where('is_supplemental', 0)->where('initial_amount', '>', 0);
+                $query->where('cost_center_id', $this->record->id)
+                ->when(!is_null($this->supplementalQuarterId), function ($query) {
+                    if($this->supplementalQuarterId == 1 ){
+                    $query->where('is_supplemental', 0);
+                    }else{
+                      $query->where('supplemental_quarter_id', (int)$this->supplementalQuarterId -1 );
+                    }
+                })
+                ->where('initial_amount', '>', 0);
             })->where('is_active', 1)->get();
             $this->wfp_type = WpfType::all();
 
@@ -55,7 +68,7 @@ class AddSupplementalFund extends Component
                 $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
                 $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
                 $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
-                $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
+
 
                 $this->balance_164 = $this->fundInitialAmount;
                 $this->isForwarded = true;
@@ -63,7 +76,7 @@ class AddSupplementalFund extends Component
                 $this->selectedType = 1;
                 $this->fundInitialAmount = 0;
                 $this->fund_description = 'No Fund Allocation';
-                $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
+
                 $this->balance_164 = $this->fundInitialAmount;
             }
 
@@ -92,27 +105,44 @@ class AddSupplementalFund extends Component
 
             $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
         } else {
-            $this->record = CostCenter::find($record);
+            $this->record = CostCenter::find($record)->load(['fundAllocations'=>function($query) use($wfpType){
+                $query->where('wpf_type_id',$wfpType)
+                ->where('supplemental_quarter_id',null)
+                ->orWhere('supplemental_quarter_id','<=', $this->supplementalQuarterId);
+            }]);
+
+
             $this->category_groups = CategoryGroup::where('is_active', 1)->get();
             $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function ($query) {
-                $query->where('cost_center_id', $this->record->id)->where('is_supplemental', 0)->where('initial_amount', '>', 0);
-            })->where('is_active', 1)->get();
+                $query->where('cost_center_id', $this->record->id)
+                ->when(!is_null($this->supplementalQuarterId), function ($query) {
+                    if($this->supplementalQuarterId == 1 ){
+                        $query->where('is_supplemental', 0);
+                    }else{
+                        $query->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId -1 );
+                    }
+                })->where('initial_amount', '>', 0);
+            })
+            ->where('is_active', 1)->get();
             $this->wfp_type = WpfType::all();
-
-            if ($this->record->fund_allocations()->exists()) {
-                $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
-                $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
+            $existing_alloction = $this->record->fundAllocations->filter(function($allocation){
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId;
+            });
+            if (count($existing_alloction)>0) {
+                $this->selectedType = $wfpType;
+                $this->fundInitialAmount = $this->record->fundAllocations
+                            ->where('wpf_type_id', $this->selectedType)
+                            ->where('is_supplemental', 0)
+                            ->first()->initial_amount;
                 $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
-                $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
             } else {
                 $this->selectedType = 1;
                 $this->fundInitialAmount = 0;
                 $this->fund_description = 'No Fund Allocation';
-                $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
             }
 
 
-            foreach (Wfp::where('wpf_type_id', $this->selectedType)->where('cost_center_id', $this->record->id)->get() as $wfp) {
+            foreach (Wfp::where('wpf_type_id', $this->selectedType)->where('supplemental_quarter_id',$this->supplementalQuarterId)->where('cost_center_id', $this->record->id)->get() as $wfp) {
                 foreach ($wfp->wfpDetails as $allocation) {
                     if (!isset($this->programmed[$allocation->category_group_id])) {
                         $this->programmed[$allocation->category_group_id] = 0;

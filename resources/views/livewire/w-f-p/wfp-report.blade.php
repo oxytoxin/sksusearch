@@ -22,7 +22,10 @@
             <p class="text-2xl font-medium">
                 Work & Financial Plan (WFP)
             </p>
-            <p class="text-md font-normal">{{ $history['description'] }}</p>
+            <p class="text-md font-normal">{{ $history['description'] }} @if ($currentSupplementalQuarter)
+                    - {{ $currentSupplementalQuarter->name }}
+                @endif
+            </p>
         </div>
         <div class="flex justify-between">
             <!-- Left Side -->
@@ -90,15 +93,20 @@
                                         <span>Regular Allocation</span>
                                     </td>
                                     <td style="text-align:right;" class="border border-gray-300">
-                                        <span>{{ $history['regular_allocation'] }}</span>
+                                        <span>{{ number_format($history['regular_allocation'], 2) }}</span>
                                     </td>
                                 </tr>
                                 <tr class="bg-gray-200">
                                     <td class="border border-gray-300">
-                                        <span>Less: WFP for 2025</span>
+                                        @if ($prevSupplementalQuarter)
+                                            <span>Less: {{ $history['description'] }} -
+                                                {{ $prevSupplementalQuarter->name }}</span>
+                                        @else
+                                            <span>Less: {{ $history['description'] }}</span>
+                                        @endif
                                     </td>
                                     <td style="text-align:right;" class="border border-gray-300">
-                                        <span>{{ $history['less'] }}</span>
+                                        <span>{{ number_format($history['regular_programmed'], 2) }}</span>
                                     </td>
                                 </tr>
                                 <tr class="bg-gray-200">
@@ -106,24 +114,26 @@
                                         <span>Balance</span>
                                     </td>
                                     <td style="text-align:right;" class="border border-gray-300">
-                                        <span>{{ $history['balance'] }}</span>
+                                        <span>{{ number_format($history['balance'], 2) }}</span>
                                     </td>
                                 </tr>
                                 <tr class="bg-gray-200">
                                     <td class="border border-gray-300">
-                                        <span>Add: Supplemental Q1</span>
+                                        <span>Add: Supplemental {{ $currentSupplementalQuarter->name }}</span>
                                     </td>
                                     <td style="text-align:right;" class="border border-gray-300">
-                                        <span>{{ $history['add'] }}</span>
+                                        <span>{{ number_format($current['regular_allocation'], 2) }}</span>
                                     </td>
                                 </tr>
                                 <tr class="bg-gray-200">
                                     <td class="border border-gray-300">
                                         <span>Balance </span>
-                                        <span>- {{ $record->wfpType->description }} </span>
+                                        <span>- {{ $history['description'] }} @if ($currentSupplementalQuarter)
+                                                - {{ $currentSupplementalQuarter->name }}
+                                            @endif </span>
                                     </td>
                                     <td style="text-align:right;" class="border w-[100px] border-gray-300">
-                                        <span>{{ $history['total_balance'] }}</span>
+                                        <span>{{ number_format($current['total_allocation'], 2) }}</span>
                                     </td>
                                 </tr>
                         </table>
@@ -507,43 +517,16 @@
                         </div>
                         <div class="col-span-1 text-gray-800 font-semibold flex justify-end">
                             <div>
-                                @php
-                                    if (
-                                        $record->costCenter->wfp
-                                            ->where('is_supplemental', 0)
-                                            ->where('wpf_type_id', $record->wpf_type_id)
-                                            ->count() > 0
-                                    ) {
-                                        $allocated = $isSupplemental
-                                            ? $record->costCenter->fundAllocations
-                                                    ->where('wpf_type_id', $record->wpf_type_id)
-
-                                                    ->where('is_supplemental', 1)
-                                                    ->sum('initial_amount') + $balance
-                                            : $record->costCenter->fundAllocations
-                                                ->where('wpf_type_id', $record->wpf_type_id)
-                                                ->where('is_supplemental', 0)
-                                                ->sum('initial_amount');
-                                    } else {
-                                        $allocated = $isSupplemental
-                                            ? $record->costCenter->fundAllocations
-                                                ->where('wpf_type_id', $record->wpf_type_id)
-                                                ->where('is_supplemental', 1)
-                                                ->sum('initial_amount')
-                                            : $record->costCenter->fundAllocations
-                                                ->where('wpf_type_id', $record->wpf_type_id)
-                                                ->where('is_supplemental', 0)
-                                                ->sum('initial_amount');
-                                    }
-                                @endphp
                                 <div class="flex justify-between space-x-3">
-                                    <span>Allocated Fund : </span><span>₱ {{ number_format($allocated, 2) }}</span>
+                                    <span>Allocated Fund : </span><span>₱
+                                        {{ number_format($current['total_allocation'], 2) }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span>Program: </span><span>₱ {{ number_format($program, 2) }}</span>
+                                    <span>Program: </span><span>₱
+                                        {{ number_format($current['regular_programmed'], 2) }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span>Balance: </span><span>₱ {{ number_format($allocated - $program, 2) }}</span>
+                                    <span>Balance: </span><span>₱ {{ number_format($current['balance'], 2) }}</span>
                                 </div>
                             </div>
                         </div>
