@@ -453,7 +453,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         } else {
             //164
             if ($isSupplemental) {
-
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     if ($isSupplemental) {
                         $programmed = [];
@@ -510,7 +509,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     //balance 164
                     $programmed = [];
                     if ($this->record->wfp !== null) {
-                        foreach ($this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id)->get() as $wfp) {
+                        foreach ($this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id) as $wfp) {
 
                             foreach ($wfp->wfpDetails as $allocation) {
                                 if (!isset($programmed[$allocation->category_group_id])) {

@@ -38,7 +38,9 @@ class SelectWfpTypeQ1 extends Component implements HasTable
     public $wfp_types;
 
     public $fund_cluster;
-    public $data = [];
+    public $data = [
+        'wfp_type' => 1
+    ];
     protected $programmed = [];
 
     public $supplementalQuarterId = null;
@@ -76,7 +78,9 @@ class SelectWfpTypeQ1 extends Component implements HasTable
             ->whereHas('fundAllocations', function ($query) {
                 $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
             })
-            ->whereDoesntHave('wfp')
+            ->whereDoesntHave('wfp', function ($query) {
+                $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
+            })
             ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
             ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
         return $query_test;
