@@ -18,7 +18,10 @@ class WfpReport extends Component
 
     public $supplementalQuarterId = null;
     public $wfpType = null;
-    protected $queryString = ['supplementalQuarterId', 'wfpType'];
+
+    public $costCenter = null;
+
+    protected $queryString = ['supplementalQuarterId', 'wfpType', 'costCenter'];
     public $oldRecords = [];
     public $history = [
         'regular_allocation' => 0,
@@ -45,6 +48,7 @@ class WfpReport extends Component
         $this->isSupplemental = $isSupplemental;
         $wfpType = WpfType::find($this->wfpType);
         $this->currentSupplementalQuarter = SupplementalQuarter::find($this->supplementalQuarterId);
+
         if ($this->supplementalQuarterId > 1) {
             $this->prevSupplementalQuarter = SupplementalQuarter::find($this->supplementalQuarterId - 1);
         }
@@ -63,9 +67,13 @@ class WfpReport extends Component
                     });
                 }
             ], 'wfpType', 'wfpDetails'])
-                ->where('is_supplemental', 0)
-                ->orWhere(function ($query) {
-                    $query->whereNotNull('supplemental_quarter_id')->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
+                ->where('wpf_type_id', $this->wfpType)
+                 ->where('cost_center_id', $this->costCenter)
+                 ->where(function($q){
+                    $q->where('is_supplemental', 0)
+                        ->orWhere(function ($query) {
+                            $query->whereNotNull('supplemental_quarter_id')->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
+                        });
                 })->get();
         } else {
             $workFinalcialPlans = Wfp::with(['costCenter' => [
@@ -78,9 +86,10 @@ class WfpReport extends Component
                 ->whereKey($record)
                 ->where('is_supplemental', 0)->get();
         }
+
         $this->record = $workFinalcialPlans->where('id', $record)->first();
 
-        $this->oldRecords = $workFinalcialPlans->where('cost_center_id', $this->record->cost_center_id)->filter(function ($wfp) use ($record) {
+        $this->oldRecords = $workFinalcialPlans->filter(function ($wfp) use ($record) {
             return ($wfp->supplemental_quarter_id < $this->supplementalQuarterId && $wfp->supplemental_quarter_id !== null) || $wfp->is_supplemental === 0;
         });
 
