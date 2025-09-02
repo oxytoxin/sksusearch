@@ -105,7 +105,13 @@ class AddSupplementalFund extends Component
 
             $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
         } else {
-            $this->record = CostCenter::find($record)->load(['fundAllocations']);
+            $this->record = CostCenter::find($record)->load(['fundAllocations'=>function($query) use($wfpType){
+                $query->where('wpf_type_id',$wfpType)
+                ->where('supplemental_quarter_id',null)
+                ->orWhere('supplemental_quarter_id','<=', $this->supplementalQuarterId);
+            }]);
+
+
             $this->category_groups = CategoryGroup::where('is_active', 1)->get();
             $this->category_groups_supplemental = CategoryGroup::whereHas('fundAllocations', function ($query) {
                 $query->where('cost_center_id', $this->record->id)
@@ -113,13 +119,16 @@ class AddSupplementalFund extends Component
                     if($this->supplementalQuarterId == 1 ){
                         $query->where('is_supplemental', 0);
                     }else{
-                        $query->where('supplemental_quarter_id', (int)$this->supplementalQuarterId -1 );
+                        $query->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId -1 );
                     }
                 })->where('initial_amount', '>', 0);
             })
             ->where('is_active', 1)->get();
             $this->wfp_type = WpfType::all();
-            if (count($this->record->fundAllocations)>0) {
+            $existing_alloction = $this->record->fundAllocations->filter(function($allocation){
+                return $allocation->supplemental_quarter_id === $this->supplementalQuarterId;
+            });
+            if (count($existing_alloction)>0) {
                 $this->selectedType = $wfpType;
                 $this->fundInitialAmount = $this->record->fundAllocations
                             ->where('wpf_type_id', $this->selectedType)
@@ -130,7 +139,6 @@ class AddSupplementalFund extends Component
                 $this->selectedType = 1;
                 $this->fundInitialAmount = 0;
                 $this->fund_description = 'No Fund Allocation';
-
             }
 
 
