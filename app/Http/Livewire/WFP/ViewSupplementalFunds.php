@@ -175,7 +175,7 @@ class ViewSupplementalFunds extends Component
 
                     foreach (
                         $this->record->wfp->filter(function ($w) use ($fund) {
-                            return ($w->supplemental_quarter_id <= $fund->supplemental_quarter_id && $w->supplemental_quarter_id  === null) || $w->is_supplemental === 0;
+                            return $w->supplemental_quarter_id <= $fund->supplemental_quarter_id;
                         }) as $wfp
                     ) {
                         foreach ($wfp->wfpDetails as $wfpDetails) {
