@@ -30,7 +30,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Sultan Kudarat State University';
          $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 1)->where('is_approved', 1)
-            ->where('is_supplemental', 1);
+            ->where('is_supplemental', 0);
          })
          ->with(['supply', 'categoryItem'])  // Load both relationships
          ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
@@ -57,7 +57,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'General Admission and Support Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
@@ -86,7 +86,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Higher Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 1)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->where('is_approved', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
@@ -115,7 +115,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Advanced Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
@@ -144,7 +144,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Research and Development';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
@@ -173,7 +173,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Extension Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
@@ -202,7 +202,7 @@ class GenerateWfpPpmp extends Component
          $this->is_active = true;
          $this->title = 'Local Fund Projects';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
-            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
+            $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 1)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
@@ -233,7 +233,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Sultan Kudarat State University';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 3)
-            ->where('is_supplemental', 1)->where('is_approved', 1);
+            ->where('is_supplemental', 0)->where('is_approved', 1);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
@@ -261,7 +261,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'General Admission and Support Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
@@ -291,7 +291,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Higher Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
@@ -321,7 +321,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Advanced Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
@@ -351,7 +351,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Research and Development';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
@@ -381,7 +381,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Extension Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
@@ -411,7 +411,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Local Fund Projects';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 3)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
@@ -442,7 +442,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Sultan Kudarat State University';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 2)
-            ->where('is_supplemental', 1)->where('is_approved', 1);
+            ->where('is_supplemental', 0)->where('is_approved', 1);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
@@ -470,7 +470,7 @@ class GenerateWfpPpmp extends Component
         $this->title = 'ACCESS Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-        ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+        ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 1);
             });
@@ -502,7 +502,7 @@ class GenerateWfpPpmp extends Component
         $this->title = 'Tacurong Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-        ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+        ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 2);
             });
@@ -534,7 +534,7 @@ class GenerateWfpPpmp extends Component
         $this->title = 'Isulan Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-        ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+        ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 3);
             });
@@ -566,7 +566,7 @@ class GenerateWfpPpmp extends Component
         $this->title = 'Kalamansig Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-        ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+        ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 4);
             });
@@ -598,7 +598,7 @@ class GenerateWfpPpmp extends Component
         $this->title = 'Lutayan Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-        ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+        ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 5);
             });
@@ -630,7 +630,7 @@ class GenerateWfpPpmp extends Component
         $this->title = 'Palimbang Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-        ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+        ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 6);
             });
@@ -662,7 +662,7 @@ class GenerateWfpPpmp extends Component
         $this->title = 'Bagumbayan Campus';
        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
         $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-        ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
+        ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 2)->whereHas('costCenter', function($query) {
             $query->where('m_f_o_s_id', 6)->whereHas('office', function($query) {
                 $query->where('campus_id', 7);
             });
@@ -695,7 +695,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Sultan Kudarat State University';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 4)->where('is_approved', 1);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
@@ -723,7 +723,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'General Admission and Support Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
@@ -753,7 +753,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Higher Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
@@ -783,7 +783,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Advanced Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
@@ -813,7 +813,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Research and Development';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
@@ -843,7 +843,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Extension Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
@@ -874,7 +874,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Local Fund Projects';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 4)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
@@ -905,7 +905,7 @@ class GenerateWfpPpmp extends Component
               $this->title = 'Sultan Kudarat State University';
              $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 7)
-                 ->where('is_supplemental', 1)->where('is_approved', 1);
+                 ->where('is_supplemental', 0)->where('is_approved', 1);
              })
              ->with(['supply', 'categoryItem'])  // Load both relationships
              ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
@@ -933,7 +933,7 @@ class GenerateWfpPpmp extends Component
               $this->title = 'General Admission and Support Services';
              $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-                 ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+                 ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 1);
                      });
              })
@@ -963,7 +963,7 @@ class GenerateWfpPpmp extends Component
               $this->title = 'Higher Education Services';
              $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-                 ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+                 ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 2);
                      });
              })
@@ -993,7 +993,7 @@ class GenerateWfpPpmp extends Component
               $this->title = 'Advanced Education Services';
              $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-                 ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+                 ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 3);
                      });
              })
@@ -1023,7 +1023,7 @@ class GenerateWfpPpmp extends Component
               $this->title = 'Research and Development';
              $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-                 ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+                 ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 4);
                      });
              })
@@ -1053,7 +1053,7 @@ class GenerateWfpPpmp extends Component
               $this->title = 'Extension Services';
              $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-                 ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+                 ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 5);
                      });
              })
@@ -1084,7 +1084,7 @@ class GenerateWfpPpmp extends Component
               $this->title = 'Local Fund Projects';
              $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                  $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-                 ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
+                 ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 7)->whereHas('costCenter', function($query) {
                      $query->where('m_f_o_s_id', 6);
                      });
              })
@@ -1115,7 +1115,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Sultan Kudarat State University';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 5)
-            ->where('is_supplemental', 1)->where('is_approved', 1);
+            ->where('is_supplemental', 0)->where('is_approved', 1);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
@@ -1143,7 +1143,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'General Admission and Support Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
@@ -1173,7 +1173,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Higher Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
@@ -1203,7 +1203,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Advanced Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
@@ -1233,7 +1233,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Research and Development';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
@@ -1263,7 +1263,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Extension Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
@@ -1293,7 +1293,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Local Fund Projects';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 5)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
@@ -1324,7 +1324,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Sultan Kudarat State University';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('fund_cluster_w_f_p_s_id', 6)
-            ->where('is_supplemental', 1)->where('is_approved', 1);
+            ->where('is_supplemental', 0)->where('is_approved', 1);
         })
         ->with(['supply', 'categoryItem'])  // Load both relationships
         ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
@@ -1352,7 +1352,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'General Admission and Support Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 1);
                 });
         })
@@ -1382,7 +1382,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Higher Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 2);
                 });
         })
@@ -1412,7 +1412,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Advanced Education Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 3);
                 });
         })
@@ -1442,7 +1442,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Research and Development';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 4);
                 });
         })
@@ -1472,7 +1472,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Extension Services';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 5);
                 });
         })
@@ -1502,7 +1502,7 @@ class GenerateWfpPpmp extends Component
          $this->title = 'Local Fund Projects';
         $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
             $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)
-            ->where('is_supplemental', 1)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
+            ->where('is_supplemental', 0)->where('fund_cluster_w_f_p_s_id', 6)->whereHas('costCenter', function($query) {
                 $query->where('m_f_o_s_id', 6);
                 });
         })
