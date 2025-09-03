@@ -134,7 +134,7 @@
                                                     <tr class="border-t border-gray-300" x-show="!open">
                                                         <td
                                                             class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                                            {{ $item['category_group_id'] }}
+                                                            {{ $item['category_group'] }}
                                                         </td>
                                                         <td
                                                             class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium text-gray-900 sm:pl-3">
