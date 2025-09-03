@@ -457,7 +457,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     if ($isSupplemental) {
                         $programmed = [];
                         if ($this->record->wfp != null) {
-                            foreach ($this->record->wfp->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->where('cost_center_id', $this->record->id)->get() as $wfp) {
+                            foreach ($this->record->wfp->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->where('cost_center_id', $this->record->id) as $wfp) {
                                 foreach ($wfp->wfpDetails as $allocation) {
                                     if (!isset($programmed[$allocation->category_group_id])) {
                                         $programmed[$allocation->category_group_id] = 0;
@@ -2044,9 +2044,20 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         if ($this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->exists()) {
                             $draft_id = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->first()->id;
                             $draft_amounts = FundDraftAmount::where('fund_draft_id', $draft_id)->where('category_group_id', $categoryGroupId)->first();
+                            if(!is_null($draft_amounts)) {
                             $draft_amounts->current_total = $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
                             $draft_amounts->balance = $this->current_balance[$key]['balance'];
                             $draft_amounts->save();
+                            }else{
+                                FundDraftAmount::create([
+                                    'fund_draft_id' => $draft_id,
+                                    'category_group_id' => $categoryGroupId,
+                                    'category_group' => $this->mooe_category_attr->categoryGroups->name,
+                                    'initial_amount' => 0,
+                                    'current_total' =>  $intEstimatedBudget,
+                                    'balance' => $this->current_balance[$key]['balance'],
+                                ]);
+                            }
                         } else {
                             $draft_amounts = FundDraftAmount::where('category_group_id', $categoryGroupId)->first();
                             $draft_amounts->current_total = $this->current_balance[$key]['current_total'] += $intEstimatedBudget;
