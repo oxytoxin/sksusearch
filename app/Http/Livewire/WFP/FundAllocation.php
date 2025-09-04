@@ -75,7 +75,7 @@ class FundAllocation extends Component implements HasTable
                    if(!is_null($this->supplementalQuarterId)){
                      $query->where('is_supplemental',0)->orWhere('supplemental_quarter_id','<=',$this->supplementalQuarterId);
                    }else{
-                     $query->where('is_supplemental',0)->orWhere('supplemental_quarter_id','<=',$this->supplementalQuarterId);
+                     $query->where('is_supplemental',0);
                    }
                 });
             }])
