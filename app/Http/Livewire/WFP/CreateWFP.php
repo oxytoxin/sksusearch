@@ -475,19 +475,25 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             });
 
                             $this->wfp_balance =  $all_allocation->sum('initial_amount') - array_sum($programmed);
-
                             $fundDraftId = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id;
-                            $this->current_balance = FundDraftAmount::where('fund_draft_id', $fundDraftId)->with(['fundDraft'])->get()->map(function ($allocation) {
-                                return [
+                            $fdrafts = FundDraftAmount::where('fund_draft_id', $fundDraftId)->with(['fundDraft'])->get();
+                            $balance_pushes = false;
+                            foreach ($fdrafts as $key => $allocation) {
+                                $init = 0;
+                                if ($balance_pushes === false) {
+                                    $init =$this->wfp_balance;
+                                    $balance_pushes = true;
+                                }
+                               $this->current_balance[] = [
                                     'category_group_id' => $allocation->category_group_id,
                                     'category_group' => $allocation->category_group,
-                                    'initial_amount' => 0,
+                                    'initial_amount' => $init,
                                     'current_total' => $allocation->current_total,
                                     'balance' => $allocation->balance,
                                     'supplemental_quarter_id' => $allocation->fundDraft->fundAllocation->supplemental_quarter_id,
                                     'cost_center_id' => $allocation->fundDraft->fundAllocation->cost_center_id
-                                ];
-                            })->toArray();
+                               ];
+                            }
                         } else {
                             $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->initial_amount;
                             $this->wfp_balance = $initial;

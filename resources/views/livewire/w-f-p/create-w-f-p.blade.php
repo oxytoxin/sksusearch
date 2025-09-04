@@ -302,7 +302,9 @@
                                                     $sumTotal = 0;
                                                     $sumBalance = 0;
 
-                                                    $sumAllocated = $wfp_balance;
+                                                    $sumAllocated = array_sum(
+                                                        array_column($current_balance, 'initial_amount'),
+                                                    );
                                                     $sumTotal = array_sum(
                                                         array_column($current_balance, 'current_total'),
                                                     );
