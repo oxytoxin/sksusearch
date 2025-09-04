@@ -456,29 +456,36 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     if ($isSupplemental) {
                         $programmed = [];
-                        if ($this->record->wfp != null) {
-                            foreach ($this->record->wfp->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->where('cost_center_id', $this->record->id) as $wfp) {
+                        if ( count($this->record->wfp) > 0) {
+                            $all_programmed = $this->record->wfp->filter(function($wfp) use ($wfpType) {
+                                return $wfp->is_supplemental === 0 ||(  $wfp->supplemental_quarter_id <=  $this->supplementalQuarterId || $wfp->supplemental_quarter_id !== null);
+                            });
+
+                            foreach ($all_programmed as $wfp) {
                                 foreach ($wfp->wfpDetails as $allocation) {
                                     if (!isset($programmed[$allocation->category_group_id])) {
                                         $programmed[$allocation->category_group_id] = 0;
                                     }
-
                                     $programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
                                 }
                             }
-                            if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first() === null) {
-                                $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->initial_amount;
-                            } else {
-                                $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->initial_amount;
-                            }
-                            $this->wfp_balance = $initial - array_sum($programmed);
-                            $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) {
+
+                            $all_allocation = $this->record->fundAllocations->filter(function($f) {
+                                return $f->is_supplemental === 0 ||(  $f->supplemental_quarter_id <=  $this->supplementalQuarterId && $f->supplemental_quarter_id !== null);
+                            });
+
+                            $this->wfp_balance =  $all_allocation->sum('initial_amount') - array_sum($programmed);
+
+                            $fundDraftId = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id;
+                            $this->current_balance = FundDraftAmount::where('fund_draft_id', $fundDraftId)->with(['fundDraft'])->get()->map(function ($allocation) {
                                 return [
                                     'category_group_id' => $allocation->category_group_id,
                                     'category_group' => $allocation->category_group,
-                                    'initial_amount' => $allocation->initial_amount,
+                                    'initial_amount' => 0,
                                     'current_total' => $allocation->current_total,
                                     'balance' => $allocation->balance,
+                                    'supplemental_quarter_id' => $allocation->fundDraft->fundAllocation->supplemental_quarter_id,
+                                    'cost_center_id' => $allocation->fundDraft->fundAllocation->cost_center_id
                                 ];
                             })->toArray();
                         } else {

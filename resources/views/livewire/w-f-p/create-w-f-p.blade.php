@@ -269,10 +269,7 @@
                                                     <td
                                                         class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
                                                     </td>
-                                                    {{-- <td class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium {{$item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600'}} sm:pl-3">₱ {{number_format($item['current_total'], 2)}}</td> --}}
-                                                    {{-- <td class="relative whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-                                            <a href="#" class="text-green-800 hover:text-green-700">View<span class="sr-only">, Lindsay Walton</span></a>
-                                          </td> --}}
+
                                                 </tr>
                                             @empty
                                                 <tr class="border-t border-gray-300" x-show="opens">
@@ -305,28 +302,12 @@
                                                     $sumTotal = 0;
                                                     $sumBalance = 0;
 
-                                                    $balance = $wfp_balance;
-                                                    $totalAllocated =
-                                                        $record->fundAllocations
-                                                            ->where('wpf_type_id', $wfp_type->id)
-                                                            ->where('is_supplemental', 1)
-                                                            ->sum('initial_amount') + $balance;
-                                                    if ($is_supplemental) {
-                                                        $sumAllocated = $totalAllocated;
-                                                    } else {
-                                                        $sumAllocated = $record->fundAllocations
-                                                            ->where('wpf_type_id', $wfp_type->id)
-                                                            ->where('is_supplemental', 0)
-                                                            ->sum('initial_amount');
-                                                    }
-                                                    // $sumAllocated = $is_supplemental
-                                                    //     ? $totalAllocated
-                                                    //     : $record->fundAllocations->where('is_supplemental', 0)->sum('inital_amount');
+                                                    $sumAllocated = $wfp_balance;
                                                     $sumTotal = array_sum(
                                                         array_column($current_balance, 'current_total'),
                                                     );
                                                     $sumBalance = $sumAllocated - $sumTotal;
-
+                                                    // $sumBalance = array_sum(array_column($current_balance, 'balance'));
                                                 @endphp
                                             <tbody class="bg-white">
                                                 <tr class="border-t border-gray-300">
