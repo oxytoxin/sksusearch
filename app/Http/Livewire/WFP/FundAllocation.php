@@ -64,19 +64,19 @@ class FundAllocation extends Component implements HasTable
         return CostCenter::query()
             ->with(['fundAllocations'=> function($query){
                 $query->where('wpf_type_id',$this->data['wfp_type'])->where(function($query){
-                    if(!is_null($this->supplementalQuarterId)){
-                        $query->where('is_supplemental',0)->orWhere('supplemental_quarter_id','<=',$this->supplementalQuarterId);
-                    }else{
-                        $query->where('is_supplemental',0);
-                    }
+                   if(!is_null($this->supplementalQuarterId)){
+                     $query->where('is_supplemental',0)->orWhere('supplemental_quarter_id','<=',$this->supplementalQuarterId);
+                   }else{
+                     $query->where('is_supplemental',0);
+                   }
                 });
             },'wfp'=> function($query){
                 $query->where('wpf_type_id',$this->data['wfp_type'])->where(function($query){
-                 if(!is_null($this->supplementalQuarterId)){
-                        $query->where('is_supplemental',0)->orWhere('supplemental_quarter_id','<=',$this->supplementalQuarterId);
-                    }else{
-                        $query->where('is_supplemental',0);
-                    }
+                   if(!is_null($this->supplementalQuarterId)){
+                     $query->where('is_supplemental',0)->orWhere('supplemental_quarter_id','<=',$this->supplementalQuarterId);
+                   }else{
+                     $query->where('is_supplemental',0);
+                   }
                 });
             }])
             ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
