@@ -4867,12 +4867,11 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     }
                 }
             } else {
-                $with_balance = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->sum('initial_amount') + $this->wfp_balance;
+                $with_balance = $this->wfp_balance;
                 if (array_sum(array_column($this->current_balance, 'current_total')) > $with_balance) {
                     $is_not_valid = true;
                 }
             }
-
             //save data to database
             DB::beginTransaction();
             if (!$is_not_valid) {
