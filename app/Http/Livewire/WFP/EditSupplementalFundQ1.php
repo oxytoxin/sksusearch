@@ -36,6 +36,10 @@ class EditSupplementalFundQ1 extends Component
     public $balance_164_q1;
     public $fundAllocation;
 
+    public $supplementalQuarterId = null;
+
+    protected $queryString = ['supplementalQuarterId'];
+
     public function mount($record, $wfpType, $isForwarded)
     {
         // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
@@ -57,7 +61,7 @@ class EditSupplementalFundQ1 extends Component
                     return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
                 });
 
-                $this->fundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->where('supplemental_quarter_id', 1)->first();
+                $this->fundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id',$this->supplementalQuarterId)->first();
 
                 $this->balance_164 = $this->fundInitialAmount;
 
@@ -74,7 +78,7 @@ class EditSupplementalFundQ1 extends Component
                     return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
                 });
 
-                $this->fundAllocation = $this->record->fundAllocations->where('is_supplemental', 1)->where('supplemental_quarter_id', 1)->first();
+                $this->fundAllocation = $this->record->fundAllocations->where('supplemental_quarter_id',$this->supplementalQuarterId)->first();
 
                 $this->balance_164 = $this->fundInitialAmount;
 
@@ -125,7 +129,7 @@ class EditSupplementalFundQ1 extends Component
                 return (float)$allocation - (float)$this->calculateSubTotal($categoryGroupId);
             });
 
-            $this->fundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->where('supplemental_quarter_id', 1)->first();
+            $this->fundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id',$this->supplementalQuarterId)->first();
 
             $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
 
@@ -297,15 +301,6 @@ class EditSupplementalFundQ1 extends Component
             'description' => $this->supplemental_allocation_description,
         ]);
 
-        // FundAllocation::create([
-        //     'cost_center_id' => $this->record->id,
-        //     'wpf_type_id' => $this->selectedType,
-        //     'supplemental_quarter_id' => $this->supplemental_quarter->id,
-        //     'fund_cluster_w_f_p_s_id' => $this->record->fundClusterWFP->id,
-        //     'initial_amount' => $this->supplemental_allocation,
-        //     'description' => $this->supplemental_allocation_description,
-        //     'is_supplemental' => 1,
-        // ]);
 
         Notification::make()->title('Successfully Updated')->success()->send();
         return redirect()->route('wfp.fund-allocation', ['filter' => $this->record->fundClusterWFP->id]);
