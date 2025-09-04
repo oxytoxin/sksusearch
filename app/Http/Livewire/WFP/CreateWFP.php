@@ -479,7 +479,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $programmed = [];
                         if ( count($this->record->wfp) > 0) {
                             $all_programmed = $this->record->wfp->filter(function($wfp) use ($wfpType) {
-                                return $wfp->is_supplemental === 0 ||(  $wfp->supplemental_quarter_id <=  $this->supplementalQuarterId || $wfp->supplemental_quarter_id !== null);
+                                return $wfp->is_supplemental === 0 ||(  $wfp->supplemental_quarter_id <  $this->supplementalQuarterId && $wfp->supplemental_quarter_id !== null);
                             });
 
                             foreach ($all_programmed as $wfp) {
