@@ -17,6 +17,7 @@ use App\Http\Livewire\WFP\RequestSupplyEdit;
 use App\Http\Livewire\WFP\SupplyReportList;
 use App\Http\Livewire\WFP\SupplyRequestedSupplies;
 use App\Http\Livewire\WFP\SupplyRequestList;
+use App\Http\Livewire\WFP\UnmatchedWfpDetails;
 use App\Http\Livewire\WFP\UserPRE;
 use App\Http\Livewire\WFP\ViewReportedSupply;
 use App\Http\Livewire\WFP\ViewReportSupplyDetails;
@@ -71,6 +72,7 @@ Route::middleware([
     Route::get('/accounting-requested-supplies', AccountingRequestedSupplies::class)->name('accounting-requested-suppluies');
     Route::get('/pricelist-document', PriceListDocument::class)->name('pricelist-document');
     Route::get('/deactivated-pricelists', DeactivatedPricelists::class)->name('deactivated-pricelists');
+    Route::get('/unmatched-items', UnmatchedWfpDetails::class)->name('unmatched-items');
     Route::get('/view-remarks/{record}', ViewRemarks::class)->name('view-remarks');
     Route::get('/add-supplemental-fund/{record}/{wfpType}/{isForwarded}', AddSupplementalFund::class)->name('add-supplemental-fund');
     Route::get('/view-supplemental-fund/{record}/{wfpType}/{isForwarded}', ViewSupplementalFunds::class)->name('view-supplemental-fund');
