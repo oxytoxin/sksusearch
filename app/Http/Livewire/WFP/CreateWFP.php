@@ -1280,7 +1280,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         if (!$existingDraftItem) {
 
                             $this->supplies[] = [
-                                'budget_category_id' => 1,
+                               'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Supplies & Semi-Expendables',
                                 'particular_id' => $this->supplies_particular_id,
                                 'particular' => $this->supplies_category_attr->particulars,
@@ -1302,7 +1302,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 1,
+                                    'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Supplies & Semi-Expendables',
                                     'particular_id' => $this->supplies_particular_id,
                                     'particular' => $this->supplies_category_attr->particulars,
@@ -1327,7 +1327,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->supplies[] = [
-                    'budget_category_id' => 1,
+                    'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Supplies & Semi-Expendables',
                     'particular_id' => $this->supplies_particular_id,
                     'particular' => $this->supplies_category_attr->particulars,
@@ -1351,7 +1351,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft_id,
-                            'budget_category_id' => 1,
+                            'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Supplies & Semi-Expendables',
                             'particular_id' => $this->supplies_particular_id,
                             'particular' => $this->supplies_category_attr->particulars,
@@ -1378,7 +1378,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 1,
+                            'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Supplies & Semi-Expendables',
                             'particular_id' => $this->supplies_particular_id,
                             'particular' => $this->supplies_category_attr->particulars,
@@ -1541,7 +1541,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         if (!$existingDraftItem) {
 
                             $this->supplies[] = [
-                                'budget_category_id' => 1,
+                                'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Supplies & Semi-Expendables',
                                 'particular_id' => $this->supplies_particular_id,
                                 'particular' => $this->supplies_category_attr->particulars,
@@ -1563,7 +1563,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 1,
+                                    'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Supplies & Semi-Expendables',
                                     'particular_id' => $this->supplies_particular_id,
                                     'particular' => $this->supplies_category_attr->particulars,
@@ -1588,7 +1588,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->supplies[] = [
-                    'budget_category_id' => 1,
+                    'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Supplies & Semi-Expendables',
                     'particular_id' => $this->supplies_particular_id,
                     'particular' => $this->supplies_category_attr->particulars,
@@ -1612,7 +1612,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft_id,
-                            'budget_category_id' => 1,
+                            'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Supplies & Semi-Expendables',
                             'particular_id' => $this->supplies_particular_id,
                             'particular' => $this->supplies_category_attr->particulars,
@@ -1639,7 +1639,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 1,
+                           'budget_category_id' => $this->supplies_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Supplies & Semi-Expendables',
                             'particular_id' => $this->supplies_particular_id,
                             'particular' => $this->supplies_category_attr->particulars,
@@ -1913,7 +1913,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->mooe_particular_id)->where('uom', $this->mooe_uom)->where('remarks', $this->mooe_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->mooe[] = [
-                                'budget_category_id' => 2,
+                                'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'MOOE',
                                 'particular_id' => $this->mooe_particular_id,
                                 'particular' => $this->mooe_category_attr->particulars,
@@ -1935,7 +1935,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 2,
+                                    'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'MOOE',
                                     'particular_id' => $this->mooe_particular_id,
                                     'particular' => $this->mooe_category_attr->particulars,
@@ -1960,7 +1960,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->mooe[] = [
-                    'budget_category_id' => 2,
+                    'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'MOOE',
                     'particular_id' => $this->mooe_particular_id,
                     'particular' => $this->mooe_category_attr->particulars,
@@ -1982,7 +1982,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                            'budget_category_id' => 2,
+                            'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'MOOE',
                             'particular_id' => $this->mooe_particular_id,
                             'particular' => $this->mooe_category_attr->particulars,
@@ -2009,7 +2009,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 2,
+                            'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'MOOE',
                             'particular_id' => $this->mooe_particular_id,
                             'particular' => $this->mooe_category_attr->particulars,
@@ -2173,7 +2173,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->mooe_particular_id)->where('uom', $this->mooe_uom)->where('remarks', $this->mooe_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->mooe[] = [
-                                'budget_category_id' => 2,
+                                'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'MOOE',
                                 'particular_id' => $this->mooe_particular_id,
                                 'particular' => $this->mooe_category_attr->particulars,
@@ -2195,7 +2195,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 2,
+                                    'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'MOOE',
                                     'particular_id' => $this->mooe_particular_id,
                                     'particular' => $this->mooe_category_attr->particulars,
@@ -2220,7 +2220,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->mooe[] = [
-                    'budget_category_id' => 2,
+                    'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'MOOE',
                     'particular_id' => $this->mooe_particular_id,
                     'particular' => $this->mooe_category_attr->particulars,
@@ -2242,7 +2242,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                            'budget_category_id' => 2,
+                            'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'MOOE',
                             'particular_id' => $this->mooe_particular_id,
                             'particular' => $this->mooe_category_attr->particulars,
@@ -2269,7 +2269,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 2,
+                            'budget_category_id' => $this->mooe_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'MOOE',
                             'particular_id' => $this->mooe_particular_id,
                             'particular' => $this->mooe_category_attr->particulars,
@@ -2523,7 +2523,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->training_particular_id)->where('uom', $this->training_uom)->where('remarks', $this->training_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->trainings[] = [
-                                'budget_category_id' => 3,
+                                'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Trainings',
                                 'particular_id' => $this->training_particular_id,
                                 'particular' => $this->training_category_attr->particulars,
@@ -2545,7 +2545,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 3,
+                                    'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Trainings',
                                     'particular_id' => $this->training_particular_id,
                                     'particular' => $this->training_category_attr->particulars,
@@ -2570,7 +2570,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->trainings[] = [
-                    'budget_category_id' => 3,
+                    'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Trainings',
                     'particular_id' => $this->training_particular_id,
                     'particular' => $this->training_category_attr->particulars,
@@ -2592,7 +2592,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft_id,
-                            'budget_category_id' => 3,
+                            'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Trainings',
                             'particular_id' => $this->training_particular_id,
                             'particular' => $this->training_category_attr->particulars,
@@ -2619,7 +2619,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 3,
+                            'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Trainings',
                             'particular_id' => $this->training_particular_id,
                             'particular' => $this->training_category_attr->particulars,
@@ -2770,7 +2770,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->training_particular_id)->where('uom', $this->training_uom)->where('remarks', $this->training_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->trainings[] = [
-                                'budget_category_id' => 3,
+                                'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Trainings',
                                 'particular_id' => $this->training_particular_id,
                                 'particular' => $this->training_category_attr->particulars,
@@ -2792,7 +2792,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 3,
+                                    'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Trainings',
                                     'particular_id' => $this->training_particular_id,
                                     'particular' => $this->training_category_attr->particulars,
@@ -2817,7 +2817,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->trainings[] = [
-                    'budget_category_id' => 3,
+                    'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Trainings',
                     'particular_id' => $this->training_particular_id,
                     'particular' => $this->training_category_attr->particulars,
@@ -2839,7 +2839,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                            'budget_category_id' => 3,
+                            'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Trainings',
                             'particular_id' => $this->training_particular_id,
                             'particular' => $this->training_category_attr->particulars,
@@ -2866,7 +2866,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 3,
+                            'budget_category_id' => $this->training_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Trainings',
                             'particular_id' => $this->training_particular_id,
                             'particular' => $this->training_category_attr->particulars,
@@ -3119,7 +3119,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->machine_particular_id)->where('uom', $this->machine_uom)->where('remarks', $this->machine_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->machines[] = [
-                                'budget_category_id' => 4,
+                                'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                                 'particular_id' => $this->machine_particular_id,
                                 'particular' => $this->machine_category_attr->particulars,
@@ -3141,7 +3141,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 4,
+                                    'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                                     'particular_id' => $this->machine_particular_id,
                                     'particular' => $this->machine_category_attr->particulars,
@@ -3167,7 +3167,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             } else {
 
                 $this->machines[] = [
-                    'budget_category_id' => 4,
+                    'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                     'particular_id' => $this->machine_particular_id,
                     'particular' => $this->machine_category_attr->particulars,
@@ -3189,7 +3189,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                            'budget_category_id' => 4,
+                            'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                             'particular_id' => $this->machine_particular_id,
                             'particular' => $this->machine_category_attr->particulars,
@@ -3216,7 +3216,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 4,
+                            'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                             'particular_id' => $this->machine_particular_id,
                             'particular' => $this->machine_category_attr->particulars,
@@ -3368,7 +3368,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->machine_particular_id)->where('uom', $this->machine_uom)->where('remarks', $this->machine_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->machines[] = [
-                                'budget_category_id' => 4,
+                                'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                                 'particular_id' => $this->machine_particular_id,
                                 'particular' => $this->machine_category_attr->particulars,
@@ -3390,7 +3390,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 4,
+                                    'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                                     'particular_id' => $this->machine_particular_id,
                                     'particular' => $this->machine_category_attr->particulars,
@@ -3415,7 +3415,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->machines[] = [
-                    'budget_category_id' => 4,
+                    'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                     'particular_id' => $this->machine_particular_id,
                     'particular' => $this->machine_category_attr->particulars,
@@ -3437,7 +3437,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                            'budget_category_id' => 4,
+                            'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                             'particular_id' => $this->machine_particular_id,
                             'particular' => $this->machine_category_attr->particulars,
@@ -3464,7 +3464,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 4,
+                            'budget_category_id' => $this->machine_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Machine & Equipment / Furniture & Fixtures / Bio / Vehicles',
                             'particular_id' => $this->machine_particular_id,
                             'particular' => $this->machine_category_attr->particulars,
@@ -3719,7 +3719,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->building_particular_id)->where('uom', $this->building_uom)->where('remarks', $this->building_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->buildings[] = [
-                                'budget_category_id' => 5,
+                                'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Building & Infrastructure',
                                 'particular_id' => $this->building_particular_id,
                                 'particular' => $this->building_category_attr->particulars,
@@ -3741,7 +3741,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 5,
+                                    'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Building & Infrastructure',
                                     'particular_id' => $this->building_particular_id,
                                     'particular' => $this->building_category_attr->particulars,
@@ -3766,7 +3766,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->buildings[] = [
-                    'budget_category_id' => 5,
+                    'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Building & Infrastructure',
                     'particular_id' => $this->building_particular_id,
                     'particular' => $this->building_category_attr->particulars,
@@ -3788,7 +3788,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                            'budget_category_id' => 5,
+                            'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Building & Infrastructure',
                             'particular_id' => $this->building_particular_id,
                             'particular' => $this->building_category_attr->particulars,
@@ -3815,7 +3815,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 5,
+                            'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Building & Infrastructure',
                             'particular_id' => $this->building_particular_id,
                             'particular' => $this->building_category_attr->particulars,
@@ -3967,7 +3967,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->building_particular_id)->where('uom', $this->building_uom)->where('remarks', $this->building_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->buildings[] = [
-                                'budget_category_id' => 5,
+                                'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Building & Infrastructure',
                                 'particular_id' => $this->building_particular_id,
                                 'particular' => $this->building_category_attr->particulars,
@@ -3989,7 +3989,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 5,
+                                    'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Building & Infrastructure',
                                     'particular_id' => $this->building_particular_id,
                                     'particular' => $this->building_category_attr->particulars,
@@ -4014,7 +4014,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->buildings[] = [
-                    'budget_category_id' => 5,
+                    'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Building & Infrastructure',
                     'particular_id' => $this->building_particular_id,
                     'particular' => $this->building_category_attr->particulars,
@@ -4036,7 +4036,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                            'budget_category_id' => 5,
+                            'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Building & Infrastructure',
                             'particular_id' => $this->building_particular_id,
                             'particular' => $this->building_category_attr->particulars,
@@ -4063,7 +4063,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 5,
+                            'budget_category_id' => $this->building_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Building & Infrastructure',
                             'particular_id' => $this->building_particular_id,
                             'particular' => $this->building_category_attr->particulars,
@@ -4319,7 +4319,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->ps_particular_id)->where('uom', $this->ps_uom)->where('remarks', $this->ps_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->ps[] = [
-                                'budget_category_id' => 6,
+                                'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Professional Services',
                                 'particular_id' => $this->ps_particular_id,
                                 'particular' => $this->ps_category_attr->particulars,
@@ -4341,7 +4341,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 6,
+                                    'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Professional Services',
                                     'particular_id' => $this->ps_particular_id,
                                     'particular' => $this->ps_category_attr->particulars,
@@ -4366,7 +4366,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->ps[] = [
-                    'budget_category_id' => 6,
+                    'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Professional Services',
                     'particular_id' => $this->ps_particular_id,
                     'particular' => $this->ps_category_attr->particulars,
@@ -4388,7 +4388,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->id,
-                            'budget_category_id' => 6,
+                            'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Professional Services',
                             'particular_id' => $this->ps_particular_id,
                             'particular' => $this->ps_category_attr->particulars,
@@ -4415,7 +4415,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 6,
+                            'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Professional Services',
                             'particular_id' => $this->ps_particular_id,
                             'particular' => $this->ps_category_attr->particulars,
@@ -4566,7 +4566,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $existingDraftItem = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->draft_items->where('particular_id', $this->ps_particular_id)->where('uom', $this->ps_uom)->where('remarks', $this->ps_remarks)->first();
                         if (!$existingDraftItem) {
                             $this->ps[] = [
-                                'budget_category_id' => 6,
+                                'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                                 'budget_category' => 'Professional Services',
                                 'particular_id' => $this->ps_particular_id,
                                 'particular' => $this->ps_category_attr->particulars,
@@ -4588,7 +4588,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             FundDraftItem::create(
                                 [
                                     'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                                    'budget_category_id' => 6,
+                                    'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                                     'budget_category' => 'Professional Services',
                                     'particular_id' => $this->ps_particular_id,
                                     'particular' => $this->ps_category_attr->particulars,
@@ -4613,7 +4613,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             } else {
                 $this->ps[] = [
-                    'budget_category_id' => 6,
+                    'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                     'budget_category' => 'Professional Services',
                     'particular_id' => $this->ps_particular_id,
                     'particular' => $this->ps_category_attr->particulars,
@@ -4635,7 +4635,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)->first()->fundDrafts->first()->id,
-                            'budget_category_id' => 6,
+                            'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Professional Services',
                             'particular_id' => $this->ps_particular_id,
                             'particular' => $this->ps_category_attr->particulars,
@@ -4662,7 +4662,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $draft_items = FundDraftItem::create(
                         [
                             'fund_draft_id' => $draft->id,
-                            'budget_category_id' => 6,
+                            'budget_category_id' => $this->ps_category_attr->categoryItems->budget_category_id,
                             'budget_category' => 'Professional Services',
                             'particular_id' => $this->ps_particular_id,
                             'particular' => $this->ps_category_attr->particulars,
