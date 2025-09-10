@@ -235,7 +235,7 @@ class FundAllocation extends Component implements HasTable
                             if($record->wfp->where('supplemental_quarter_id',$this->supplementalQuarterId)->first()) {
                                  return $record->wfp->where('supplemental_quarter_id',$this->supplementalQuarterId)->first()->is_approved !== 1;
                             }
-                            return false;
+                            return true;
                         }else{
                             return count($record->wfp->where('is_supplemental',0)) === 0|| $record->wfp->where('is_supplemental',0)->first()->is_approved === 0;
                         }
