@@ -307,7 +307,7 @@
                                         <tr>
                                             <th scope="row"
                                                 class="hidden pl-4 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">
-                                                Total</th>
+                                                Total </th>
                                             <th scope="row"
                                                 class="pl-4 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 sm:hidden">
                                                 Total</th>

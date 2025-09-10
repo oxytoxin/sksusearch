@@ -109,6 +109,12 @@ class EditSupplementalFundQ1 extends Component
                     $this->allocations[$allocation->category_group_id] = $allocation->initial_amount;
                 }
 
+                  foreach ($this->record->fundAllocations->filter(function ($allocation) {
+                        return $allocation->supplemental_quarter_id == $this->supplementalQuarterId && $allocation->supplemental_quarter_id !== null;
+                    }) as $allocation) {
+                    $this->amounts[$allocation->category_group_id] = $allocation->initial_amount;
+                }
+
                 //supplemental
                 foreach ($this->record->wfp->filter(function($wfp){
                     return $wfp->supplemental_quarter_id == $this->supplementalQuarterId && $wfp->supplemental_quarter_id !== null;
@@ -156,6 +162,7 @@ class EditSupplementalFundQ1 extends Component
                 $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
             }
         } else {
+
             $this->record = CostCenter::find($record)->load('fundAllocations');
             $this->amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->pluck('initial_amount', 'category_group_id')->toArray();
             $this->category_groups = CategoryGroup::where('is_active', 1)->get();
