@@ -214,7 +214,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->wfp_param = $wfpType;
         if ($isEdit == 1) {
             $this->record = CostCenter::with(['fundAllocations' => function ($query) use ($wfpType) {
-                $query->where('wpf_type_id', $wfpType);
+                $query->where('wpf_type_id', $wfpType)->with('categoryGroup');
             }])
                 ->where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
                     $query->where('wpf_type_id', $wfpType)
@@ -234,7 +234,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $query->where('is_supplemental',0)->orWhere(function($query){
                             $query->where('supplemental_quarter_id','!=',null)->where('supplemental_quarter_id','<=',$this->supplementalQuarterId);
                         });
-                    });
+                    })->with('categoryGroup');
                 }])->where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
                     $query->where('wpf_type_id', $wfpType);
                 })->first();
@@ -353,7 +353,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
                     $this->programmed_non_supplemental = array_sum(array_diff_key($allocation_non_supplemental, array_flip(array_column($this->current_balance, 'category_group_id'))));
                 } else {
-
                     // HERE NON-DRAFT
 
                    $workFinancialPlans = $this->record->wfp->filter(function($wfp) {
@@ -471,10 +470,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
         } else {
+
             //164
             if ($isSupplemental) {
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     if ($isSupplemental) {
+
                         $programmed = [];
                         if ( count($this->record->wfp) > 0) {
                             $all_programmed = $this->record->wfp->filter(function($wfp) use ($wfpType) {
@@ -539,11 +540,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         })->toArray();
                     }
                 } else {
+
                     //balance 164
                     $programmed = [];
-                    if ($this->record->wfp !== null) {
-                        foreach ($this->record->wfp->where('wpf_type_id', $wfpType)->where('cost_center_id', $this->record->id) as $wfp) {
-
+                    if (count($this->record->wfp) > 0) {
+                        foreach ($this->record->wfp->filter(function($wfp){
+                            return $wfp->is_supplemental === 0 || ( $wfp->supplemental_quarter_id <  $this->supplementalQuarterId && $wfp->supplemental_quarter_id !== null);
+                        }) as $wfp) {
                             foreach ($wfp->wfpDetails as $allocation) {
                                 if (!isset($programmed[$allocation->category_group_id])) {
                                     $programmed[$allocation->category_group_id] = 0;
@@ -551,9 +554,32 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                 $programmed[$allocation->category_group_id] += ($allocation->total_quantity * $allocation->cost_per_unit);
                             }
                         }
+
+                        $prev_allocations = [];
+
+                        foreach ($this->record->fundAllocations->filter(function($allocation){
+                            return $allocation->is_supplemental === 0 || ( $allocation->supplemental_quarter_id <  $this->supplementalQuarterId && $allocation->supplemental_quarter_id !== null);
+                        }) as $allocation) {
+                            if(isset($prev_allocations[$allocation->category_group_id])) {
+                                $prev_allocations[$allocation->category_group_id] += $allocation->initial_amount;
+                            } else {
+                                $prev_allocations[$allocation->category_group_id] = $allocation->initial_amount;
+                            }
+                        }
+
                         $initial = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->initial_amount;
                         $this->wfp_balance = $initial - array_sum($programmed);
-                        $this->current_balance = [];
+
+                        $balance = array_sum($prev_allocations) - array_sum($programmed);
+                         $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->map(function ($allocation) use ($balance) {
+                                return [
+                                    'category_group_id' => $allocation->category_group_id,
+                                    'category_group' => "",
+                                    'initial_amount' =>  $allocation->initial_amount + $balance,
+                                    'current_total' => $allocation->current_total,
+                                    'balance' => $allocation->balance,
+                                ];
+                        })->toArray();
                     } else {
                         $this->wfp_balance = $this->record->fundAllocations->where('supplemental_quarter_id', $this->supplementalQuarterId)->sum('initial_amount');
                         $this->current_balance = [];
