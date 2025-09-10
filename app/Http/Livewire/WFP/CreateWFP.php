@@ -262,6 +262,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             if ($isSupplemental) {
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     // HERE DRAFT
+
                     $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items()->get();
                     if ($draft_amounts) {
                         foreach ($draft_amounts as $draft_amount) {
@@ -350,6 +351,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         ->toArray();
                     $this->programmed_non_supplemental = array_sum(array_diff_key($allocation_non_supplemental, array_flip(array_column($this->current_balance, 'category_group_id'))));
                 } else {
+
                     // HERE NON-DRAFT
                     $workFinancialPlans = $this->record->wfp()->where('wpf_type_id', $wfpType)
                         ->when(!is_null($this->supplementalQuarterId), function ($query) {
@@ -379,6 +381,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             }
                         }
                     }
+
                     $costCenterFundAllocations = $this->record->fundAllocations;
                     $allocation_non_supplemental = [];
 
@@ -394,7 +397,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             return $allocation->initial_amount > 0 && $allocation->categoryGroup?->is_active == 1;
                         })
                         ->map(function ($allocation) use ($allocation_non_supplemental) {
-                            $current_and_prev_allocation = $allocation_non_supplemental[$allocation->category_group_id] ?? 0 + $allocation->initial_amount;
+                            $current_and_prev_allocation = $allocation_non_supplemental[$allocation->category_group_id] ?? 0 ;
                             if ($allocation->supplemental_quarter_id === $this->supplementalQuarterId) {
                                 $current_and_prev_allocation += $allocation->initial_amount;
                             }
