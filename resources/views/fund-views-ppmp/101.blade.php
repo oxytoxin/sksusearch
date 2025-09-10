@@ -407,7 +407,7 @@
                                     <div class="flex justify-center mt-5">
                                         Noted by:
                                     </div>
-                                    <div class="flex justify-center underline font-semibold">
+                                    <div class="flex mt-8 justify-center underline font-semibold">
                                         {{ $budget->full_name }}
                                     </div>
                                     <div class="flex justify-center">
@@ -420,7 +420,7 @@
                                     <div class="flex justify-center mt-5">
                                         Recommending Approval:
                                     </div>
-                                    <div class="flex justify-center underline font-semibold">
+                                    <div class="flex mt-8 justify-center underline font-semibold">
                                         {{ $vp_finance->full_name }}
                                     </div>
                                     <div class="flex justify-center">
@@ -433,7 +433,7 @@
                                     <div class="flex justify-center mt-5">
                                         Approved by:
                                     </div>
-                                    <div class="flex justify-center underline font-semibold">
+                                    <div class="flex mt-8 justify-center underline font-semibold">
                                         {{ $president->full_name }}
                                     </div>
                                     <div class="flex justify-center">
