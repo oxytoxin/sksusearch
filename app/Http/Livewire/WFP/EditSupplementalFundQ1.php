@@ -50,7 +50,7 @@ class EditSupplementalFundQ1 extends Component
             $this->record = CostCenter::find($record)->load(['fundAllocations' => function ($query) use ($wfpType) {
                 $query->where('wpf_type_id', $wfpType)->where(function ($query) use ($wfpType) {
                     if ($this->supplementalQuarterId == 1) {
-                        $query->where('is_supplemental', 0)->where('supplemental_quarter_id', null);
+                        $query->where('is_supplemental', 0)->orWhere('supplemental_quarter_id', 1);
                     } else {
                         $query->where('is_supplemental', 0)->orWhere('supplemental_quarter_id', '<=', (int) $this->supplementalQuarterId);
                     }
@@ -139,8 +139,8 @@ class EditSupplementalFundQ1 extends Component
 
                 $this->balance_164 = $this->fundInitialAmount;
 
-                $this->supplemental_allocation_description = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->description;
-                $this->supplemental_allocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
+                $this->supplemental_allocation_description = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->description;
+                $this->supplemental_allocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id',  $this->supplementalQuarterId)->first()->initial_amount;
                 $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
                 $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
             } else {
