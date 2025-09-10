@@ -5,25 +5,26 @@ namespace App\Http\Livewire\WFP;
 use App\Models\Wfp;
 use Filament\Forms;
 use App\Models\Supply;
+use App\Models\WpfType;
 use Livewire\Component;
+use App\Models\FundDraft;
+use App\Models\WfpDetail;
 use App\Models\CostCenter;
 use WireUi\Traits\Actions;
 use App\Models\CategoryGroup;
 use App\Models\CategoryItems;
-use App\Models\WpfType;
-use App\Models\FundDraft;
-use App\Models\FundDraftAmount;
 use App\Models\FundDraftItem;
-use App\Models\WfpDetail;
+use App\Models\BudgetCategory;
+use App\Models\FundDraftAmount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\View;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\Actions\Action;
 use Awcodes\FilamentTableRepeater\Components\TableRepeater;
-use Filament\Forms\Components\Select;
-use Filament\Notifications\Notification;
 
 
 class CreateWFP extends Component implements Forms\Contracts\HasForms
@@ -1019,6 +1020,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                 $this->supplies_uom = $this->supplies_category_attr->uom;
                                 $this->supplies_quantity = array_fill(0, 12, 0);
                                 $this->calculateSuppliesTotalQuantity();
+
                             } else {
                                 $this->supplies_particular_id = null;
                                 $this->supplies_category_attr = null;
@@ -1223,12 +1225,106 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function updatedSuppliesQuantity()
     {
-        $this->calculateSuppliesTotalQuantity();
+          $supply = $this->supplies_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $supply->categoryItems()->first()->budget_category_id)->first()->id;
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function updatedSuppliesCostPerUnit()
     {
-        $this->calculateSuppliesTotalQuantity();
+          $supply = $this->supplies_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $supply->categoryItems()->first()->budget_category_id)->first()->id;
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function calculateSuppliesTotalQuantity()
@@ -1250,7 +1346,22 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function addSupplies()
     {
         //validate all step 2
-        $this->validate(
+
+        $this->supplies_particular_id = $this->supplies_particular;
+        $this->supplies_category_attr = Supply::find($this->supplies_particular);
+        $this->supplies_specs = $this->supplies_category_attr->specifications;
+        $this->supplies_code = $this->supplies_category_attr->supply_code;
+        $this->supplies_uacs = $this->supplies_category_attr->categoryItems->uacs_code;
+        $this->supplies_title_group = $this->supplies_category_attr->categoryGroups->name;
+        $this->supplies_account_title = $this->supplies_category_attr->categoryItems->name;
+        $this->supplies_ppmp = $this->supplies_category_attr->is_ppmp;
+        $this->supplies_cost_per_unit = $this->supplies_category_attr->unit_cost;
+        $this->supplies_uom = $this->supplies_category_attr->uom;
+        $this->supplies_quantity = array_fill(0, 12, 0);
+
+
+        try{
+             $this->validate(
             [
                 'supplies_particular_id' => 'required',
                 'supplies_uom' => 'required',
@@ -1265,6 +1376,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'supplies_total_quantity.gt' => 'Total quantity must be greater than 0',
             ]
         );
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            dd($e->errors(), $this->supplies_particular_id);
+        }
+
+
 
         if ($this->is_supplemental) {
             $is_valid_category_group = $this->record->fundAllocations->where('wpf_type_id', $this->wfp_param)
@@ -1781,7 +1898,28 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
 
         $this->addDraft();
-        $this->clearSupplies();
+        switch($this->global_index)
+        {
+            case 2:
+                $this->clearSupplies();
+            break;
+            case 3:
+                $this->clearMooe();
+            break;
+            case 4:
+                $this->clearTrainings();
+            break;
+            case 5:
+                $this->clearMachine();
+            break;
+            case 6:
+                $this->clearBuilding();
+            break;
+            case 7:
+                $this->clearPs();
+            break;
+        }
+
     }
 
     public function addDraft()
@@ -1858,12 +1996,106 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function updatedMooeQuantity()
     {
-        $this->calculateMooeTotalQuantity();
+          $mooe = $this->mooe_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $mooe->categoryItems()->first()->budget_category_id)->first()->id;
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->training_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->machine_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->building_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->ps_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->ps_estimated_budget = number_format($this->ps_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function updatedMooeCostPerUnit()
     {
-        $this->calculateMooeTotalQuantity();
+          $mooe = $this->mooe_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $mooe->categoryItems()->first()->budget_category_id)->first()->id;
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->training_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->machine_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->building_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->mooe_cost_per_unit == null  ? 0 : $this->mooe_cost_per_unit;
+                $this->ps_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->mooe_quantity ?? [0]));
+                $this->ps_estimated_budget = number_format($this->ps_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function calculateMooeTotalQuantity()
@@ -2409,7 +2641,27 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
 
         $this->addDraft();
-        $this->clearMooe();
+        switch($this->global_index)
+        {
+            case 2:
+                $this->clearSupplies();
+            break;
+            case 3:
+                $this->clearMooe();
+            break;
+            case 4:
+                $this->clearTrainings();
+            break;
+            case 5:
+                $this->clearMachine();
+            break;
+            case 6:
+                $this->clearBuilding();
+            break;
+            case 7:
+                $this->clearPs();
+            break;
+        }
     }
 
     public function showMooeDetails()
@@ -2467,12 +2719,106 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function updatedTrainingQuantity()
     {
-        $this->calculateTrainingTotalQuantity();
+          $training = $this->training_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $training->categoryItems()->first()->budget_category_id)->first()->id;
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->mooe_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->machine_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->building_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->ps_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->ps_estimated_budget = number_format($this->ps_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function updatedTrainingCostPerUnit()
     {
-        $this->calculateTrainingTotalQuantity();
+          $training = $this->training_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $training->categoryItems()->first()->budget_category_id)->first()->id;
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->mooe_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->machine_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->building_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->training_cost_per_unit == null  ? 0 : $this->training_cost_per_unit;
+                $this->ps_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->training_quantity ?? [0]));
+                $this->ps_estimated_budget = number_format($this->ps_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function calculateTrainingTotalQuantity()
@@ -3005,7 +3351,27 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         }
 
         $this->addDraft();
-        $this->clearTrainings();
+        switch($this->global_index)
+        {
+            case 2:
+                $this->clearSupplies();
+            break;
+            case 3:
+                $this->clearMooe();
+            break;
+            case 4:
+                $this->clearTrainings();
+            break;
+            case 5:
+                $this->clearMachine();
+            break;
+            case 6:
+                $this->clearBuilding();
+            break;
+            case 7:
+                $this->clearPs();
+            break;
+        }
     }
 
     public function showTrainingDetails()
@@ -3063,12 +3429,108 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function updatedMachineQuantity()
     {
-        $this->calculateMachineTotalQuantity();
+          $machine = $this->machine_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $machine->categoryItems()->first()->budget_category_id)->first()->id;
+
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->mooe_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->training_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->building_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->ps_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->ps_estimated_budget = number_format($this->ps_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function updatedMachineCostPerUnit()
     {
-        $this->calculateMachineTotalQuantity();
+          $machine = $this->machine_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $machine->categoryItems()->first()->budget_category_id)->first()->id;
+
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->mooe_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->training_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->building_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->machine_cost_per_unit == null  ? 0 : $this->machine_cost_per_unit;
+                $this->ps_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->machine_quantity ?? [0]));
+                $this->ps_estimated_budget = number_format($this->ps_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function calculateMachineTotalQuantity()
@@ -3605,7 +4067,27 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
 
         $this->addDraft();
-        $this->clearMachine();
+        switch($this->global_index)
+        {
+            case 2:
+                $this->clearSupplies();
+            break;
+            case 3:
+                $this->clearMooe();
+            break;
+            case 4:
+                $this->clearTrainings();
+            break;
+            case 5:
+                $this->clearMachine();
+            break;
+            case 6:
+                $this->clearBuilding();
+            break;
+            case 7:
+                $this->clearPs();
+            break;
+        }
     }
 
     public function showMachineDetails()
@@ -3663,12 +4145,108 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function updatedBuildingQuantity()
     {
-        $this->calculateBuildingTotalQuantity();
+          $building = $this->building_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $building->categoryItems()->first()->budget_category_id)->first()->id;
+
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->mooe_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->training_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->machine_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->ps_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->ps_estimated_budget = number_format($this->ps_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function updatedBuildingCostPerUnit()
     {
-        $this->calculateBuildingTotalQuantity();
+          $building = $this->building_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $building->categoryItems()->first()->budget_category_id)->first()->id;
+
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->mooe_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->training_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->machine_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->ps_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->ps_estimated_budget = number_format($this->ps_total_quantity * $cost_per_unit, 2);
+                break;
+            }
     }
 
     public function calculateBuildingTotalQuantity()
@@ -4203,7 +4781,27 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         }
 
         $this->addDraft();
-        $this->clearBuilding();
+        switch($this->global_index)
+        {
+            case 2:
+                $this->clearSupplies();
+            break;
+            case 3:
+                $this->clearMooe();
+            break;
+            case 4:
+                $this->clearTrainings();
+            break;
+            case 5:
+                $this->clearMachine();
+            break;
+            case 6:
+                $this->clearBuilding();
+            break;
+            case 7:
+                $this->clearPs();
+            break;
+        }
     }
 
 
@@ -4262,12 +4860,106 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function updatedPsQuantity()
     {
-        $this->calculatePsTotalQuantity();
+          $ps = $this->ps_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $ps->categoryItems()->first()->budget_category_id)->first()->id;
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->mooe_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->training_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->machine_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->building_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                break;
+            }
     }
 
     public function updatedPsCostPerUnit()
     {
-        $this->calculatePsTotalQuantity();
+          $ps = $this->ps_category_attr;
+          $budget_category_id = BudgetCategory::where('id', $ps->categoryItems()->first()->budget_category_id)->first()->id;
+          switch($budget_category_id)
+            {
+            case 1:
+                $this->calculateSuppliesTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->supplies_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->supplies_estimated_budget = number_format($this->supplies_total_quantity * $cost_per_unit, 2);
+                break;
+            case 2:
+                $this->calculateMooeTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->mooe_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->mooe_estimated_budget = number_format($this->mooe_total_quantity * $cost_per_unit, 2);
+                break;
+            case 3:
+                $this->calculateTrainingTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->training_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->training_estimated_budget = number_format($this->training_total_quantity * $cost_per_unit, 2);
+                break;
+            case 4:
+                $this->calculateMachineTotalQuantity();
+                $cost_per_unit = $this->ps_cost_per_unit == null  ? 0 : $this->ps_cost_per_unit;
+                $this->machine_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->ps_quantity ?? [0]));
+                $this->machine_estimated_budget = number_format($this->machine_total_quantity * $cost_per_unit, 2);
+                break;
+            case 5:
+                $this->calculateBuildingTotalQuantity();
+                $cost_per_unit = $this->building_cost_per_unit == null  ? 0 : $this->building_cost_per_unit;
+                $this->building_total_quantity = array_sum(array_map(function ($quantity) {
+                    return is_numeric($quantity) ? (int)$quantity : 0;
+                }, $this->building_quantity ?? [0]));
+                $this->building_estimated_budget = number_format($this->building_total_quantity * $cost_per_unit, 2);
+                break;
+            case 6:
+                $this->calculatePsTotalQuantity();
+                break;
+            }
     }
 
     public function calculatePsTotalQuantity()
@@ -4802,7 +5494,27 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
 
         $this->addDraft();
-        $this->clearPs();
+        switch($this->global_index)
+        {
+            case 2:
+                $this->clearSupplies();
+            break;
+            case 3:
+                $this->clearMooe();
+            break;
+            case 4:
+                $this->clearTrainings();
+            break;
+            case 5:
+                $this->clearMachine();
+            break;
+            case 6:
+                $this->clearBuilding();
+            break;
+            case 7:
+                $this->clearPs();
+            break;
+        }
     }
 
     public function showPsDetails()
@@ -6111,11 +6823,31 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     }
 
 
-    // protected function getFormStatePath(): string
-    // {
-    //     return 'data';
-    // }
+    public function addDetail($value)
+    {
+       switch($value)
+       {
+            case 1:
+                $this->addSupplies();
+                break;
+            case 2:
+                $this->addMooe();
+                break;
+            case 3:
+                $this->addTraining();
+                break;
+            case 4:
+                $this->addMachine();
+                break;
+            case 5:
+                $this->addBuilding();
+                break;
+            case 6:
+                $this->addPs();
+                break;
 
+       }
+    }
 
     public function render(): View
     {
