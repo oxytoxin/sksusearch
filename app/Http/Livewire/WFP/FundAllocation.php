@@ -227,7 +227,13 @@ class FundAllocation extends Component implements HasTable
                     ->button()
                     ->color('warning')
                     ->url(fn(CostCenter $record): string => route('wfp.edit-supplemental-funds-q1', ['record' => $record, 'wfpType' => $this->data['wfp_type'],'supplementalQuarterId'=>$this->supplementalQuarterId, 'isForwarded' => $record->wfp()->where('is_supplemental', 0)->exists() ? 0 : 1]))
-                    ->visible(fn(CostCenter $record) => $this->filter_is_supplemental && ($record->wfp()->whereNull('supplemental_quarter_id')->first()?->is_approved === 1 && $record->hasSupplementalFund()) || (!$record->wfp()->exists() && $record->hasSupplementalFund())),
+                    ->visible(function(CostCenter $record) {
+                        if ($this->filter_is_supplemental) {
+                            return count($record->wfp->where('supplemental_quarter_id',$this->supplementalQuarterId)) === 0 || $record->wfp->where('supplemental_quarter_id',$this->supplementalQuarterId)->first()->is_approved === 0;
+                        }else{
+                            return count($record->wfp->where('is_supplemental',0)) === 0|| $record->wfp->where('is_supplemental',0)->first()->is_approved === 0;
+                        }
+                    }),
             ]),
             Action::make('forward_balance')
                 ->icon('ri-arrow-right-line')
