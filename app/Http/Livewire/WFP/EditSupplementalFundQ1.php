@@ -83,10 +83,16 @@ class EditSupplementalFundQ1 extends Component
             }
 
             if (count($this->prev_allocations) > 0) {
-                $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
-                $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
-                $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
-                $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
+               if($this->supplementalQuarterId == 1){
+                 $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
+                 $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
+                 $this->fund_description = $this->record->fundAllocations->where('is_supplemental', 0)->first()->description;
+               }else{
+                $this->selectedType = $this->record->fundAllocations->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->wpf_type_id;
+                $this->fundInitialAmount = $this->record->fundAllocations->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->initial_amount;
+                $this->fund_description = $this->record->fundAllocations->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->description;
+               }
+                $this->supplemental_quarter = SupplementalQuarter::find( $this->supplementalQuarterId );
 
                 foreach ($this->record->wfp->filter(function($wfp)  {
                     return $wfp->is_supplemental === 0|| ($wfp->supplemental_quarter_id < $this->supplementalQuarterId && $wfp->supplemental_quarter_id !== null);
