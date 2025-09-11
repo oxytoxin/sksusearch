@@ -484,9 +484,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
         } else {
-
             //164
             if ($isSupplemental) {
+
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     if ($isSupplemental) {
 
@@ -543,6 +543,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             })->toArray();
                         }
                     } else {
+
                         $this->current_balance = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental', 0)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) {
                             return [
                                 'category_group_id' => $allocation->category_group_id,
@@ -557,7 +558,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
                     //balance 164
                     $programmed = [];
-                    if (count($this->record->wfp) > 0) {
+                    // if (count($this->record->wfp) > 0) {
                         foreach ($this->record->wfp->filter(function($wfp){
                             return $wfp->is_supplemental === 0 || ( $wfp->supplemental_quarter_id <  $this->supplementalQuarterId && $wfp->supplemental_quarter_id !== null);
                         }) as $wfp) {
@@ -594,10 +595,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                     'balance' => $allocation->balance,
                                 ];
                         })->toArray();
-                    } else {
-                        $this->wfp_balance = $this->record->fundAllocations->where('supplemental_quarter_id', $this->supplementalQuarterId)->sum('initial_amount');
-                        $this->current_balance = [];
-                    }
+                    // } else {
+                    //     $this->wfp_balance = $this->record->fundAllocations->where('supplemental_quarter_id', $this->supplementalQuarterId)->sum('initial_amount');
+                    //     $this->current_balance = [];
+                    // }
                 }
             } else {
 
