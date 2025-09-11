@@ -34,7 +34,9 @@ class FundAllocation extends Component implements HasTable
     public $fund_cluster;
     public $group_keys = [];
     public $isPresident;
-    public $data = [];
+    public $data = [
+        'wfp_type' => 1
+    ];
 
     public $filter_is_supplemental = false;
 
@@ -61,7 +63,7 @@ class FundAllocation extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return CostCenter::query()
+        $record =  CostCenter::query()
             ->with(['fundAllocations'=> function($query){
                 $query->where('wpf_type_id',$this->data['wfp_type'])->where(function($query){
                    if(!is_null($this->supplementalQuarterId)){
@@ -80,6 +82,7 @@ class FundAllocation extends Component implements HasTable
                 });
             }])
             ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
+            return $record;
     }
 
     protected function getTableColumns()
@@ -229,9 +232,12 @@ class FundAllocation extends Component implements HasTable
                     ->url(fn(CostCenter $record): string => route('wfp.edit-supplemental-funds-q1', ['record' => $record, 'wfpType' => $this->data['wfp_type'],'supplementalQuarterId'=>$this->supplementalQuarterId, 'isForwarded' => $record->wfp()->where('is_supplemental', 0)->exists() ? 0 : 1]))
                     ->visible(function(CostCenter $record) {
                         if ($this->filter_is_supplemental) {
-                            return count($record->wfp->where('supplemental_quarter_id',$this->supplementalQuarterId)) === 0 || $record->wfp->where('supplemental_quarter_id',$this->supplementalQuarterId)->first()->is_approved === 0;
+                            if($record->wfp->where('supplemental_quarter_id',$this->supplementalQuarterId)->first()) {
+                                 return $record->wfp->where('supplemental_quarter_id',$this->supplementalQuarterId)->first()->is_approved !== 1;
+                            }
+                            return true;
                         }else{
-                            return count($record->wfp->where('is_supplemental',0)) === 0|| $record->wfp->where('is_supplemental',0)->first()->is_approved === 0;
+                            return count($record->wfp->where('is_supplemental',0)) === 0 || $record->wfp->where('is_supplemental',0)->first()->is_approved !== 1;
                         }
                     }),
             ]),
