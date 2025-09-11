@@ -261,9 +261,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
         if (in_array($this->wfp_fund->id, [1, 3, 9])) {
             if ($isSupplemental) {
-
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     // HERE DRAFT
+
                     $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items()->get();
                     if ($draft_amounts) {
                         foreach ($draft_amounts as $draft_amount) {
@@ -310,12 +310,16 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     foreach ($prev_allocation as $allocation) {
                         $allocation_non_supplemental[$allocation->category_group_id] = $allocation->initial_amount;
                     }
+
+                    $all_current_allocation = $costCenterFundAllocations->filter(function ($allocation) {
+                        return $allocation->supplemental_quarter_id === $this->supplementalQuarterId;
+                    });
                     //
                     $this->current_balance = $costCenterFundAllocations
                         ->filter(function ($allocation) {
                             return $allocation->initial_amount > 0 && $allocation->categoryGroup?->is_active == 1;
                         })
-                        ->map(function ($allocation) use ($allocation_non_supplemental , $costCenterFundAllocations) {
+                        ->map(function ($allocation) use ($allocation_non_supplemental , $costCenterFundAllocations,$all_current_allocation) {
                             $current_and_prev_allocation = $allocation_non_supplemental[$allocation->category_group_id] ?? 0 + $allocation->initial_amount;
                             if ($allocation->supplemental_quarter_id === $this->supplementalQuarterId) {
                                 $current_and_prev_allocation += $allocation->initial_amount;
@@ -327,6 +331,10 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             }else{
                                 $total_programmed = 0;
                             }
+                            if($allocation->supplemental_quarter_id !== $this->supplementalQuarterId && !empty($all_current_allocation->where('category_group_id', $allocation->category_group_id)->first())) {
+                                  return null;
+                            }
+
                             if ($allocation->supplemental_quarter_id === $this->supplementalQuarterId) {
                                 return [
                                     'category_group_id' => $allocation->category_group_id,
@@ -346,6 +354,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                     'sort_id' => $allocation->categoryGroup?->sort_id, // Adding sort_id for sorting
                                 ];
                             }
+                        })
+                       ->filter(function ($item)  {
+                            return !is_null($item);
                         })
                         ->sortBy('sort_id') // Sort by sort_id
                         ->values()
