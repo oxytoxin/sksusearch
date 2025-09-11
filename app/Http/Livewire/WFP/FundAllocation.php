@@ -237,7 +237,7 @@ class FundAllocation extends Component implements HasTable
                             }
                             return true;
                         }else{
-                            return count($record->wfp->where('is_supplemental',0)) === 0|| $record->wfp->where('is_supplemental',0)->first()->is_approved === 0;
+                            return count($record->wfp->where('is_supplemental',0)) === 0 || $record->wfp->where('is_supplemental',0)->first()->is_approved !== 1;
                         }
                     }),
             ]),
