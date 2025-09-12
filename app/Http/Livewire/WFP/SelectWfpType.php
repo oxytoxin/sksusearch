@@ -39,19 +39,14 @@ class SelectWfpType extends Component implements HasTable
 
     public function mount()
     {
-        $isOfficeHead = auth()->user()->employee_information->office?->head_employee?->id == auth()->user()->employee_information->id;
         $this->fund_cluster = 1;
 
         $this->wfp_type = WpfType::all()->count();
-        $head_id = WpfPersonnel::where('user_id', Auth::user()->id)->first()?->head_id;
         $has_personnel = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->first();
-        if($has_personnel){
-            $this->cost_centers = Auth::user()->employee_information->office->cost_centers()
-            ->with('wpfPersonnel', function ($query) {
-                $query->where('user_id', Auth::user()->id)
-                ->orWhere('head_id', Auth::user()->id);
-            })->get();
-        }else{
+        $designatedCostCentersId = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->get()->pluck('cost_center_id')->toArray();
+        if ($has_personnel) {
+            $this->cost_centers = CostCenter::whereIn('id', $designatedCostCentersId)->get();
+        } else {
             $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
         }
         // $this->cost_centers = Auth::user()->employee_information->office->cost_centers

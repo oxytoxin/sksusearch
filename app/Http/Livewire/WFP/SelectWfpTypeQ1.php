@@ -13,6 +13,7 @@ use App\Models\WpfPersonnel;
 use App\Models\FundAllocation;
 use App\Models\FundClusterWFP;
 use App\Models\Wfp;
+use DB;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Layout;
@@ -49,18 +50,14 @@ class SelectWfpTypeQ1 extends Component implements HasTable
 
     public function mount()
     {
-        $isOfficeHead = auth()->user()->employee_information->office?->head_employee?->id == auth()->user()->employee_information->id;
         $this->fund_cluster = 1;
         $this->wfp_types = WpfType::get();
         $this->wfp_type = count($this->wfp_types);
-        $head_id = WpfPersonnel::where('user_id', Auth::user()->id)->first()?->head_id;
         $has_personnel = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->first();
+
+        $designatedCostCentersId = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->get()->pluck('cost_center_id')->toArray();
         if ($has_personnel) {
-            $this->cost_centers = Auth::user()->employee_information->office->cost_centers()
-                ->with('wpfPersonnel', function ($query) {
-                    $query->where('user_id', Auth::user()->id)
-                        ->orWhere('head_id', Auth::user()->id);
-                })->get();
+            $this->cost_centers = CostCenter::whereIn('id', $designatedCostCentersId)->get();
         } else {
             $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
         }
