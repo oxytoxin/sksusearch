@@ -34,7 +34,7 @@ class GenerateWfpPpmp extends Component
              ->where('is_approved', 1)
             ->where('is_supplemental', 0);
          })
-         ->with(['supply', 'categoryItem','wfp'])  // Load both relationships
+         ->with(['supply', 'categoryItem','wfp','budgetCategory'])  // Load both relationships
          ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
          ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
          ->get();
@@ -80,6 +80,7 @@ class GenerateWfpPpmp extends Component
             }
             $record->merged_quantities = $mergedQuantities;
         }
+        dd($this->record);
      }
 
      public function hesPpmp()

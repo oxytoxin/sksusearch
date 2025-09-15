@@ -1,19 +1,15 @@
 <div class="space-y-2">
     <div class="flex justify-between items-center">
         <h2 class="font-light capitalize text-primary-600">Generate PPMP</h2>
-        {{-- <a href="{{ route('requisitioner.motorpool.create') }}"
-            class="hover:bg-primary-500 p-2 bg-primary-600 rounded-md font-light capitalize text-white text-sm">New
-            Request</a> --}}
     </div>
     <div>
-        {{-- @if ($wfp_type > 0) --}}
-        <div x-data="{ selectedTab: '101' , showPrintable: false }">
-
+        <div x-data="{ selectedTab: '101', showPrintable: false }">
             <!-- Dropdown for small screens -->
             <div class="sm:hidden">
                 <label for="tabs" class="sr-only">Select a tab</label>
-                <select id="tabs" name="tabs" class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
-                        x-model="selectedTab" @change="showPrintable = false">
+                <select id="tabs" name="tabs"
+                    class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
+                    x-model="selectedTab" @change="showPrintable = false">
                     <option>101</option>
                     <option>163</option>
                     <option>161</option>
@@ -24,22 +20,26 @@
                 </select>
             </div>
             @php
-                $fund = App\Models\FundClusterWFP::get();
+                $fundClusterWfps = App\Models\FundClusterWFP::where('position', '!=', 0)
+                    ->orderBy('position', 'asc')
+                    ->get();
             @endphp
 
             <!-- Tabs for larger screens -->
             <div class="hidden sm:block">
                 <nav wire:click="resetPrintable" class="flex space-x-4" aria-label="Tabs">
-                    <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                       :class="{
-                           'bg-green-500 text-white': selectedTab === '101',
-                           'text-gray-800 hover:text-green-700': selectedTab !== '101'
-                       }"
-                       @click.prevent="selectedTab = '101'; showPrintable = false">
-                       Fund {{$fund->where('id', 1)->first()->name}}
-                    </a>
+                    @foreach ($fundClusterWfps as $fund)
+                        <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
+                            :class="{
+                                'bg-green-500 text-white': selectedTab === '101',
+                                'text-gray-800 hover:text-green-700': selectedTab !== '101'
+                            }"
+                            @click.prevent="selectedTab = '101'; showPrintable = false">
+                            Fund {{ $fund->name }}
+                        </a>
+                    @endforeach
 
-                    <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
+                    {{-- <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
                        :class="{
                            'bg-green-500 text-white': selectedTab === '163',
                            'text-gray-800 hover:text-green-700': selectedTab !== '163'
@@ -91,14 +91,15 @@
                        }"
                        @click.prevent="selectedTab = '164MF'; showPrintable = false">
                        Fund {{$fund->where('id', 6)->first()->name}}
-                    </a>
+                    </a> --}}
                 </nav>
             </div>
             <div class="mt-5">
                 <div class="flex justify-start items-center">
-                    <select wire:model="selectedType" id="wfp_type" name="wfp_type" class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                    <select wire:model="selectedType" id="wfp_type" name="wfp_type"
+                        class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
                         <option value="0" disabled selected>Select WFP Type</option>
-                        @foreach($wfp_types as $type)
+                        @foreach ($wfp_types as $type)
                             <option value="{{ $type->id }}">{{ $type->description }}</option>
                         @endforeach
                     </select>
