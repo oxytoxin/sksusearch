@@ -263,7 +263,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             if ($isSupplemental) {
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                     // HERE DRAFT
-
                     $draft_amounts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id', $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items()->get();
                     if ($draft_amounts) {
                         foreach ($draft_amounts as $draft_amount) {
@@ -322,9 +321,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         })
                         ->map(function ($allocation) use ($allocation_non_supplemental , $costCenterFundAllocations,$all_current_allocation , $prev_allocation, $all_prev_programmed) {
                             $current_and_prev_allocation = $allocation_non_supplemental[$allocation->category_group_id] ?? 0  + $allocation->initial_amount;
-                            if ($allocation->supplemental_quarter_id === $this->supplementalQuarterId) {
-                                $current_and_prev_allocation += $allocation->initial_amount;
-                            }
+
                             $total_programmed_draft = isset($this->draft_amounts[$allocation->category_group_id]) ? $this->draft_amounts[$allocation->category_group_id] :0;
 
                             if($total_programmed_draft === 0){
@@ -335,9 +332,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             if($allocation->supplemental_quarter_id !== $this->supplementalQuarterId && !empty($all_current_allocation->where('category_group_id', $allocation->category_group_id)->first())) {
                                   return null;
                             }
-
-
-
                             if ($allocation->supplemental_quarter_id === $this->supplementalQuarterId) {
                                 return [
                                     'category_group_id' => $allocation->category_group_id,
