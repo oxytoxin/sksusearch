@@ -321,9 +321,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             return $allocation->initial_amount > 0 && $allocation->categoryGroup?->is_active == 1;
                         })
                         ->map(function ($allocation) use ($allocation_non_supplemental , $costCenterFundAllocations,$all_current_allocation , $prev_allocation, $all_prev_programmed) {
-                            $current_and_prev_allocation = $allocation_non_supplemental[$allocation->category_group_id] ?? 0  + $allocation->initial_amount;
+                            $current_and_prev_allocation = $allocation_non_supplemental[$allocation->category_group_id] ?? 0;
 
                             $total_programmed_draft = isset($this->draft_amounts[$allocation->category_group_id]) ? $this->draft_amounts[$allocation->category_group_id] :0;
+
+                            if ($allocation->supplemental_quarter_id == $this->supplementalQuarterId) {
+                                $current_and_prev_allocation += $allocation->initial_amount;
+                            }
 
                             if($total_programmed_draft === 0){
                                 $total_programmed = isset($this->programmed[$allocation->category_group_id]) ? $this->programmed[$allocation->category_group_id] : 0;
