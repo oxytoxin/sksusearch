@@ -1,46 +1,7 @@
-<div x-data>
-    <div class="p-4">
-        <div class="flex justify-center">
-            <button @click="showPrintable = true" wire:click="sksuPpmp"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
-                SKSU 101
-            </button>
-        </div>
-        <div class="flex justify-center space-x-4 mt-3">
-            <button @click="showPrintable = true" wire:click="gasPpmp"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                General Admission and Support Services (GASS)
-            </button>
-            <button @click="showPrintable = true" wire:click="hesPpmp"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                Higher Education Services (HES)
-            </button>
-            <button @click="showPrintable = true" wire:click="aesPpmp"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                Advanced Education Services (AES)
-            </button>
-            <button @click="showPrintable = true" wire:click="rdPpmp"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                Research and Development (RD)
-            </button>
-            <button @click="showPrintable = true" wire:click="extensionPpmp"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                Extension Services (ES)
-            </button>
-            <button @click="showPrintable = true" wire:click="lfPpmp"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                Local Fund Projects (LFP)
-            </button>
-        </div>
-    </div>
-    <div x-show="showPrintable" class="bg-gray-50">
+<div>
+    <div class="bg-gray-50">
         @if ($is_active)
-            <div class="flex justify-end p-4">
-                <button @click="printOut($refs.printContainer.outerHTML);" type="button"
-                    class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
-                    Print PPMP
-                </button>
-            </div>
+
             <div x-ref="printContainer" class="w-full bg-gray-50 px-2 py-4 rounded-md">
                 <div class="text-center">
                     <p class="text-2xl font-medium">
