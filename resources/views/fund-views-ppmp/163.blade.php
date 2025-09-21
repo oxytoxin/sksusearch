@@ -1,5 +1,5 @@
-<div x-data>
-    <div class="p-4">
+<div>
+    {{-- <div class="p-4">
         <div class="flex justify-center">
             <button @click="showPrintable = true" wire:click="sksuPpmp163"
                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
@@ -36,16 +36,10 @@
                 PALIMBANG CAMPUS
             </button>
         </div>
-    </div>
-    <div x-show="showPrintable" class="bg-gray-50">
+    </div> --}}
+    <div class="bg-gray-50">
         @if ($is_active)
-            <div class="flex justify-end p-4">
-                <button @click="printOut($refs.printContainer.outerHTML);" type="button"
-                    class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
-                    Print PPMP
-                </button>
-            </div>
-            <div id="printarea" class="w-full bg-gray-50 px-2 py-4 rounded-md">
+            <div x-ref="printContainer" id="printarea" class="w-full bg-gray-50 px-2 py-4 rounded-md">
                 <div class="text-center">
                     <p class="text-2xl font-medium">
                         Project Procurement Management Plan (PPMP)
@@ -55,7 +49,6 @@
                     </p>
                     <p class="text-md font-normal">
                         {{ $title }}
-
                     </p>
                 </div>
                 <div class="my-2 overflow-x-auto sm:-mx-6 lg:-mx-2">
