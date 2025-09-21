@@ -17,10 +17,56 @@ class GenerateWfpPpmp extends Component
     public $wfp_types;
     public $selectedType;
 
+    public $fundClusterWfpId = null;
+    public $supplementalQuarterId = null;
+    public $mfoId = null;
+    public $campusId = null;
+
+    protected $queryString = ['fundClusterWfpId', 'supplementalQuarterId', 'mfoId','title','campusId'];
+
     public function mount()
     {
         $this->wfp_types = WpfType::all();
         $this->selectedType = 1;
+         $this->is_active = true;
+        $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
+            $query->where('wpf_type_id', $this->selectedType)
+            ->where('is_approved', 1)
+            ->where('fund_cluster_w_f_p_s_id', $this->fundClusterWfpId)
+            ->when($this->supplementalQuarterId, function ($query) {
+                $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
+            })
+            ->when(!$this->supplementalQuarterId, function ($query) {
+                $query->where('is_supplemental', 0);
+            })
+            ->when($this->mfoId || $this->campusId, function ($query) {
+                $query->whereHas('costCenter', function($query) {
+                    $query->when($this->mfoId, function ($query) {
+                        $query->where('m_f_o_s_id', $this->mfoId);
+                    })
+                    ->when($this->campusId, function ($query) {
+                        $query->whereHas('office', function($query) {
+                            $query->where('campus_id', $this->campusId);
+                        });
+                    });
+                });
+            });
+        })
+        ->with(['supply', 'categoryItem'])  // Load both relationships
+        ->selectRaw('supply_id, category_item_id, uacs_code, budget_category_id, uom, SUM(total_quantity) as total_quantity, cost_per_unit, SUM(cost_per_unit * total_quantity) as estimated_budget, JSON_ARRAYAGG(quantity_year) as merged_quantities')
+        ->groupBy('supply_id', 'category_item_id', 'uacs_code', 'cost_per_unit', 'uom', 'budget_category_id')
+        ->get();
+        $this->total = $this->record->sum('estimated_budget');
+        foreach ($this->record as $record) {
+            $mergedQuantities = array_fill(0, 12, 0); // initialize with 12 months
+            foreach (json_decode($record->merged_quantities) as $quantities) {
+                $quantitiesArray = json_decode(json_encode($quantities), true);
+                foreach ($quantitiesArray as $monthIndex => $value) {
+                    $mergedQuantities[$monthIndex] += (int) $value;
+                }
+            }
+            $record->merged_quantities = $mergedQuantities;
+        }
     }
      //101
      public function sksuPpmp()
