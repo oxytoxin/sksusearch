@@ -64,7 +64,7 @@
                           @endphp
                           <div class="grid grid-cols-7 space-x-4 mt-3">
                               @foreach ($campuses as $item)
-                                  <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'campusId' => $item->id]) }}"
+                                  <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'campusId' => $item->id, 'mfoId' => 6]) }}"
                                       class="bg-green-800 hover:bg-green-700 text-center text-white font-bold py-1.5 px-3 rounded-lg uppercase">
                                       {{ $item->name }}
                                   </a>

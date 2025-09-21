@@ -1,13 +1,19 @@
 <div class="space-y-2">
-
     <div>
         <div>
             <!-- Dropdown for small screens -->
             <div class="flex justify-end gap-2">
                 {{-- /reports/generate-wfp-ppmp?wfp_type_id={{$selectedType}}&fund_cluster_w_f_p_s_id={{$fundClusterWfpId}}&m_f_o_s_id={{ $mfoId }} --}}
-                <a href="" type="button"
+                <a href="{{ route('generate-wfp-ppmp-report', [
+                    'wfp_type_id' => $selectedType,
+                    'fund_cluster_w_f_p_s_id' => $fundClusterWfpId,
+                    'm_f_o_s_id' => $mfoId,
+                    'campus_id' => $campusId,
+                    'supplemental_quarter_id' => $supplementalQuarterId,
+                ]) }}"
+                    target="_blank"
                     class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
-                    Print PPMP
+                    Export PPMP
                 </a>
                 <button @click="printOut($refs.printContainer.outerHTML);" type="button"
                     class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
