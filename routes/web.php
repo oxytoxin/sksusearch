@@ -71,3 +71,13 @@ Route::get('/test-example', function () {
 
     // dd($cashAdvances);
 });
+
+
+Route::get('/migrate-files-to-r2', function () {
+    try {
+        \App\Jobs\MigrateFilesToR2::dispatch();
+        return 'File migration job dispatched successfully.';
+    } catch (Exception $e) {
+        return 'Error dispatching job: ' . $e->getMessage();
+    }
+});
