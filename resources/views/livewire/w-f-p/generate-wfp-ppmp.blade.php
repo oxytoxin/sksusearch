@@ -12,7 +12,8 @@
             <!-- Dropdown for small screens -->
             <div class="sm:hidden">
                 <label for="tabs" class="sr-only">Select a tab</label>
-                <select id="tabs" name="tabs" class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
+                <select id="tabs" name="tabs"
+                        class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
                         x-model="selectedTab" @change="showPrintable = false">
                     <option>101</option>
                     <option>163</option>
@@ -24,10 +25,10 @@
                 </select>
             </div>
             @php
-                $fund = App\Models\FundClusterWFP::get();
+                $fund = App\Models\FundCluster::get();
             @endphp
 
-            <!-- Tabs for larger screens -->
+                <!-- Tabs for larger screens -->
             <div class="hidden sm:block">
                 <nav wire:click="resetPrintable" class="flex space-x-4" aria-label="Tabs">
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
@@ -36,7 +37,7 @@
                            'text-gray-800 hover:text-green-700': selectedTab !== '101'
                        }"
                        @click.prevent="selectedTab = '101'; showPrintable = false">
-                       Fund {{$fund->where('id', 1)->first()->name}}
+                        Fund {{$fund->where('id', 1)->first()->name}}
                     </a>
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
@@ -45,7 +46,7 @@
                            'text-gray-800 hover:text-green-700': selectedTab !== '163'
                        }"
                        @click.prevent="selectedTab = '163'; showPrintable = false">
-                       Fund {{$fund->where('id', 2)->first()->name}}
+                        Fund {{$fund->where('id', 2)->first()->name}}
                     </a>
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
@@ -54,7 +55,7 @@
                            'text-gray-800 hover:text-green-700': selectedTab !== '161'
                        }"
                        @click.prevent="selectedTab = '161'; showPrintable = false">
-                       Fund {{$fund->where('id', 3)->first()->name}}
+                        Fund {{$fund->where('id', 3)->first()->name}}
                     </a>
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
@@ -63,16 +64,16 @@
                            'text-gray-800 hover:text-green-700': selectedTab !== '164T / FHE'
                        }"
                        @click.prevent="selectedTab = '164T / FHE'; showPrintable = false">
-                       Fund {{$fund->where('id', 4)->first()->name}}
+                        Fund {{$fund->where('id', 4)->first()->name}}
                     </a>
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
-                    :class="{
+                       :class="{
                         'bg-green-500 text-white': selectedTab === '164T / Non-FHE',
                         'text-gray-800 hover:text-green-700': selectedTab !== '164T / Non-FHE'
                     }"
-                    @click.prevent="selectedTab = '164T / Non-FHE'; showPrintable = false">
-                    Fund {{$fund->where('id', 7)->first()->name}}
+                       @click.prevent="selectedTab = '164T / Non-FHE'; showPrintable = false">
+                        Fund {{$fund->where('id', 7)->first()->name}}
                     </a>
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
@@ -81,7 +82,7 @@
                            'text-gray-800 hover:text-green-700': selectedTab !== '164OSF'
                        }"
                        @click.prevent="selectedTab = '164OSF'; showPrintable = false">
-                       Fund {{$fund->where('id', 5)->first()->name}}
+                        Fund {{$fund->where('id', 5)->first()->name}}
                     </a>
 
                     <a href="#" class="rounded-md px-3 py-2 text-sm font-medium"
@@ -90,13 +91,14 @@
                            'text-gray-800 hover:text-green-700': selectedTab !== '164MF'
                        }"
                        @click.prevent="selectedTab = '164MF'; showPrintable = false">
-                       Fund {{$fund->where('id', 6)->first()->name}}
+                        Fund {{$fund->where('id', 6)->first()->name}}
                     </a>
                 </nav>
             </div>
             <div class="mt-5">
                 <div class="flex justify-start items-center">
-                    <select wire:model="selectedType" id="wfp_type" name="wfp_type" class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                    <select wire:model="selectedType" id="wfp_type" name="wfp_type"
+                            class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
                         <option value="0" disabled selected>Select WFP Type</option>
                         @foreach($wfp_types as $type)
                             <option value="{{ $type->id }}">{{ $type->description }}</option>
