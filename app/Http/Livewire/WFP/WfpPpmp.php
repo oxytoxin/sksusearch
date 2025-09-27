@@ -82,7 +82,6 @@ class WfpPpmp extends Component
             });
        }
 
-
         $this->wfpDetails = $this->record->wfpDetails->where('is_ppmp',1);
 
         foreach ($this->wfpDetails as $wfpDetail) {

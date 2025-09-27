@@ -19,9 +19,9 @@ class WfpReport extends Component
     public $supplementalQuarterId = null;
     public $wfpType = null;
 
-    public $costCenter = null;
+    public $costCenterId = null;
 
-    protected $queryString = ['supplementalQuarterId', 'wfpType', 'costCenter'];
+    protected $queryString = ['supplementalQuarterId', 'wfpType', 'costCenterId'];
     public $oldRecords = [];
     public $history = [
         'regular_allocation' => 0,
@@ -68,7 +68,7 @@ class WfpReport extends Component
                 }
             ], 'wfpType', 'wfpDetails'])
                 ->where('wpf_type_id', $this->wfpType)
-                 ->where('cost_center_id', $this->costCenter)
+                 ->where('cost_center_id', $this->costCenterId)
                  ->where(function($q){
                     $q->where('is_supplemental', 0)
                         ->orWhere(function ($query) {

@@ -5,6 +5,7 @@ namespace App\Http\Livewire\WFP;
 use App\Models\CostCenter;
 use App\Models\EmployeeInformation;
 use App\Models\FundClusterWFP;
+use App\Models\Office;
 use App\Models\WpfPersonnel;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -23,6 +24,25 @@ class AssignPersonnel extends Component implements HasTable
 {
     public $fund_cluster;
     use InteractsWithTable;
+
+    public $costCenters = [];
+    public $officesIds = [];
+
+
+    public function mount()
+    {
+        $officeId = auth()->user()->employee_information->office_id;
+
+        $office = Office::find($officeId)->load('cost_centers');
+
+        $this->costCenters = $office->cost_centers;
+        // $this->costCenters = $offices->map(function ($office) {
+        //     return $office->cost_centers;
+        // })->flatten()->toArray();
+        // dd($this->costCenters);
+    }
+
+
 
     protected function getTableQuery()
     {
@@ -43,7 +63,7 @@ class AssignPersonnel extends Component implements HasTable
                 ->searchable()
                 ->preload()
                 ->reactive()
-                ->options(fn () => FundClusterWFP::whereIn('id', [1,2,3,4,5,6,7])->pluck('name', 'id')),
+                ->options(fn () => FundClusterWFP::whereIn('id', [1,2,3,4,5,6,7,9])->pluck('name', 'id')),
                 Select::make('user_id')
                     ->label('User')
                     ->required()
@@ -55,12 +75,11 @@ class AssignPersonnel extends Component implements HasTable
                         if ($get('fund_cluster_w_f_p_s_id') === '3') {
                             return EmployeeInformation::where('position_id', 39)
                             ->whereNotIn('id', [auth()->user()->employee_information->id])
-                            //->whereDoesntHave('user.wfp_personnel')
+                            ->whereDoesntHave('user.wfp_personnel')
                             ->pluck('full_name', 'user_id');
                         }else{
-
                             return EmployeeInformation::whereNotIn('id', [auth()->user()->employee_information->id])
-                            //->whereDoesntHave('user.wfp_personnel')
+                            ->whereDoesntHave('user.wfp_personnel')
                             ->pluck('full_name', 'user_id');
                         }
                     }),
@@ -81,11 +100,10 @@ class AssignPersonnel extends Component implements HasTable
                     ->searchable()
                     ->preload()
                     ->reactive()
-                    ->options(fn ($get) => CostCenter::whereHas('fundAllocations', function ($query) {
-                        $query->where('is_locked', 0)->where('is_supplemental', 1);
-                    })->whereHas('office', function ($query) {
+                    ->options(fn ($get) => CostCenter::whereHas('office', function ($query) {
                         $query->where('id', auth()->user()->employee_information->office_id);
-                    })->with('wpfPersonnel')
+                    })
+                    ->whereDoesntHave('wpfPersonnel')
                     ->where('fund_cluster_w_f_p_s_id', $get('fund_cluster_w_f_p_s_id'))->pluck('name', 'id'))
              ])
              ->action(function ($data) {

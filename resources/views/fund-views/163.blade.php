@@ -481,7 +481,7 @@
                             <div class="flex justify-center mt-5">
                                 Approved by:
                             </div>
-                            <div class="flex justify-center underline font-semibold">
+                            <div class="flex mt-8 justify-center underline font-semibold">
                                 {{ $president->full_name }}
                             </div>
                             <div class="flex justify-center">

@@ -13,6 +13,7 @@ use App\Models\WpfPersonnel;
 use App\Models\FundAllocation;
 use App\Models\FundClusterWFP;
 use App\Models\Wfp;
+use DB;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Layout;
@@ -49,20 +50,19 @@ class SelectWfpTypeQ1 extends Component implements HasTable
 
     public function mount()
     {
-        $isOfficeHead = auth()->user()->employee_information->office?->head_employee?->id == auth()->user()->employee_information->id;
         $this->fund_cluster = 1;
         $this->wfp_types = WpfType::get();
         $this->wfp_type = count($this->wfp_types);
-        $head_id = WpfPersonnel::where('user_id', Auth::user()->id)->first()?->head_id;
-        $has_personnel = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->first();
+        $has_personnel = WpfPersonnel::where('head_id', Auth::user()->id)->first();
+
+        $designatedCostCentersId = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->get()->pluck('cost_center_id')->toArray();
         if ($has_personnel) {
-            $this->cost_centers = Auth::user()->employee_information->office->cost_centers()
-                ->with('wpfPersonnel', function ($query) {
-                    $query->where('user_id', Auth::user()->id)
-                        ->orWhere('head_id', Auth::user()->id);
-                })->get();
+            $this->cost_centers = array_merge(
+                array_diff_key(array_column(Auth::user()->employee_information->office->cost_centers()->get()->toArray(), 'id'), array_flip($designatedCostCentersId)),
+                array_column(CostCenter::whereIn('id', $designatedCostCentersId)->get()->toArray(), 'id')
+            );
         } else {
-            $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
+            $this->cost_centers = Auth::user()->employee_information->office->cost_centers()->get()->pluck('id')->toArray();
         }
     }
 
@@ -81,8 +81,8 @@ class SelectWfpTypeQ1 extends Component implements HasTable
             ->whereDoesntHave('wfp', function ($query) {
                 $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
             })
-            ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
-            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
+            ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)
+            ->whereIn('id', $this->cost_centers);
         return $query_test;
     }
 

@@ -187,7 +187,15 @@
 </div>
 {{-- add button --}}
     <div class="mt-3 w-full">
-        <x-button wire:click="addMachine" full emerald label="Add" />
+        @php
+            $supply = App\Models\Supply::find($machine_particular_id);
+            if ($supply) {
+            $budget_category_id = App\Models\BudgetCategory::where('id', $supply->categoryItems()->first()->budget_category_id)->first()->id;
+            }else{
+            $budget_category_id = null;
+            }
+        @endphp
+        <x-button wire:click="addDetail({{ $budget_category_id }})" full emerald label="Add" />
 </div>
 
 {{-- modal --}}
