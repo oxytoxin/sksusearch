@@ -10,15 +10,15 @@
                 WFP
             </button>
             <button class="mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300" @click="tab = 'q1'"
-                :class="tab == 'q1' && 'bg-white -mt-2 text-primary-600'">
+                    :class="tab == 'q1' && 'bg-white -mt-2 text-primary-600'">
                 Supplemental Q1
             </button>
         </div>
         <div class="origin-top-left bg-white p-4" x-show="tab === 'wfp'"
-            :class="tab == 'wfp' && 'rounded-b-lg rounded-r-lg'" x-transition:enter='transform ease-out duration-200'
-            x-transition:enter-start='scale-0' x-transition:enter-end='scale-100'>
+             :class="tab == 'wfp' && 'rounded-b-lg rounded-r-lg'" x-transition:enter='transform ease-out duration-200'
+             x-transition:enter-start='scale-0' x-transition:enter-end='scale-100'>
             <div x-show="tab === 'wfp'" x-transition:enter='transition fade-in duration-700'
-                x-transition:enter-start='opacity-0' x-transition:enter-end='opacity-100'>
+                 x-transition:enter-start='opacity-0' x-transition:enter-end='opacity-100'>
                 <div>
                     {{-- @if ($wfp_type > 0) --}}
                     <div x-cloak x-data="{ selectedTab: '101', showPrintable: false }">
@@ -26,8 +26,8 @@
                         <div class="sm:hidden">
                             <label for="tabs" class="sr-only">Select a tab</label>
                             <select id="tabs" name="tabs"
-                                class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
-                                x-model="selectedTab" @change="showPrintable = false">
+                                    class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
+                                    x-model="selectedTab" @change="showPrintable = false">
                                 <option>101</option>
                                 <option>163</option>
                                 <option>161</option>
@@ -39,21 +39,21 @@
                         </div>
 
                         @php
-                            $fund = App\Models\FundClusterWFP::where('position', '!=', 0)
+                            $fund = App\Models\FundCluster::where('position', '!=', 0)
                                 ->orderBy('position', 'asc')
                                 ->get();
                         @endphp
 
-                        <!-- Tabs for larger screens -->
+                            <!-- Tabs for larger screens -->
                         <div class="hidden sm:block">
                             <nav wire:click="resetPrintable" class="flex space-x-4" aria-label="Tabs">
                                 @foreach ($fund as $fund)
                                     <button class="rounded-md px-3 py-2 text-sm text-start font-medium w-auto"
-                                        :class="{
+                                            :class="{
                                             'bg-green-500 text-white': selectedTab === '{{ $fund->name }}',
                                             'text-gray-800 hover:text-green-700': selectedTab !== '{{ $fund->name }}'
                                         }"
-                                        @click.prevent="selectedTab = '{{ $fund->name }}'; showPrintable = false">
+                                            @click.prevent="selectedTab = '{{ $fund->name }}'; showPrintable = false">
                                         Fund {{ $fund->name }}
                                     </button>
                                 @endforeach
@@ -124,7 +124,7 @@
                         <div class="mt-5">
                             <div class="flex justify-start items-center">
                                 <select wire:model.defer="selectedType" id="wfp_type" name="wfp_type"
-                                    class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                                        class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
                                     <option value="0" disabled selected>Select WFP Type</option>
                                     @foreach ($wfp_types as $type)
                                         <option value="{{ $type->id }}">{{ $type->description }}</option>
@@ -205,11 +205,11 @@
             </div>
         </div>
         <div class="origin-[10%_0] bg-white p-4" x-show="tab === 'q1'"
-            :class="tab == 'q1' && 'rounded-b-lg rounded-r-lg'" x-transition:enter='transform ease-out duration-200'
-            x-transition:enter-start='scale-0' x-transition:enter-end='scale-100'>
+             :class="tab == 'q1' && 'rounded-b-lg rounded-r-lg'" x-transition:enter='transform ease-out duration-200'
+             x-transition:enter-start='scale-0' x-transition:enter-end='scale-100'>
             <div x-show="tab === 'q1'" x-transition:enter='transition fade-in duration-700'
-                x-transition:enter-start='opacity-0' x-transition:enter-end='opacity-100'>
-                <livewire:w-f-p.generate-ppmp-q1 />
+                 x-transition:enter-start='opacity-0' x-transition:enter-end='opacity-100'>
+                <livewire:w-f-p.generate-ppmp-q1/>
             </div>
         </div>
     </div>

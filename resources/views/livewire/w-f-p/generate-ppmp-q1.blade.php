@@ -6,8 +6,8 @@
         <div class="sm:hidden">
             <label for="tabs" class="sr-only">Select a tab</label>
             <select id="tabs" name="tabs"
-                class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
-                x-model="selectedTab" @change="showPrintable = false">
+                    class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
+                    x-model="selectedTab" @change="showPrintable = false">
                 <option>101</option>
                 <option>163</option>
                 <option>161</option>
@@ -19,19 +19,19 @@
         </div>
 
         @php
-            $fund = App\Models\FundClusterWFP::where('position', '!=', 0)->orderBy('position', 'asc')->get();
+            $fund = App\Models\FundCluster::where('position', '!=', 0)->orderBy('position', 'asc')->get();
         @endphp
 
-        <!-- Tabs for larger screens -->
+            <!-- Tabs for larger screens -->
         <div class="hidden sm:block">
             <nav wire:click="resetPrintable" class="flex space-x-4" aria-label="Tabs">
                 @foreach ($fund as $fund)
                     <button class="rounded-md px-3 py-2 text-sm text-start font-medium w-auto"
-                        :class="{
+                            :class="{
                             'bg-green-500 text-white': selectedTab === '{{ $fund->name }}',
                             'text-gray-800 hover:text-green-700': selectedTab !== '{{ $fund->name }}'
                         }"
-                        @click.prevent="selectedTab = '{{ $fund->name }}'; showPrintable = false">
+                            @click.prevent="selectedTab = '{{ $fund->name }}'; showPrintable = false">
                         Fund {{ $fund->name }}
                     </button>
                 @endforeach
@@ -40,7 +40,7 @@
         <div class="mt-5">
             <div class="flex justify-start items-center">
                 <select wire:model.defer="selectedType" id="wfp_type" name="wfp_type"
-                    class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                        class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
                     <option value="0" disabled selected>Select WFP Type</option>
                     @foreach ($wfp_types as $type)
                         <option value="{{ $type->id }}">{{ $type->description }}</option>

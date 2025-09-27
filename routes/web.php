@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttachmentsController;
+use App\Http\Controllers\GenerateWfpPpmpExportController;
 use Carbon\Carbon;
 use App\Models\CaReminderStep;
 use App\Models\LegacyDocument;
@@ -47,7 +48,7 @@ Route::get('/export/cost-center',App\Http\Controllers\TestController::class)->na
 Route::get('/attachments/{attachment}/download', [AttachmentsController::class, 'download'])->name('attachments.download');
 
 
-
+Route::get('/reports/generate-wfp-ppmp',[GenerateWfpPpmpExportController::class,'index'])->name('generate-wfp-ppmp-report');
 
 Route::get('/test-example', function () {
     $now = Carbon::now();
