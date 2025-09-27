@@ -85,7 +85,7 @@
                         });
                     }
                 ])
-                ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
+                ->where('fund_cluster_id', $this->fund_cluster);
             return $record;
         }
 

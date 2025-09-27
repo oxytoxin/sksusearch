@@ -73,7 +73,7 @@
                     });
                 })
                     ->whereHas('fundAllocations', function ($query) {
-                        $query->where('fund_cluster_w_f_p_s_id', $this->fund_cluster_id);
+                        $query->where('fund_cluster_id', $this->fund_cluster_id);
                     }) // Add this line for the fundAllocations relationship
                     ->get();
             }

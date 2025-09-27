@@ -56,7 +56,7 @@
                     ->icon('heroicon-o-plus-circle')
                     ->button()
                     ->form([
-                        Select::make('fund_cluster_w_f_p_s_id')
+                        Select::make('fund_cluster_id')
                             ->label('Fund Cluster')
                             ->required()
                             ->searchable()
@@ -72,7 +72,7 @@
                             ->preload()
                             ->reactive()
                             ->options(function ($get) {
-                                if ($get('fund_cluster_w_f_p_s_id') === '3') {
+                                if ($get('fund_cluster_id') === '3') {
                                     return EmployeeInformation::where('position_id', 39)
                                         ->whereNotIn('id', [auth()->user()->employee_information->id])
                                         ->whereDoesntHave('user.wfp_personnel')
@@ -105,7 +105,7 @@
                                 $query->where('id', auth()->user()->employee_information->office_id);
                             })
                                 ->whereDoesntHave('wpfPersonnel')
-                                ->where('fund_cluster_w_f_p_s_id', $get('fund_cluster_w_f_p_s_id'))->pluck('name',
+                                ->where('fund_cluster_id', $get('fund_cluster_id'))->pluck('name',
                                     'id'))
                     ])
                     ->action(function ($data) {

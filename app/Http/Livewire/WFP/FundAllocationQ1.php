@@ -64,7 +64,7 @@
 
         protected function getTableQuery()
         {
-            return CostCenter::query()->where('fund_cluster_w_f_p_s_id', $this->fund_cluster);
+            return CostCenter::query()->where('fund_cluster_id', $this->fund_cluster);
         }
 
         protected function getTableColumns()

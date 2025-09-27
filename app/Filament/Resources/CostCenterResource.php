@@ -40,7 +40,7 @@
                 ->schema([
                     Grid::make(3)
                         ->schema([
-                            Select::make('fund_cluster_w_f_p_s_id')
+                            Select::make('fund_cluster_id')
                                 ->label('Fund Cluster')
                                 // ->relationship('fundClusterWFP', 'name')
                                 ->options(fn($record) => FundCluster::orderBy('id')->pluck('name', 'id'))
@@ -54,13 +54,13 @@
                                 ->options(function ($get) {
 
                                     return MfoFee::where('m_f_o_s_id',
-                                        $get('m_f_o_s_id'))->where('fund_cluster_w_f_p_s_id',
-                                        $get('fund_cluster_w_f_p_s_id'))->pluck('name', 'id');
+                                        $get('m_f_o_s_id'))->where('fund_cluster_id',
+                                        $get('fund_cluster_id'))->pluck('name', 'id');
                                 })
                                 ->searchable()
                                 //->relationship('mfoFee', 'name')
                                 ->visible(fn($get
-                                ) => $get('fund_cluster_w_f_p_s_id') != 1 || $get('fund_cluster_w_f_p_s_id') != 3),
+                                ) => $get('fund_cluster_id') != 1 || $get('fund_cluster_id') != 3),
                         ]),
 
                     Select::make('office_id')

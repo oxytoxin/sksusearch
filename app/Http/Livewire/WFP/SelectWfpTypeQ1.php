@@ -86,7 +86,7 @@
                 ->whereDoesntHave('wfp', function ($query) {
                     $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
                 })
-                ->where('fund_cluster_w_f_p_s_id', $this->fund_cluster)
+                ->where('fund_cluster_id', $this->fund_cluster)
                 ->whereIn('id', $this->cost_centers);
             return $query_test;
         }

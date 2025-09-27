@@ -18,7 +18,7 @@
 
         public function fundClusterWFP()
         {
-            return $this->belongsTo(FundCluster::class, 'fund_cluster_w_f_p_s_id');
+            return $this->belongsTo(FundCluster::class, 'fund_cluster_id');
         }
 
         public function costCenter()

@@ -43,7 +43,7 @@
         {
             $this->record = Wfp::find($record);
             $this->cost_center = $this->record->costCenter;
-            $this->title = FundCluster::find($this->record->fund_cluster_w_f_p_s_id)->name;
+            $this->title = FundCluster::find($this->record->fund_cluster_id)->name;
 
             if (in_array($this->record->fundClusterWfp->id, [1, 3, 9])) {
                 if ($isSupplemental) {
@@ -54,7 +54,7 @@
                         ->whereHas('costCenter', function ($query) {
                             $query->whereHas('wfp', function ($query) {
                                 $query->where('wpf_type_id', $this->wfpType)
-                                    ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                                    ->where('fund_cluster_id', $this->record->fund_cluster_id);
                             });
                         })
                         ->when(!is_null($this->supplementalQuarterId), function ($query) {
@@ -75,7 +75,7 @@
                     $wpfDetails = WfpDetail::whereHas('wfp', function ($query) {
                         $query->where('cost_center_id', $this->costCenterId)
                             ->where('wpf_type_id', $this->wfpType)
-                            ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id)
+                            ->where('fund_cluster_id', $this->record->fund_cluster_id)
                             ->where(function ($query) {
                                 $query->where('is_supplemental', 0)
                                     ->orWhere(function ($query) {
@@ -131,8 +131,8 @@
                         ->where('is_supplemental', $isSupplemental)
                         ->whereHas('costCenter', function ($query) {
                             $query->whereHas('wfp', function ($query) {
-                                $query->where('wpf_type_id', $this->wfpType)->where('fund_cluster_w_f_p_s_id',
-                                    $this->record->fund_cluster_w_f_p_s_id);
+                                $query->where('wpf_type_id', $this->wfpType)->where('fund_cluster_id',
+                                    $this->record->fund_cluster_id);
                             });
                         })
                         ->get();
@@ -142,7 +142,7 @@
                         $query->where('wpf_type_id', $this->wfpType);
                     })->where('is_supplemental', $isSupplemental)
                         ->where('cost_center_id', $this->record->cost_center_id)
-                        ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                        ->where('fund_cluster_id', $this->record->fund_cluster_id);
                 })
                     ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
                     ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -166,8 +166,8 @@
                     $query->when($this->wfpType, function ($query) {
                         $query->where('wpf_type_id', $this->wfpType);
                     })->where('is_supplemental', $isSupplemental)->where('cost_center_id',
-                        $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id',
-                        $this->record->fund_cluster_w_f_p_s_id);
+                        $this->record->cost_center_id)->where('fund_cluster_id',
+                        $this->record->fund_cluster_id);
                 })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
                 $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
             } else {
@@ -175,7 +175,7 @@
                     $isSupplemental)->whereHas('costCenter', function ($query) {
                     $query->where('id', $this->cost_center->id)
                         ->whereHas('mfoFee', function ($query) {
-                            $query->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                            $query->where('fund_cluster_id', $this->record->fund_cluster_id);
                         });
                 })->get();
                 if ($isSupplemental) {
@@ -186,14 +186,14 @@
                         $query->when($this->wfpType, function ($query) {
                             $query->where('wpf_type_id', $this->wfpType);
                         })->where('is_supplemental', 0)->where('cost_center_id',
-                            $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id',
-                            $this->record->fund_cluster_w_f_p_s_id);
+                            $this->record->cost_center_id)->where('fund_cluster_id',
+                            $this->record->fund_cluster_id);
                     })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
                     $this->_164['balance'] = $temp_total_allocated - $this->_164['total_programmed']->total_budget;
                 }
                 // $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
                 //     $query->where('cost_center_id', $this->record->cost_center_id)
-                //           ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                //           ->where('fund_cluster_id', $this->record->fund_cluster_id);
                 // })
                 // ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
                 // ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -217,7 +217,7 @@
                         $query->where('wpf_type_id', $this->wfpType);
                     })->where('is_supplemental', $isSupplemental)->where('cost_center_id',
                         $this->record->cost_center_id)
-                        ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                        ->where('fund_cluster_id', $this->record->fund_cluster_id);
                 })
                     ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
                     ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -241,8 +241,8 @@
                     $query->when($this->wfpType, function ($query) {
                         $query->where('wpf_type_id', $this->wfpType);
                     })->where('is_supplemental', $isSupplemental)->where('cost_center_id',
-                        $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id',
-                        $this->record->fund_cluster_w_f_p_s_id);
+                        $this->record->cost_center_id)->where('fund_cluster_id',
+                        $this->record->fund_cluster_id);
                 })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
                 $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
             }
