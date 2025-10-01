@@ -261,13 +261,10 @@ class UserPRE extends Component
                 ->get();
 
 
-            $this->total_allocated = FundAllocation::when(!is_null($this->supplementalQuarterId), function ($query) {
-                if ($this->supplementalQuarterId == 1) {
-                    $query->where('is_supplemental', 0);
-                } else {
-                    $query->where('supplemental_quarter_id', $this->supplementalQuarterId - 1);
-                }
-            })->where('cost_center_id', $this->cost_center->id)
+            $this->total_allocated = FundAllocation::where('fund_cluster_id', $this->record->fund_cluster_id)
+                ->where('wpf_type_id', $this->wfpType)
+                    ->where('supplemental_quarter_id', $this->supplementalQuarterId)
+                ->where('cost_center_id', $this->cost_center->id)
                 ->where('initial_amount', '>', 0)->sum('initial_amount');
             $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($isSupplemental) {
                 $query->when($this->wfpType, function ($query) {
