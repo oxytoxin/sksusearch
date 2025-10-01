@@ -2,25 +2,26 @@
 
 namespace App\Http\Livewire\Archiver;
 
-use App\Models\DisbursementVoucher;
+use Filament\Forms;
+use Livewire\Component;
+use App\Models\FundCluster;
+use Livewire\WithPagination;
 use App\Models\LegacyDocument;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\Position;
+use App\Models\DisbursementVoucher;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\Layout;
+use Filament\Tables\Actions\Position;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\Layout;
-use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Filters\SelectFilter;
-use Livewire\Component;
-use Livewire\WithPagination;
-use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Tables\Concerns\InteractsWithTable;
 
 class ViewLegacyDocuments extends Component implements HasTable
 {
@@ -51,6 +52,7 @@ class ViewLegacyDocuments extends Component implements HasTable
             ]),
             MultiSelectFilter::make('fund_cluster_name')
             ->label('Fund Cluster')
+             ->options(fn () => FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id')->toArray())
             ->relationship('fund_cluster', 'name'),
             MultiSelectFilter::make('cheque_state')
             ->options([
