@@ -1,6 +1,7 @@
 @php
     $quarters = DB::table('supplemental_quarters')->get();
     $fundClusterWfps = App\Models\FundCluster::where('position', '!=', 0)->orderBy('position', 'asc')->get();
+    $wfp_types = App\Models\WpfType::all();
 @endphp
 <x-app-layout>
     <div class="space-y-2">
@@ -45,6 +46,18 @@
                             </a>
                         @endforeach
                     </nav>
+                </div>
+                <div x-data="{ selectedType: '{{ request()->input('selectedType') }}' }" class="flex my-2">
+                    <select x-model="selectedType" name="selectedType" id="selectedType"
+                        x-on:change="window.location.href = '{{ request()->fullUrl() }}&selectedType=' + $event.target.value"
+                        class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                        <option value="">ALL</option>
+                        @foreach ($wfp_types as $item)
+                            <option value="{{ $item->id }}">
+                                {{ $item->description }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
                 {{--  --}}
                 @if (request()->input('fundClusterWfpId') == 2)
