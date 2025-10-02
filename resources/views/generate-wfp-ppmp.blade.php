@@ -30,7 +30,7 @@
                   @endforeach
               </div>
               @php
-                  $fundClusterWfps = App\Models\FundClusterWFP::where('position', '!=', 0)
+                  $fundClusterWfps = App\Models\FundCluster::where('position', '!=', 0)
                       ->orderBy('position', 'asc')
                       ->get();
               @endphp
