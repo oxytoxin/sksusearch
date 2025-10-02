@@ -1,11 +1,11 @@
   @php
       $quarters = DB::table('supplemental_quarters')->get();
+      $wfp_types = App\Models\WpfType::all();
   @endphp
   <x-app-layout>
       <div x-data class="space-y-2">
           <div class="flex justify-between items-center">
               <h2 class="font-light capitalize text-primary-600">Generate PPMP</h2>
-
           </div>
           <div>
               <div class="mt-2 inline-flex flex-row">
@@ -50,6 +50,18 @@
                               </a>
                           @endforeach
                       </nav>
+                  </div>
+                  <div x-data="{ selectedType: '{{ request()->input('selectedType') }}' }" class="flex my-2">
+                      <select x-model="selectedType" name="selectedType" id="selectedType"
+                          x-on:change="window.location.href = '{{ request()->fullUrl() }}&selectedType=' + $event.target.value"
+                          class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
+                          <option value="">ALL</option>
+                          @foreach ($wfp_types as $item)
+                              <option value="{{ $item->id }}">
+                                  {{ $item->description }}
+                              </option>
+                          @endforeach
+                      </select>
                   </div>
                   @if (request()->input('fundClusterWfpId') == 2)
                       <div class="p-4">

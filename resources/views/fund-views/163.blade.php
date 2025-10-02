@@ -1,47 +1,5 @@
 <div x-data>
-    <div class="p-4">
-        <div class="grid gap-2  justify-center">
-            <button @click="showPrintable = true" wire:click="sksuPre(2)"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
-                SKSU 163 PRE
-            </button>
-            <button @click="showPrintable = true" wire:click="sksuPpmp163"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
-                SKSU 163
-            </button>
-        </div>
-        <div class="flex justify-center space-x-4 mt-3">
-            <button @click="showPrintable = true" wire:click="accessPpmp163"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                ACCESS CAMPUS
-            </button>
-            <button @click="showPrintable = true" wire:click="tacurongPpmp163"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                TACURONG CAMPUS
-            </button>
-            <button @click="showPrintable = true" wire:click="isulanPpmp163"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                ISULAN CAMPUS
-            </button>
-            <button @click="showPrintable = true" wire:click="kalamansigPpmp163"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                KALAMANSIG CAMPUS
-            </button>
-            <button @click="showPrintable = true" wire:click="bagumbayanPpmp163"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                BAGUMBAYAN CAMPUS
-            </button>
-            <button @click="showPrintable = true" wire:click="lutayanPpmp163"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                LUTAYAN CAMPUS
-            </button>
-            <button @click="showPrintable = true" wire:click="palimbangPpmp163"
-                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
-                PALIMBANG CAMPUS
-            </button>
-        </div>
-    </div>
-    <div x-show="showPrintable" class="bg-gray-50">
+    <div class="bg-gray-50">
         @if ($is_active)
             <div class="flex justify-end p-4 space-x-4">
                 <button @click="printOut($refs.printContainer.outerHTML);" type="button"
