@@ -313,7 +313,7 @@ trait OfficeDashboardActions
                     return [
                         Select::make('fund_cluster_id')
                             ->label('Fund Cluster')
-                            ->options(FundCluster::pluck('name', 'id'))
+                            ->options(FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id'))
                             ->default($record->fund_cluster_id)
                             ->required(),
                         TextInput::make('ors_burs')

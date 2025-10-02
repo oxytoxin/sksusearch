@@ -6,7 +6,7 @@
                 class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                 Print
             </button>
-            <button onclick="window.history.back()" href="{{ route('wfp.wfp-submissions', $record->fundClusterWFP->id) }}"
+            <button onclick="window.history.back()" href="{{ route('wfp.wfp-submissions', $record->fundClusterWfp->id) }}"
                 class="flex hover:bg-gray-500 p-2 bg-gray-600 rounded-md font-light capitalize text-white text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5 mr-3">
@@ -546,7 +546,7 @@
                     <div class="flex justify-center mt-5">
                         Prepared by:
                     </div>
-                    <div class="flex justify-center underline font-semibold">
+                    <div class="flex mt-5 justify-center underline font-semibold">
                         {{ $record->costCenter->office->head_employee?->full_name }}
                     </div>
                     <div class="flex justify-center">
@@ -558,7 +558,7 @@
                                 <div class="flex justify-center mt-5">
                                     Noted by:
                                 </div>
-                                <div class="flex justify-center underline font-semibold">
+                                <div class="flex mt-5 justify-center underline font-semibold">
                                     {{ $budget->full_name }}
                                 </div>
                                 <div class="flex justify-center">
@@ -571,7 +571,7 @@
                                 <div class="flex justify-center mt-5">
                                     Recommending Approval:
                                 </div>
-                                <div class="flex justify-center underline font-semibold">
+                                <div class="flex mt-5 justify-center underline font-semibold">
                                     {{ $vp_finance->full_name }}
                                 </div>
                                 <div class="flex justify-center">
@@ -584,7 +584,7 @@
                                 <div class="flex justify-center mt-5">
                                     Approved by:
                                 </div>
-                                <div class="flex justify-center underline font-semibold">
+                                <div class="flex mt-5 justify-center underline font-semibold">
                                     {{ $president->full_name }}
                                 </div>
                                 <div class="flex justify-center">

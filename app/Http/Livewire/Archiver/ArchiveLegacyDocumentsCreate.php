@@ -68,7 +68,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     Select::make("fund_cluster")
                     ->required()
                     ->preload()
-                    ->options(FundCluster::all()->pluck('name', 'id'))
+                    ->options(FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id'))
                     ->reactive()
                     ->required(fn () => in_array($this->document_category,['1','2']))
                     ->visible(fn () => in_array($this->document_category,['1','2']))

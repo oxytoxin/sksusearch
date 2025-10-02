@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Archiver;
 
 use App\Models\DisbursementVoucher;
+use App\Models\FundCluster;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -24,6 +25,7 @@ class ViewArchives extends Component implements HasTable
         return [
             MultiSelectFilter::make('fund_cluster_name')
             ->label('Fund Cluster')
+            ->options(fn () => FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id')->toArray())
             ->relationship('fund_cluster', 'name'),
             Filter::make('created_at')
             ->form([

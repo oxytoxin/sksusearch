@@ -7,7 +7,7 @@ use App\Models\Wfp;
 use Livewire\Component;
 use App\Models\WfpDetail;
 use App\Models\CostCenter;
-use App\Models\FundClusterWFP;
+use App\Models\FundCluster;
 use App\Models\FundAllocation;
 
 class UserPRE extends Component
@@ -43,7 +43,7 @@ class UserPRE extends Component
     {
         $this->record = Wfp::find($record);
         $this->cost_center = $this->record->costCenter;
-        $this->title = FundClusterWFP::find($this->record->fund_cluster_w_f_p_s_id)->name;
+        $this->title = FundCluster::find($this->record->fund_cluster_id)->name;
 
         if (in_array($this->record->fundClusterWfp->id, [1, 3, 9])) {
             if ($isSupplemental) {
@@ -54,7 +54,7 @@ class UserPRE extends Component
                     ->whereHas('costCenter', function ($query) {
                         $query->whereHas('wfp', function ($query) {
                             $query->where('wpf_type_id', $this->wfpType)
-                                ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                                ->where('fund_cluster_id', $this->record->fund_cluster_id);
                         });
                     })
                     ->when(!is_null($this->supplementalQuarterId), function ($query) {
@@ -75,7 +75,7 @@ class UserPRE extends Component
                 $wpfDetails = WfpDetail::whereHas('wfp', function ($query) {
                     $query->where('cost_center_id', $this->costCenterId)
                         ->where('wpf_type_id', $this->wfpType)
-                        ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id)
+                        ->where('fund_cluster_id', $this->record->fund_cluster_id)
                         ->where(function ($query) {
                             $query->where('is_supplemental', 0)
                                 ->orWhere(function ($query) {
@@ -96,19 +96,35 @@ class UserPRE extends Component
 
                 $this->forwarded_balance = $this->forwarded_ppmp_details->sum('initial_amount') - $this->sub_forwared_balance->sum('balance_amount');
 
-                $supplemental_fund_allocation = $temp_fund_allocation->where('supplemental_quarter_id', $this->supplementalQuarterId);
+                $supplemental_fund_allocation = $temp_fund_allocation->where(
+                    'supplemental_quarter_id',
+                    $this->supplementalQuarterId
+                );
 
-                $non_supplemental_fund_allocation = $temp_fund_allocation->filter(function ($item) use ($supplemental_fund_allocation) {
+                $non_supplemental_fund_allocation = $temp_fund_allocation->filter(function ($item) use (
+                    $supplemental_fund_allocation
+                ) {
                     return $item->supplemental_quarter_id !== $this->supplementalQuarterId;
                 });
 
-                $this->fund_allocation = $temp_fund_allocation->filter(function ($item) use ($supplemental_fund_allocation, $non_supplemental_fund_allocation) {
+                $this->fund_allocation = $temp_fund_allocation->filter(function ($item) use (
+                    $supplemental_fund_allocation,
+                    $non_supplemental_fund_allocation
+                ) {
                     if ($item->is_supplemental === 1) {
                         return $item;
-                    } else if ($item->is_supplemental === 0 && !is_null($non_supplemental_fund_allocation->where('category_group_id', $item->category_group_id)->first()) && $supplemental_fund_allocation->where('category_group_id', $item->category_group_id)->first() === null) {
-                        return $item;
                     } else {
-                        return null;
+                        if ($item->is_supplemental === 0 && !is_null($non_supplemental_fund_allocation->where(
+                            'category_group_id',
+                            $item->category_group_id
+                        )->first()) && $supplemental_fund_allocation->where(
+                            'category_group_id',
+                            $item->category_group_id
+                        )->first() === null) {
+                            return $item;
+                        } else {
+                            return null;
+                        }
                     }
                 })->filter(function ($item) use ($supplemental_fund_allocation, $non_supplemental_fund_allocation) {
                     return !is_null($item);
@@ -121,7 +137,10 @@ class UserPRE extends Component
                     ->where('is_supplemental', $isSupplemental)
                     ->whereHas('costCenter', function ($query) {
                         $query->whereHas('wfp', function ($query) {
-                            $query->where('wpf_type_id', $this->wfpType)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                            $query->where('wpf_type_id', $this->wfpType)->where(
+                                'fund_cluster_id',
+                                $this->record->fund_cluster_id
+                            );
                         });
                     })
                     ->get();
@@ -131,7 +150,7 @@ class UserPRE extends Component
                     $query->where('wpf_type_id', $this->wfpType);
                 })->where('is_supplemental', $isSupplemental)
                     ->where('cost_center_id', $this->record->cost_center_id)
-                    ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                    ->where('fund_cluster_id', $this->record->fund_cluster_id);
             })
                 ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
                 ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -154,52 +173,78 @@ class UserPRE extends Component
             $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($isSupplemental) {
                 $query->when($this->wfpType, function ($query) {
                     $query->where('wpf_type_id', $this->wfpType);
-                })->where('is_supplemental', $isSupplemental)->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                })->where('is_supplemental', $isSupplemental)->where(
+                    'cost_center_id',
+                    $this->record->cost_center_id
+                )->where(
+                    'fund_cluster_id',
+                    $this->record->fund_cluster_id
+                );
             })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
         } else {
-            $this->fund_allocation = FundAllocation::where('is_supplemental', $isSupplemental)->whereHas('costCenter', function ($query) {
+            $this->fund_allocation = FundAllocation::where(
+                'supplemental_quarter_id',
+                $this->supplementalQuarterId
+            )->whereHas('costCenter', function ($query) {
                 $query->where('id', $this->cost_center->id)
                     ->whereHas('mfoFee', function ($query) {
-                        $query->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                        $query->where('fund_cluster_id', $this->record->fund_cluster_id);
                     });
             })->get();
             if ($isSupplemental) {
-                $temp_total_allocated = FundAllocation::where('is_supplemental', 0)->where('cost_center_id', $this->cost_center->id)
+                $temp_total_allocated = FundAllocation::where('fund_cluster_id',$this->record->fund_cluster_id)
+                    ->where('wpf_type_id', $this->wfpType)
+                   ->where(function ($query) {
+                        $query->when(!is_null($this->supplementalQuarterId), function ($query) {
+                          if ($this->supplementalQuarterId == 1) {
+                                $query->where('is_supplemental', 0);
+                            } else {
+                                $query->where('is_supplemental', 0)->orWhere(function ($query) {
+                                    $query->where('supplemental_quarter_id', '!=', null)->where('supplemental_quarter_id', '<', $this->supplementalQuarterId);
+                                });
+                            }
+                        });
+                   })
+                    ->where(
+                        'cost_center_id',
+                        $this->cost_center->id
+                    )
                     ->where('initial_amount', '>', 0)->sum('initial_amount');
+
                 $this->_164['total_programmed'] = WfpDetail::whereHas('wfp', function ($query) {
                     $query->when($this->wfpType, function ($query) {
                         $query->where('wpf_type_id', $this->wfpType);
-                    })->where('is_supplemental', 0)->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                    })
+                       ->where(function($query) {
+                           $query->when(!is_null($this->supplementalQuarterId), function ($query) {
+                            if ($this->supplementalQuarterId == 1) {
+                                $query->where('is_supplemental', 0);
+                            } else {
+                                $query->where('is_supplemental', 0)->orWhere(function ($query) {
+                                    $query->where('supplemental_quarter_id', '!=', null)->where('supplemental_quarter_id', '<', $this->supplementalQuarterId);
+                                });
+                            }
+                        });
+                       })
+                        ->where(
+                            'cost_center_id',
+                            $this->record->cost_center_id
+                        )->where(
+                            'fund_cluster_id',
+                            $this->record->fund_cluster_id
+                        );
                 })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
                 $this->_164['balance'] = $temp_total_allocated - $this->_164['total_programmed']->total_budget;
             }
-            // $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
-            //     $query->where('cost_center_id', $this->record->cost_center_id)
-            //           ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
-            // })
-            // ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
-            // ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
-            // ->join('category_item_budgets', 'supplies.category_item_budget_id', '=', 'category_item_budgets.id')
-            // ->join('category_items', 'supplies.category_item_id', '=', 'category_items.id')
-            // ->select(
-            //     'wfps.cost_center_id as cost_center_id',
-            //     'category_items.uacs_code as uacs',
-            //     'category_items.name as item_name',
-            //     \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
-            //     'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
-            //     'category_item_budgets.name as budget_name', // Include the related field in the select
-            //     'category_item_budgets.id as budget_id',
-            //     \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
-            // )
-            // ->groupBy('cost_center_id', 'uacs', 'budget_id', 'item_name', 'budget_uacs', 'budget_name')
-            // ->get();
-
             $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) use ($isSupplemental) {
                 $query->when($this->wfpType, function ($query) {
                     $query->where('wpf_type_id', $this->wfpType);
-                })->where('is_supplemental', $isSupplemental)->where('cost_center_id', $this->record->cost_center_id)
-                    ->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                })->where('supplemental_quarter_id', $this->supplementalQuarterId)->where(
+                    'cost_center_id',
+                    $this->record->cost_center_id
+                )
+                    ->where('fund_cluster_id', $this->record->fund_cluster_id);
             })
                 ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
                 ->join('supplies', 'wfp_details.supply_id', '=', 'supplies.id') // Join with the supplies table
@@ -216,16 +261,32 @@ class UserPRE extends Component
                 ->get();
 
 
-            $this->total_allocated = FundAllocation::where('is_supplemental', $isSupplemental)->where('cost_center_id', $this->cost_center->id)
+            $this->total_allocated = FundAllocation::where('fund_cluster_id', $this->record->fund_cluster_id)
+                ->where('wpf_type_id', $this->wfpType)
+                    ->where('supplemental_quarter_id', $this->supplementalQuarterId)
+                ->where('cost_center_id', $this->cost_center->id)
                 ->where('initial_amount', '>', 0)->sum('initial_amount');
             $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($isSupplemental) {
                 $query->when($this->wfpType, function ($query) {
                     $query->where('wpf_type_id', $this->wfpType);
-                })->where('is_supplemental', $isSupplemental)->where('cost_center_id', $this->record->cost_center_id)->where('fund_cluster_w_f_p_s_id', $this->record->fund_cluster_w_f_p_s_id);
+                })->when(!is_null($this->supplementalQuarterId), function ($query) {
+                    if ($this->supplementalQuarterId == 1) {
+                        $query->where('is_supplemental', 0);
+                    } else {
+                        $query->where('supplemental_quarter_id', $this->supplementalQuarterId - 1);
+                    }
+                })->where(
+                    'cost_center_id',
+                    $this->record->cost_center_id
+                )->where(
+                    'fund_cluster_id',
+                    $this->record->fund_cluster_id
+                );
             })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
             $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
         }
     }
+
     public function render()
     {
         return view('livewire.w-f-p.user-p-r-e');

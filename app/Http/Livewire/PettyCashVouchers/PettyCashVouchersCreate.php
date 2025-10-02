@@ -53,7 +53,7 @@ class PettyCashVouchersCreate extends Component implements HasForms
             Select::make('signatory_id')->label('Signatory')->searchable()->required()->options(EmployeeInformation::pluck('full_name', 'user_id')),
             Grid::make(2)->schema([
                 TextInput::make('entity_name')->default('SKSU'),
-                Select::make('fund_cluster_id')->label('Fund Cluster')->required()->options(FundCluster::pluck('name', 'id')),
+                Select::make('fund_cluster_id')->label('Fund Cluster')->required()->options(FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id')),
                 TextInput::make('payee')->required(),
                 TextInput::make('address')->maxLength(191),
                 TextInput::make('responsibility_center'),

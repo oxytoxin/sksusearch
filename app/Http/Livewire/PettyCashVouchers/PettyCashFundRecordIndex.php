@@ -63,7 +63,7 @@ class PettyCashFundRecordIndex extends Component implements HasForms
                     ->placeholder('All')
                     ->reactive()
                     ->label('Fund Cluster')
-                    ->options(FundCluster::pluck('name', 'id')),
+                    ->options(FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id')),
 
             ])
         ];

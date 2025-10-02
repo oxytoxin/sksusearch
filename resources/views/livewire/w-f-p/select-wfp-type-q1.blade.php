@@ -6,8 +6,8 @@
                 <div class="sm:hidden">
                     <label for="tabs" class="sr-only">Select a tab</label>
                     <select id="tabs" name="tabs"
-                        class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
-                        x-model="selectedTab">
+                            class="block w-full rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500"
+                            x-model="selectedTab">
                         <option>101</option>
                         <option>161</option>
                         <option>163</option>
@@ -18,18 +18,18 @@
                     </select>
                 </div>
                 @php
-                    $funds = App\Models\FundClusterWFP::where('position', '!=', 0)->orderBy('position', 'asc')->get();
+                    $funds = App\Models\FundCluster::where('position', '!=', 0)->orderBy('position', 'asc')->get();
                 @endphp
                 <div class="hidden sm:block">
                     <nav class="flex space-x-4" aria-label="Tabs">
                         @foreach ($funds as $fund)
                             <button wire:click="filter({{ $fund->id }})"
-                                class="rounded-md px-3 py-2 text-sm font-medium"
-                                :class="{
+                                    class="rounded-md px-3 py-2 text-sm font-medium"
+                                    :class="{
                                     'bg-green-500 text-white': selectedTab === '{{ $fund->name }}',
                                     'text-gray-800 hover:text-green-700': selectedTab !== '{{ $fund->name }}'
                                 }"
-                                @click.prevent="selectedTab = '{{ $fund->name }}'">
+                                    @click.prevent="selectedTab = '{{ $fund->name }}'">
                                 Fund {{ $fund->name }}
                             </button>
                         @endforeach

@@ -1,38 +1,38 @@
 <?php
 
-namespace Database\Seeders;
+    namespace Database\Seeders;
 
-use App\Models\FundClusterWFP;
-use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+    use App\Models\FundCluster;
+    use Illuminate\Database\Seeder;
+    use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class FundWFPSeeder extends Seeder
-{
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    class FundWFPSeeder extends Seeder
     {
-        FundClusterWFP::create([
-            'name' => '101',
-        ]);
+        /**
+         * Run the database seeds.
+         *
+         * @return void
+         */
+        public function run()
+        {
+            FundCluster::create([
+                'name' => '101',
+            ]);
 
-        FundClusterWFP::create([
-            'name' => '161',
-        ]);
+            FundCluster::create([
+                'name' => '161',
+            ]);
 
-        FundClusterWFP::create([
-            'name' => '163',
-        ]);
+            FundCluster::create([
+                'name' => '163',
+            ]);
 
-        FundClusterWFP::create([
-            'name' => '164TF',
-        ]);
+            FundCluster::create([
+                'name' => '164TF',
+            ]);
 
-        FundClusterWFP::create([
-            'name' => '164FF/OSF',
-        ]);
+            FundCluster::create([
+                'name' => '164FF/OSF',
+            ]);
+        }
     }
-}
