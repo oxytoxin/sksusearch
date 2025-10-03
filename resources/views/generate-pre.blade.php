@@ -62,8 +62,12 @@
                 {{--  --}}
                 @if (request()->input('fundClusterWfpId') == 2)
                     <div class="p-4">
-                        <div class="flex justify-center">
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University']) }}"
+                        <div class="grid justify-center">
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true]) }}"
+                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                                SKSU {{ request()->input('sksuLabel') }} PRE
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => false]) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }}
                             </a>
@@ -73,7 +77,7 @@
                         @endphp
                         <div class="grid grid-cols-7 space-x-4 mt-3">
                             @foreach ($campuses as $item)
-                                <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'campusId' => $item->id, 'mfoId' => 6]) }}"
+                                <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'campusId' => $item->id, 'mfoId' => 6, 'showPre' => false]) }}"
                                     class="bg-green-800 hover:bg-green-700 text-center text-white font-bold py-1.5 px-3 rounded-lg uppercase">
                                     {{ $item->name }}
                                 </a>
@@ -82,34 +86,38 @@
                     </div>
                 @else
                     <div class="p-4">
-                        <div class="flex justify-center">
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University']) }}"
+                        <div class="grid justify-center">
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true]) }}"
+                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                                SKSU {{ request()->input('sksuLabel') }} PRE
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'title' => 'Sultan Kudarat State University']) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }}
                             </a>
                         </div>
                         <div class="flex justify-center space-x-4 mt-3">
-                            <a href="{{ request()->fullUrlWithQuery(['mfoId' => 1, 'title' => 'General Admission and Support Services (GASS)']) }}"
+                            <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'mfoId' => 1, 'title' => 'General Admission and Support Services (GASS)']) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                                 General Admission and Support Services (GASS)
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['mfoId' => 2, 'title' => 'Higher Education Services (HES)']) }}"
+                            <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'mfoId' => 2, 'title' => 'Higher Education Services (HES)']) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                                 Higher Education Services (HES)
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['mfoId' => 3, 'title' => 'Advanced Education Services (AES)']) }}"
+                            <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'mfoId' => 3, 'title' => 'Advanced Education Services (AES)']) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                                 Advanced Education Services (AES)
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['mfoId' => 4, 'title' => 'Research and Development (RD)']) }}"
+                            <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'mfoId' => 4, 'title' => 'Research and Development (RD)']) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                                 Research and Development (RD)
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['mfoId' => 5, 'title' => 'Extension Services (ES)']) }}"
+                            <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'mfoId' => 5, 'title' => 'Extension Services (ES)']) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                                 Extension Services (ES)
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['mfoId' => 6, 'title' => 'Local Fund Projects (LFP)']) }}"
+                            <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'mfoId' => 6, 'title' => 'Local Fund Projects (LFP)']) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-lg">
                                 Local Fund Projects (LFP)
                             </a>
