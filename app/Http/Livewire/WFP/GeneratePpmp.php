@@ -151,7 +151,6 @@ class GeneratePpmp extends Component
             }
         } else {
             $this->title = 'Sultan Kudarat State University';
-
             $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
                 ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
                 ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
