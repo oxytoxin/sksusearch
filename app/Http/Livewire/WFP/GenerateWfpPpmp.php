@@ -22,12 +22,10 @@
         public $mfoId = null;
         public $campusId = null;
 
-        protected $queryString = ['fundClusterWfpId', 'supplementalQuarterId', 'mfoId', 'title', 'campusId'];
+        protected $queryString = ['fundClusterWfpId', 'supplementalQuarterId', 'mfoId', 'title', 'campusId','selectedType'];
 
         public function mount()
         {
-            $this->wfp_types = WpfType::all();
-            $this->selectedType = 1;
             $this->is_active = true;
             $this->record = WfpDetail::where('is_ppmp', 1)->whereHas('wfp', function ($query) {
                 $query->where('wpf_type_id', $this->selectedType)
