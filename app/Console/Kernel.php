@@ -16,8 +16,18 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('cash-advance:check-reminders')->everyFiveMinutes()->runInBackground();
+        // $schedule->command('cash-advance:check-reminders')->everyFiveMinutes()->runInBackground();
         // $schedule->command('cash-advance:check-reminders')->dailyAt('00:00');
+        if (env('CA_REMINDER_FREQUENCY', 'daily') === 'daily') {
+    $schedule->command('cash-advance:check-reminders')
+             ->dailyAt('00:00')
+             ->runInBackground();
+} else {
+    $schedule->command('cash-advance:check-reminders')
+             ->everyFiveMinutes()
+             ->runInBackground();
+}
+
     }
 
     /**
