@@ -5,7 +5,6 @@ namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use App\Models\DisbursementVoucher;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,7 +39,21 @@ class DisbursementVouchersUnliquidated extends Component implements HasTable
         return [
             Action::make('liquidate')->button()->url(fn($record) => route('requisitioner.liquidation-reports.create', [
                 'disbursement_voucher' => $record
+            ])),
+
+            Action::make('view_notices')
+            ->label('View Notices')
+            ->color('primary')
+            ->icon('heroicon-o-bell-alert')
+            ->button()
+            ->url(fn ($record) => route('disbursement-vouchers.notices', [
+                'disbursement_voucher' => $record->id,
             ]))
+            ->visible(fn ($record) =>
+                // show only if there are related notice histories
+                $record->cash_advance_reminder &&
+                $record->cash_advance_reminder->caReminderStepHistories()->exists()
+            ),
         ];
     }
 

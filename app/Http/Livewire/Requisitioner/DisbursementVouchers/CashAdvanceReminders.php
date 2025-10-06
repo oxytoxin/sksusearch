@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
-use Dom\Text;
+
 use Livewire\Component;
 use App\Models\CaReminderStep;
 use App\Models\EmployeeInformation;
@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\NotificationController;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+
 
 class CashAdvanceReminders extends Component implements HasTable
 {
@@ -275,13 +275,13 @@ class CashAdvanceReminders extends Component implements HasTable
             Action::make('uploadFD')->label('Upload FD')->icon('ri-send-plane-fill')
                 ->button()
                 ->form([
-                //    FileUpload::make('auditor_attachment')
-                //         ->label('Upload FD')
-                //         ->required()
-                //         ->preserveFilenames()
-                //         ->disk('public')
-                //         ->directory('fd')
-                //         ->acceptedFileTypes(['application/pdf']),
+                   FileUpload::make('auditor_attachment')
+                        ->label('Upload FD')
+                        ->required()
+                        ->preserveFilenames()
+                        ->disk('public')
+                        ->directory('fd')
+                        ->acceptedFileTypes(['application/pdf']),
                     DatePicker::make('auditor_deadline')
                         ->label('Deadline')
                         ->required()

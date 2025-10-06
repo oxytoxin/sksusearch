@@ -18,7 +18,7 @@ class MyNotices extends Component implements HasTable
 {
     use InteractsWithTable;
 
-    
+
 
 
     // public function mount(){
@@ -48,7 +48,7 @@ class MyNotices extends Component implements HasTable
         return [
             ActionGroup::make([
 
-                  ViewAction::make('view')
+            ViewAction::make('view')
                ->label('Preview DV')
                ->modalContent(fn($record) => view('components.disbursement_vouchers.disbursement_voucher_view_no_layout', ['disbursement_voucher' => $record->caReminderStep->disbursement_voucher]))
                ->modalWidth('4xl')
