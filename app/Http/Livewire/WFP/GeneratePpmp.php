@@ -57,32 +57,32 @@ class GeneratePpmp extends Component
             }else if(strpos($this->sksuLabel, '164') !== false){
                 $this->load164();
             } else {
-                $this->fund_allocation = FundAllocation::selectRaw(
-                    'fund_allocations.wpf_type_id, category_groups.id as category_group_id,
-            category_groups.name as name, SUM(fund_allocations.initial_amount) as total_allocated'
-                )
-                    ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
-                    ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
-                    ->join('wfps', 'cost_centers.id', '=', 'wfps.cost_center_id') // Ensure wfp exists
-                    ->when(!is_null($this->campusId), function ($query) {
-                        $query->join('campuses', 'offices.campus_id', '=', 'campuses.id') // Join campuses table
-                            ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id');
-                    })
-                    ->when(!is_null($this->mfoId), function ($query) {
-                        $query->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
-                            ->where('m_f_o_s.id', $this->mfoId);
-                    })
-                    ->where('fund_allocations.fund_cluster_id', $this->fundClusterWfpId)
-                    ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
-                    ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
-                    ->when(is_null($this->supplementalQuarterId), function ($query) {
-                        $query->where('fund_allocations.is_supplemental', 0);
-                    })
-                    ->when(!is_null($this->supplementalQuarterId), function ($query) {
-                        $query->where('fund_allocations.supplemental_quarter_id', $this->supplementalQuarterId);
-                    })
-                    ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
-                    ->get();
+              $this->fund_allocation = FundAllocation::selectRaw('fund_allocations.wpf_type_id,
+        category_groups.id as category_group_id,
+        category_groups.name as name,
+        SUM(fund_allocations.initial_amount) as total_allocated
+    ')
+    ->join('category_groups', 'fund_allocations.category_group_id', '=', 'category_groups.id')
+    ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
+    ->when(!is_null($this->campusId), function ($query) {
+        $query->join('campuses', 'offices.campus_id', '=', 'campuses.id') // Check if "offices" join exists
+              ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id');
+    })
+    ->when(!is_null($this->mfoId), function ($query) {
+        $query->join('m_f_o_s', 'cost_centers.m_f_o_s_id', '=', 'm_f_o_s.id')
+              ->where('m_f_o_s.id', $this->mfoId);
+    })
+    ->where('fund_allocations.fund_cluster_id', $this->fundClusterWfpId)
+    ->where('fund_allocations.wpf_type_id', $this->selectedType)
+    ->where('fund_allocations.initial_amount', '>', 0)
+    ->when(is_null($this->supplementalQuarterId), function ($query) {
+        $query->where('fund_allocations.is_supplemental', 0);
+    })
+    ->when(!is_null($this->supplementalQuarterId), function ($query) {
+        $query->where('fund_allocations.supplemental_quarter_id', $this->supplementalQuarterId);
+    })
+    ->groupBy('fund_allocations.wpf_type_id','category_groups.id', 'category_groups.name')
+    ->get();
 
                 $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {
                     $query->where('wpf_type_id', $this->selectedType)
@@ -893,9 +893,10 @@ class GeneratePpmp extends Component
             ->where('fund_allocations.wpf_type_id', $this->selectedType) // Explicit table name
             ->where('fund_allocations.initial_amount', '>', 0) // Explicit table name
             ->where('fund_allocations.is_supplemental', 0)
-            ->whereIn('m_f_o_s.id', [6, 7])
+            ->whereIn('m_f_o_s.id', [6,7])
             ->groupBy('fund_allocations.wpf_type_id', 'category_groups.id', 'category_groups.name')
             ->get();
+
 
 
         $this->ppmp_details = WfpDetail::whereHas('wfp', function ($query) {

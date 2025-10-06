@@ -17,7 +17,7 @@
                         Program of Receipts & Expenditures (PRE)
                     </p>
                     <p class="text-xl font-medium">
-                        Fund 163
+                        Fund {{ $sksuLabel }}
                     </p>
                     <p class="text-md font-normal">{{ $title }}</p>
                 </div>
