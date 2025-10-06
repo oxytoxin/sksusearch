@@ -67,7 +67,7 @@
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }} PRE
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => false]) }}"
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => false, 'mfoId' => null]) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }}
                             </a>
