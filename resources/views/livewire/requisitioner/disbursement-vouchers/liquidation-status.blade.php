@@ -24,7 +24,7 @@
             x-transition:enter-end="scale-100">
             <div x-transition:enter="transition fade-in duration-700" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100">
-                <livewire:requisitioner.disbursement-vouchers.disbursement-vouchers-unliquidated />
+                <livewire:requisitioner.disbursement-vouchers.disbursement-vouchers-liquidated />
             </div>
         </div>
         <div x-show="tab === 'liquidated'" class="origin-top-left bg-white p-4 rounded-b-lg rounded-r-lg"
@@ -34,7 +34,7 @@
             <div {{-- x-transition:enter="transition fade-in duration-700"
                 x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" --}}>
-                Liquidated
+              <livewire:requisitioner.disbursement-vouchers.disbursement-vouchers-unliquidated />
                 {{-- <livewire:requisitioner.disbursement-vouchers.disbursement-vouchers-liquidated /> --}}
             </div>
         </div>
