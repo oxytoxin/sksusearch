@@ -19,7 +19,7 @@
                 open = true
             "
         />
-        <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-primary-500 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+        <div class="mt-2 px-2 py-1 bg-primary-500 text-white text-xs rounded whitespace-nowrap inline-block absolute left-1/2 -translate-x-1/2 z-10 text-center">
             Navigate the SEARCH Dashboard
         </div>
     </div>
@@ -73,9 +73,10 @@
                     open = true
                 "
             />
-            <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-primary-500 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                Create Travel Order
+            <div class="mt-2 px-2 py-1 bg-primary-500 text-white text-xs rounded whitespace-nowrap inline-block absolute left-1/2 -translate-x-1/2 z-10 text-center">
+            Create Travel Order
             </div>
+
         </div>
 
         <!-- Modal -->
@@ -122,8 +123,8 @@
                 open = true
             "
         />
-        <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-primary-500 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-            Request Vehicle
+         <div class="mt-2 px-2 py-1 bg-primary-500 text-white text-xs rounded whitespace-nowrap inline-block absolute left-1/2 -translate-x-1/2 z-10 text-center">
+             Request Vehicle
         </div>
     </div>
 
@@ -171,8 +172,8 @@
                 open = true
             "
         />
-        <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-primary-500 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-            Create Activity Design
+         <div class="mt-2 px-2 py-1 bg-primary-500 text-white text-xs rounded whitespace-nowrap inline-block absolute left-1/2 -translate-x-1/2 z-10 text-center">
+             Create Activity Design
         </div>
     </div>
 
@@ -206,7 +207,7 @@
     </section>
 
     <!-- Middle band: Financials -->
-    <section class="relative h-[40vh] bg-[#cce0c1] border-b-[2px] border-[#a2c69b]">
+    <section class="relative h-[45vh] bg-[#cce0c1] border-b-[2px] border-[#a2c69b]">
       <div class="absolute left-4 top-1/2 -translate-y-1/2 -rotate-90 origin-left text-sm font-semibold tracking-tight text-black">
         Financials
       </div>
@@ -227,9 +228,9 @@
                     open = true
                 "
             />
-            <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-primary-500 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+             <div class="mt-2 px-2 py-1 bg-primary-500 text-white text-xs rounded whitespace-nowrap inline-block absolute left-1/2 -translate-x-1/2 z-10 text-center">
                 Disbursement Voucher
-            </div>
+             </div>
         </div>
 
         <!-- Modal -->
@@ -261,14 +262,14 @@
 
 
       <!-- Second Box: Cash Advance -->
-      <div class="absolute top-[175px] left-[505px] border border-black bg-gray-600 shadow px-1 py-1 text-white max-w-28 text-sm">
+      <div class="absolute top-[205px] left-[505px] border border-black bg-gray-600 shadow px-1 py-1 text-white max-w-28 text-sm">
         Cash Advance
       </div>
 
       <!-- Third Box: Liquidate Cash Advance -->
      <div
             x-data="{ open: false, videoSrc: '' }"
-            class="absolute top-60 left-[500px] border border-black bg-white shadow px-1 py-1 max-w-28"
+            class="absolute top-[270px] left-[500px] border border-black bg-white shadow px-1 py-1 max-w-28"
         >
             <!-- Image with hover tooltip -->
             <div class="relative group">
@@ -281,7 +282,7 @@
                         open = true
                     "
                 />
-                <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-primary-500 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                <div class="mt-2 px-2 py-1 bg-primary-500 text-white text-xs rounded whitespace-nowrap inline-block absolute left-1/2 -translate-x-1/2 z-10 text-center">
                     Liquidate Cash Advance (Liquidation Report)
                 </div>
             </div>
@@ -330,7 +331,7 @@
                         open = true
                     "
                 />
-                <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-primary-500 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                <div class="mt-2 px-2 py-1 bg-primary-500 text-white text-xs rounded whitespace-nowrap inline-block absolute left-1/2 -translate-x-1/2 z-10 text-center">
                     Track Disbursement Voucher
                 </div>
             </div>
@@ -366,7 +367,7 @@
       <!-- Fifth Box: Track Liquidation Report -->
      <div
     x-data="{ open: false, videoSrc: '' }"
-    class="absolute top-60 left-[850px] border border-black bg-white shadow px-1 py-1 max-w-28"
+    class="absolute top-[270px] left-[850px] border border-black bg-white shadow px-1 py-1 max-w-28"
 >
     <!-- Image with hover tooltip -->
     <div class="relative group">
@@ -379,7 +380,7 @@
                 open = true
             "
         />
-        <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 bg-primary-500 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+        <div class="mt-2 px-2 py-1 bg-primary-500 text-white text-xs rounded whitespace-nowrap inline-block absolute left-1/2 -translate-x-1/2 z-10 text-center">
             Track Liquidation Report
         </div>
     </div>
@@ -414,7 +415,7 @@
     </section>
 
     <!-- Bottom band: Others -->
-    <section class="relative h-[40vh] bg-[#2f5b2f]">
+    <section class="relative h-[35vh] bg-[#477a45]">
       <div class="absolute left-4 top-1/2 -translate-y-1/2 -rotate-90 origin-left text-sm font-semibold tracking-tight text-white">
         Others
       </div>
@@ -437,14 +438,14 @@
       {{-- <path d="M700 478 L850 200" stroke="black" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrowhead)" /> --}}
 
       <!-- Broken line: Liquidate Cash Advance -> Track Liquidation Report -->
-    <line x1="612" y1="670" x2="846" y2="670" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" />
+    <line x1="612" y1="710" x2="846" y2="710" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" />
       {{-- <path d="M640 480 L850 480" stroke="black" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrowhead)" /> --}}
 
       <!-- Line: Disbursement Voucher -> Cash Advance -->
-      <line x1="555" y1="532" x2="555" y2="553" stroke="black" stroke-width="1.5"  />
+      <line x1="555" y1="532" x2="555" y2="583" stroke="black" stroke-width="1.5"  />
 
       <!-- Arrow: Cash Advance -> Liquidate Cash Advance -->
-      <line x1="555" y1="582" x2="555" y2="612" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
+      <line x1="555" y1="612" x2="555" y2="642" stroke="black" stroke-width="1.5" marker-end="url(#arrowhead)" />
 
       <!-- Define arrowhead -->
       <defs>
