@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
-use Illuminate\Database\Eloquent\Builder;
-use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\Storage;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use App\Http\Controllers\NotificationController;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -273,13 +275,13 @@ class CashAdvanceReminders extends Component implements HasTable
             Action::make('uploadFD')->label('Upload FD')->icon('ri-send-plane-fill')
                 ->button()
                 ->form([
-                   FileUpload::make('auditor_attachment')
-                        ->label('Upload FD')
-                        ->required()
-                        ->preserveFilenames()
-                        ->disk('public')
-                        ->directory('fd')
-                        ->acceptedFileTypes(['application/pdf']),
+                //    FileUpload::make('auditor_attachment')
+                //         ->label('Upload FD')
+                //         ->required()
+                //         ->preserveFilenames()
+                //         ->disk('public')
+                //         ->directory('fd')
+                //         ->acceptedFileTypes(['application/pdf']),
                     DatePicker::make('auditor_deadline')
                         ->label('Deadline')
                         ->required()
@@ -287,7 +289,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         ->minDate(now()),
                 ])
                 ->action(function ($record, $data) {
-                    $record->auditor_attachment = $data['auditor_attachment'];
+                    // $record->auditor_attachment = $data['auditor_attachment'];
                     $record->auditor_deadline = $data['auditor_deadline'];
                     $record->status = 'On-Going';
                     $record->step = 7;
@@ -313,8 +315,29 @@ class CashAdvanceReminders extends Component implements HasTable
                         // 'user_id' => Auth::id(),
                     ]);
                     $this->emit('historyCreated');
+                        $url = Storage::disk(app()->environment('local') ? 'local' : 'public')
+            ->url($record->auditor_attachment ??'#');
+                    NotificationController::sendCASystemReminder(
+            'FDS',
+            'Formal Demand File Sent',
+            'The Formal Demand file for your cash advance (' .
+                $record->disbursement_voucher->tracking_number .
+                ') has been uploaded. Please review it immediately.',
+            $this->auditor->user->name,
+            $record->disbursementVoucher->user->name,
+            $this->auditor->id,
+            $record->disbursementVoucher->user,
+            '#',
+            $record->disbursement_voucher
+        );
 
-                    
+        // ✅ Show success notification (Filament)
+        Notification::make()
+            ->title('Formal Demand Uploaded')
+            ->body('Notification sent to ' . $record->disbursementVoucher->user->name)
+            ->success()
+            ->send();
+
 
                 })
                 ->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),

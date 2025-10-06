@@ -15,8 +15,8 @@ class CaReminderStepHistory extends Model
 
     public function caReminderStep()
     {
-        return $this->belongsTo(CaReminderStep::class);
+        return $this->belongsTo(CaReminderStep::class,'ca_reminder_step_id');
     }
-    
+
 
 }

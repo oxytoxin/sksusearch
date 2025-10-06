@@ -71,7 +71,7 @@
         </button>
 
         <div class="space-y-1" class="origin-top-left" id="sub-menu-1" x-show='open' x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95' x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-300' x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'>
-            <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900" href="{{ route('requisitioner.disbursement-vouchers.unliquidated') }}" href="#">
+            <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900" href="{{ route('requisitioner.disbursement-vouchers.unliquidated') }}" >
                 Unliquidated
             </a>
             @php
@@ -84,6 +84,11 @@
                     Notices
                 </a>
             @endif
+
+
+         <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900" href="{{ route('requisitioner.disbursement-my-notices') }}" >
+              My Notices
+          </a>
 
         </div>
     </div>
