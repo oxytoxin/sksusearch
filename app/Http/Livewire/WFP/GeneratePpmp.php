@@ -54,7 +54,7 @@ class GeneratePpmp extends Component
         if (!$this->showPre) {
             if($this->fundClusterWfpId === 2){
                 $this->load163();
-            }else if(strpos($this->sksuLabel, '164') !== false){
+            }else if($this->is164){
                 $this->load164();
             } else {
               $this->fund_allocation = FundAllocation::selectRaw('fund_allocations.wpf_type_id,
@@ -241,7 +241,7 @@ class GeneratePpmp extends Component
 
     public function load164()
     {
-    $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
+     $this->fund_allocation = FundAllocation::selectRaw('wpf_type_id, mfo_fees.id as mfo_fee_id, mfo_fees.name as name, SUM(initial_amount) as total_allocated')
             ->join('cost_centers', 'fund_allocations.cost_center_id', '=', 'cost_centers.id')
             ->join('mfo_fees', 'cost_centers.mfo_fee_id', '=', 'mfo_fees.id')
             ->where('mfo_fees.fund_cluster_id', $this->fundClusterWfpId)
@@ -252,7 +252,9 @@ class GeneratePpmp extends Component
             ->when(is_null($this->supplementalQuarterId), function ($query) {
                 $query->where('is_supplemental', 0);
             })
-            ->where('cost_centers.m_f_o_s_id', $this->mfoId)
+            ->when(!is_null($this->mfoId), function ($query) {
+                $query->where('cost_centers.m_f_o_s_id', $this->mfoId);
+            })
             ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name')
             ->get();
 
@@ -269,8 +271,10 @@ class GeneratePpmp extends Component
                     $query->where('is_supplemental', 0);
                 })
                 ->where('is_approved', 1)
-                ->whereHas('costCenter', function ($query) {
-                    $query->where('m_f_o_s_id', $this->mfoId);
+                ->when(!is_null($this->mfoId), function ($query) {
+                    $query->whereHas('costCenter', function ($query) {
+                        $query->where('m_f_o_s_id', $this->mfoId);
+                    });
                 });
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
@@ -304,7 +308,9 @@ class GeneratePpmp extends Component
                 \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
             )
             ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
-            ->where('cost_centers.m_f_o_s_id', $this->mfoId)
+            ->when(!is_null($this->mfoId), function ($query) {
+                $query->where('cost_centers.m_f_o_s_id', $this->mfoId);
+            })
             ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
             ->get();
     }
