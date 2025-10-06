@@ -22,7 +22,7 @@
                         Program of Receipts & Expenditures (PRE)
                     </p>
                     <p class="text-xl font-medium">
-                        Fund 164T / FHE
+                        Fund {{ $sksuLabel }}
                     </p>
                     <p class="text-md font-normal">{{ $title }}</p>
                 </div>
@@ -44,8 +44,6 @@
                                 @endif
                                 <th colspan="3" class="border border-black bg-gray-300">Expenditure</th>
                                 <th class="border border-black bg-gray-300">Balance</th>
-                                {{-- <th colspan="2" class="border border-black bg-gray-300">Corresponding Account Codes
-                        </th> --}}
                             </tr>
                         </thead>
                         <tbody>
