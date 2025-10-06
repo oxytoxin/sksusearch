@@ -28,6 +28,7 @@ use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCancell
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCreate;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCancelled;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersUnliquidated;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\LiquidationStatus;
 
 Route::middleware([
     'auth:sanctum',
@@ -46,6 +47,8 @@ Route::middleware([
     Route::get('/itinerary/{itinerary}', ItineraryShow::class)->name('itinerary.show');
     Route::get('/itinerary/print/{itinerary}', ItineraryPrint::class)->name('itinerary.print');
     Route::get('/disbursement-vouchers', DisbursementVouchersIndex::class)->name('disbursement-vouchers.index');
+
+    Route::get('/liquidation/status', LiquidationStatus::class)->name('disbursement-vouchers.liquidation.status');
     Route::get('/unliquidated-disbursement-vouchers', DisbursementVouchersUnliquidated::class)->name('disbursement-vouchers.unliquidated');
     Route::get('my-disbursement/notices/{DisbursementVoucher}', MyNotices::class)->name('disbursement-my-notices');
     Route::get('/cancelled-disbursement-vouchers', DisbursementVouchersCancelled::class)->name('disbursement-vouchers.cancelled');

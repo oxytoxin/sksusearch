@@ -18,6 +18,8 @@ class MyNotices extends Component implements HasTable
 {
     use InteractsWithTable;
 
+    
+
 
     // public function mount(){
     //    $careminders = CaReminderStepHistory::whereHas('caReminderStep', function($query){
