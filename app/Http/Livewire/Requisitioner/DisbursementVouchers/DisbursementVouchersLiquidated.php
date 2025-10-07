@@ -12,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+
 class DisbursementVouchersLiquidated extends Component implements HasTable
 {
     use InteractsWithTable, OfficeDashboardActions;
@@ -20,8 +21,7 @@ class DisbursementVouchersLiquidated extends Component implements HasTable
     {
         return DisbursementVoucher::query()
             ->whereHas('liquidation_report', function (Builder $query) {
-                $query->where('current_step_id', '>=', 8000)
-                      ->whereNull('cancelled_at');
+                $query->where('current_step_id', '>=', 8000);
             })
             ->whereRelation('voucher_subtype', 'voucher_type_id', 1)
             ->whereNot('voucher_subtype_id', 69)
@@ -44,6 +44,21 @@ class DisbursementVouchersLiquidated extends Component implements HasTable
                 ->url(fn($record) => route('requisitioner.liquidation-reports.show', [
                     'disbursement_voucher' => $record
                 ])),
+            Action::make('view_notices')
+                ->label('View Notices')
+                ->color('primary')
+                ->icon('heroicon-o-bell')
+                ->button()
+                ->url(fn($record) => route('requisitioner.disbursement-vouchers.notices', [
+                    'disbursement_voucher' => $record->id,
+                ]))
+                ->visible(
+                    fn($record) =>
+                    // show only if there are related notice histories
+                    $record->cash_advance_reminder &&
+                        $record->cash_advance_reminder->caReminderStepHistories()->exists()
+                ),
+
         ];
     }
 

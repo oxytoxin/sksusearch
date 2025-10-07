@@ -272,75 +272,86 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 5 && $record->is_sent == 0),
-            Action::make('uploadFD')->label('Upload FD')->icon('ri-send-plane-fill')
-                ->button()
-                ->form([
-                   FileUpload::make('auditor_attachment')
-                        ->label('Upload FD')
-                        ->required()
-                        ->preserveFilenames()
-                        ->disk('public')
-                        ->directory('fd')
-                        ->acceptedFileTypes(['application/pdf']),
-                    DatePicker::make('auditor_deadline')
-                        ->label('Deadline')
-                        ->required()
-                        ->default(now())
-                        ->minDate(now()),
-                ])
-                ->action(function ($record, $data) {
-                    // $record->auditor_attachment = $data['auditor_attachment'];
-                    $record->auditor_deadline = $data['auditor_deadline'];
-                    $record->status = 'On-Going';
-                    $record->step = 7;
-                    $record->user_id = Auth::id();
-                    $record->save();
-                    // Store history
-                    $record->caReminderStepHistories()->create([
-                        'step_data' => [
-                            'disbursement_voucher_id' => $record->disbursement_voucher_id,
-                            'status' => $record->status,
-                            'voucher_end_date' => $record->voucher_end_date,
-                            'liquidation_period_end_date' => $record->liquidation_period_end_date,
-                            'step' => $record->step,
-                            'is_sent' => $record->is_sent,
-                            'title' => $record->title,
-                            'message' => $record->message,
-                            'sent_at' => now(),
-                        ],
-                        'sender_name' => $this->auditor->user->name,
-                        'sent_at' => now(),
-                        'receiver_name' => $this->auditor->user->name,
-                        'type' => 'FD',
-                        // 'user_id' => Auth::id(),
-                    ]);
-                    $this->emit('historyCreated');
-                        $url = Storage::disk(app()->environment('local') ? 'local' : 'public')
-            ->url($record->auditor_attachment ??'#');
-                    NotificationController::sendCASystemReminder(
-            'FDS',
-            'Formal Demand File Sent',
-            'The Formal Demand file for your cash advance (' .
-                $record->disbursement_voucher->tracking_number .
-                ') has been uploaded. Please review it immediately.',
-            $this->auditor->user->name,
-            $record->disbursementVoucher->user->name,
-            $this->auditor->id,
-            $record->disbursementVoucher->user,
-            '#',
-            $record->disbursement_voucher
-        );
+                   Action::make('uploadFD')
+            ->label('Upload FD')
+            ->icon('ri-send-plane-fill')
+            ->color('primary')
+            ->button()
+            ->form([
+                FileUpload::make('auditor_attachment')
+                    ->label('Upload FD')
+                    ->required()
+                    ->preserveFilenames()
+                    ->disk('public')
+                    ->directory('fd')
+                    ->acceptedFileTypes(['application/pdf'])
+                    ->helperText('Only PDF files are allowed.'),
+                DatePicker::make('auditor_deadline')
+                    ->label('Deadline')
+                    ->required()
+                    ->default(now())
+                    ->minDate(now())
+                    ->helperText('Select the deadline for the accountable person to respond.'),
+            ])
+            ->action(function ($record, $data) {
+                // ✅ Save FD attachment and deadline
+                $record->auditor_attachment = $data['auditor_attachment'];
+                $record->auditor_deadline = $data['auditor_deadline'];
+                $record->status = 'On-Going';
+                $record->step = 7;
+                $record->user_id = Auth::id();
+                $record->save();
 
-        // ✅ Show success notification (Filament)
-        Notification::make()
-            ->title('Formal Demand Uploaded')
-            ->body('Notification sent to ' . $record->disbursementVoucher->user->name)
-            ->success()
-            ->send();
+                // ✅ Create Reminder History
+                $record->caReminderStepHistories()->create([
+    'step_data' => [
+        'disbursement_voucher_id' => $record->disbursement_voucher_id,
+        'status' => $record->status,
+        'voucher_end_date' => $record->voucher_end_date,
+        'liquidation_period_end_date' => $record->liquidation_period_end_date,
+        'step' => $record->step,
+        'is_sent' => $record->is_sent,
+        'title' => $record->title,
+        'message' => $record->message,
+        'sent_at' => now(),
+    ],
+    'sender_name' => $this->auditor->user->name,
+    'receiver_name' => $record->disbursementVoucher->user->name, // ✅ correct receiver
+    'sent_at' => now(),
+    'type' => 'FD',
+]);
 
 
-                })
-                ->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
+                // ✅ Build public file URL
+                $fileUrl = Storage::disk('public')->url($record->auditor_attachment ?? '#');
+
+                // ✅ Send system notification
+                NotificationController::sendCASystemReminder(
+                    'FDS',
+                    'Formal Demand File Sent',
+                    'The Formal Demand file for your cash advance (' .
+                        $record->disbursement_voucher->tracking_number .
+                        ') has been uploaded. Please review it immediately.',
+                    $this->auditor->user->name,
+                    $record->disbursementVoucher->user->name,
+                    $this->auditor->id,
+                    $record->disbursementVoucher->user,
+                    $fileUrl, // 👈 send actual FD URL
+                    $record->disbursement_voucher
+                );
+
+                // ✅ Trigger Livewire refresh
+                $this->emit('historyCreated');
+
+                // ✅ Show success toast
+                Notification::make()
+                    ->title('Formal Demand Uploaded')
+                    ->body('Notification sent to ' . $record->disbursementVoucher->user->name)
+                    ->success()
+                    ->send();
+            })
+            ->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
+
             ViewAction::make('view')
                 ->label('Preview DV')
                 ->openUrlInNewTab()

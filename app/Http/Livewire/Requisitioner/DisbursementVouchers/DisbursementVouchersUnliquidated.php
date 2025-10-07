@@ -42,18 +42,19 @@ class DisbursementVouchersUnliquidated extends Component implements HasTable
             ])),
 
             Action::make('view_notices')
-            ->label('View Notices')
-            ->color('primary')
-            ->icon('heroicon-o-bell-alert')
-            ->button()
-            ->url(fn ($record) => route('disbursement-vouchers.notices', [
-                'disbursement_voucher' => $record->id,
-            ]))
-            ->visible(fn ($record) =>
-                // show only if there are related notice histories
-                $record->cash_advance_reminder &&
-                $record->cash_advance_reminder->caReminderStepHistories()->exists()
-            ),
+                ->label('View Notices')
+                ->color('primary')
+                ->icon('heroicon-o-bell')
+                ->button()
+                ->url(fn($record) => route('requisitioner.disbursement-vouchers.notices', [
+                    'disbursement_voucher' => $record->id,
+                ]))
+                ->visible(
+                    fn($record) =>
+                    // show only if there are related notice histories
+                    $record->cash_advance_reminder &&
+                        $record->cash_advance_reminder->caReminderStepHistories()->exists()
+                ),
         ];
     }
 
