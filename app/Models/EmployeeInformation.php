@@ -60,7 +60,7 @@ class EmployeeInformation extends Model
 
     public static function accountantUser()
     {
-        return EmployeeInformationModel::where('position_id', 15)->where('office_id', 3)->first();
+        return EmployeeInformationModel::where('position_id', 15)->where('office_id', 3)->with(['user.signature'])->first();
     }
 
     public static function presidentUser()

@@ -82,16 +82,19 @@
                         <p class="mt-6">For your guidance and immediate compliance.</p>
                     </div>
 
-                    <div class="mt-6 text-xs text-gray-800 ">
+                    <div class="mt-6 text-xs text-gray-800  relative ">
                         <div class="mt-6 text-xs text-gray-800 ">
                             <p class="font-bold">{{ App\Models\EmployeeInformation::accountantUser()->full_name }}</p>
                             <p>{{ App\Models\EmployeeInformation::accountantUser()?->position->description }}-{{ App\Models\EmployeeInformation::accountantUser()?->office->name }}
                             </p>
                         </div>
+                         <img src="{{ App\Models\EmployeeInformation::accountantUser()->user->signature?->content }}"
+                                    alt="" class="absolute  h-24 w-24 inset-x-7 top-4">
+                        <div class="mt-12 border-b w-64 mb-2 border-gray-800"></div>
                     </div>
 
-                    <div class="mt-12 text-xs text-gray-800">
-                        <div class="border-b w-64 mb-2 border-gray-800"></div>
+                    <div class=" text-xs text-gray-800">
+
                         <p><sup>1</sup> Section 5.1.1, COA Circular No. 97-002 dated February 10, 1997</p>
                         <p><sup>2</sup> Section 5.1.3, Ibid.</p>
                         <p><sup>3</sup> Ibid.</p>

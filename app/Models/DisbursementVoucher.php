@@ -123,6 +123,10 @@ class DisbursementVoucher extends Model
     {
         return $this->hasOne(CaReminderStep::class);
     }
+    public function ca_reminder_steps()
+    {
+        return $this->hasOne(CaReminderStep::class);
+    }
 
     public function totalSumDisbursementVoucherParticular()
     {

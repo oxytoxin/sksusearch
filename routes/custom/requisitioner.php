@@ -1,31 +1,36 @@
 <?php
 
+use App\Models\DisbursementVoucher;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Livewire\LiquidationReports\LiquidationReportsShow;
-use App\Http\Livewire\Requisitioner\DisbursementVouchers\CashAdvanceReminders;
-use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCancelled;
-use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCreate;
-use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersIndex;
-use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersUnliquidated;
-use App\Http\Livewire\Requisitioner\Itinerary\ItineraryCreate;
-use App\Http\Livewire\Requisitioner\Itinerary\ItineraryPrint;
-use App\Http\Livewire\Requisitioner\Itinerary\ItineraryShow;
-use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCancelled;
-use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCreate;
-use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsIndex;
+use App\Http\Livewire\Requisitioner\TutorialIndex;
+use App\Http\Livewire\Requisitioner\PromptSignature;
 use App\Http\Livewire\Requisitioner\TransactionsIndex;
 use App\Http\Livewire\Requisitioner\PromptContactNumber;
-use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersCreate;
-use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersIndex;
+
+use App\Http\Livewire\Requisitioner\Itinerary\ItineraryShow;
+use App\Http\Livewire\Requisitioner\Itinerary\ItineraryPrint;
+use App\Http\Livewire\Requisitioner\Itinerary\ItineraryCreate;
+use App\Http\Livewire\LiquidationReports\LiquidationReportsShow;
+use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleShow;
+use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleIndex;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersShow;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersView;
-use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleIndex;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\MyNotices;
 use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleCreate;
-use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleShow;
+use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersIndex;
+use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersCreate;
 use App\Http\Livewire\Requisitioner\Motorpool\VehicleRequestFormShow;
-use App\Http\Livewire\Requisitioner\PromptSignature;
-use App\Http\Livewire\Requisitioner\TutorialIndex;
-use Illuminate\Support\Facades\Route;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\LiquidationStatus;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\CashAdvanceReminders;
+use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsIndex;
+use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCreate;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersIndex;
+use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCancelled;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVoucherNotices;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCreate;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersCancelled;
+use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersUnliquidated;
 
 Route::middleware([
     'auth:sanctum',
@@ -44,7 +49,11 @@ Route::middleware([
     Route::get('/itinerary/{itinerary}', ItineraryShow::class)->name('itinerary.show');
     Route::get('/itinerary/print/{itinerary}', ItineraryPrint::class)->name('itinerary.print');
     Route::get('/disbursement-vouchers', DisbursementVouchersIndex::class)->name('disbursement-vouchers.index');
+
+    Route::get('/liquidation/status', LiquidationStatus::class)->name('disbursement-vouchers.liquidation.status');
     Route::get('/unliquidated-disbursement-vouchers', DisbursementVouchersUnliquidated::class)->name('disbursement-vouchers.unliquidated');
+    Route::get('/disbursement-vouchers/notices/{disbursement_voucher}', DisbursementVoucherNotices::class)->name('disbursement-vouchers.notices');
+    Route::get('my-disbursement/notices/{DisbursementVoucher}', MyNotices::class)->name('disbursement-my-notices');
     Route::get('/cancelled-disbursement-vouchers', DisbursementVouchersCancelled::class)->name('disbursement-vouchers.cancelled');
     Route::get('/disbursement-vouchers/{voucher_subtype}/create', DisbursementVouchersCreate::class)->name('disbursement-vouchers.create');
     Route::get('/liquidation-reports/create', LiquidationReportsCreate::class)->name('liquidation-reports.create');
