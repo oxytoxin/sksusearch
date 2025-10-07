@@ -1,8 +1,8 @@
 <x-app-layout>
     <div>
         <div
-            class="mx-auto flex max-w-[90%] border-collapse print:block print:h-[297mm] print:max-h-[297mm] print:w-[220mm] print:max-w-[220mm]"
-            id="dvPrint">
+                class="mx-auto flex max-w-[90%] border-collapse print:block print:h-[297mm] print:max-h-[297mm] print:w-[220mm] print:max-w-[220mm]"
+                id="dvPrint">
             <div class="grid border-collapse grid-cols-8 border-4 border-black">
                 <div class="col-span-6 border border-black">
                     <div class="flex min-w-full place-items-center justify-between">
@@ -12,7 +12,7 @@
                                     <img class="mx-auto h-full w-14 object-scale-down"
                                          src="{{ asset('images/sksulogo.png') }}" alt="sksu logo">
                                     <span
-                                        class="text-center text-xs text-black print:text-8">SKSU Works for Success!</span>
+                                            class="text-center text-xs text-black print:text-8">SKSU Works for Success!</span>
                                     {{-- <span class="text-xs font-bold text-center text-black"> ISO 9001:2015</span> --}}
                                 </div>
                             </div>
@@ -21,7 +21,7 @@
                                     <span class="block text-sm font-bold uppercase text-black">Republic of the Philippines</span>
                                     <span class="block text-sm font-bold uppercase text-green-600">SULTAN KUDARAT STATE UNIVERSITY</span>
                                     <span
-                                        class="block text-sm text-black">ACCESS, EJC Montilla, 9800 City of Tacurong</span>
+                                            class="block text-sm text-black">ACCESS, EJC Montilla, 9800 City of Tacurong</span>
                                     <span class="block text-sm text-black">Province of Sultan Kudarat</span>
                                 </div>
                             </div>
@@ -33,7 +33,7 @@
                                      src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ route('disbursement-vouchers.show-from-trn', ['disbursement_voucher' => $disbursement_voucher->tracking_number]) }}"
                                      alt="N/A">
                                 <span
-                                    class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>
+                                        class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>
                             </div>
 
                         </div>
@@ -47,7 +47,7 @@
                 <div class="col-span-2 grid grid-rows-2 border border-black">
                     <div class="row-span-1 border-b border-l border-black">
                         <span
-                            class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
+                                class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
                             fund cluster:
                         </span>
                     </div>
@@ -109,7 +109,7 @@
                     </div>
                     <div class="flex h-full w-60 px-2 py-1 text-left">
                         <span
-                            class="pb-3 text-xs font-extrabold">ORS/BURS No.: {{ $disbursement_voucher->ors_burs }}</span>
+                                class="pb-3 text-xs font-extrabold">ORS/BURS No.: {{ $disbursement_voucher->ors_burs }}</span>
                     </div>
 
                 </div>
@@ -286,14 +286,14 @@
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
                         <span
-                            class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
+                                class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
                     </div>
                     <div class="flex w-1/2 items-center space-y-1 border-r-2 border-black text-center print:text-8">
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
                         <span
-                            class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
+                                class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
                     </div>
                 </div>
                 <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
@@ -350,13 +350,13 @@
 
                 <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
                     <div class="w-full flex-col">
-                        <div class="flex w-full border-b-2 border-black">
+                        <div class="flex w-full border-b-2 border-r border-black">
                             <div class="border-r border-black px-1 font-extrabold print:text-12">E.</div>
                             <span class="pl-1 font-extrabold print:text-12">Receipt of Payment</span>
                         </div>
-                        <div class="flex w-full flex-row border-b-2 border-black">
+                        <div class="flex w-full flex-row border-b border-black">
                             <div
-                                class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
+                                    class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
                                 Check / ADA No.:
                             </div>
                             <div class="h-auto w-1/3 shrink-0 border-r border-black">
@@ -370,17 +370,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="float-left h-full w-1/6 shrink-0 border-l border-black">
+                    <div class="float-left h-full w-1/6 shrink-0 border-l border-b border-black">
                         <div class="flex text-left print:text-12">
                             JEV No.
                         </div>
                     </div>
                 </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="w-full flex-col">
+                <div class="col-span-8 flex min-w-full items-start border-t border-black font-serif print:text-12">
+                    <div class="w-full flex-col border-r-2 border-black">
                         <div class="flex w-full flex-row border-b-2 border-black">
                             <div
-                                class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
+                                    class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
                                 Signature
                             </div>
                             <div class="h-auto w-1/3 shrink-0 border-r border-black">
@@ -389,28 +389,30 @@
                             <div class="h-auto w-full border-r border-black px-1 text-xs font-extrabold print:text-10">
                                 Date:
                             </div>
-                            <div class="h-auto w-full border-r border-black px-1 text-xs font-extrabold print:text-10">
+                            <div class="h-auto w-full px-1 text-xs font-extrabold print:text-10">
                                 Printed Name:
                             </div>
                         </div>
                         <div class="w-full">
-                            <span class="pl-1 font-extrabold print:text-12">Official Receipt No. & Date/Other
-                                Documents</span>
+                            <span class="pl-1 font-extrabold print:text-12">Official Receipt No. & Date/OtherDocuments</span>
                         </div>
                     </div>
-                    <div class="float-left h-full w-1/6 shrink-0 border-l border-black">
+                    <div class="h-full w-1/5">
                         <div class="flex text-left print:text-12">
                             Date
                         </div>
                     </div>
                 </div>
-
+                <div class="border-t col-span-8 text-xs text-center italic border-black w-full">
+                    <p>The original copy of this document appears in electronic form.</p>
+                </div>
             </div>
+
         </div>
         <div class="mx-auto mt-4 max-w-[90%]">
             <button
-                class="mt-2 inline-flex items-center rounded-md border border-transparent bg-primary-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                type="button" onclick="printDiv('dvPrint')">
+                    class="mt-2 inline-flex items-center rounded-md border border-transparent bg-primary-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                    type="button" onclick="printDiv('dvPrint')">
                 <!-- Heroicon name: mini/envelope -->
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                      fill="currentColor">
