@@ -41,19 +41,19 @@ class CashAdvanceReminders extends Component implements HasTable
         $is_president = Auth::user()->employee_information->office_id == 51 && Auth::user()->employee_information->position_id == 34;
         $is_accountant = Auth::user()->employee_information->office_id == 3 && Auth::user()->employee_information->position_id == 15;
         if ($is_president) {
-            return CaReminderStep::query()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->latest()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
         } elseif ($is_accountant) {
-            return CaReminderStep::query()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->latest()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
         } else {
-            return CaReminderStep::query()->whereIn('step', [6])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->latest()->whereIn('step', [6])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
@@ -64,9 +64,9 @@ class CashAdvanceReminders extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            TextColumn::make('disbursementVoucher.dv_number')->label('DV Number'),
-            TextColumn::make('disbursementVoucher.tracking_number')->label('DV Tracking Number'),
-            TextColumn::make('disbursementVoucher.user.name')->label('Requested By'),
+            TextColumn::make('disbursementVoucher.dv_number')->label('DV Number')->searchable(),
+            TextColumn::make('disbursementVoucher.tracking_number')->label('DV Tracking Number')->searchable(),
+            TextColumn::make('disbursementVoucher.user.name')->label('Requested By')->searchable(),
             TextColumn::make('status'),
         ];
     }
