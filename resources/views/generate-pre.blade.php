@@ -63,12 +63,12 @@
                 @if (request()->input('fundClusterWfpId') == 2)
                     <div class="p-4">
                         <div class="grid gap-2 justify-center">
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true, 'mfoId' => null]) }}"
-                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true, 'mfoId' => 6]) }}"
+                                class="bg-green-800 hover:bg-green-700 text-white text-center  font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }} PRE
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => false, 'mfoId' => null]) }}"
-                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => false, 'mfoId' => 6]) }}"
+                                class="bg-green-800 hover:bg-green-700 text-white text-center  font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }}
                             </a>
                         </div>
@@ -88,11 +88,11 @@
                     <div class="p-4">
                         <div class="grid gap-2 justify-center">
                             <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true, 'mfoId' => null]) }}"
-                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                                class="bg-green-800 hover:bg-green-700 text-white text-center font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }} PRE
                             </a>
                             <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'title' => 'Sultan Kudarat State University', 'mfoId' => null]) }}"
-                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                                class="bg-green-800 hover:bg-green-700 text-white text-center  font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }}
                             </a>
                         </div>

@@ -166,7 +166,10 @@ class GeneratePpmp extends Component
                 $query->where('is_supplemental', 0);
             })
             ->where('wpf_type_id', $this->selectedType)
-            ->where('campuses.id', $this->campusId) // Filter by campus_id
+            ->when(!is_null($this->campusId), function ($query) {
+                $query->where('campuses.id', $this->campusId);
+            })
+             // Filter by campus_id
             ->whereHas('costCenter.wfp')
             ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name')
             ->get();
