@@ -51,7 +51,6 @@ class GeneratePpmp extends Component
        }
         if (is_null($this->selectedType)) $this->selectedType = 1;
 
-        if (!$this->showPre) {
             if($this->fundClusterWfpId === 2){
                 $this->load163();
             }else if($this->is164){
@@ -149,9 +148,6 @@ class GeneratePpmp extends Component
                 })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
                 $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
             }
-        } else {
-            $this->sksuPre($this->fundClusterWfpId);
-        }
     }
 
     public function load163()
@@ -190,10 +186,12 @@ class GeneratePpmp extends Component
                     $query->where('is_supplemental', 0);
                 })
                 ->where('is_approved', 1)
-                ->whereHas('costCenter', function ($query) {
-                    $query->whereHas('office', function ($query) {
-                        $query->whereHas('campus', function ($query) {
-                            $query->where('id', $this->campusId); // Filter by campus_id
+                ->when(!is_null($this->campusId), function ($query) {
+                    $query->whereHas('costCenter', function ($query) {
+                        $query->whereHas('office', function ($query) {
+                            $query->whereHas('campus', function ($query) {
+                                $query->where('id', $this->campusId); // Filter by campus_id
+                            });
                         });
                     });
                 });
@@ -233,7 +231,9 @@ class GeneratePpmp extends Component
                 'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
                 \DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
             )
-            ->where('campuses.id', $this->campusId) // Filter by campus_id
+            ->when(!is_null($this->campusId), function ($query) {
+                $query->where('campuses.id', $this->campusId);
+            })
             ->whereIn('cost_centers.mfo_fee_id', $mfo_ids)
             ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id')
             ->get();
@@ -5368,18 +5368,6 @@ class GeneratePpmp extends Component
         })->select(DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
         $this->balance = $this->total_allocated - $this->total_programmed->total_budget;
 
-        // $this->ppmp_details = WfpDetail::whereHas('wfp', function($query) {
-        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_id', 9)->whereHas('costCenter', function($query) {
-        //     $query->where('m_f_o_s_id', 6);
-        //     });
-        // })->select('category_item_id', \DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))
-        // ->groupBy('category_item_id')
-        // ->get();
-        // $this->total = WfpDetail::whereHas('wfp', function($query) {
-        //     $query->where('wpf_type_id', $this->selectedType)->where('is_approved', 1)->where('fund_cluster_id', 9)->whereHas('costCenter', function($query) {
-        //     $query->where('m_f_o_s_id', 6);
-        //     });
-        // })->select(\DB::raw('SUM(cost_per_unit * total_quantity) as total_budget'))->first();
     }
 
     // PRE
