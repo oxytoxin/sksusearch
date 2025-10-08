@@ -15,11 +15,10 @@
 
         public function __invoke(Request $request)
         {
-            try {
                 $cost_centers = $this->getCostCenterWithFundAllocations($request);
                 $total_allocated = $cost_centers->sum('total_initial_amount');
                 $total_programmed = $this->getTotalProgrammed($request->input('is_supplemental'),
-                    $request->input('fund_cluster_id'), $request->input('wfp_type_id'), $request->input('m_f_o_s_id'));
+                    $request->input('fund_cluster_id'), $request->input('wfp_type_id'), $request->input('m_f_o_s_id'), $request->input('supplementalQuarterId'));
                 $total_balance = $total_allocated - $total_programmed->total_budget;
 
                 $mfo_fee_ids = $cost_centers->pluck('fund_allocations.*.mfo_fee_id')->flatten()->unique()->toArray();
@@ -47,9 +46,7 @@
 
                 return Excel::download(new CostCenterPreExport($cost_centers, $total_allocated,
                     $total_programmed->total_budget, $total_balance), $fileName.'.xlsx');
-            } catch (\Throwable $th) {
-                return "No Data Found";
-            }
+
         }
 
         public function getCostCenterWithFundAllocations(Request $request)
@@ -68,8 +65,11 @@
                 ->when($request->input('m_f_o_s_id'), function ($query) use ($request) {
                     $query->where('cost_centers.m_f_o_s_id', $request->input('m_f_o_s_id'));
                 })
-                ->when($request->has('is_supplemental'), function ($query) use ($request) {
-                    $query->where('is_supplemental', $request->input('is_supplemental'));
+                ->when($request->has('supplementalQuarterId'), function ($query) use ($request) {
+                    $query->where('fund_allocations.supplemental_quarter_id', $request->input('supplementalQuarterId'));
+                })
+                ->when(is_null($request->input('supplementalQuarterId')), function ($query) {
+                    $query->where('fund_allocations.is_supplemental', 0);
                 })
                 ->groupBy('wpf_type_id', 'mfo_fees.id', 'mfo_fees.name', 'is_supplemental', 'offices.name')
                 ->get()->map(function ($item) {
@@ -117,13 +117,18 @@
             return $cost_centers;
         }
 
-        public function getTotalProgrammed($is_supplemental, $fund_cluster_id, $selectedType, $m_f_o_s_id)
+        public function getTotalProgrammed($is_supplemental, $fund_cluster_id, $selectedType, $m_f_o_s_id,$supplementalQuarterId)
         {
             return WfpDetail::whereHas('wfp',
-                function ($query) use ($selectedType, $is_supplemental, $fund_cluster_id, $m_f_o_s_id) {
+                function ($query) use ($selectedType, $is_supplemental, $fund_cluster_id, $m_f_o_s_id, $supplementalQuarterId) {
                     $query->where('wpf_type_id', $selectedType)
                         ->where('fund_cluster_id', $fund_cluster_id)
-                        ->where('is_supplemental', $is_supplemental)
+                        ->when(!is_null($is_supplemental), function ($query) use ($is_supplemental, $supplementalQuarterId) {
+                            $query->where('supplemental_quarter_id', $supplementalQuarterId);
+                        })
+                        ->when(is_null($is_supplemental), function ($query) {
+                            $query->where('is_supplemental', 0);
+                        })
                         ->where('is_approved', 1)
                         ->when($m_f_o_s_id, function ($query) use ($m_f_o_s_id) {
                             $query->whereHas('costCenter', function ($query) use ($m_f_o_s_id) {
@@ -138,7 +143,12 @@
             $data = WfpDetail::whereHas('wfp', function ($query) use ($request) {
                 $query->where('wpf_type_id', $request->input('wfp_type_id'))
                     ->where('fund_cluster_id', $request->input('fund_cluster_id'))
-                    ->where('is_supplemental', $request->input('is_supplemental'))
+                    ->when(!is_null($request->input('supplementalQuarterId')), function ($query) use ($request) {
+                        $query->where('supplemental_quarter_id', $request->input('supplementalQuarterId'));
+                    })
+                    ->when(is_null($request->input('supplementalQuarterId')), function ($query) {
+                        $query->where('is_supplemental', 0);
+                    })
                     ->where('is_approved', 1);
             })
                 ->join('wfps', 'wfp_details.wfp_id', '=', 'wfps.id') // Join with the wfp table
@@ -151,15 +161,15 @@
                     DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget'),
                     'category_item_budgets.uacs_code as budget_uacs', // Include the related field in the select
                     'category_item_budgets.name as budget_name', // Include the related field in the select
-                    'cost_centers.mfo_fee_id as mfo_fee_id', // Include the mfo_fee_id in the select
-                    'cost_centers.id as cost_center_id',
+                    'wfps.cost_center_id as cost_center_id',
+                    'cost_centers.mfo_fee_id as mfo_fee_id',
                     DB::raw('SUM(wfp_details.cost_per_unit * wfp_details.total_quantity) as total_budget_per_uacs') // Total budget per budget_uacs and budget_name
                 )
                 ->whereIn('cost_centers.mfo_fee_id', $mfo_fee_ids)
                 ->when($request->input('m_f_o_s_id'), function ($query) use ($request) {
                     $query->where('cost_centers.m_f_o_s_id', $request->input('m_f_o_s_id'));
                 })
-                ->groupBy('budget_uacs', 'budget_name', 'mfo_fee_id', 'cost_center_id')
+                ->groupBy('budget_uacs', 'budget_name', 'cost_center_id', 'mfo_fee_id')
                 ->get();
             return $data;
         }

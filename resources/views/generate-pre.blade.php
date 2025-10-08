@@ -62,11 +62,11 @@
                 @if (request()->input('fundClusterWfpId') == 2)
                     <div class="p-4">
                         <div class="grid gap-2 justify-center">
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true, 'mfoId' => 6]) }}"
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true, 'mfoId' => 6, 'campusId' => null]) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white text-center  font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }} PRE
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => false, 'mfoId' => 6]) }}"
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => false, 'mfoId' => 6, 'campusId' => null]) }}"
                                 class="bg-green-800 hover:bg-green-700 text-white text-center  font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }}
                             </a>

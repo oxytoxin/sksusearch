@@ -5,7 +5,11 @@
           @if ($fundClusterWfpId === 2)
               @include('fund-views.163')
           @else
-              @include('fund-views.101')
+              @if (!$showPre)
+                  @include('fund-views.101')
+              @else
+                  @include('fund-views.164T')
+              @endif
           @endif
       @endif
   </div>
