@@ -61,7 +61,7 @@ class WfpPpmp extends Component
 
         $this->current['regular_allocation'] = $this->fundAllocations->sum('initial_amount');
 
-        $workFinancialPlans = Wfp::with(['wfpDetails'])
+        $workFinancialPlans = Wfp::with(['wfpDetails','costCenter.mfoFee'])
             ->where('wpf_type_id', $this->wfpType)
             ->where('cost_center_id', $this->costCenterId)->where(function ($query) use ($record, $isSupplemental) {
                  if($isSupplemental){
@@ -75,6 +75,7 @@ class WfpPpmp extends Component
             })->get();
 
         $this->record = $workFinancialPlans->where('id', $record)->first();
+
 
        if($isSupplemental){
             $this->oldRecords = $workFinancialPlans->filter(function ($workFinancialPlan) use ($record) {

@@ -42,10 +42,10 @@
                     <span class="text-left font-semibold">MFO:</span>
                     <span class="text-center">{{ $record->costCenter->mfo->name }}</span>
                 </div>
-                @if ($record->fundClusterWfp->id > 3)
+                @if (!in_array($record->fundClusterWfp->id, [1, 3, 9]))
                     <div class="py-2">
                         <span class="text-left font-semibold">MFO Fee: </span>
-                        <span class="text-center">{{ $record->costCenter->mfoFee->name }}</span>
+                        <span class="text-center">{{ $record->costCenter->mfoFee?->name }}</span>
                     </div>
                 @endif
                 <div class="py-2">

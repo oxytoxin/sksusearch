@@ -192,7 +192,8 @@
                         <td class="border border-black text-right font-semibold px-2">
                             <div class="flex justify-between">
                                 <span>₱</span>
-                                <span>{{ $total_programmed === null ? 0 : number_format($total_programmed->total_budget, 2) }}</span>
+                                <span>{{ $total_programmed === null ? 0 : number_format($total_programmed->total_budget, 2) }}
+                                </span>
                             </div>
                         </td>
                         <td class="border border-black text-right font-semibold px-2">
