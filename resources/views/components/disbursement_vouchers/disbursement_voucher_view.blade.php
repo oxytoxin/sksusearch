@@ -144,7 +144,7 @@
                     <div class="h-44 w-64 border-r-2 border-black text-center">
                         <div class="flex flex-col">
                             @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                                <span>{{ $particular->responsibility_center }}</span>
+                                <span>{{ $disbursement_voucher->responsibility_center }}</span>
                             @endforeach
                         </div>
                     </div>

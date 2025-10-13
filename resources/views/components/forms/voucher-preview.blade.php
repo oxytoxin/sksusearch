@@ -213,7 +213,7 @@
                     <div class="w-64 text-center border-r-2 border-black h-44">
                         <div class="flex flex-col">
                             @foreach ($particulars as $particular)
-                                {{ $particular['responsibility_center'] }}
+                                {{ $evaluate(fn($get) => $get('responsibility_center')) }}
                             @endforeach
                         </div>
                     </div>
