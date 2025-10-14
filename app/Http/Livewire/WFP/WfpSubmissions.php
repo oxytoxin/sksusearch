@@ -29,6 +29,8 @@
         public $supplementalQuarterId = null;
         protected $queryString = ['supplementalQuarterId'];
 
+        public  $is164 = null;
+
         public function mount($filter)
         {
             $this->isPresident = auth()->user()->employee_information->office_id == 51 && auth()->user()->employee_information->position_id == 34;
@@ -91,8 +93,12 @@
                         ->label('View WFP')
                         ->button()
                         ->icon('heroicon-o-eye')
-                        ->url(fn($record): string => route('wfp.print-wfp',
-                            ['record' => $record, 'isSupplemental' => 0, 'wfpType' => $record->wpf_type_id])),
+                        ->url(fn($record): string => route('wfp.print-wfp',[
+                            'record' => $record,
+                            'isSupplemental' => 0,
+                            'wfpType' => $record->wpf_type_id,
+                            'is164' => !in_array($record->fund_cluster_id, [1, 3,9]),
+                        ])),
                     Action::make('view ppmp')
                         ->label('View PPMP')
                         ->button()
@@ -175,6 +181,9 @@
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         if (!empty($data['mfo'])) {
+                            // if(!in_array($data['mfo'],[1,3,9])){
+                            //     $this->is164 = true;
+                            // }
                             return $query->whereHas('costCenter', function ($query) use ($data) {
                                 $query->where('m_f_o_s_id', $data['mfo']);
                             });

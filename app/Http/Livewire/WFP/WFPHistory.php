@@ -18,6 +18,8 @@ class WFPHistory extends Component implements HasTable
     use InteractsWithTable;
     public $cost_centers;
 
+    public  $is164 = null;
+
     public function mount()
     {
         $has_personnel = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id', Auth::user()->id)->first();
@@ -77,7 +79,10 @@ class WFPHistory extends Component implements HasTable
                 ->label('View WFP')
                 ->button()
                 ->icon('heroicon-o-eye')
-                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 0,'wfpType' => $record->wpf_type_id,'costCenterId' => $record->cost_center_id]))
+                ->url(fn ($record): string => route('wfp.print-wfp', ['record' => $record, 'isSupplemental' => 0,'wfpType' => $record->wpf_type_id,'costCenterId' => $record->cost_center_id,
+                             'is164' => !in_array($record->fund_cluster_id, [1, 3,9]),
+
+                ]))
                 ->visible(fn ($record) => $record->is_approved === 0 || $record->is_approved === 1),
                 Action::make('view ppmp')
                 ->label('View PPMP')
