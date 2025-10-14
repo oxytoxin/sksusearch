@@ -44,7 +44,7 @@ class UserPRE extends Component
         $this->record = Wfp::find($record);
         $this->cost_center = $this->record->costCenter;
         $this->title = FundCluster::find($this->record->fund_cluster_id)->name;
-
+        $category_group_ids = [];
         if (in_array($this->record->fundClusterWfp->id, [1, 3, 9])) {
             if ($isSupplemental) {
                 $temp_fund_allocation = FundAllocation::where('wpf_type_id', $this->wfpType)
@@ -67,6 +67,7 @@ class UserPRE extends Component
                     })
                     ->get();
 
+                 $category_group_ids = $temp_fund_allocation->pluck('category_group_id')->toArray();
 
                 $this->forwarded_ppmp_details = $temp_fund_allocation->filter(function ($item) {
                     return $item->supplemental_quarter_id != $this->supplementalQuarterId;
@@ -84,6 +85,8 @@ class UserPRE extends Component
                                 });
                         });
                 })->with('wfp')->get();
+
+
 
                 $this->sub_forwared_balance = $wpfDetails->filter(function ($item) {
                     return $item->wfp->supplemental_quarter_id != $this->supplementalQuarterId;
@@ -175,7 +178,7 @@ class UserPRE extends Component
                 ->get();
             $this->total_allocated = $this->fund_allocation->sum('initial_amount');
 
-            $this->total_programmed = WfpDetail::whereHas('wfp', function ($query) use ($isSupplemental) {
+            $this->total_programmed = WfpDetail::whereIn('category_group_id', $this->fund_allocation->pluck('category_group_id')->toArray())->whereHas('wfp', function ($query) use ($isSupplemental) {
                 $query->when($this->wfpType, function ($query) {
                     $query->where('wpf_type_id', $this->wfpType);
                 })->when(!is_null($this->supplementalQuarterId), function ($query) {
