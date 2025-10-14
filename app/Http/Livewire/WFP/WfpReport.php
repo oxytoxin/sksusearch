@@ -71,7 +71,7 @@ class WfpReport extends Component
                     });
                 }
             ], 'wfpType', 'wfpDetails'=>function($query) use($fundAllocationCategoryIds){
-                $query->whereNotIn('category_group_id', $fundAllocationCategoryIds);
+                $query->whereIn('category_group_id', $fundAllocationCategoryIds);
             }])
                 ->where('wpf_type_id', $this->wfpType)
                  ->where('cost_center_id', $this->costCenterId)
