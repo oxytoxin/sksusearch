@@ -22,7 +22,9 @@ class WfpReport extends Component
 
     public $costCenterId = null;
 
-    protected $queryString = ['supplementalQuarterId', 'wfpType', 'costCenterId'];
+    public $is164 = null;
+
+    protected $queryString = ['supplementalQuarterId', 'wfpType', 'costCenterId','is164'];
     public $oldRecords = [];
     public $history = [
         'regular_allocation' => 0,
@@ -71,7 +73,9 @@ class WfpReport extends Component
                     });
                 }
             ], 'wfpType', 'wfpDetails'=>function($query) use($fundAllocationCategoryIds){
-                $query->whereIn('category_group_id', $fundAllocationCategoryIds);
+                $query->when(is_null($this->is164), function ($query) use ($fundAllocationCategoryIds) {
+                    $query->whereIn('category_group_id', $fundAllocationCategoryIds);
+                });
             }])
                 ->where('wpf_type_id', $this->wfpType)
                  ->where('cost_center_id', $this->costCenterId)
