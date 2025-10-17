@@ -56,9 +56,14 @@
                         @endforeach
                     </ul>
                     <div class="mt-4 text-xs text-gray-800 leading-relaxed">
-                        <p>Records also show that a prior reminder contained in FMR No. xxxx-xxxx was issued to you on
-                            &lt;Date&gt; in
-                            relation hereto.</p>
+                    <p>
+    Records also show that a prior reminder contained in
+    FMR No. {{ $record->CaReminderStep->fmr_number ?? 'xxxx-xxxx' }}
+    was issued to you on
+{{ optional($record->CaReminderStep->fmr_date)->format('F d, Y') ?? '__________' }}
+    in relation hereto.
+</p>
+
 
                         <p class="mt-4">In view of the foregoing premises, you are hereby ordered to effect the
                             immediate
