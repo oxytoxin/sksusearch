@@ -18,7 +18,7 @@ class NotificationDropdown extends Component
     public function mount()
     {
         $this->loadNotifications();
-         $this->dispatchBrowserEvent('emitToAllNotifications');
+        //  $this->dispatchBrowserEvent('emitToAllNotifications');
     }
 
     public function loadNotifications()
@@ -42,15 +42,17 @@ class NotificationDropdown extends Component
         $this->dispatchBrowserEvent('emitToAllNotifications');
     }
 
-    public function markAllAsRead()
-    {
-        $user = Auth::user();
-        if ($user) {
-            $user->unreadNotifications->markAsRead();
-            $this->loadNotifications();
-            $this->dispatchBrowserEvent('emitToAllNotifications');
-        }
+   public function markAllAsRead()
+{
+    if ($user = Auth::user()) {
+        // Mas mabilis at deterministic
+        $user->unreadNotifications()->update(['read_at' => now()]);
+
+        $this->loadNotifications();
+        $this->dispatchBrowserEvent('emitToAllNotifications');
     }
+}
+
 
     public function render()
     {
