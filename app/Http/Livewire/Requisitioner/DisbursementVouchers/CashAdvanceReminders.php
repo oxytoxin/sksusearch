@@ -322,10 +322,9 @@ class CashAdvanceReminders extends Component implements HasTable
                     ]);
 
 
-                    // ✅ Build public file URL
                     $fileUrl = Storage::disk('public')->url($record->auditor_attachment ?? '#');
 
-                    // ✅ Send system notification
+
                     NotificationController::sendCASystemReminder(
                         'FDS',
                         'Formal Demand File Sent',
@@ -340,10 +339,10 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
 
-                    // ✅ Trigger Livewire refresh
+
                     $this->emit('historyCreated');
 
-                    // ✅ Show success toast
+
                     Notification::make()
                         ->title('Formal Demand Uploaded')
                         ->body('Notification sent to ' . $record->disbursementVoucher->user->name)
@@ -351,6 +350,27 @@ class CashAdvanceReminders extends Component implements HasTable
                         ->send();
                 })
                 ->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
+
+            ViewAction::make('FD')
+                ->label('View FD File')
+                ->url(
+                    fn($record) =>
+                    $record->caReminderStep?->disbursementVoucher
+                        ? route('print.endorsement-for-fd-file', ['record' => $record->caReminderStep->disbursementVoucher])
+                        : '#'
+                )
+                ->button()
+                ->color('primary')
+                ->icon('heroicon-o-document-text')
+                ->tooltip('View FD')
+                ->visible(
+                    fn($record) =>
+                    $record->step === 6 &&
+                        filled($record->auditor_attachment) &&
+                        auth()->user()?->employee_information?->office_id === 61 &&
+                        auth()->user()?->employee_information?->position_id === 31
+                ),
+
 
             ViewAction::make('view')
                 ->label('Preview DV')
