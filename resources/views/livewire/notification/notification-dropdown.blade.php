@@ -22,6 +22,7 @@
 
             @if ($unreadCount > 0)
                 <button
+                   type="button"
                     wire:click="markAllAsRead"
                     class="text-sm font-medium text-white bg-primary-600 px-3 py-1.5 rounded-md shadow-md transition duration-200
                            hover:bg-primary-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
