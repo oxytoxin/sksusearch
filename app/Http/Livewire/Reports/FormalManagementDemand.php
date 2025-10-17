@@ -12,6 +12,7 @@ class FormalManagementDemand extends Component
     public function mount(DisbursementVoucher $record)
     {
         $this->record = $record;
+        $this->record->load(['cash_advance_reminder']);
     }
 
     public function render()
