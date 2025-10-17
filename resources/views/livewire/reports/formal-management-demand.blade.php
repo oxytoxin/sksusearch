@@ -59,7 +59,7 @@
         @php
     $step = $record->CaReminderStep;
 @endphp
-
+@dump($record->CaReminderStep->toArray())
 <p>
     Records also show that a prior reminder contained in
     FMR No. {{ $step->fmr_number ?? 'xxxx-xxxx' }}
