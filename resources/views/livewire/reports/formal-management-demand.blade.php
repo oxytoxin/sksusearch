@@ -56,17 +56,17 @@
                         @endforeach
                     </ul>
                     <div class="mt-4 text-xs text-gray-800 leading-relaxed">
-        @php
-    $step = $record->CaReminderStep;
-@endphp
-@dump($record->CaReminderStep)
-<p>
-    Records also show that a prior reminder contained in
-    FMR No. {{ $step->fmr_number ?? 'xxxx-xxxx' }}
-    was issued to you on
-    {{ $step?->fmr_date ? $step->fmr_date->format('F d, Y') : '__________' }}
-    in relation hereto.
-</p>
+                        @php
+                            $step = $record->CaReminderStep;
+                        @endphp
+                        @dump($record->ca_reminder_steps)
+                        <p>
+                            Records also show that a prior reminder contained in
+                            FMR No. {{ $step->fmr_number ?? 'xxxx-xxxx' }}
+                            was issued to you on
+                            {{ $step?->fmr_date ? $step->fmr_date->format('F d, Y') : '__________' }}
+                            in relation hereto.
+                        </p>
 
 
 
