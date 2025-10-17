@@ -56,15 +56,13 @@
                         @endforeach
                     </ul>
                     <div class="mt-4 text-xs text-gray-800 leading-relaxed">
-                        @php
-                            $step = $record->caReminderStep;
-                        @endphp
-                            @dump($step)
+
+                          
                         <p>
                             Records also show that a prior reminder contained in
-                            FMR No. {{ $step?->fmr_number ?? 'xxxx-xxxx' }}
+                            FMR No. {{ $record?->fmr_number ?? 'xxxx-xxxx' }}
                             was issued to you on
-                            {{ $step?->fmr_date?->format('F d, Y') ?? '&lt;Date&gt;' }}
+                            {{ $record?->fmr_date?->format('F d, Y') ?? '&lt;Date&gt;' }}
                             in relation hereto.
                         </p>
 
