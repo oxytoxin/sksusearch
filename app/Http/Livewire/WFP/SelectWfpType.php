@@ -42,15 +42,22 @@
             $this->fund_cluster = 1;
 
             $this->wfp_type = WpfType::all()->count();
-            $has_personnel = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id',
-                Auth::user()->id)->first();
+            // $has_personnel = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id',
+            //     Auth::user()->id)->first();
             $designatedCostCentersId = WpfPersonnel::where('user_id', Auth::user()->id)->orWhere('head_id',
                 Auth::user()->id)->get()->pluck('cost_center_id')->toArray();
-            if ($has_personnel) {
-                $this->cost_centers = CostCenter::whereIn('id', $designatedCostCentersId)->get();
-            } else {
-                $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
+
+             $mergedCostCenterIds = [];
+            $mergedCostCenterIds = array_merge($mergedCostCenterIds, $designatedCostCentersId);
+
+            $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
+
+            if(!empty($this->cost_centers)) {
+                $mergedCostCenterIds = array_merge($mergedCostCenterIds, $this->cost_centers->pluck('id')->toArray());
             }
+
+
+
             // $this->cost_centers = Auth::user()->employee_information->office->cost_centers
             // ->hereHas('wpfPersonnel', function ($query) {
             //     $query->where('user_id', Auth::user()->id)
