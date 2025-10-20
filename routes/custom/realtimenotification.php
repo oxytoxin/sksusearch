@@ -39,8 +39,7 @@ Route::middleware([
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-])->prefix('print')->name('print.')->group(function () {
-
+])->prefix('disbursement')->name('print.')->group(function () {
 
 
 
@@ -54,6 +53,7 @@ Route::get('endorsement-for-fd/{record}', EndorsementForFD::class)->name('endors
 Route::get('endorsement-for-fd-file/{record}', EndorsementForFDFile::class)->name('endorsement-for-fd-file');
 Route::get('show-cause-order/{record}', ShowCauseOrder::class)->name('show-cause-order');
 Route::get('disbursement-voucher/{record}', ShowCauseOrder::class)->name('disbursement-voucher');
+
 // Route::middleware(['check.voucher.subtype'])->group(function () {
 
 // });

@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
-use Dom\Text;
+
 use Livewire\Component;
 use App\Models\CaReminderStep;
 use App\Models\EmployeeInformation;
@@ -11,14 +11,16 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
-use Illuminate\Database\Eloquent\Builder;
-use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\Storage;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use App\Http\Controllers\NotificationController;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+
 
 class CashAdvanceReminders extends Component implements HasTable
 {
@@ -39,19 +41,19 @@ class CashAdvanceReminders extends Component implements HasTable
         $is_president = Auth::user()->employee_information->office_id == 51 && Auth::user()->employee_information->position_id == 34;
         $is_accountant = Auth::user()->employee_information->office_id == 3 && Auth::user()->employee_information->position_id == 15;
         if ($is_president) {
-            return CaReminderStep::query()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->latest()->whereIn('step', [4, 5])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
         } elseif ($is_accountant) {
-            return CaReminderStep::query()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->latest()->whereIn('step', [2, 3])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
             });
         } else {
-            return CaReminderStep::query()->whereIn('step', [6])->whereHas('disbursement_voucher', function ($query) {
+            return CaReminderStep::query()->latest()->whereIn('step', [6])->whereHas('disbursement_voucher', function ($query) {
                 $query->whereHas('liquidation_report', function ($query) {
                     $query->where('current_step_id', '<', 8000);
                 })->orDoesntHave('liquidation_report');
@@ -62,9 +64,9 @@ class CashAdvanceReminders extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            TextColumn::make('disbursementVoucher.dv_number')->label('DV Number'),
-            TextColumn::make('disbursementVoucher.tracking_number')->label('DV Tracking Number'),
-            TextColumn::make('disbursementVoucher.user.name')->label('Requested By'),
+            TextColumn::make('disbursementVoucher.dv_number')->label('DV Number')->searchable(),
+            TextColumn::make('disbursementVoucher.tracking_number')->label('DV Tracking Number')->searchable(),
+            TextColumn::make('disbursementVoucher.user.employee_information.full_name')->label('Requested By')->searchable(),
             TextColumn::make('status'),
         ];
     }
@@ -270,30 +272,37 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
                 })->requiresConfirmation()->visible(fn($record) => $record->step == 5 && $record->is_sent == 0),
-            Action::make('uploadFD')->label('Upload FD')->icon('ri-send-plane-fill')
+            Action::make('uploadFD')
+                ->label('Upload FD')
+                ->icon('ri-send-plane-fill')
+                ->color('primary')
                 ->button()
                 ->form([
-                   FileUpload::make('auditor_attachment')
+                    FileUpload::make('auditor_attachment')
                         ->label('Upload FD')
                         ->required()
                         ->preserveFilenames()
                         ->disk('public')
                         ->directory('fd')
-                        ->acceptedFileTypes(['application/pdf']),
+                        ->acceptedFileTypes(['application/pdf'])
+                        ->helperText('Only PDF files are allowed.'),
                     DatePicker::make('auditor_deadline')
                         ->label('Deadline')
                         ->required()
                         ->default(now())
-                        ->minDate(now()),
+                        ->minDate(now())
+                        ->helperText('Select the deadline for the accountable person to respond.'),
                 ])
                 ->action(function ($record, $data) {
+                    // ✅ Save FD attachment and deadline
                     $record->auditor_attachment = $data['auditor_attachment'];
                     $record->auditor_deadline = $data['auditor_deadline'];
                     $record->status = 'On-Going';
                     $record->step = 7;
                     $record->user_id = Auth::id();
                     $record->save();
-                    // Store history
+
+                    // ✅ Create Reminder History
                     $record->caReminderStepHistories()->create([
                         'step_data' => [
                             'disbursement_voucher_id' => $record->disbursement_voucher_id,
@@ -307,17 +316,62 @@ class CashAdvanceReminders extends Component implements HasTable
                             'sent_at' => now(),
                         ],
                         'sender_name' => $this->auditor->user->name,
+                        'receiver_name' => $record->disbursementVoucher->user->name, // ✅ correct receiver
                         'sent_at' => now(),
-                        'receiver_name' => $this->auditor->user->name,
                         'type' => 'FD',
-                        // 'user_id' => Auth::id(),
                     ]);
+
+
+                    $fileUrl = Storage::disk('public')->url($record->auditor_attachment ?? '#');
+
+
+                    NotificationController::sendCASystemReminder(
+                        'FDS',
+                        'Formal Demand File Sent',
+                        'The Formal Demand file for your cash advance (' .
+                            $record->disbursement_voucher->tracking_number .
+                            ') has been uploaded. Please review it immediately.',
+                        $this->auditor->user->name,
+                        $record->disbursementVoucher->user->name,
+                        $this->auditor->id,
+                        $record->disbursementVoucher->user,
+                        $fileUrl, // 👈 send actual FD URL
+                        $record->disbursement_voucher
+                    );
+
+
                     $this->emit('historyCreated');
 
-                    
 
+                    Notification::make()
+                        ->title('Formal Demand Uploaded')
+                        ->body('Notification sent to ' . $record->disbursementVoucher->user->name)
+                        ->success()
+                        ->send();
                 })
                 ->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
+
+            ViewAction::make('FD')
+                ->label('View FD File')
+                ->url(
+                    fn($record) =>
+                    $record->caReminderStep?->disbursementVoucher
+                        ? route('print.endorsement-for-fd-file', ['record' => $record->caReminderStep->disbursementVoucher])
+                        : '#'
+                )
+                ->button()
+                ->color('primary')
+                ->icon('heroicon-o-document-text')
+                ->tooltip('View FD')
+                ->visible(
+                    fn($record) =>
+                    $record->step === 6 &&
+                        filled($record->auditor_attachment) &&
+                        auth()->user()?->employee_information?->office_id === 61 &&
+                        auth()->user()?->employee_information?->position_id === 31
+                ),
+
+
             ViewAction::make('view')
                 ->label('Preview DV')
                 ->openUrlInNewTab()

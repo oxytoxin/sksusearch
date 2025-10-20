@@ -118,10 +118,14 @@
             return $this->hasOne(TravelCompletedCertificate::class);
         }
 
-        public function cash_advance_reminder()
-        {
-            return $this->hasOne(CaReminderStep::class);
-        }
+    public function cash_advance_reminder()
+    {
+        return $this->hasOne(CaReminderStep::class);
+    }
+    public function ca_reminder_steps()
+    {
+        return $this->hasOne(CaReminderStep::class);
+    }
 
         public function totalSumDisbursementVoucherParticular()
         {
