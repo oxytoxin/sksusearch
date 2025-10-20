@@ -213,14 +213,10 @@
                                                 </th>
                                                 <th scope="col"
                                                     class="px-3 py-2 text-left text-sm font-semibold text-gray-50">
-                                                    Program</th>
+                                                    Program </th>
                                                 <th scope="col"
                                                     class="px-3 py-2 text-left text-sm font-semibold text-gray-50">
                                                 </th>
-                                                {{-- <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th> --}}
-                                                {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
-                                            <span class="sr-only">Edit</span>
-                                          </th> --}}
                                             </tr>
                                         <tbody class="bg-white">
                                             <tr class="border-t border-gray-300">

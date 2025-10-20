@@ -232,6 +232,7 @@
                             });
                     })->first();
             } else {
+
                 $this->record = CostCenter::with([
                     'wfp' => function ($query) use ($wfpType) {
                         $query->where('wpf_type_id', $wfpType)->with('wfpDetails');
@@ -649,7 +650,6 @@
                         // }
                     }
                 } else {
-
                     if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental',
                         0)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                         if ($isSupplemental) {
@@ -667,7 +667,6 @@
                                 ];
                             })->toArray();
                         } else {
-
                             if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental',
                                     0)->first() === null) {
                                 $initial = $this->record->fundAllocations->where('wpf_type_id',
@@ -692,7 +691,18 @@
                             })->toArray();
                         }
                     } else {
-                        $this->current_balance = [];
+                            $initial = $this->record->fundAllocations->where('wpf_type_id',
+                                    $wfpType)->where('is_supplemental', 0)->first()->initial_amount;
+                            $this->current_balance = $this->record->fundAllocations->where('wpf_type_id',
+                                $wfpType)->where('is_supplemental',0)->map(function ($allocation) use ($initial) {
+                                return [
+                                    'category_group_id' => $allocation->category_group_id,
+                                    'category_group' => $allocation->category_group,
+                                    'initial_amount' => $initial,
+                                    'current_total' => $allocation->current_total,
+                                    'balance' => $allocation->balance,
+                                ];
+                            })->toArray();
                     }
                 }
             }
