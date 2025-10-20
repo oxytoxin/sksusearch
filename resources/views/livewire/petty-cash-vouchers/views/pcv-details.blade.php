@@ -1,24 +1,35 @@
 <div x-data>
-    <div x-ref="printContainer" class="max-w-xl bg-white border-2 border-black divide-y-2 divide-black" style="font-family: 'Times New Roman', Times, serif">
+    <div x-ref="printContainer" class="max-w-xl bg-white border-2 border-black divide-y-2 divide-black"
+         style="font-family: 'Times New Roman', Times, serif">
         <div class="flex font-bold divide-x-2 divide-black">
             <div class="w-3/5 p-2">
                 <h3 class="text-lg text-center">PETTY CASH VOUCHER</h3>
-                <p class="flex mt-4"><span class="whitespace-nowrap">Entity Name : </span><span class="flex-1 px-2 mx-2 border-b border-black">&nbsp;{{ $pcv->entity_name }}</span></p>
-                <p class="flex"><span class="whitespace-nowrap">Fund Cluster : </span><span class="flex-1 px-2 mx-2 border-b border-black">&nbsp;{{ $pcv->fund_cluster->name }}</span></p>
+                <p class="flex mt-4"><span class="whitespace-nowrap">Entity Name : </span><span
+                            class="flex-1 px-2 mx-2 border-b border-black">&nbsp;{{ $pcv->entity_name }}</span></p>
+                <p class="flex"><span class="whitespace-nowrap">Fund Cluster : </span><span
+                            class="flex-1 px-2 mx-2 border-b border-black">&nbsp;{{ $pcv->fund_cluster->name }}</span>
+                </p>
             </div>
             <div class="flex flex-col items-center w-2/5">
-                <p class="flex items-start flex-1"><span class="whitespace-nowrap">No. : </span><span class="min-w-[8rem] px-2 border-b border-black">&nbsp;{{ $pcv->pcv_number }}</span></p>
-                <p class="flex items-start flex-1"><span class="whitespace-nowrap">Date : </span><span class="min-w-[8rem] px-2 border-b text-center border-black">&nbsp;{{ $pcv->pcv_date->format('m/d/Y') }}</span></p>
+                <p class="flex items-start flex-1"><span class="whitespace-nowrap">No. : </span><span
+                            class="min-w-[8rem] px-2 border-b border-black">&nbsp;{{ $pcv->pcv_number }}</span></p>
+                <p class="flex items-start flex-1"><span class="whitespace-nowrap">Date : </span><span
+                            class="min-w-[8rem] px-2 border-b text-center border-black">&nbsp;{{ $pcv->pcv_date->format('m/d/Y') }}</span>
+                </p>
             </div>
         </div>
         <div class="flex font-bold divide-x-2 divide-black">
             <div class="w-3/5 p-2">
-                <p class="flex"><span class="whitespace-nowrap">Payee/Office : </span><span class="flex-1 px-2 mx-2 border-b border-black">&nbsp;{{ $pcv->payee }}</span></p>
-                <p class="flex"><span class="whitespace-nowrap">Address : </span><span class="flex-1 px-2 mx-2 border-b border-black">&nbsp;{{ $pcv->address }}</span></p>
+                <p class="flex"><span class="whitespace-nowrap">Payee/Office : </span><span
+                            class="flex-1 px-2 mx-2 border-b border-black">&nbsp;{{ $pcv->payee }}</span></p>
+                <p class="flex"><span class="whitespace-nowrap">Address : </span><span
+                            class="flex-1 px-2 mx-2 border-b border-black">&nbsp;{{ $pcv->address }}</span></p>
             </div>
             <div class="flex flex-col items-center w-2/5 py-2 justify-evenly">
                 <p class="whitespace-nowrap">Responsibility Center Code: </p>
-                <p class="flex"><span class="min-w-[8rem] px-2 border-b text-center border-black">&nbsp;{{ $pcv->responsibility_center }}</span></p>
+                <p class="flex"><span
+                            class="min-w-[8rem] px-2 border-b text-center border-black">&nbsp;{{ $pcv->responsibility_center }}</span>
+                </p>
             </div>
         </div>
         <div class="flex divide-x-2 divide-black">
@@ -33,31 +44,31 @@
             <div class="flex-1">
                 <table class="w-full divide-y-2 divide-black">
                     <thead class="">
-                        <tr class="divide-x-2 divide-black">
-                            <th class="w-3/5">Particulars</th>
-                            <th class="w-2/5">Amount</th>
-                        </tr>
+                    <tr class="divide-x-2 divide-black">
+                        <th class="w-3/5">Particulars</th>
+                        <th class="w-2/5">Amount</th>
+                    </tr>
                     </thead>
                     <tbody class="divide-y-2 divide-black">
-                        @foreach ($pcv->particulars as $particular)
+                    @foreach ($pcv->particulars as $particular)
+                        <tr class="divide-x-2 divide-black">
+                            <td class="px-2 text-left">{{ $particular['name'] }}</td>
+                            <td class="px-2 text-right">{{ number_format($particular['amount'], 2) }}</td>
+                        </tr>
+                    @endforeach
+                    @if (7 - count($pcv->particulars) > 0)
+                        @foreach (range(0, 7 - count($pcv->particulars) - 1) as $item)
                             <tr class="divide-x-2 divide-black">
-                                <td class="px-2 text-left">{{ $particular['name'] }}</td>
-                                <td class="px-2 text-right">{{ number_format($particular['amount'], 2) }}</td>
+                                <td class="text-left">&nbsp;</td>
+                                <td class="text-right">&nbsp;</td>
                             </tr>
                         @endforeach
-                        @if (7 - count($pcv->particulars) > 0)
-                            @foreach (range(0, 7 - count($pcv->particulars) - 1) as $item)
-                                <tr class="divide-x-2 divide-black">
-                                    <td class="text-left">&nbsp;</td>
-                                    <td class="text-right">&nbsp;</td>
-                                </tr>
-                            @endforeach
-                        @endif
+                    @endif
 
-                        <tr class="divide-x-2 divide-black">
-                            <td class="px-2 text-left">Total</td>
-                            <td class="px-2 text-right">{{ number_format($pcv->amount_granted, 2) }}</td>
-                        </tr>
+                    <tr class="divide-x-2 divide-black">
+                        <td class="px-2 text-left">Total</td>
+                        <td class="px-2 text-right">{{ number_format($pcv->amount_granted, 2) }}</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -84,7 +95,8 @@
                         <p class="italic">Requested by:</p>
                     </div>
                     <div class="w-3/4 mx-auto mt-4 text-center">
-                        <div class="border-b border-black">&nbsp;{{ $pcv->requisitioner->employee_information->full_name }}</div>
+                        <div class="border-b border-black">
+                            &nbsp;{{ $pcv->requisitioner->employee_information->full_name }}</div>
                         <p>Signature over Printed Name</p>
                     </div>
                 </div>
@@ -95,7 +107,8 @@
                         <p class="italic">Approved by:</p>
                     </div>
                     <div class="w-3/4 mx-auto mt-4 mb-4 text-center">
-                        <div class="border-b border-black">&nbsp;{{ $pcv->signatory->employee_information->full_name }}</div>
+                        <div class="border-b border-black">
+                            &nbsp;{{ $pcv->signatory->employee_information->full_name }}</div>
                         <p>Signature over Printed Name</p>
                         <p>&nbsp;</p>
                     </div>
@@ -105,25 +118,30 @@
                 <div class="grid w-6 h-6 border-b border-r border-black place-items-center">C</div>
                 <div class="flex gap-2 pl-8 mt-2 italic">
                     <div class="relative">
-                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated && $pcv->net_amount > 0) bg-primary-400 @endif">&nbsp;</div>
+                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated && $pcv->net_amount > 0) bg-primary-400 @endif">
+                            &nbsp;
+                        </div>
                         @if ($pcv->is_liquidated && $pcv->net_amount > 0)
-                            <x-ri-check-line class="absolute top-0 left-1" />
+                            <x-ri-check-line class="absolute top-0 left-1"/>
                         @endif
                     </div>
                     <p>Received Refund</p>
                 </div>
                 <div class="flex gap-2 pl-8 mt-2 italic">
                     <div class="relative">
-                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated && $pcv->net_amount < 0) bg-primary-400 @endif">&nbsp;</div>
+                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated && $pcv->net_amount < 0) bg-primary-400 @endif">
+                            &nbsp;
+                        </div>
                         @if ($pcv->is_liquidated && $pcv->net_amount < 0)
-                            <x-ri-check-line class="absolute top-0 left-1" />
+                            <x-ri-check-line class="absolute top-0 left-1"/>
                         @endif
                     </div>
                     <p>Reimbursement Paid</p>
                 </div>
                 <div class="flex-1"></div>
                 <div class="w-3/4 mx-auto mt-8 mb-4 text-center">
-                    <div class="border-b border-black">&nbsp;{{ $pcv->custodian->employee_information->full_name }}</div>
+                    <div class="border-b border-black">
+                        &nbsp;{{ $pcv->custodian->employee_information->full_name }}</div>
                     <p>Signature over Printed Name</p>
                     <p>Petty Cash Custodian</p>
                 </div>
@@ -135,7 +153,8 @@
                         <p class="italic">Paid by:</p>
                     </div>
                     <div class="w-3/4 mx-auto mt-4 mb-4 text-center">
-                        <div class="border-b border-black">&nbsp;{{ $pcv->custodian->employee_information->full_name }}</div>
+                        <div class="border-b border-black">
+                            &nbsp;{{ $pcv->custodian->employee_information->full_name }}</div>
                         <p>Signature over Printed Name</p>
                         <p>Petty Cash Custodian</p>
                     </div>
@@ -160,18 +179,22 @@
                 <div class="grid w-6 h-6 border-b border-r border-black place-items-center">D</div>
                 <div class="flex gap-2 pl-8 mt-2">
                     <div class="relative">
-                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated) bg-primary-400 @endif">&nbsp;</div>
+                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated) bg-primary-400 @endif">
+                            &nbsp;
+                        </div>
                         @if ($pcv->is_liquidated)
-                            <x-ri-check-line class="absolute top-0 left-1" />
+                            <x-ri-check-line class="absolute top-0 left-1"/>
                         @endif
                     </div>
                     <p class="italic">Liquidation Submitted</p>
                 </div>
                 <div class="flex gap-2 pl-8 mt-2">
                     <div class="relative">
-                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated && $pcv->net_amount < 0) bg-primary-400 @endif">&nbsp;</div>
+                        <div class="w-8 h-6 border-2 border-black @if ($pcv->is_liquidated && $pcv->net_amount < 0) bg-primary-400 @endif">
+                            &nbsp;
+                        </div>
                         @if ($pcv->is_liquidated && $pcv->net_amount < 0)
-                            <x-ri-check-line class="absolute top-0 left-1" />
+                            <x-ri-check-line class="absolute top-0 left-1"/>
                         @endif
                     </div>
                     <p class="italic">Reimbursement Received by:</p>
@@ -187,6 +210,9 @@
                     </p>
                 </div>
             </div>
+        </div>
+        <div class="border-t col-span-8 text-xs text-center italic border-black w-full">
+            <p>The original copy of this document appears in electronic form.</p>
         </div>
     </div>
     <div class="flex justify-end mt-4">

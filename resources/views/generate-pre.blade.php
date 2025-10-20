@@ -47,11 +47,10 @@
                         @endforeach
                     </nav>
                 </div>
-                <div x-data="{ selectedType: '{{ request()->input('selectedType') }}' }" class="flex my-2">
+                <div x-data="{ selectedType: '{{ request()->input('selectedType') || 1 }}' }" class="flex my-2">
                     <select x-model="selectedType" name="selectedType" id="selectedType"
                         x-on:change="window.location.href = '{{ request()->fullUrl() }}&selectedType=' + $event.target.value"
                         class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
-                        <option value="">ALL</option>
                         @foreach ($wfp_types as $item)
                             <option value="{{ $item->id }}">
                                 {{ $item->description }}
@@ -63,12 +62,12 @@
                 @if (request()->input('fundClusterWfpId') == 2)
                     <div class="p-4">
                         <div class="grid gap-2 justify-center">
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true]) }}"
-                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true, 'mfoId' => 6, 'campusId' => null]) }}"
+                                class="bg-green-800 hover:bg-green-700 text-white text-center  font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }} PRE
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => false]) }}"
-                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => false, 'mfoId' => 6, 'campusId' => null]) }}"
+                                class="bg-green-800 hover:bg-green-700 text-white text-center  font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }}
                             </a>
                         </div>
@@ -87,12 +86,12 @@
                 @else
                     <div class="p-4">
                         <div class="grid gap-2 justify-center">
-                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true]) }}"
-                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                            <a href="{{ request()->fullUrlWithQuery(['title' => 'Sultan Kudarat State University', 'showPre' => true, 'mfoId' => null]) }}"
+                                class="bg-green-800 hover:bg-green-700 text-white text-center font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }} PRE
                             </a>
-                            <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'title' => 'Sultan Kudarat State University']) }}"
-                                class="bg-green-800 hover:bg-green-700 text-white font-bold py-1.5 px-8 rounded-lg">
+                            <a href="{{ request()->fullUrlWithQuery(['showPre' => false, 'title' => 'Sultan Kudarat State University', 'mfoId' => null]) }}"
+                                class="bg-green-800 hover:bg-green-700 text-white text-center  font-bold py-1.5 px-8 rounded-lg">
                                 SKSU {{ request()->input('sksuLabel') }}
                             </a>
                         </div>

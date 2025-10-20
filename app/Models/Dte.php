@@ -1,28 +1,21 @@
 <?php
 
-namespace App\Models;
+    namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Database\Eloquent\Casts\Attribute;
+    use Illuminate\Database\Eloquent\Factories\HasFactory;
+    use Illuminate\Database\Eloquent\Model;
 
-/**
- * @mixin IdeHelperDte
- */
-class Dte extends Model
-{
-    use HasFactory;
-
-    protected function amount(): Attribute
+    /**
+     * @mixin IdeHelperDte
+     */
+    class Dte extends Model
     {
-        return Attribute::make(
-            get: fn ($value) => $value / 100,
-            set: fn ($value) => $value * 100,
-        );
-    }
+        use HasFactory;
 
-    public function philippine_region()
-    {
-        return $this->belongsTo(PhilippineRegion::class);
+
+        public function philippine_region()
+        {
+            return $this->belongsTo(PhilippineRegion::class);
+        }
     }
-}

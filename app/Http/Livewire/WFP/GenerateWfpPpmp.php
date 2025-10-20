@@ -22,7 +22,11 @@
         public $mfoId = null;
         public $campusId = null;
 
-        protected $queryString = ['fundClusterWfpId', 'supplementalQuarterId', 'mfoId', 'title', 'campusId','selectedType'];
+        public $sksuLabel = "";
+
+        protected $queryString = ['fundClusterWfpId', 'supplementalQuarterId', 'mfoId', 'title', 'campusId','selectedType','sksuLabel'];
+
+
 
         public function mount()
         {

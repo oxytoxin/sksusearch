@@ -8,7 +8,7 @@
                         Project Procurement Management Plan (PPMP)
                     </p>
                     <p class="text-xl font-medium">
-                        Fund 101
+                        Fund {{ $sksuLabel }}
                     </p>
                     <p class="text-md font-normal">
                         {{ $title }}

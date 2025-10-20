@@ -13,7 +13,9 @@
                         </div>
                         <div class="relative right-0">
                             <div class="m-auto flex justify-center items-center flex-col">
-                                <img class="w-12" src="https://api.qrserver.com/v1/create-qr-code/?data={{ $liquidation_report->tracking_number }}&amp;size=100x100" title="" alt="" />
+                                <img class="w-12"
+                                     src="https://api.qrserver.com/v1/create-qr-code/?data={{ $liquidation_report->tracking_number }}&amp;size=100x100"
+                                     title="" alt=""/>
                                 <span class="font-xs flex justify-center text-[11px]">{{ $liquidation_report->tracking_number }}</span>
                             </div>
                         </div>
@@ -78,7 +80,8 @@
             <div class="flex text-sm divide-x-2 divide-black">
                 <h4 class="flex-1 p-1">AMOUNT OF CASH ADVANCE PER DV NO.
                     <span class="border-b border-black">{{ $liquidation_report->disbursement_voucher->dv_number }}</span>
-                    DTD.<span class="border-b border-black">{{ $liquidation_report->disbursement_voucher->created_at->format('m/d/Y') }}</span>
+                    DTD.<span
+                            class="border-b border-black">{{ $liquidation_report->disbursement_voucher->created_at->format('m/d/Y') }}</span>
                 </h4>
                 <h4 class="w-1/3 p-1 px-4 text-right">
                     {{ Akaunting\Money\Money::PHP($liquidation_report->disbursement_voucher->total_amount, true) }}
@@ -88,7 +91,8 @@
                 <div class="flex text-sm divide-x-2 divide-black">
                     <h4 class="flex-1 p-1">AMOUNT REFUNDED PER OR NO.
                         <span class="border-b border-black">{{ $refund_particular['or_number'] }}</span>
-                        DTD.<span class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
+                        DTD.<span
+                                class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
                     </h4>
                     <h4 class="w-1/3 p-1 pl-12 text-left">
                         {{ Akaunting\Money\Money::PHP($refund_particular['amount'] ? $refund_particular['amount'] : 0, true) }}
@@ -170,6 +174,9 @@
                         </p>
                     </div>
                 </div>
+            </div>
+            <div class="border-t col-span-8 text-xs text-center italic border-black w-full">
+                <p>The original copy of this document appears in electronic form.</p>
             </div>
         </div>
     </div>

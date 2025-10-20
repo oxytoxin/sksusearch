@@ -1,34 +1,29 @@
 <?php
 
-namespace App\Models;
+    namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Database\Eloquent\Casts\Attribute;
+    use Illuminate\Database\Eloquent\Factories\HasFactory;
+    use Illuminate\Database\Eloquent\Model;
 
-/**
- * @mixin IdeHelperArchivedCheque
- */
-class ArchivedCheque extends Model
-{
-    
-    use HasFactory;
-    protected $casts = [
-        'journal_date' => 'immutable_date',
-        'upload_date' => 'immutable_date',
-        'cheque_date' => 'immutable_date',
-        'particulars' => 'array',
-        'other_details' => 'array',
-    ];
-    protected function chequeAmount(): Attribute
+    /**
+     * @mixin IdeHelperArchivedCheque
+     */
+    class ArchivedCheque extends Model
     {
-        return Attribute::make(
-            get: fn ($value) => $value / 100,
-            set: fn ($value) => $value * 100,
-        );
+
+        use HasFactory;
+
+        protected $casts = [
+            'journal_date' => 'immutable_date',
+            'upload_date' => 'immutable_date',
+            'cheque_date' => 'immutable_date',
+            'particulars' => 'array',
+            'other_details' => 'array',
+        ];
+
+        public function scanned_documents()
+        {
+            return $this->morphMany(ScannedDocument::class, 'documentable');
+        }
     }
-    public function scanned_documents()
-    {
-        return $this->morphMany(ScannedDocument::class, 'documentable');
-    }
-}

@@ -30,6 +30,8 @@
 
         protected $queryString = ['supplementalQuarterId'];
 
+        public $is164 = false;
+
         public $data = [
             'wfp_type_id' => 1,
         ];
@@ -103,7 +105,8 @@
                         ->url(fn($record): string => route('wfp.print-wfp', [
                             'record' => $record, 'isSupplemental' => 1,
                             'supplementalQuarterId' => $this->supplementalQuarterId,
-                            'wfpType' => $this->data['wfp_type_id'], 'costCenterId' => $record->cost_center_id
+                            'wfpType' => $this->data['wfp_type_id'], 'costCenterId' => $record->cost_center_id,
+                             'is164' => !in_array($record->fund_cluster_id, [1, 3,9]),
                         ])),
                     Action::make('view ppmp')
                         ->label('View PPMP')
@@ -120,7 +123,8 @@
                         ->icon('heroicon-o-eye')
                         ->url(fn($record): string => route('wfp.print-pre', [
                             'record' => $record, 'isSupplemental' => 1, 'costCenterId' => $record->cost_center_id,
-                            'wfpType' => $record->wpf_type_id, 'supplementalQuarterId' => $this->supplementalQuarterId
+                            'wfpType' => $record->wpf_type_id, 'supplementalQuarterId' => $this->supplementalQuarterId,
+
                         ]))
                 ]),
                 Action::make('approve')
@@ -189,6 +193,11 @@
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         if (!empty($data['mfo'])) {
+
+                            if(!in_array($data['mfo'],[1,3,9])){
+                                $this->is164 = true;
+                            }
+
                             return $query->whereHas('costCenter', function ($query) use ($data) {
                                 $query->where('m_f_o_s_id', $data['mfo']);
                             });

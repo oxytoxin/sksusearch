@@ -26,7 +26,7 @@
                                          src="http://sksu.edu.ph/wp-content/uploads/2020/09/512x512-1.png"
                                          alt="sksu logo">
                                     <span
-                                        class="text-xs text-center text-black print:text-8">SKSU Works for Success!</span>
+                                            class="text-xs text-center text-black print:text-8">SKSU Works for Success!</span>
                                     {{-- <span class="text-xs font-bold text-center text-black"> ISO 9001:2015</span> --}}
                                 </div>
                             </div>
@@ -48,7 +48,7 @@
                                      src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $evaluate(fn($get) => $get('tracking_number')) }}"
                                      alt="N/A">
                                 <span
-                                    class="flex justify-center text-xs font-normal">{{ $evaluate(fn($get) => $get('tracking_number')) }}</span>
+                                        class="flex justify-center text-xs font-normal">{{ $evaluate(fn($get) => $get('tracking_number')) }}</span>
                             </div>
 
                         </div>
@@ -62,7 +62,7 @@
                 <div class="grid col-span-2 grid-rows-2 border border-black">
                     <div class="row-span-1 border-b border-l border-black">
                         <span
-                            class="mx-auto ml-1 font-serif text-xs font-extrabold text-black capitalize print:text-12">
+                                class="mx-auto ml-1 font-serif text-xs font-extrabold text-black capitalize print:text-12">
                             fund cluster:
                         </span>
                     </div>
@@ -158,7 +158,7 @@
 
                                 <div class="ml-1 text-sm">
                                     <span
-                                        class="font-medium text-black">{{ $evaluate(fn($get) => $get('other_reason')) }}</span>
+                                            class="font-medium text-black">{{ $evaluate(fn($get) => $get('other_reason')) }}</span>
                                 </div>
                             </div>
                         @endif
@@ -213,7 +213,7 @@
                     <div class="w-64 text-center border-r-2 border-black h-44">
                         <div class="flex flex-col">
                             @foreach ($particulars as $particular)
-                                {{ $particular['responsibility_center'] }}
+                                {{ $evaluate(fn($get) => $get('responsibility_center')) }}
                             @endforeach
                         </div>
                     </div>
@@ -367,14 +367,14 @@
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
                         <span
-                            class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
+                                class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
                     </div>
                     <div class="flex items-center w-1/2 space-y-1 text-center border-r-2 border-black print:text-8">
                         <div class="flex w-20 h-auto text-center border-r border-black print:h-8 print:w-16">
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
                         <span
-                            class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
+                                class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-12">
@@ -433,7 +433,7 @@
                         </div>
                         <div class="flex flex-row w-full border-b-2 border-black">
                             <div
-                                class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
+                                    class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
                                 Check / ADA No.:
                             </div>
                             <div class="w-1/3 h-auto border-r border-black shrink-0">
@@ -457,7 +457,7 @@
                     <div class="flex-col w-full">
                         <div class="flex flex-row w-full border-b-2 border-black">
                             <div
-                                class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
+                                    class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
                                 Signature
                             </div>
                             <div class="w-1/3 h-auto border-r border-black shrink-0">
@@ -472,7 +472,7 @@
                         </div>
                         <div class="w-full">
                             <span
-                                class="pl-1 font-extrabold print:text-12">Official Receipt No. & Date/Other Documents</span>
+                                    class="pl-1 font-extrabold print:text-12">Official Receipt No. & Date/Other Documents</span>
                         </div>
                     </div>
                     <div class="float-left w-1/6 h-full border-l border-black shrink-0">
@@ -481,7 +481,9 @@
                         </div>
                     </div>
                 </div>
-
+                <div class="border-t col-span-8 text-xs text-center italic border-black w-full">
+                    <p>The original copy of this document appears in electronic form.</p>
+                </div>
             </div>
         </div>
     </div>

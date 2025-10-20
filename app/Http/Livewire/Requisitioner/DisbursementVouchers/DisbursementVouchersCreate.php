@@ -107,6 +107,8 @@
 
         public $mop_id;
 
+        public $responsibility_center;
+
         public $signatory_id;
 
         public $activity_date_from;
@@ -157,7 +159,6 @@
                                         $set('disbursement_voucher_particulars', [
                                             [
                                                 'purpose' => $ad->title,
-                                                'responsibility_center' => '',
                                                 'mfo_pap' => '',
                                                 'amount' => $ad->total_amount,
                                             ],
@@ -205,7 +206,6 @@
                                             $set('disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $to->purpose,
-                                                    'responsibility_center' => '',
                                                     'mfo_pap' => '',
                                                     'amount' => $amount,
                                                 ],
@@ -214,7 +214,6 @@
                                             $set('disbursement_voucher_particulars', [
                                                 [
                                                     'purpose' => $to->purpose,
-                                                    'responsibility_center' => '',
                                                     'mfo_pap' => '',
                                                     'amount' => 0,
                                                 ],
@@ -250,6 +249,7 @@
                                         ->label('Mode of Payment')
                                         ->options(Mop::pluck('name', 'id')),
                                 ]),
+                                TextInput::make('responsibility_center'),
                                 #region Utilities
                                 //Electricity, Water, Fuel (start)
                                 Repeater::make('electricity_utility_particulars')
@@ -310,7 +310,6 @@
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
                                                         'purpose' => $get('../../purpose'),
-                                                        'responsibility_center' => '',
                                                         'mfo_pap' => '',
                                                         'amount' => round($total, 2),
                                                     ],
@@ -368,7 +367,6 @@
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
                                                         'purpose' => $get('../../purpose'),
-                                                        'responsibility_center' => '',
                                                         'mfo_pap' => '',
                                                         'amount' => round($total, 2),
                                                     ],
@@ -429,7 +427,6 @@
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
                                                         'purpose' => $get('../../purpose'),
-                                                        'responsibility_center' => '',
                                                         'mfo_pap' => '',
                                                         'amount' => round($total, 2),
                                                     ],
@@ -469,7 +466,6 @@
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
                                                         'purpose' => $get('../../purpose'),
-                                                        'responsibility_center' => '',
                                                         'mfo_pap' => '',
                                                         'amount' => round($total, 2),
                                                     ],
@@ -530,7 +526,6 @@
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
                                                         'purpose' => $get('../../purpose'),
-                                                        'responsibility_center' => '',
                                                         'mfo_pap' => '',
                                                         'amount' => round($total, 2),
                                                     ],
@@ -570,7 +565,6 @@
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
                                                         'purpose' => $get('../../purpose'),
-                                                        'responsibility_center' => '',
                                                         'mfo_pap' => '',
                                                         'amount' => round($total, 2),
                                                     ],
@@ -608,7 +602,6 @@
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
                                                         'purpose' => $get('../../purpose'),
-                                                        'responsibility_center' => '',
                                                         'mfo_pap' => '',
                                                         'amount' => round($total, 2),
                                                     ],
@@ -640,7 +633,6 @@
                                                 $set('../../disbursement_voucher_particulars', [
                                                     [
                                                         'purpose' => $get('../../purpose'),
-                                                        'responsibility_center' => '',
                                                         'mfo_pap' => '',
                                                         'amount' => round($total, 2),
                                                     ],
@@ -705,7 +697,6 @@
                                                     $set('../../disbursement_voucher_particulars', [
                                                         [
                                                             'purpose' => $get('../../purpose'),
-                                                            'responsibility_center' => '',
                                                             'mfo_pap' => '',
                                                             'amount' => round($total, 2),
                                                         ],
@@ -738,14 +729,12 @@
                                         Textarea::make('purpose')
                                             ->required(),
                                         Grid::make(3)->schema([
-                                            TextInput::make('responsibility_center'),
                                             TextInput::make('mfo_pap')
                                                 ->label('MFO/PAP'),
                                             TextInput::make('amount')
                                                 ->reactive()
                                                 ->numeric()
-                                                ->disabled(fn(
-                                                ) => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
+                                                ->disabled(fn() => TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
                                                 ->required(),
                                         ]),
                                     ])
@@ -782,8 +771,7 @@
                         ->schema([
                             Card::make()
                                 ->schema([
-                                    Placeholder::make('related_documents_list')->disableLabel()->content(fn(
-                                    ) => view('components.disbursement_vouchers.related_documents', [
+                                    Placeholder::make('related_documents_list')->disableLabel()->content(fn() => view('components.disbursement_vouchers.related_documents', [
                                         'voucher_subtype' => $this->voucher_subtype,
                                     ])),
                                 ]),
@@ -899,6 +887,7 @@
                 'signatory_id' => $this->signatory_id,
                 'mop_id' => filled($this->mop_id) ? $this->mop_id : null,
                 'payee' => $this->payee,
+                'responsibility_center' => $this->responsibility_center ?? null,
                 'travel_order_id' => $this->travel_order_id,
                 'activity_design_id' => $this->activity_design_id,
                 'tracking_number' => $this->tracking_number,
@@ -911,7 +900,6 @@
             foreach ($this->disbursement_voucher_particulars as $key => $particulars) {
                 $dv->disbursement_voucher_particulars()->create([
                     'purpose' => $particulars['purpose'],
-                    'responsibility_center' => $particulars['responsibility_center'],
                     'mfo_pap' => $particulars['mfo_pap'],
                     'amount' => $particulars['amount'],
                 ]);

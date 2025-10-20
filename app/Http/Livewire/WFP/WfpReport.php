@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\WFP;
 
+use App\Models\FundAllocation;
 use App\Models\SupplementalQuarter;
 use App\Models\Wfp;
 use App\Models\WpfType;
@@ -21,7 +22,9 @@ class WfpReport extends Component
 
     public $costCenterId = null;
 
-    protected $queryString = ['supplementalQuarterId', 'wfpType', 'costCenterId'];
+    public $is164 = null;
+
+    protected $queryString = ['supplementalQuarterId', 'wfpType', 'costCenterId','is164'];
     public $oldRecords = [];
     public $history = [
         'regular_allocation' => 0,
@@ -55,6 +58,9 @@ class WfpReport extends Component
         // WFP SHOULD EXIST
         abort_unless(!empty($wfpType), 404);
 
+        $fundAllocationCategoryIds = FundAllocation::where('cost_center_id', $this->costCenterId)->where('wpf_type_id', $this->wfpType)
+                ->where('supplemental_quarter_id', $this->supplementalQuarterId)
+                ->pluck('category_group_id')->toArray();
         // RETRIEVE OLD AND CURRENT WFP
         $workFinalcialPlans = [];
         if ($isSupplemental) {
@@ -66,13 +72,17 @@ class WfpReport extends Component
                         });
                     });
                 }
-            ], 'wfpType', 'wfpDetails'])
+            ], 'wfpType', 'wfpDetails'=>function($query) use($fundAllocationCategoryIds){
+                $query->when(is_null($this->is164), function ($query) use ($fundAllocationCategoryIds) {
+                    $query->whereIn('category_group_id', $fundAllocationCategoryIds);
+                });
+            }])
                 ->where('wpf_type_id', $this->wfpType)
                  ->where('cost_center_id', $this->costCenterId)
                  ->where(function($q){
                     $q->where('is_supplemental', 0)
                         ->orWhere(function ($query) {
-                            $query->whereNotNull('supplemental_quarter_id')->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
+                            $query->where('supplemental_quarter_id', '!=', null)->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
                         });
                 })->get();
         } else {
@@ -112,7 +122,9 @@ class WfpReport extends Component
         foreach ($this->wfpDetails as $wfpDetail) {
             $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
         }
+
         $this->current['regular_programmed'] = $this->program;
+
 
 
         //HISTORY

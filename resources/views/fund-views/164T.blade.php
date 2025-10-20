@@ -6,12 +6,12 @@
                     class="flex hover:bg-yellow-500 p-2 bg-yellow-600 rounded-md font-light capitalize text-white text-sm">
                     Print PRE
                 </button>
-                <button wire:click="export164" type="button"
+                <button wire:click="exportExcel" type="button"
                     class="flex hover:bg-green-600 p-2 bg-green-700 rounded-md font-light capitalize text-white text-sm">
                     Export Excel
                 </button>
                 <a type="button" target="_blank"
-                    href="/export/cost-center?is_supplemental={{ $is_q1 ? 1 : 0 }}&fund_cluster_id=4&wfp_type_id={{ $selectedType }}&m_f_o_s_id={{ $mfoId }}&fileName={{ str_replace(' ', '_', $title) }}.xlsx"
+                    href="/export/cost-center?supplementalQuarterId={{ $supplementalQuarterId }}&is_supplemental={{ $is_q1 ? 1 : 0 }}&fund_cluster_id=4&wfp_type_id={{ $selectedType }}&m_f_o_s_id={{ $mfoId }}&fileName={{ str_replace(' ', '_', $title) }}.xlsx"
                     class="flex hover:bg-green-600 p-2 bg-green-700 rounded-md font-light capitalize text-white text-sm">
                     Cost Center Export
                 </a>
@@ -22,7 +22,7 @@
                         Program of Receipts & Expenditures (PRE)
                     </p>
                     <p class="text-xl font-medium">
-                        Fund 164T / FHE
+                        Fund {{ $sksuLabel }}
                     </p>
                     <p class="text-md font-normal">{{ $title }}</p>
                 </div>
@@ -44,8 +44,6 @@
                                 @endif
                                 <th colspan="3" class="border border-black bg-gray-300">Expenditure</th>
                                 <th class="border border-black bg-gray-300">Balance</th>
-                                {{-- <th colspan="2" class="border border-black bg-gray-300">Corresponding Account Codes
-                        </th> --}}
                             </tr>
                         </thead>
                         <tbody>
