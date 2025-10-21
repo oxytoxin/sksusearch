@@ -298,9 +298,7 @@
                                                     $sumTotal = 0;
                                                     $sumBalance = 0;
 
-                                                    $sumAllocated = array_sum(
-                                                        array_column($current_balance, 'initial_amount'),
-                                                    );
+                                                    $sumAllocated = $current_balance[0]['initial_amount'];
                                                     $sumTotal = array_sum(
                                                         array_column($current_balance, 'current_total'),
                                                     );

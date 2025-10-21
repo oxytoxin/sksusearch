@@ -232,7 +232,6 @@
                             });
                     })->first();
             } else {
-
                 $this->record = CostCenter::with([
                     'wfp' => function ($query) use ($wfpType) {
                         $query->where('wpf_type_id', $wfpType)->with('wfpDetails');
@@ -273,7 +272,6 @@
             $this->global_index = 1;
 
             if (in_array($this->wfp_fund->id, [1, 3, 9])) {
-
                 if ($isSupplemental) {
                     if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id',
                         $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
@@ -676,11 +674,13 @@
                                 $initial = $this->record->fundAllocations->where('wpf_type_id',
                                     $wfpType)->where('is_supplemental', 0)->first()->initial_amount;
                             }
+
                             $this->current_balance = $this->record->fundAllocations->where('wpf_type_id',
                                 $wfpType)->where('is_supplemental',
                                 0)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) use (
-                                $initial
+                                $initial,
                             ) {
+
                                 return [
                                     'category_group_id' => $allocation->category_group_id,
                                     'category_group' => $allocation->category_group,
