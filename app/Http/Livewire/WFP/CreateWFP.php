@@ -206,10 +206,9 @@
         public $supplementalQuarterId = null;
         protected $queryString = ['supplementalQuarterId'];
 
-
+        public $categoryIds = [];
         public function mount($record, $wfpType, $isEdit, $isSupplemental)
         {
-
             $this->is_supplemental = $isSupplemental;
             $costCenter_id = Wfp::where('cost_center_id', $record)->first()?->cost_center_id;
             $this->wfp_param = $wfpType;
@@ -521,7 +520,6 @@
                     if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('supplemental_quarter_id',
                         $this->supplementalQuarterId)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
                         if ($isSupplemental) {
-
                             $programmed = [];
                             if (count($this->record->wfp) > 0) {
                                 $all_programmed = $this->record->wfp->filter(function ($wfp) use ($wfpType) {
@@ -648,8 +646,10 @@
                         // }
                     }
                 } else {
-                    if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental',
-                        0)->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
+                    $fundDrafts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where('is_supplemental',
+                        0)->first()->fundDrafts()->first()?->draft_amounts()->get();
+                        $this->categoryIds = $fundDrafts->pluck('category_group_id')->toArray();
+                    if (count($fundDrafts) > 0) {
                         if ($isSupplemental) {
                             $this->current_balance = $this->record->fundAllocations->where('wpf_type_id',
                                 $wfpType)->where('supplemental_quarter_id',
@@ -674,13 +674,11 @@
                                 $initial = $this->record->fundAllocations->where('wpf_type_id',
                                     $wfpType)->where('is_supplemental', 0)->first()->initial_amount;
                             }
-
                             $this->current_balance = $this->record->fundAllocations->where('wpf_type_id',
                                 $wfpType)->where('is_supplemental',
                                 0)->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) use (
                                 $initial,
                             ) {
-
                                 return [
                                     'category_group_id' => $allocation->category_group_id,
                                     'category_group' => $allocation->category_group,
@@ -754,8 +752,8 @@
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->where('supplemental_quarter_id',
                         $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->filter(function ($item
-                    ) {
-                        return $item->budget_category_id == 1;
+                    )  {
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 1;
                     })->map(function ($item) {
                         $this->supplies[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -781,8 +779,8 @@
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->where('supplemental_quarter_id',
                         $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->filter(function ($item
-                    ) {
-                        return $item->budget_category_id == 2;
+                    )  {
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 2;
                     })->map(function ($item) {
                         $this->mooe[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -808,8 +806,8 @@
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->where('supplemental_quarter_id',
                         $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->filter(function ($item
-                    ) {
-                        return $item->budget_category_id == 3;
+                    )  {
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 3;
                     })->map(function ($item) {
                         $this->trainings[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -835,8 +833,8 @@
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->where('supplemental_quarter_id',
                         $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->filter(function ($item
-                    ) {
-                        return $item->budget_category_id == 4;
+                    )  {
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 4;
                     })->map(function ($item) {
                         $this->machines[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -862,8 +860,8 @@
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->where('supplemental_quarter_id',
                         $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->filter(function ($item
-                    ) {
-                        return $item->budget_category_id == 5;
+                    )  {
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 5;
                     })->map(function ($item) {
                         $this->buildings[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -889,8 +887,8 @@
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->where('supplemental_quarter_id',
                         $this->supplementalQuarterId)->first()->fundDrafts->first()->draft_items->filter(function ($item
-                    ) {
-                        return $item->budget_category_id == 6;
+                    )  {
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 6;
                     })->map(function ($item) {
                         $this->ps[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -919,7 +917,7 @@
                     //1
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                        return $item->budget_category_id == 1;
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 1;
                     })->map(function ($item) {
                         $this->supplies[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -944,7 +942,7 @@
                     //2
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                        return $item->budget_category_id == 2;
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 2;
                     })->map(function ($item) {
                         $this->mooe[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -969,7 +967,7 @@
                     //3
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                        return $item->budget_category_id == 3;
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 3;
                     })->map(function ($item) {
                         $this->trainings[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -994,7 +992,7 @@
                     //4
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                        return $item->budget_category_id == 4;
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 4;
                     })->map(function ($item) {
                         $this->machines[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -1019,7 +1017,7 @@
                     //5
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                        return $item->budget_category_id == 5;
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 5;
                     })->map(function ($item) {
                         $this->buildings[] = [
                             'budget_category_id' => $item->budget_category_id,
@@ -1044,7 +1042,7 @@
                     //6
                     $this->record->fundAllocations->where('wpf_type_id',
                         $this->wfp_param)->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                        return $item->budget_category_id == 6;
+                        return in_array($item->title_group,$this->categoryIds) && $item->budget_category_id == 6;
                     })->map(function ($item) {
                         $this->ps[] = [
                             'budget_category_id' => $item->budget_category_id,

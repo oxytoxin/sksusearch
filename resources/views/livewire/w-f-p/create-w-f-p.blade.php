@@ -207,7 +207,7 @@
                                             <tr>
                                                 <th scope="col"
                                                     class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3">
-                                                    Title Group</th>
+                                                    Title Group </th>
                                                 <th scope="col"
                                                     class="px-3 py-2 text-left text-sm font-semibold text-gray-50">
                                                 </th>
