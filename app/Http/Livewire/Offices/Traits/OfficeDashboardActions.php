@@ -2,8 +2,11 @@
 
     namespace App\Http\Livewire\Offices\Traits;
 
+    use App\Models\CategoryItemBudget;
     use App\Models\FundCluster;
+    use App\Models\Mop;
     use App\Models\TravelOrderType;
+    use Filament\Forms\Components\Textarea;
     use Illuminate\Support\Facades\DB;
     use App\Forms\Components\Flatpickr;
     use App\Http\Controllers\NotificationController;
@@ -159,10 +162,10 @@
                 Action::make('cheque_ada')->label('Cheque/ADA')->button()->action(function ($record, $data) {
                     DB::beginTransaction();
                     $record->update([
+                        'mop_id' => $data['mop_id'],
                         'cheque_number' => $data['cheque_number'],
                         'current_step_id' => $record->current_step_id + 1000,
                         'cheque_number_added_at' => now(),
-
                     ]);
                     $description = 'Cheque/ADA made for requisitioner.';
                     if ($this->isOic()) {
@@ -235,9 +238,32 @@
                             TextInput::make('cheque_number')
                                 ->label('Cheque number/ADA')
                                 ->required(),
+                            Select::make('mop_id')
+                                ->label('Mode of Payment')
+                                ->options(Mop::pluck('name', 'id'))
+                                ->required()
                         ];
                     })
                     ->requiresConfirmation(),
+                Action::make('cancel')
+                    ->requiresConfirmation()
+                    ->action(function ($record, $data) {
+                        $record->update([
+                            'cancellation_remarks' => $data['cancellation_remarks'],
+                            'for_cancellation' => true,
+                            'cancelled_at' => now()
+                        ]);
+                        $description = 'Cheque/ADA cancelled.';
+                        $record->activity_logs()->create([
+                            'description' => $description,
+                        ]);
+                    })
+                    ->form([
+                        Textarea::make('cancellation_remarks')
+                    ])
+                    ->button()
+                    ->color('danger')
+                    ->visible(fn($record) => $record->cheque_number && $record->current_step_id == 18000 && !$record->for_cancellation),
             ];
         }
 
@@ -289,6 +315,8 @@
                     DB::beginTransaction();
                     $record->update([
                         'ors_burs' => $data['ors_burs'],
+                        'category_item_budget_id' => $data['category_item_budget_id'],
+                        'responsibility_center' => $data['responsibility_center'],
                         'fund_cluster_id' => $data['fund_cluster_id'],
                     ]);
                     $description = 'ORS/BURS and Fund Cluster assigned to Disbursement Voucher.';
@@ -319,6 +347,15 @@
                                 ->label('ORS/BURS')
                                 ->default($record->ors_burs)
                                 ->required(),
+                            TextInput::make('responsibility_center')
+                                ->default($record->responsibility_center)
+                                ->required(),
+                            Select::make('category_item_budget_id')
+                                ->label('UACS Code')
+                                ->options(CategoryItemBudget::pluck('uacs_code', 'id'))
+                                ->preload()
+                                ->searchable()
+                                ->required()
                         ];
                     })
                     ->requiresConfirmation(),
