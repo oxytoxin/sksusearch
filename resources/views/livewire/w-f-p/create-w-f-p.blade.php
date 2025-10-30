@@ -1481,12 +1481,15 @@
                                                         $sumTotal = 0;
                                                         $sumBalance = 0;
 
-                                                        if (
-                                                            !empty($current_balance) &&
-                                                            isset($current_balance[0]['initial_amount'])
-                                                        ) {
-                                                            $sumAllocated = $current_balance[0]['initial_amount'];
-                                                        }
+                                                        // if (
+                                                        //     !empty($current_balance) &&
+                                                        //     isset($current_balance[0]['initial_amount'])
+                                                        // ) {
+                                                        //     $sumAllocated = $current_balance[0]['initial_amount'];
+                                                        // }
+                                                        $sumAllocated = array_sum(
+                                                            array_column($current_balance, 'initial_amount'),
+                                                        );
 
                                                         if (!empty($current_balance)) {
                                                             $sumTotal = array_sum(
