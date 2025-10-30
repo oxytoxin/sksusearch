@@ -12,6 +12,7 @@ use App\Http\Livewire\Test\CountetTest;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Livewire\Shared\TravelCompletedCertificatePrint;
+use App\Jobs\MigrateFilesToR2;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,10 +75,16 @@ Route::get('/test-example', function () {
 
 
 Route::get('/migrate-files-to-r2', function () {
-    try {
-        \App\Jobs\MigrateFilesToR2::dispatch();
-        return 'File migration job dispatched successfully.';
+ try {
+        $localDisk = Storage::disk('local');
+        $allFiles = $localDisk->allFiles();
+
+        foreach ($allFiles as $file) {
+            MigrateFilesToR2::dispatch($file);
+        }
+
+        return 'File migration jobs dispatched successfully (' . count($allFiles) . ' files).';
     } catch (Exception $e) {
-        return 'Error dispatching job: ' . $e->getMessage();
+        return 'Error dispatching jobs: ' . $e->getMessage();
     }
 });
