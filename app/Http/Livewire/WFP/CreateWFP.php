@@ -501,10 +501,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     // dd($this->current_balance);
                 }
             } else {
-                if ($this->record->fundAllocations->where(
+                $fundDrafts = $this->record->fundAllocations->where(
                     'wpf_type_id',
                     $wfpType
-                )->first()->fundDrafts()->first()?->draft_amounts()->exists()) {
+                )->first()->fundDrafts()->first()?->draft_amounts()->get();
+                if (!empty($fundDrafts)) {
+                     $this->categoryIds = $fundDrafts->pluck('category_group_id')->toArray();
                     $initial_amount = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
                     $draft_amounts = $this->record->fundAllocations->where(
                         'wpf_type_id',
@@ -641,7 +643,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             })->toArray();
                         }
                     } else {
-
                         $this->current_balance = $this->record->fundAllocations->where(
                             'wpf_type_id',
                             $wfpType
@@ -717,6 +718,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     // }
                 }
             } else {
+                // xdd
                 $fundDrafts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where(
                     'is_supplemental',
                     0
@@ -1098,6 +1100,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'remarks' => $item->remarks,
                     ];
                 });
+
                 //3
                 $this->record->fundAllocations->where(
                     'wpf_type_id',
@@ -1125,6 +1128,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'remarks' => $item->remarks,
                     ];
                 });
+
                 //4
                 $this->record->fundAllocations->where(
                     'wpf_type_id',

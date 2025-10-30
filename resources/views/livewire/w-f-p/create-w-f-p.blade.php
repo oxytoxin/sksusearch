@@ -823,7 +823,6 @@
                                                 text-left text-sm font-semibold text-gray-900 sm:pl-3">
                                                         {{ $mooe_name }}</th>
                                                 </tr>
-                                                @dump($mooe);
                                                 @forelse ($mooe as $item)
                                                     <tr class="border-t border-gray-300">
                                                         @if (in_array($wfp_fund->id, [1, 3, 9]))
