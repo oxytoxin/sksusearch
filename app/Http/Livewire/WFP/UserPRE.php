@@ -200,7 +200,7 @@ class UserPRE extends Component
             $this->fund_allocation = FundAllocation::where(
                 'supplemental_quarter_id',
                 $this->supplementalQuarterId
-            )->whereHas('costCenter', function ($query) {
+            )->where('wpf_type_id', $this->wfpType)->whereHas('costCenter', function ($query) {
                 $query->where('id', $this->cost_center->id)
                     ->whereHas('mfoFee', function ($query) {
                         $query->where('fund_cluster_id', $this->record->fund_cluster_id);

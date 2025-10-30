@@ -38,7 +38,7 @@ class ViewAllocatedFund extends Component
         $this->wfp_type = WpfType::all();
         $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->wpf_type_id;
         $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->first()->initial_amount;
-        $this->fund_description = $this->record->fundAllocations->first()->description;
+        $this->fund_description = $this->record->fundAllocations->where('wpf_type_id', $this->selectedType)->first()->description;
 
         foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
             $this->amounts[$allocation->category_group_id] = $allocation->initial_amount;

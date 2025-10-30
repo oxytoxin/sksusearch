@@ -207,20 +207,16 @@
                                             <tr>
                                                 <th scope="col"
                                                     class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-50 sm:pl-3">
-                                                    Title Group</th>
+                                                    Title Group </th>
                                                 <th scope="col"
                                                     class="px-3 py-2 text-left text-sm font-semibold text-gray-50">
                                                 </th>
                                                 <th scope="col"
                                                     class="px-3 py-2 text-left text-sm font-semibold text-gray-50">
-                                                    Program</th>
+                                                    Program </th>
                                                 <th scope="col"
                                                     class="px-3 py-2 text-left text-sm font-semibold text-gray-50">
                                                 </th>
-                                                {{-- <th scope="col" class="px-3 py-2 text-left text-sm font-semibold text-gray-50">Total</th> --}}
-                                                {{-- <th scope="col" class="relative py-2 pl-3 pr-4 sm:pr-3">
-                                            <span class="sr-only">Edit</span>
-                                          </th> --}}
                                             </tr>
                                         <tbody class="bg-white">
                                             <tr class="border-t border-gray-300">
@@ -302,14 +298,20 @@
                                                     $sumTotal = 0;
                                                     $sumBalance = 0;
 
-                                                    $sumAllocated = array_sum(
-                                                        array_column($current_balance, 'initial_amount'),
-                                                    );
-                                                    $sumTotal = array_sum(
-                                                        array_column($current_balance, 'current_total'),
-                                                    );
+                                                    if (
+                                                        !empty($current_balance) &&
+                                                        isset($current_balance[0]['initial_amount'])
+                                                    ) {
+                                                        $sumAllocated = $current_balance[0]['initial_amount'];
+                                                    }
+
+                                                    if (!empty($current_balance)) {
+                                                        $sumTotal = array_sum(
+                                                            array_column($current_balance, 'current_total'),
+                                                        );
+                                                    }
+
                                                     $sumBalance = $sumAllocated - $sumTotal;
-                                                    // $sumBalance = array_sum(array_column($current_balance, 'balance'));
                                                 @endphp
                                             <tbody class="bg-white">
                                                 <tr class="border-t border-gray-300">
@@ -1479,14 +1481,23 @@
                                                         $sumTotal = 0;
                                                         $sumBalance = 0;
 
+                                                        // if (
+                                                        //     !empty($current_balance) &&
+                                                        //     isset($current_balance[0]['initial_amount'])
+                                                        // ) {
+                                                        //     $sumAllocated = $current_balance[0]['initial_amount'];
+                                                        // }
                                                         $sumAllocated = array_sum(
                                                             array_column($current_balance, 'initial_amount'),
                                                         );
-                                                        $sumTotal = array_sum(
-                                                            array_column($current_balance, 'current_total'),
-                                                        );
+
+                                                        if (!empty($current_balance)) {
+                                                            $sumTotal = array_sum(
+                                                                array_column($current_balance, 'current_total'),
+                                                            );
+                                                        }
+
                                                         $sumBalance = $sumAllocated - $sumTotal;
-                                                        // $sumBalance = array_sum(array_column($current_balance, 'balance'));
                                                     @endphp
                                                     <div class="flex justify-between space-x-3">
                                                         {{-- TODO --}}
