@@ -722,7 +722,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     0
                 )->first()->fundDrafts()->first()?->draft_amounts()->get();
                 // FIX
-                if (count($fundDrafts) > 0) {
+                if (!empty($fundDrafts)) {
                  $this->categoryIds = $fundDrafts->pluck('category_group_id')->toArray();
                     if ($isSupplemental) {
                         $this->current_balance = $this->record->fundAllocations->where(
