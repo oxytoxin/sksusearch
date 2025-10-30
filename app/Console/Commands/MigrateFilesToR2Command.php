@@ -4,11 +4,12 @@ namespace App\Console\Commands;
 
 use App\Jobs\MigrateFilesToR2;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
+use Storage;
+
 use Exception;
 class MigrateFilesToR2Command extends Command
 {
-    protected $signature = 'migrate:files-to-r2';
+    protected $signature = 'migrate-to-r2';
 
     /**
      * The console command description.
