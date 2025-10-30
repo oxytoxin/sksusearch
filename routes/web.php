@@ -74,17 +74,3 @@ Route::get('/test-example', function () {
 });
 
 
-Route::get('/migrate-files-to-r2', function () {
- try {
-        $localDisk = Storage::disk('local');
-        $allFiles = $localDisk->allFiles();
-
-        foreach ($allFiles as $file) {
-            MigrateFilesToR2::dispatch($file);
-        }
-
-        return 'File migration jobs dispatched successfully (' . count($allFiles) . ' files).';
-    } catch (Exception $e) {
-        return 'Error dispatching jobs: ' . $e->getMessage();
-    }
-});
