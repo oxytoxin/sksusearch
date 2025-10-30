@@ -16,9 +16,9 @@ class MigrateFilesToR2 implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    public function __construct(public string $file)
     {
-        //
+        $this->file = $file;
     }
 
     /**
@@ -26,17 +26,15 @@ class MigrateFilesToR2 implements ShouldQueue
      */
     public function handle(): void
     {
-        $localDisk = Storage::disk('local'); // storage/app
+        $localDisk = Storage::disk('local');
         $r2Disk = Storage::disk('s3');
+        $file = $this->file;
 
-        $allFiles = $localDisk->allFiles();
-        foreach ($allFiles as $file) {
-            if (!$r2Disk->exists($file)) {
-                $r2Disk->put($file, $localDisk->get($file));
-                logger("Migrated: {$file}");
-            } else {
-                logger("Skipped (already exists): {$file}");
-            }
+        if (!$r2Disk->exists($file)) {
+            $r2Disk->put($file, $localDisk->get($file));
+            logger("✅ Migrated: {$file}");
+        } else {
+            logger("⚠️ Skipped (already exists): {$file}");
         }
     }
 }
