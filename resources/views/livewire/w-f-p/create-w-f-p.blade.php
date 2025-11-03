@@ -184,6 +184,7 @@
                                                 // $sumBalance = array_sum(array_column($current_balance, 'balance'));
                                             @endphp
                                             <tr class="border-t border-gray-300">
+                                                {{-- //TOTAL --}}
                                                 <td
                                                     class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">
                                                     Total</td>
@@ -317,7 +318,7 @@
                                                 <tr class="border-t border-gray-300">
                                                     <td
                                                         class="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-3">
-                                                        Total</td>
+                                                        Total </td>
                                                     <td
                                                         class="whitespace-nowrap py-3 pl-4 pr-3 text-sm text-right font-semibold text-gray-900 sm:pl-3">
                                                         ₱ {{ number_format($sumAllocated, 2) }}</td>
@@ -1487,14 +1488,29 @@
                                                         // ) {
                                                         //     $sumAllocated = $current_balance[0]['initial_amount'];
                                                         // }
-                                                        $sumAllocated = array_sum(
-                                                            array_column($current_balance, 'initial_amount'),
-                                                        );
-
-                                                        if (!empty($current_balance)) {
-                                                            $sumTotal = array_sum(
-                                                                array_column($current_balance, 'current_total'),
+                                                        if (in_array($wfp_fund->id, [1, 3, 9])) {
+                                                            $sumAllocated = array_sum(
+                                                                array_column($current_balance, 'initial_amount'),
                                                             );
+
+                                                            if (!empty($current_balance)) {
+                                                                $sumTotal = array_sum(
+                                                                    array_column($current_balance, 'current_total'),
+                                                                );
+                                                            }
+                                                        } else {
+                                                            if (
+                                                                !empty($current_balance) &&
+                                                                isset($current_balance[0]['initial_amount'])
+                                                            ) {
+                                                                $sumAllocated = $current_balance[0]['initial_amount'];
+                                                            }
+
+                                                            if (!empty($current_balance)) {
+                                                                $sumTotal = array_sum(
+                                                                    array_column($current_balance, 'current_total'),
+                                                                );
+                                                            }
                                                         }
 
                                                         $sumBalance = $sumAllocated - $sumTotal;
@@ -1502,7 +1518,7 @@
                                                     <div class="flex justify-between space-x-3">
                                                         {{-- TODO --}}
                                                         <span>Allocated Fund: </span><span>₱
-                                                            {{ number_format($sumAllocated + $programmed_non_supplemental, 2) }}</span>
+                                                            {{ number_format($sumAllocated, 2) }}</span>
                                                     </div>
                                                     <div class="flex justify-between">
                                                         {{-- TODO --}}
