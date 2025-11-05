@@ -27,10 +27,10 @@
             $this->record = CostCenter::find($record);
             $this->category_groups = CategoryGroup::where('is_active', 1)->get();
             $this->wfp_type = WpfType::all();
-            $this->selectedType = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->wpf_type_id;
-            $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id',
-                $this->selectedType)->first()->initial_amount;
-            $this->fund_description = $this->record->fundAllocations->first()->description;
+            $fundAllocation = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first();
+            $this->selectedType = $fundAllocation->wpf_type_id;
+            $this->fundInitialAmount = $fundAllocation->initial_amount;
+            $this->fund_description = $fundAllocation->description;
             // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
 
             foreach ($this->record->fundAllocations->where('wpf_type_id', $wfpType) as $allocation) {
