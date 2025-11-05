@@ -562,6 +562,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         } else {
             //164
             if ($isSupplemental) {
+
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where(
                     'supplemental_quarter_id',
                     $this->supplementalQuarterId
