@@ -2,31 +2,32 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
-
-use Livewire\Component;
+use App\Http\Controllers\NotificationController;
 use App\Models\CaReminderStep;
 use App\Models\EmployeeInformation;
-use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Contracts\HasTable;
-use Illuminate\Support\Facades\Storage;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Illuminate\Database\Eloquent\Builder;
-use App\Http\Controllers\NotificationController;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
 
 class CashAdvanceReminders extends Component implements HasTable
 {
     use InteractsWithTable;
+
     public $accounting;
+
     public $president;
+
     public $auditor;
 
     public function mount()
@@ -79,7 +80,7 @@ class CashAdvanceReminders extends Component implements HasTable
                 ->form([
                     TextInput::make('fmr_number')
                         ->label('FMR Number')
-                        ->required()
+                        ->required(),
                 ])
                 ->action(function ($record, $data) {
                     // Update record
@@ -115,7 +116,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     NotificationController::sendCASystemReminder(
                         'FMR',
                         'Formal Management Reminder',
-                        'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
+                        'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
                         $this->accounting,
                         $record->disbursementVoucher->user->name,
                         $this->accounting->id,
@@ -123,13 +124,13 @@ class CashAdvanceReminders extends Component implements HasTable
                         route('print.formal-management-reminder', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
-                })->requiresConfirmation()->visible(fn($record) => $record->step == 2 && $record->is_sent == 0),
+                })->requiresConfirmation()->visible(fn ($record) => $record->step == 2 && $record->is_sent == 0),
             Action::make('sendFMD')->label('Send FMD')->icon('ri-send-plane-fill')
                 ->button()
                 ->form([
                     TextInput::make('fmd_number')
                         ->label('FMD Number')
-                        ->required()
+                        ->required(),
                 ])
                 ->action(function ($record, $data) {
                     // Update record
@@ -166,7 +167,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     NotificationController::sendCASystemReminder(
                         'FMD',
                         'Formal Management Demand',
-                        'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
+                        'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
                         $this->accounting,
                         $record->disbursementVoucher->user->name,
                         $this->accounting->id,
@@ -174,13 +175,13 @@ class CashAdvanceReminders extends Component implements HasTable
                         route('print.formal-management-demand', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
-                })->requiresConfirmation()->visible(fn($record) => $record->step == 3 && $record->is_sent == 0),
+                })->requiresConfirmation()->visible(fn ($record) => $record->step == 3 && $record->is_sent == 0),
             Action::make('sendSOC')->label('Send SCO')->icon('ri-send-plane-fill')
                 ->button()
                 ->form([
                     TextInput::make('memorandum_number')
                         ->label('Memorandum Number')
-                        ->required()
+                        ->required(),
                 ])
                 ->action(function ($record, $data) {
                     // Update record
@@ -217,7 +218,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     NotificationController::sendCASystemReminder(
                         'SCO',
                         'Show Cause Order',
-                        'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
+                        'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
                         $this->accounting,
                         $record->disbursementVoucher->user->name,
                         $this->accounting->id,
@@ -225,7 +226,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         route('print.show-cause-order', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
-                })->requiresConfirmation()->visible(fn($record) => $record->step == 4 && $record->is_sent == 0),
+                })->requiresConfirmation()->visible(fn ($record) => $record->step == 4 && $record->is_sent == 0),
             Action::make('sendFD')->label('Endorse FD')->icon('ri-send-plane-fill')
                 ->button()
                 ->action(function ($record) {
@@ -263,7 +264,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     NotificationController::sendCASystemReminder(
                         'FD',
                         'Endorsement For FD',
-                        'Your cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please liquidate.',
+                        'Your cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' is due for liquidation. Please liquidate.',
                         $this->president,
                         $this->auditor->user->name,
                         $this->president->id,
@@ -271,7 +272,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         route('print.endorsement-for-fd', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
-                })->requiresConfirmation()->visible(fn($record) => $record->step == 5 && $record->is_sent == 0),
+                })->requiresConfirmation()->visible(fn ($record) => $record->step == 5 && $record->is_sent == 0),
             Action::make('uploadFD')
                 ->label('Upload FD')
                 ->icon('ri-send-plane-fill')
@@ -321,15 +322,13 @@ class CashAdvanceReminders extends Component implements HasTable
                         'type' => 'FD',
                     ]);
 
-
                     $fileUrl = Storage::disk('public')->url($record->auditor_attachment ?? '#');
-
 
                     NotificationController::sendCASystemReminder(
                         'FDS',
                         'Formal Demand File Sent',
-                        'The Formal Demand file for your cash advance (' .
-                            $record->disbursement_voucher->tracking_number .
+                        'The Formal Demand file for your cash advance ('.
+                            $record->disbursement_voucher->tracking_number.
                             ') has been uploaded. Please review it immediately.',
                         $this->auditor->user->name,
                         $record->disbursementVoucher->user->name,
@@ -339,45 +338,41 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
 
-
                     $this->emit('historyCreated');
-
 
                     Notification::make()
                         ->title('Formal Demand Uploaded')
-                        ->body('Notification sent to ' . $record->disbursementVoucher->user->name)
+                        ->body('Notification sent to '.$record->disbursementVoucher->user->name)
                         ->success()
                         ->send();
                 })
-                ->visible(fn($record) => $record->step == 6 && $record->is_sent == 1),
+                ->visible(fn ($record) => $record->step == 6 && $record->is_sent == 1),
 
             ViewAction::make('FD')
                 ->label('View FD File')
-                ->url(
-                    fn($record) =>
-                    $record->caReminderStep?->disbursementVoucher
-                        ? route('print.endorsement-for-fd-file', ['record' => $record->caReminderStep->disbursementVoucher])
-                        : '#'
+                ->url(fn ($record) => optional(optional($record->caReminderStep)->disbursementVoucher)?->id
+            ? route('print.endorsement-for-fd-file', [
+                  'record' => $record->caReminderStep->disbursementVoucher->id,
+            ])
+            : '#'
                 )
                 ->button()
                 ->color('primary')
                 ->icon('heroicon-o-document-text')
                 ->tooltip('View FD')
-                ->visible(
-                    fn($record) =>
-                    $record->step === 6 &&
-                        filled($record->auditor_attachment) &&
-                        auth()->user()?->employee_information?->office_id === 61 &&
-                        auth()->user()?->employee_information?->position_id === 31
-                ),
-
+              ->visible(fn ($record) =>
+        $record->step === 6 &&
+        filled($record->auditor_attachment) &&
+        auth()->user()?->employee_information?->office_id === 61 &&
+        auth()->user()?->employee_information?->position_id === 31
+    ),
 
             ViewAction::make('view')
                 ->label('Preview DV')
                 ->openUrlInNewTab()
                 ->button()
                 ->color('success')
-                ->url(fn($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record->disbursement_voucher]), true),
+                ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record->disbursement_voucher]), true),
         ];
     }
 
