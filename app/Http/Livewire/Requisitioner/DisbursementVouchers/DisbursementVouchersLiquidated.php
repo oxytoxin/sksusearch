@@ -42,7 +42,7 @@ class DisbursementVouchersLiquidated extends Component implements HasTable
             Action::make('view')
                 ->button()
                 ->url(fn($record) => route('requisitioner.liquidation-reports.show', [
-                    'disbursement_voucher' => $record
+                    'liquidation_report' => $record
                 ])),
             Action::make('view_notices')
                 ->label('View Notices')
