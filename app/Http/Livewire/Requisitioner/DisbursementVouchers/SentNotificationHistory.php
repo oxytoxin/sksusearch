@@ -24,18 +24,23 @@ class SentNotificationHistory extends Component implements HasTable
         return view('livewire.requisitioner.disbursement-vouchers.sent-notification-history');
     }
 
-    protected function getTableQuery()
-    {
-        $query = CaReminderStepHistory::query()->latest();
+   protected function getTableQuery()
+{
+    $query = CaReminderStepHistory::query()
+        ->latest()
+        // ✅ show only histories whose chain leads to an existing disbursement voucher
+        ->whereHas('caReminderStep.disbursementVoucher');
 
-        if (auth()->id() === EmployeeInformation::presidentUser()->user_id) {
-            $query->whereHas('caReminderStep', function ($q) {
-                $q->where('user_id', auth()->id());
-            });
-        }
-
-        return $query;
+    // optional filter if the current user is president
+    if (auth()->id() === EmployeeInformation::presidentUser()->user_id) {
+        $query->whereHas('caReminderStep', function ($q) {
+            $q->where('user_id', auth()->id());
+        });
     }
+
+    return $query;
+}
+
 
 //     protected function getTableFiltersLayout(): ?string
 // {
@@ -59,7 +64,14 @@ class SentNotificationHistory extends Component implements HasTable
                ->label('View FMD')
             //    ->modalContent(fn($record) => $record->type === 'FMD' ? view('reports.formal-management-demand', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
             //    ->modalWidth('4xl')
-               ->url(fn ($record) => route('print.formal-management-demand', ['record' => $record->caReminderStep->disbursementVoucher]))
+             ->url(fn ($record) =>
+        $record->caReminderStep?->disbursementVoucher?->id
+            ? route('print.formal-management-demand', [
+                'record' => $record->caReminderStep->disbursementVoucher->id,
+              ])
+            : '#'
+    )
+            //    ->url(fn ($record) => route('print.formal-management-demand', ['record' => $record->caReminderStep->disbursementVoucher]))
                ->button()
                ->color('primary')
                ->icon('heroicon-o-document-text')
@@ -70,7 +82,14 @@ class SentNotificationHistory extends Component implements HasTable
                ->label('View FMR')
             //    ->modalContent(fn($record) => $record->type === 'FMR' ? view('reports.formal-management-reminder', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
             //    ->modalWidth('4xl')
-               ->url(fn ($record) => route('print.formal-management-reminder', ['record' => $record->caReminderStep->disbursementVoucher]))
+                ->url(fn ($record) =>
+        $record->caReminderStep?->disbursementVoucher?->id
+            ? route('print.formal-management-reminder', [
+                'record' => $record->caReminderStep->disbursementVoucher->id,
+              ])
+            : '#'
+    )
+            //    ->url(fn ($record) => route('print.formal-management-reminder', ['record' => $record->caReminderStep->disbursementVoucher]))
                ->button()
                ->color('primary')
                ->icon('heroicon-o-document-text')
@@ -81,7 +100,13 @@ class SentNotificationHistory extends Component implements HasTable
                ->label('View FD')
             //    ->modalContent(fn($record) => $record->type === 'FD' ? view('reports.endorsement-for-f-d', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
             //    ->modalWidth('4xl')
-                ->url(fn ($record) => route('print.endorsement-for-fd-file', ['record' => $record->caReminderStep->disbursementVoucher]))
+              ->url(fn ($record) =>
+        $record->caReminderStep?->disbursementVoucher?->id
+            ? route('print.endorsement-for-fd-file', [
+                'record' => $record->caReminderStep->disbursementVoucher->id,
+              ])
+            : '#'
+    )
                ->button()
                ->color('primary')
                ->icon('heroicon-o-document-text')
@@ -92,7 +117,14 @@ class SentNotificationHistory extends Component implements HasTable
                ->label('View SCO')
             //    ->modalContent(fn($record) => $record->type === 'SCO' ? view('reports.show-cause-order', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
             //    ->modalWidth('4xl')
-               ->url(fn ($record) => route('print.show-cause-order', ['record' => $record->caReminderStep->disbursementVoucher]))
+              ->url(fn ($record) =>
+        $record->caReminderStep?->disbursementVoucher?->id
+            ? route('print.show-cause-order', [
+                'record' => $record->caReminderStep->disbursementVoucher->id,
+              ])
+            : '#'
+    )
+            //    ->url(fn ($record) => route('print.show-cause-order', ['record' => $record->caReminderStep->disbursementVoucher]))
                ->button()
                ->color('primary')
                ->icon('heroicon-o-document-text')

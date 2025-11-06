@@ -35,7 +35,9 @@
         public $total_amount;
         public $wfp_type;
         public $fund_cluster;
-        public $data = [];
+        public $data = [
+            'wfp_type' => 1
+        ];
 
         public function mount()
         {
@@ -58,35 +60,6 @@
 
 
 
-            // $this->cost_centers = Auth::user()->employee_information->office->cost_centers
-            // ->hereHas('wpfPersonnel', function ($query) {
-            //     $query->where('user_id', Auth::user()->id)
-            //     ->orWhere('head_id', Auth::user()->id);
-            // });
-            // if($head_id === null)
-            // {
-            //     $this->user_wfp_id = Auth::user()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
-            //     $this->wfp = WpfType::find($this->user_wfp_id);
-            //     $this->cost_center_id = Auth::user()->employee_information->office->cost_centers->first()->id;
-            //     $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
-            //     $this->office_id = Auth::user()->employee_information->office->id;
-            // }else{
-            //     if($head_id != Auth::user()->id)
-            //     {
-            //         $this->user_wfp_id = Auth::user()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
-            //         $this->wfp = WpfType::find($this->user_wfp_id);
-            //         $this->cost_center_id = Auth::user()->employee_information->office->cost_centers->first()->id;
-            //         $this->cost_centers = Auth::user()->employee_information->office->cost_centers;
-            //         $this->office_id = Auth::user()->employee_information->office->id;
-            //     }else{
-            //         $this->user_wfp_id = User::where('id', $head_id)->first()->employee_information->office->cost_centers->first()->fundAllocations->first()?->wpf_type_id;
-            //         $this->wfp = WpfType::find($this->user_wfp_id);
-            //         $this->cost_center_id = User::where('id', $head_id)->first()->employee_information->office->cost_centers->first()->id;
-            //         $this->cost_centers = User::where('id', $head_id)->first()->employee_information->office->cost_centers;
-            //         $this->office_id = User::where('id', $head_id)->first()->employee_information->office->id;
-            //     }
-            // }
-
             $this->types = FundCluster::whereHas('costCenters', function ($query) {
                 $query->where('office_id', $this->office_id)->whereHas('fundAllocations', function ($query) {
                     $query->where('wpf_type_id', $this->user_wfp_id);
@@ -98,33 +71,11 @@
         protected function getTableQuery()
         {
             $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
-            return CostCenter::query()->whereHas('fundAllocations', function ($query) {
+            return CostCenter::query()->with(['fundAllocations'])->whereHas('fundAllocations', function ($query) {
                 $query->where('is_locked', 1);
             })
                 ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
                 ->where('fund_cluster_id', $this->fund_cluster);
-            // if($user === null)
-            // {
-            //     return CostCenter::query()->whereHas('fundAllocations', function ($query) {
-            //         $query->where('is_locked', 1);
-            //     })
-            //     ->where('fund_cluster_id', $this->fund_cluster)
-            //     ->whereIn('id', $this->cost_centers->pluck('id')->toArray());
-            // }else{
-            //     return CostCenter::query()
-            //     ->whereHas('fundAllocations', function ($query) {
-            //         $query->where('is_locked', 1);
-            //     })
-            //     ->where('fund_cluster_id', $this->fund_cluster)
-            //     ->orWhereHas('wpfPersonnel', function ($query) {
-            //         $query->where('user_id', Auth::user()->id)
-            //               ->orWhere('head_id', Auth::user()->id)
-            //               ->whereHas('cost_center', function ($subQuery) {
-            //                   $subQuery->where('fund_cluster_id', $this->fund_cluster);
-            //               });
-            //     });
-            //     // ->whereIn('id', $this->cost_centers->pluck('id')->toArray());
-            // }
         }
 
         protected function getTableColumns()
@@ -210,7 +161,7 @@
                         return $query->whereDoesntHave('wfp', function ($query) use ($data) {
                             $query->where('wpf_type_id', $data['wfp_type']);
                         })->whereHas('fundAllocations', function ($query) use ($data) {
-                            $query->where('wpf_type_id', $data['wfp_type']);
+                            $query->where('wpf_type_id', $data['wfp_type'])->where('is_locked', 1);
                         });
                     }),
                 SelectFilter::make('mfo')
