@@ -39,7 +39,6 @@
 
         public function mount()
         {
-            dd('Testing');
             $this->fund_cluster = 1;
 
             $this->wfp_type = WpfType::all()->count();
