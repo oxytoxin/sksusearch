@@ -99,7 +99,7 @@
         {
             $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
             return CostCenter::query()->whereHas('fundAllocations', function ($query) {
-                $query->where('is_locked', true);
+                $query->where('is_locked', 1);
             })
                 ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
                 ->where('fund_cluster_id', $this->fund_cluster);
@@ -178,7 +178,7 @@
                         'record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0, 'isSupplemental' => 0
                     ]))
                     ->visible(fn($record) => !$record->fundAllocations->where('wpf_type_id',
-                        $this->data['wfp_type'])->first()->fundDrafts()->exists()),
+                        $this->data['wfp_type'])->first()->fundDrafts()->exists() && $record->fundAllocations->is_locked == 1),
                 Action::make('continue_draft')
                     ->label('Continue Draft')
                     ->color('warning')
@@ -188,7 +188,7 @@
                         'record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0, 'isSupplemental' => 0
                     ]))
                     ->visible(fn($record) => $record->fundAllocations->where('wpf_type_id',
-                        $this->data['wfp_type'])->first()->fundDrafts()->exists()),
+                        $this->data['wfp_type'])->first()->fundDrafts()->exists() && $record->fundAllocations->is_locked == 1),
             ];
         }
 
