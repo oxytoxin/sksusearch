@@ -24,18 +24,23 @@ class SentNotificationHistory extends Component implements HasTable
         return view('livewire.requisitioner.disbursement-vouchers.sent-notification-history');
     }
 
-    protected function getTableQuery()
-    {
-        $query = CaReminderStepHistory::query()->latest();
+   protected function getTableQuery()
+{
+    $query = CaReminderStepHistory::query()
+        ->latest()
+        // ✅ show only histories whose chain leads to an existing disbursement voucher
+        ->whereHas('caReminderStep.disbursementVoucher');
 
-        if (auth()->id() === EmployeeInformation::presidentUser()->user_id) {
-            $query->whereHas('caReminderStep', function ($q) {
-                $q->where('user_id', auth()->id());
-            });
-        }
-
-        return $query;
+    // optional filter if the current user is president
+    if (auth()->id() === EmployeeInformation::presidentUser()->user_id) {
+        $query->whereHas('caReminderStep', function ($q) {
+            $q->where('user_id', auth()->id());
+        });
     }
+
+    return $query;
+}
+
 
 //     protected function getTableFiltersLayout(): ?string
 // {
