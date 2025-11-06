@@ -98,7 +98,14 @@ class SentNotificationHistory extends Component implements HasTable
                ->label('View SCO')
             //    ->modalContent(fn($record) => $record->type === 'SCO' ? view('reports.show-cause-order', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
             //    ->modalWidth('4xl')
-               ->url(fn ($record) => route('print.show-cause-order', ['record' => $record->caReminderStep->disbursementVoucher]))
+              ->url(fn ($record) =>
+        $record->caReminderStep?->disbursementVoucher?->id
+            ? route('print.show-cause-order', [
+                'record' => $record->caReminderStep->disbursementVoucher->id,
+              ])
+            : '#'
+    )
+            //    ->url(fn ($record) => route('print.show-cause-order', ['record' => $record->caReminderStep->disbursementVoucher]))
                ->button()
                ->color('primary')
                ->icon('heroicon-o-document-text')
