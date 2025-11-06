@@ -71,8 +71,9 @@
         protected function getTableQuery()
         {
             $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
-            return CostCenter::query()
-                ->with(['fundAllocations'])
+            return CostCenter::query()->with(['fundAllocations'])->whereHas('fundAllocations', function ($query) {
+                $query->where('is_locked', 1);
+            })
                 ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
                 ->where('fund_cluster_id', $this->fund_cluster);
         }
