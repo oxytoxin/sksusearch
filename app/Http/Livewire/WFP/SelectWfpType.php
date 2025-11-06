@@ -178,7 +178,7 @@
                         'record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0, 'isSupplemental' => 0
                     ]))
                     ->visible(fn($record) => !$record->fundAllocations->where('wpf_type_id',
-                        $this->data['wfp_type'])->first()->fundDrafts()->exists() && $record->fundAllocations->first()->is_locked == 1),
+                        $this->data['wfp_type'])->first()->fundDrafts()->exists()),
                 Action::make('continue_draft')
                     ->label('Continue Draft')
                     ->color('warning')
@@ -188,7 +188,7 @@
                         'record' => $record, 'wfpType' => $this->data['wfp_type'], 'isEdit' => 0, 'isSupplemental' => 0
                     ]))
                     ->visible(fn($record) => $record->fundAllocations->where('wpf_type_id',
-                        $this->data['wfp_type'])->first()->fundDrafts()->exists() && $record->fundAllocations->first()->is_locked == 1),
+                        $this->data['wfp_type'])->first()->fundDrafts()->exists()),
             ];
         }
 
