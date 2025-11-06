@@ -59,7 +59,14 @@ class SentNotificationHistory extends Component implements HasTable
                ->label('View FMD')
             //    ->modalContent(fn($record) => $record->type === 'FMD' ? view('reports.formal-management-demand', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
             //    ->modalWidth('4xl')
-               ->url(fn ($record) => route('print.formal-management-demand', ['record' => $record->caReminderStep->disbursementVoucher]))
+             ->url(fn ($record) =>
+        $record->caReminderStep?->disbursementVoucher?->id
+            ? route('print.formal-management-demand', [
+                'record' => $record->caReminderStep->disbursementVoucher->id,
+              ])
+            : '#'
+    )
+            //    ->url(fn ($record) => route('print.formal-management-demand', ['record' => $record->caReminderStep->disbursementVoucher]))
                ->button()
                ->color('primary')
                ->icon('heroicon-o-document-text')
