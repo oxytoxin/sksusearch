@@ -98,7 +98,7 @@
         protected function getTableQuery()
         {
             $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
-            return CostCenter::query()->whereHas('fundAllocations', function ($query) {
+            return CostCenter::query()->with(['fundAllocations'])->whereHas('fundAllocations', function ($query) {
                 $query->where('is_locked', 1);
             })
                 ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
@@ -210,7 +210,7 @@
                         return $query->whereDoesntHave('wfp', function ($query) use ($data) {
                             $query->where('wpf_type_id', $data['wfp_type']);
                         })->whereHas('fundAllocations', function ($query) use ($data) {
-                            $query->where('wpf_type_id', $data['wfp_type']);
+                            $query->where('wpf_type_id', $data['wfp_type'])->where('is_locked', 1);
                         });
                     }),
                 SelectFilter::make('mfo')
