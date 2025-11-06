@@ -215,7 +215,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         if ($isEdit == 1) {
             $this->record = CostCenter::with([
                 'fundAllocations' => function ($query) use ($wfpType) {
-                    $query->where('wpf_type_id', $wfpType)->with('categoryGroup');
+                    $query->where('wpf_type_id', $wfpType)
+                        ->where(function ($q) {
+                            $q->whereNotNull('supplemental_quarter_id')
+                              ->orWhere(function ($q2) {
+                                  $q2->whereNull('supplemental_quarter_id')
+                                     ->where('is_lock', true);
+                              });
+                        })
+                        ->with('categoryGroup');
                 }
             ])
                 ->where('id', $costCenter_id)->whereHas('fundAllocations', function ($query) use ($wfpType) {
