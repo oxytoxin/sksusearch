@@ -348,24 +348,26 @@ class CashAdvanceReminders extends Component implements HasTable
                 })
                 ->visible(fn ($record) => $record->step == 6 && $record->is_sent == 1),
 
-            ViewAction::make('FD')
-                ->label('View FD File')
-                ->url(fn ($record) => optional(optional($record->caReminderStep)->disbursementVoucher)?->id
+         ViewAction::make('FD')
+    ->label('View FD File')
+    ->url(fn ($record) =>
+        $record->caReminderStep?->disbursementVoucher?->id
             ? route('print.endorsement-for-fd-file', [
-                  'record' => $record->caReminderStep->disbursementVoucher->id,
-            ])
+                'record' => $record->caReminderStep->disbursementVoucher->id,
+              ])
             : '#'
-                )
-                ->button()
-                ->color('primary')
-                ->icon('heroicon-o-document-text')
-                ->tooltip('View FD')
-              ->visible(fn ($record) =>
+    )
+    ->button()
+    ->color('primary')
+    ->icon('heroicon-o-document-text')
+    ->tooltip('View FD')
+    ->visible(fn ($record) =>
         $record->step === 6 &&
         filled($record->auditor_attachment) &&
         auth()->user()?->employee_information?->office_id === 61 &&
         auth()->user()?->employee_information?->position_id === 31
-    ),
+            ),
+
 
             ViewAction::make('view')
                 ->label('Preview DV')
