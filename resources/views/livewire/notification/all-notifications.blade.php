@@ -1,13 +1,19 @@
+
+
 <div class="max-w-4xl mx-auto py-8 px-4 bg-white rounded-sm">
+
     <div class="flex justify-between items-center mb-4">
         <h1 class="text-2xl font-bold">All Notifications</h1>
+        <div class="flex justify-end space-x-2">
 
-        @if (auth()->user()->unreadNotifications->count())
+            <x-filament-support::button icon="heroicon-s-arrow-left" type="button" color="secondary" onclick="window.history.back()" >   Back</x-filament-support::button>
+            @if (auth()->user()->unreadNotifications->count())
             <button wire:click="markAllAsRead"
-                class="text-sm font-medium text-white bg-primary-600 px-3 py-1.5 rounded-md shadow hover:bg-primary-700 ">
-                ✅ Mark all as read
-            </button>
+            class="text-sm font-medium text-white bg-primary-600 px-3 py-1.5 rounded-md shadow hover:bg-primary-700 ">
+            ✅ Mark all as read
+        </button>
         @endif
+    </div>
     </div>
 
     @forelse ($notifications as $notification)

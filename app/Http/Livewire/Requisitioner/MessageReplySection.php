@@ -2,31 +2,40 @@
 
 namespace App\Http\Livewire\Requisitioner;
 
-use App\Models\User;
-use App\Models\Message;
-use Livewire\Component;
-use App\Models\EmployeeInformation;
-use WireUi\Traits\Actions;
+use App\Events\MessageDeleted;
 use App\Events\MessageSent;
 use App\Events\ReplyAdded;
-use App\Events\MessageDeleted;
+use App\Http\Controllers\NotificationController;
+use App\Models\EmployeeInformation;
+use App\Models\Message;
+use Livewire\Component;
+use WireUi\Traits\Actions;
 
 class MessageReplySection extends Component
 {
     use Actions;
 
     public $disbursement_voucher;
+
     public $messageContent;
+
     public $messages;
+
     public $replyingTo = null;
+
     public $replyContent = '';
 
     protected $listeners = ['messageAdded', 'replyAdded', 'messageDeleted', 'refreshMessages'];
 
+    public $currentRouteName;
+
     public function mount($disbursement_voucher)
     {
+
         $this->disbursement_voucher = $disbursement_voucher;
         $this->loadMessages();
+        $this->currentRouteName = request()->route()->getName();
+
     }
 
     public function render()
@@ -41,7 +50,7 @@ class MessageReplySection extends Component
         ], [
             'messageContent.required' => 'The message content is required.',
         ]);
-        $message = new Message();
+        $message = new Message;
         $message->content = $this->messageContent;
         $message->user_id = auth()->id();
         $message->messageable_type = 'App\\Models\\DisbursementVoucher';
@@ -59,6 +68,27 @@ class MessageReplySection extends Component
         event(new MessageSent($message, $this->disbursement_voucher->id));
 
         $this->messageContent = '';
+
+        if ($this->currentRouteName === 'print.formal-management-reminder') {
+            $voucherOwner = auth()->user(); // the one sending the message
+            $accountingOfficer = $this->disbursement_voucher->user; // the DV owner / requisitioner
+            $president = EmployeeInformation::presidentUser();
+
+           NotificationController::sendCASystemReminder(
+    type: 'Message',
+    title: 'New Message in Formal Management Reminder',
+    message: 'You received a new message from '.$sender->name.
+             ' regarding Cash Advance DV-'.$this->disbursement_voucher->dv_number.'.',
+    senderName: $sender->name,
+    receiverName: $receiver->name,
+    senderId: $sender->id,
+    receiver: $receiver,
+    route: route('print.formal-management-reminder', $this->disbursement_voucher->id),
+    disbursement_voucher: $this->disbursement_voucher
+);
+
+        }
+
     }
 
     public function addReply($parentId)
@@ -69,7 +99,7 @@ class MessageReplySection extends Component
             'replyContent.required' => 'The reply content is required.',
         ]);
 
-        $reply = new Message();
+        $reply = new Message;
         $reply->content = $this->replyContent;
         $reply->user_id = auth()->id();
         $reply->parent_id = $parentId;
@@ -94,11 +124,11 @@ class MessageReplySection extends Component
     public function confirmDelete($messageId)
     {
         $this->dialog()->confirm([
-            'title'       => 'Are you Sure?',
+            'title' => 'Are you Sure?',
             'description' => 'Do you really want to delete this message?',
             'acceptLabel' => 'Yes, Delete it',
-            'method'      => 'deleteMessage',
-            'params'      => $messageId,
+            'method' => 'deleteMessage',
+            'params' => $messageId,
         ]);
     }
 

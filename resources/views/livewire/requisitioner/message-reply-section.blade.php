@@ -9,6 +9,7 @@
         </div>
         Message & Reply Section
     </h3>
+    {{-- @dump($currentRouteName) --}}
     <div class="p-3 h-full overflow-y-auto flex-grow">
         <div class="text-xs text-gray-700 message-container">
             @foreach ($messages as $message)
@@ -26,7 +27,10 @@
                         </div>
                         <div class="mt-1">
                             <button wire:click="$set('replyingTo', {{ $message->id }})" class="px-2 py-1 text-primary-500 rounded text-xs font-bold">Reply</button>
-                            {{-- <button wire:click="confirmDelete({{ $message->id }})" class="px-2 py-1 text-red-500 rounded text-xs font-bold">Delete</button> --}}
+                            @if (Auth::user()->id === $message->user_id)
+                            <button wire:click="confirmDelete({{ $message->id }})" class="px-2 py-1 text-red-500 rounded text-xs font-bold">Delete</button>
+
+                            @endif
                         </div>
                         @if ($replyingTo === $message->id)
                             <div class="mt-2 ml-4">
@@ -34,9 +38,11 @@
                                 @error('replyContent')
                                     <span class="text-red-500 text-xs block mt-1">{{ $message }}</span>
                                 @enderror
+
                                 <button wire:click="addReply({{ $message->id }})" wire:loading.attr="disabled" class="mt-2 px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600 transition duration-200 ease-in-out" :disabled="!replyContent">
                                     <span>Send Reply</span>
                                 </button>
+
                                 <div wire:loading class="text-gray-500">Sending reply...</div>
                             </div>
                         @endif
@@ -50,11 +56,13 @@
                                         <p class="font-bold">{{ $reply->user->name }}</p>
                                         <p class="text-xs text-gray-500">{{ $reply->created_at->format('F d, Y h:i A') }}</p>
                                     </div>
-                                    {{-- <button wire:click="confirmDelete({{ $reply->id }})" class="absolute top-0 right-0 mt-1 mr-1 text-red-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button> --}}
+                                       @if (Auth::user()->id === $reply->user_id)
+                                       <button wire:click="confirmDelete({{ $reply->id }})" class="absolute top-0 right-0 mt-1 mr-1 text-red-500">
+                                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                           </svg>
+                                       </button>
+                                @endif
                                 </div>
                                 <p class="mb-2 text-sm text-gray-700">{{ $reply->content }}</p>
                             </div>
