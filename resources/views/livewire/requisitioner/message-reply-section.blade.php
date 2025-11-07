@@ -26,7 +26,7 @@
                         </div>
                         <div class="mt-1">
                             <button wire:click="$set('replyingTo', {{ $message->id }})" class="px-2 py-1 text-primary-500 rounded text-xs font-bold">Reply</button>
-                            <button wire:click="confirmDelete({{ $message->id }})" class="px-2 py-1 text-red-500 rounded text-xs font-bold">Delete</button>
+                            {{-- <button wire:click="confirmDelete({{ $message->id }})" class="px-2 py-1 text-red-500 rounded text-xs font-bold">Delete</button> --}}
                         </div>
                         @if ($replyingTo === $message->id)
                             <div class="mt-2 ml-4">
@@ -50,11 +50,11 @@
                                         <p class="font-bold">{{ $reply->user->name }}</p>
                                         <p class="text-xs text-gray-500">{{ $reply->created_at->format('F d, Y h:i A') }}</p>
                                     </div>
-                                    <button wire:click="confirmDelete({{ $reply->id }})" class="absolute top-0 right-0 mt-1 mr-1 text-red-500">
+                                    {{-- <button wire:click="confirmDelete({{ $reply->id }})" class="absolute top-0 right-0 mt-1 mr-1 text-red-500">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
-                                    </button>
+                                    </button> --}}
                                 </div>
                                 <p class="mb-2 text-sm text-gray-700">{{ $reply->content }}</p>
                             </div>
@@ -92,7 +92,7 @@
                     console.log("Message Deleted:", message);
                     Livewire.emit('refreshMessages'); // Ensure this line is present
                 });
-                
+
         });
     </script>
 </div>

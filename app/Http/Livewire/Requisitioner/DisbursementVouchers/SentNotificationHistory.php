@@ -10,6 +10,7 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Concerns\InteractsWithTable;
 
@@ -130,6 +131,26 @@ class SentNotificationHistory extends Component implements HasTable
                ->icon('heroicon-o-document-text')
                ->tooltip('View SCO')
                ->visible(fn($record) => $record->type === 'SCO'),
+
+           ViewAction::make('ENDORSEMENT')
+               ->label('View Endorsement')
+            //    ->modalContent(fn($record) => $record->type === 'SCO' ? view('reports.show-cause-order', ['record' => $record->caReminderStep->disbursement_voucher]) : null)
+            //    ->modalWidth('4xl')
+              ->url(fn ($record) =>
+        $record->caReminderStep?->disbursementVoucher?->id
+            ? route('print.endorsement-for-fd', [
+                'record' => $record->caReminderStep->disbursementVoucher->id,
+              ])
+            : '#'
+    )
+            //    ->url(fn ($record) => route('print.show-cause-order', ['record' => $record->caReminderStep->disbursementVoucher]))
+               ->button()
+               ->color('primary')
+               ->icon('heroicon-o-document-text')
+               ->tooltip('View Endorsement for FD')
+               ->visible(fn($record) => $record->type === 'ENDORSEMENT'),
+
+
         ];
     }
 
@@ -142,6 +163,7 @@ class SentNotificationHistory extends Component implements HasTable
                     'FMD' => 'Formal Management Demand',
                     'SCO' => 'Show Cause Order',
                     'FD' => 'Formal Demand',
+                    'ENDORSEMENT' => 'Endorsement',
                 ])
                 ->label('Type')
         ];
@@ -152,7 +174,24 @@ class SentNotificationHistory extends Component implements HasTable
         return [
             TextColumn::make('caReminderStep.disbursementVoucher.dv_number')->label('DV Number')->searchable(),
             TextColumn::make('caReminderStep.disbursementVoucher.tracking_number')->label('Tracking Number')->searchable(),
-            TextColumn::make('type')->label('Type'),
+            // TextColumn::make('type')->label('Type'),
+              BadgeColumn::make('type')
+                ->label('Type')
+                ->colors([
+                    'primary' => 'FMR',
+                    'success' => 'FMD',
+                    'warning' => 'SCO',
+                    'danger' => 'FD',
+                    'secondary' => 'ENDORSEMENT',
+                ])
+                ->formatStateUsing(fn ($state) => match ($state) {
+                    'FMR' => 'Formal Management Reminder',
+                    'FMD' => 'Formal Management Demand',
+                    'SCO' => 'Show Cause Order',
+                    'FD' => 'Formal Demand',
+                    'ENDORSEMENT' => 'Endorsement',
+                    default => 'Unknown',
+                }),
             TextColumn::make('caReminderStep.disbursementVoucher.totalSum')->label('Amount'),
             TextColumn::make('sent_at')->label('Sent Date')->dateTime('F j, Y, g:i a'),
             TextColumn::make('sender_name')->label('Sender')->searchable(),

@@ -1,5 +1,7 @@
 <div>
-    <div class="flex justify-start w-full mb-4 ">
+    <div class="flex justify-start w-full mb-4 space-x-2 ">
+          <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()" >   Back</x-filament-support::button>
+
         <button onclick="printDiv('printableDiv')" class="px-4 py-2 bg-primary-500 text-white rounded text-sm">
             Print Document
         </button>
@@ -83,7 +85,15 @@
 
                         <p class="mt-4">We look forward to your usual support.</p>
 
-                        <p class="mt-6 font-bold">{{ App\Models\EmployeeInformation::presidentUser()->full_name }}</p>
+                        <div class="mt-12"></div>
+                        <div class="relative mt-6">
+
+                             <img src="{{ App\Models\EmployeeInformation::presidentUser()->user->signature?->content }}"
+                                    alt="" class="absolute  h-24 w-24 inset-x-1 bottom-[-1rem]">
+
+                            <p class="mt-6 font-bold">{{ App\Models\EmployeeInformation::presidentUser()->full_name }}</p>
+                        </div>
+
                         <p>University President</p>
                     </div>
                 </div>

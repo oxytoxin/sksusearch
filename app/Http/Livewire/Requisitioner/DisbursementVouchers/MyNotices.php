@@ -102,7 +102,18 @@ class MyNotices extends Component implements HasTable
                ->button()
                ->color('primary')
                ->icon('heroicon-o-document-text')
-               ->tooltip('View SCO')
+               ->tooltip('View SCO'),
+
+                 ViewAction::make('Endorsement FD')
+                    ->label('View Endorsement')
+                    ->url(fn ($record) => route('print.endorsement-for-fd', [
+                        'record' => $record->caReminderStep->disbursementVoucher,
+                    ]))
+                    ->button()
+                    ->color('primary')
+                    ->icon('heroicon-o-exclamation')
+                    ->tooltip('View Show Endorsement For FD')
+                    ->visible(fn ($record) => $record->type === 'ENDORSEMENT'),
 
             ]),
 

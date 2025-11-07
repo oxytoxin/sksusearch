@@ -1,4 +1,10 @@
 <div class="p-4 bg-white rounded-lg shadow">
+<div class="flex justify-start w-full mb-4  space-x-2">
+          <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()" >   Back</x-filament-support::button>
+       
+    </div>
+
+
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold text-gray-800">Formal Demand Document</h2>
         <div class="text-sm text-gray-600">

@@ -1,7 +1,9 @@
 <div>
-    <div class="flex justify-start w-full mb-4 ">
-        <button onclick="printDiv('printableDiv')" class="px-4 py-2 bg-primary-500 text-white rounded text-sm">
-            Print Document
+    <div class="flex justify-start w-full mb-4  space-x-2 ">
+        <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()" >   Back</x-filament-support::button>
+          <x-filament-support::button class="" type="button" color="primary" onclick="printDiv('printableDiv')" >Print Document</x-filament-support::button>
+          {{-- <button  class="px-4 py-2 bg-primary-500 text-white rounded text-sm"> --}}
+
         </button>
     </div>
 
@@ -25,7 +27,7 @@
                     </div>
                     <div class="flex justify-start font-bold">
                         <p class="label min-w-12"> Re:</p>
-                        <div class=""> Demand Liquidated Advance</div>
+                        <div class=""> Demand to liquidate cash advance</div>
                     </div>
                     <div class="flex justify-start font-bold">
                         <p class="label min-w-12"> Date:</p>
@@ -101,21 +103,22 @@
                 <div class="text-xs mt-4 text-gray-800">
                     <div class="grid grid-cols-3">
                         <div class="col-span-1  relative">
-                            <div class="text-center">
+                              <div class="mt-8">
+
+                                {{-- <hr class="border-t border-black mx-8"> --}}
+                                {{-- @dump(App\Models\EmployeeInformation::accountantUser()->toArray()) --}}
+                                <img src="{{ App\Models\EmployeeInformation::accountantUser()->user->signature?->content }}"
+                                    alt="" class="absolute  h-24 w-24 inset-x-16 bottom-[-1rem]">
+
+                            </div>
+                            <div class="text-center ">
                                 <p class="font-bold">{{ App\Models\EmployeeInformation::accountantUser()->full_name }}
                                 </p>
                                 <p>{{ App\Models\EmployeeInformation::accountantUser()?->position->description }}-{{ App\Models\EmployeeInformation::accountantUser()?->office->name }}
                                 </p>
                             </div>
 
-                            <div class="mt-6 ">
 
-                                <hr class="border-t border-black mx-8">
-                                {{-- @dump(App\Models\EmployeeInformation::accountantUser()->toArray()) --}}
-                                <img src="{{ App\Models\EmployeeInformation::accountantUser()->user->signature?->content }}"
-                                    alt="" class="absolute  h-24 w-24 inset-x-16 top-1">
-
-                            </div>
 
                         </div>
 
