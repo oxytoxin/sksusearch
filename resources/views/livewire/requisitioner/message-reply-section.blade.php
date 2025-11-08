@@ -1,4 +1,6 @@
+
 <div class="w-1/3 bg-white border border-gray-300 ml-4 shadow-md rounded-lg overflow-hidden max-h-[90vh] flex flex-col">
+
     <h3 class="text-lg font-bold mb-2 flex items-center bg-gray-800 text-white p-4">
         <div class="flex items-center justify-center w-12 h-12 bg-primary-200 rounded-full mr-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -9,7 +11,8 @@
         </div>
         Message & Reply Section
     </h3>
-    {{-- @dump($currentRouteName) --}}
+
+
     <div class="p-3 h-full overflow-y-auto flex-grow">
         <div class="text-xs text-gray-700 message-container">
             @foreach ($messages as $message)
