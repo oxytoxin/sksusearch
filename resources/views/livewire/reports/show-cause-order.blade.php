@@ -1,6 +1,7 @@
 <div>
 
-    <div class="flex justify-start w-full mb-4 ">
+    <div class="flex justify-start w-full mb-4 space-x-2">
+             <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()" >   Back</x-filament-support::button>
         <button onclick="printDiv('printableDiv')" class="px-4 py-2 bg-primary-500 text-white rounded text-sm">
             Print Document
         </button>

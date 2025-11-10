@@ -1,5 +1,6 @@
 <div>
-    <div class="flex justify-start w-full mb-4 ">
+    <div class="flex justify-start w-full mb-4  space-x-2">
+          <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()" >   Back</x-filament-support::button>
         <button onclick="printDiv('printableDiv')" class="px-4 py-2 bg-primary-500 text-white rounded text-sm">
             Print Document
         </button>
@@ -82,15 +83,17 @@
                         <p class="mt-6">For your guidance and immediate compliance.</p>
                     </div>
 
-                    <div class="mt-6 text-xs text-gray-800  relative ">
-                        <div class="mt-6 text-xs text-gray-800 ">
+                    <div class="mt-6 text-xs text-gray-800  relative  ">
+                          <img src="{{ App\Models\EmployeeInformation::accountantUser()->user->signature?->content }}"
+                                    alt="" class="absolute  h-24 w-24 inset-x-2 bottom-[-1rem] ">
+                        <div class="mt-14 text-xs text-gray-800 ">
                             <p class="font-bold">{{ App\Models\EmployeeInformation::accountantUser()->full_name }}</p>
                             <p>{{ App\Models\EmployeeInformation::accountantUser()?->position->description }}-{{ App\Models\EmployeeInformation::accountantUser()?->office->name }}
                             </p>
                         </div>
-                         <img src="{{ App\Models\EmployeeInformation::accountantUser()->user->signature?->content }}"
-                                    alt="" class="absolute  h-24 w-24 inset-x-7 top-4">
-                        <div class="mt-12 border-b w-64 mb-2 border-gray-800"></div>
+
+                        <div class="mt-10 w-64 mb-2 "></div>
+                        {{-- <div class="mt-12 border-b w-64 mb-2 border-gray-800"></div> --}}
                     </div>
 
                     <div class=" text-xs text-gray-800">

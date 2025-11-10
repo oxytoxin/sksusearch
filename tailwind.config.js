@@ -1,8 +1,9 @@
+const { info } = require('autoprefixer')
 const colors = require('tailwindcss/colors')
 const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
     presets: [
-      
+
         require('./vendor/wireui/wireui/tailwind.config.js')
     ],
     content: [
@@ -41,6 +42,7 @@ module.exports = {
             },
             colors: {
                 danger: colors.rose,
+                info: colors.blue,
                 success: colors.green,
                 warning: colors.yellow,
                 "primary-bg": "#0c6600",

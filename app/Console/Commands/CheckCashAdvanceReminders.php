@@ -78,7 +78,7 @@ class CheckCashAdvanceReminders extends Command
                         NotificationController::sendCASystemReminder(
                             'Cash Advance Reminder',
                             'Formal Management Reminder',
-                            'A cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please remind the user to submit a liquidation report.',
+                            'A cash advance with a DV number ' . $record->disbursement_voucher->dv_number . ' is due for liquidation. Please remind the user to submit a liquidation report.',
                             'System',
                             $receiver->user->name,
                             null,
@@ -92,7 +92,7 @@ class CheckCashAdvanceReminders extends Command
                         NotificationController::sendCASystemReminder(
                             'Cash Advance Reminder',
                             'Formal Management Demand',
-                            'A cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please remind the user to submit a liquidation report.',
+                            'A cash advance with a DV number ' . $record->disbursement_voucher->dv_number . ' is due for liquidation. Please remind the user to submit a liquidation report.',
                             'System',
                             $receiver->user->name,
                             null,
@@ -106,7 +106,7 @@ class CheckCashAdvanceReminders extends Command
                         NotificationController::sendCASystemReminder(
                             'Cash Advance Reminder',
                             'Show Cause Order',
-                            'A cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please remind the user to submit a liquidation report.',
+                            'A cash advance with a DV number ' . $record->disbursement_voucher->dv_number . ' is due for liquidation. Please remind the user to submit a liquidation report.',
                             'System',
                             $president->user->name,
                             null,
@@ -120,7 +120,7 @@ class CheckCashAdvanceReminders extends Command
                         NotificationController::sendCASystemReminder(
                             'Cash Advance Reminder',
                             'Endorsement for FD',
-                            'A cash advance with a tracking number ' . $record->disbursement_voucher->tracking_number . ' is due for liquidation. Please remind the user to submit a liquidation report.',
+                            'A cash advance with a DV number ' . $record->disbursement_voucher->dv_number . ' is due for liquidation. Please remind the user to submit a liquidation report.',
                             'System',
                             $president->user->name,
                             null,
@@ -134,7 +134,7 @@ class CheckCashAdvanceReminders extends Command
                         //     NotificationController::sendCASystemReminder(
                         //         'Cash Advance Reminder',
                         //         'Unliquidated',
-                        //         'A cash advance with a tracking number '.$record->disbursement_voucher->tracking_number.' has beed marked Unliquidated.',
+                        //         'A cash advance with a DV number '.$record->disbursement_voucher->dv_number.' has beed marked Unliquidated.',
                         //         'System',
                         //         $president->user->name, null, $president->user,
                         //         route('requisitioner.ca-reminders'),
