@@ -46,8 +46,8 @@
         public function mount($record, $wfpType, $isForwarded)
         {
             $this->supplemental_quarter = SupplementalQuarter::where('id', $this->supplementalQuarterId)->first();
-
              $this->selectedType = $wfpType;
+
 
             // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
 
@@ -134,7 +134,6 @@
                     return $allocation->supplemental_quarter_id === $this->supplementalQuarterId;
                 });
                 if (count($existing_alloction) > 0) {
-                    $this->selectedType = $wfpType;
                     $this->fundInitialAmount = $this->record->fundAllocations
                         ->where('wpf_type_id', $this->selectedType)
                         ->where('is_supplemental', 0)
@@ -142,7 +141,6 @@
                     $this->fund_description = $this->record->fundAllocations->where('is_supplemental',
                         0)->first()->description;
                 } else {
-                    $this->selectedType = 1;
                     $this->fundInitialAmount = 0;
                     $this->fund_description = 'No Fund Allocation';
                 }
