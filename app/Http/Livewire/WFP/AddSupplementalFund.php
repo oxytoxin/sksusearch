@@ -39,12 +39,15 @@
 
         public $supplementalQuarterId = null;
 
+
         protected $queryString = ['supplementalQuarterId'];
 
 
         public function mount($record, $wfpType, $isForwarded)
         {
             $this->supplemental_quarter = SupplementalQuarter::where('id', $this->supplementalQuarterId)->first();
+
+             $this->selectedType = $wfpType;
 
             // $this->amounts = array_fill_keys($this->category_groups->pluck('id')->toArray(), 0);
 
@@ -64,22 +67,19 @@
                 })->where('is_active', 1)->get();
                 $this->wfp_type = WpfType::all();
 
+
+
                 if ($this->record->fund_allocations()->exists()) {
-                    $this->selectedType = $this->record->fundAllocations->where('wpf_type_id',
-                        $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
                     $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id',
                         $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
                     $this->fund_description = $this->record->fundAllocations->where('is_supplemental',
                         0)->first()->description;
 
-
                     $this->balance_164 = $this->fundInitialAmount;
                     $this->isForwarded = true;
                 } else {
-                    $this->selectedType = 1;
                     $this->fundInitialAmount = 0;
                     $this->fund_description = 'No Fund Allocation';
-
                     $this->balance_164 = $this->fundInitialAmount;
                 }
 
