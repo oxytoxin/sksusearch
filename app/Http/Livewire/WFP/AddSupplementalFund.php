@@ -137,9 +137,9 @@
                     $this->fundInitialAmount = $this->record->fundAllocations
                         ->where('wpf_type_id', $this->selectedType)
                         ->where('is_supplemental', 0)
-                        ->first()->initial_amount;
+                        ->first()?->initial_amount ?? 0;
                     $this->fund_description = $this->record->fundAllocations->where('is_supplemental',
-                        0)->first()->description;
+                        0)->first()->description ?? 'No Fund Allocation';
                 } else {
                     $this->fundInitialAmount = 0;
                     $this->fund_description = 'No Fund Allocation';
