@@ -206,6 +206,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public $supplementalQuarterId = null;
     protected $queryString = ['supplementalQuarterId'];
 
+    public $budgetCategoryTabIds = [
+        2 => 1,
+        3 => 2,
+        4 => 3,
+        5 => 4,
+        6 => 5,
+        7 => 6
+    ];
+
     public $categoryIds = [];
     public function mount($record, $wfpType, $isEdit, $isSupplemental)
     {
@@ -2500,10 +2509,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedMooeQuantity()
     {
         $mooe = $this->mooe_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $mooe->categoryItems()->first()->budget_category_id
-        )->first()->id;
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
