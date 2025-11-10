@@ -728,16 +728,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     // }
                 }
             } else {
+
                 // xdd
                 $fundDrafts = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where(
                     'is_supplemental',
                     0
                 )->first()->fundDrafts()->first()?->draft_amounts()->get();
 
-
                 // FIX
-                if (!empty($fundDrafts)) {
-
+                if (count($fundDrafts) > 0) {
                     $draftItems = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where(
                     'is_supplemental',
                     0
