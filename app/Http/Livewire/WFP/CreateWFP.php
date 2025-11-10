@@ -1249,10 +1249,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 ->searchable()
                 ->placeholder('Search for a particular')
                 ->getSearchResultsUsing(function (string $search) {
-                    $id = $this->global_index - 1;
-                    return Supply::whereHas('categoryItems', function ($query) use ($id) {
-                        $query->where('budget_category_id', $id);
-                    })->where('is_active', 1)->where('particulars', 'like', "%{$search}%")
+                    return Supply::whereHas('categoryItems', function ($query) {
+                        $query->where('budget_category_id', $this->budgetCategoryTabIds[$this->global_index]);
+                    })->where('is_active', operator: 1)->where('particulars', 'like', "%{$search}%")
                         ->orWhere('specifications', 'like', "%{$search}%")
                         ->limit(50)->pluck('particulars', 'id');
                     // switch($this->global_index)
