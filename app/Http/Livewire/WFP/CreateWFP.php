@@ -1255,8 +1255,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $query->where('budget_category_id', $this->budgetCategoryTabIds[$this->global_index]);
                     })->where('is_active', operator: 1)
                         ->when(!is_null($search), function ($query) use ($search) {
-                            $query->where('specifications', 'like', "%{$search}%")
-                            ->orWhere('particulars', 'like', "%{$search}%");
+                            $query->where('particulars', 'like', "%{$search}%");
                         })
                         ->limit(50)->pluck('particulars', 'id');
                     // switch($this->global_index)
