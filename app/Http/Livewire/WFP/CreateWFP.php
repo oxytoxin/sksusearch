@@ -2573,10 +2573,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedMooeCostPerUnit()
     {
         $mooe = $this->mooe_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $mooe->categoryItems()->first()->budget_category_id
-        )->first()->id;
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
@@ -3425,10 +3422,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedTrainingQuantity()
     {
         $training = $this->training_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $training->categoryItems()->first()->budget_category_id
-        )->first()->id;
+         $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
@@ -3485,10 +3479,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedTrainingCostPerUnit()
     {
         $training = $this->training_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $training->categoryItems()->first()->budget_category_id
-        )->first()->id;
+      $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
@@ -4309,10 +4300,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedMachineQuantity()
     {
         $machine = $this->machine_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $machine->categoryItems()->first()->budget_category_id
-        )->first()->id;
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
 
         switch ($budget_category_id) {
             case 1:
@@ -4373,10 +4361,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedMachineCostPerUnit()
     {
         $machine = $this->machine_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $machine->categoryItems()->first()->budget_category_id
-        )->first()->id;
+     $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
 
         switch ($budget_category_id) {
             case 1:
@@ -5211,10 +5196,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedBuildingQuantity()
     {
         $building = $this->building_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $building->categoryItems()->first()->budget_category_id
-        )->first()->id;
+     $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
 
         switch ($budget_category_id) {
             case 1:
@@ -5272,10 +5254,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedBuildingCostPerUnit()
     {
         $building = $this->building_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $building->categoryItems()->first()->budget_category_id
-        )->first()->id;
+      $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
 
         switch ($budget_category_id) {
             case 1:
@@ -6106,10 +6085,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedPsQuantity()
     {
         $ps = $this->ps_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $ps->categoryItems()->first()->budget_category_id
-        )->first()->id;
+       $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
@@ -6169,10 +6145,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedPsCostPerUnit()
     {
         $ps = $this->ps_category_attr;
-        $budget_category_id = BudgetCategory::where(
-            'id',
-            $ps->categoryItems()->first()->budget_category_id
-        )->first()->id;
+       $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
