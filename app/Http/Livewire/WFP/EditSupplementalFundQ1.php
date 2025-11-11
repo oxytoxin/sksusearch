@@ -91,18 +91,18 @@
                 if (count($this->prev_allocations) > 0) {
                     if ($this->supplementalQuarterId == 1) {
                         $this->selectedType = $this->record->fundAllocations->where('wpf_type_id',
-                            $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
+                            $wfpType)->where('is_supplemental', 0)->first()?->wpf_type_id;
                         $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id',
-                            $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
+                            $this->selectedType)->where('is_supplemental', 0)->first()?->initial_amount;
                         $this->fund_description = $this->record->fundAllocations->where('is_supplemental',
-                            0)->first()->description;
+                            0)->first()?->description;
                     } else {
                         $this->selectedType = $this->record->fundAllocations->where('supplemental_quarter_id',
-                            $this->supplementalQuarterId)->first()->wpf_type_id;
+                            $this->supplementalQuarterId)->first()?->wpf_type_id;
                         $this->fundInitialAmount = $this->record->fundAllocations->where('supplemental_quarter_id',
-                            $this->supplementalQuarterId)->first()->initial_amount;
+                            $this->supplementalQuarterId)->first()?->initial_amount;
                         $this->fund_description = $this->record->fundAllocations->where('supplemental_quarter_id',
-                            $this->supplementalQuarterId)->first()->description;
+                            $this->supplementalQuarterId)->first()?->description;
                     }
                     $this->supplemental_quarter = SupplementalQuarter::find($this->supplementalQuarterId);
 
@@ -191,11 +191,11 @@
                 })->where('is_active', 1)->get();
                 $this->wfp_type = WpfType::all();
                 $this->selectedType = $this->record->fundAllocations->where('wpf_type_id',
-                    $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
+                    $wfpType)->where('is_supplemental', 0)->first()?->wpf_type_id;
                 $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id',
-                    $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
+                    $this->selectedType)->where('is_supplemental', 0)->first()?->initial_amount;
                 $this->fund_description = $this->record->fundAllocations->where('is_supplemental',
-                    0)->first()->description;
+                    0)->first()?->description;
                 $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
                 foreach ($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('is_supplemental',
                     0)->where('cost_center_id', $this->record->id) as $wfp) {
@@ -235,9 +235,9 @@
                 $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
 
                 $this->supplemental_allocation_description = $this->record->fundAllocations->where('wpf_type_id',
-                    $wfpType)->where('is_supplemental', 1)->first()->description;
+                    $wfpType)->where('is_supplemental', 1)->first()?->description;
                 $this->supplemental_allocation = $this->record->fundAllocations->where('wpf_type_id',
-                    $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
+                    $wfpType)->where('is_supplemental', 1)->first()?->initial_amount;
                 $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
                 $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
             }
