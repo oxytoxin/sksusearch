@@ -312,6 +312,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         'supplemental_quarter_id',
                         $this->supplementalQuarterId
                     )->first()->fundDrafts->first()->draft_items()->get();
+
+                    $this->categoryIds = $draft_amounts->pluck('budget_category_id')->toArray();
+
                     if ($draft_amounts) {
                         foreach ($draft_amounts as $draft_amount) {
                             if (!isset($this->draft_amounts[$draft_amount->title_group])) {
