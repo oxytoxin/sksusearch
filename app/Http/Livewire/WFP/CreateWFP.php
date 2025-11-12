@@ -313,8 +313,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         $this->supplementalQuarterId
                     )->first()->fundDrafts->first()->draft_items()->get();
 
-                    $this->categoryIds = $draft_amounts->pluck('budget_category_id')->toArray();
-
+                    $this->categoryIds = $draft_amounts->pluck('title_group')->toArray();
                     if ($draft_amounts) {
                         foreach ($draft_amounts as $draft_amount) {
                             if (!isset($this->draft_amounts[$draft_amount->title_group])) {
@@ -518,7 +517,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $wfpType
                 )->first()->fundDrafts()->first()?->draft_amounts()->get();
                 if (!empty($fundDrafts)) {
-                     $this->categoryIds = $fundDrafts->pluck('category_group_id')->toArray();
+                    $this->categoryIds = $fundDrafts->pluck('category_group_id')->toArray();
                     $initial_amount = $this->record->fundAllocations->where('wpf_type_id', $wfpType);
                     $draft_amounts = $this->record->fundAllocations->where(
                         'wpf_type_id',
