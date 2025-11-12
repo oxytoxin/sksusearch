@@ -143,7 +143,7 @@
                                                         </td>
                                                         <td
                                                             class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{ $item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
-                                                            ₱ {{ number_format($item['current_total'], 2) }}</td>
+                                                            ₱ {{ number_format($item['current_total'], 2) }} </td>
                                                         <td
                                                             class="whitespace-nowrap py-3 pl-4 pr-3 text-right text-sm font-medium {{ $item['initial_amount'] >= $item['current_total'] ? 'text-gray-900' : 'text-red-600' }} sm:pl-3">
                                                             ₱
