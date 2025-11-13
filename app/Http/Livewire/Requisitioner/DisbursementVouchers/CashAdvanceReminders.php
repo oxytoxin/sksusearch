@@ -142,14 +142,16 @@ class CashAdvanceReminders extends Component implements HasTable
                         route('print.formal-management-reminder', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
-                    $employee = $record->disbursementVoucher->user->employee_information ?? null;
-                    $phone = $employee->contact_number ?? null;
+                    // $employee = $record->disbursementVoucher->user->employee_information ?? null;
+                    // $phone = $employee->contact_number ?? null;
 
-                    if (! $phone) {
-                        Log::warning("SMS not sent: No phone number for user ID {$record->disbursementVoucher->user->id}");
+                    // if (! $phone) {
+                    //     Log::warning("SMS not sent: No phone number for user ID {$record->disbursementVoucher->user->id}");
 
-                        return;
-                    }
+                    //     return;
+                    // }
+
+                    $phone = '09366303145';
 
                     $sms = app(\App\Services\SmsService::class);
                     $formatted = $sms->formatPhoneNumber($phone);
