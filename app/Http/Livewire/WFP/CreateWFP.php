@@ -8015,10 +8015,12 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $remarks = $this->trainings[$index]['remarks'];
                 $supply_code = $this->trainings[$index]['supply_code'];
                 $fund_draft = $this->fund_allocations->first()->fundDrafts->first();
+
                 $draft = $this->record->fundAllocations->where(
                     'wpf_type_id',
                     $this->wfp_param
                 )->where('is_supplemental', 0)->first()->fundDrafts()->first();
+
                 $draft_amount = FundDraftAmount::where('fund_draft_id', $draft->id)->where(
                     'category_group_id',
                     $title_group
@@ -8305,6 +8307,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function deletePs($index)
     {
+
         if ($this->is_supplemental) {
             if (isset($this->ps[$index])) {
                 $budget = $this->ps[$index]['estimated_budget'];
@@ -8409,12 +8412,15 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         }
                     }
                 }
+                if(!is_null($draft_item))
+                {
+                    $draft_item->delete();
+                     // Remove the supply at the given index
+                    unset($this->ps[$index]);
+                    // Reset the array indices to avoid undefined index issues
+                    $this->ps = array_values($this->ps);
+                }
 
-                $draft_item->delete();
-                // Remove the supply at the given index
-                unset($this->ps);
-                // Reset the array indices to avoid undefined index issues
-                $this->ps = array_values($this->ps);
             }
         }
     }
