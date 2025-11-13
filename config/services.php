@@ -35,4 +35,8 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => config('app_url'). '/auth/google/callback',
     ],
+     'semaphore' => [
+        'api_key' => env('SEMAPHORE_API_KEY'),
+        'sender_name' => env('SEMAPHORE_SENDER_NAME', 'HIMS'),
+    ],
 ];

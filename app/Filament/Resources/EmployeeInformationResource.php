@@ -51,6 +51,7 @@ class EmployeeInformationResource extends Resource
                         TextInput::make('last_name')->required(),
                         TextInput::make('address'),
                         DatePicker::make('birthday'),
+                        TextInput::make('contact_number'),
                         Grid::make(1)
                             ->schema([
                                 TextInput::make('full_name')->required(),
