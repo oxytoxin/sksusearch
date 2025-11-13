@@ -162,10 +162,9 @@ class CashAdvanceReminders extends Component implements HasTable
 
                         return;
                     }
+$amount = number_format($record->disbursement_voucher->total_sum, 2);
 
-                    $amount = number_format($record->disbursement_voucher->totalSum(), 2);
-
-                    $message = "FMR Reminder: Your Cash Advance (DV #{$record->disbursement_voucher->dv_number}) amounting to ₱{$amount} is now due for liquidation.";
+$message = "FMR Reminder: Your Cash Advance (DV #{$record->disbursement_voucher->dv_number}) amounting to ₱{$amount} is now due for liquidation.";
 
                     // Dispatch SMS job
                     SendSmsJob::dispatch($formatted, $message);
