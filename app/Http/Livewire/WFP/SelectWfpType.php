@@ -72,7 +72,7 @@
         {
             $user = WpfPersonnel::where('user_id', Auth::user()->id)->first();
             return CostCenter::query()->with(['fundAllocations'])->whereHas('fundAllocations', function ($query) {
-                $query->where('is_locked', 1);
+                $query->where('is_locked', 1)->where('is_supplemental', 0);
             })
                 ->whereIn('id', $this->cost_centers->pluck('id')->toArray())
                 ->where('fund_cluster_id', $this->fund_cluster);
