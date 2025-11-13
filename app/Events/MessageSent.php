@@ -12,7 +12,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class MessageSent implements ShouldBroadcastNow
+class MessageSent implements ShouldBroadcastNow 
 {
     use Dispatchable, InteractsWithSockets, SerializesModels, InteractsWithBroadcasting;
 
@@ -47,7 +47,7 @@ class MessageSent implements ShouldBroadcastNow
             'message' => $this->message->content,
             'sender' => $this->message->user->name,
             'created_at' => $this->message->created_at->toDateTimeString(),
-            
+
         ];
     }
 }

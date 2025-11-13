@@ -61,6 +61,7 @@ class EditEmployeeInformation extends EditRecord
             'last_name' => strtoupper($data['last_name']),
             'full_name' => strtoupper($data['full_name']),
             'address' =>  $data['address'],
+            'contact_number' =>  $data['contact_number'],
             'birthday' => $data['birthday'],
             'position_id' => $data['position_id'],
             'office_id' => $data['office_id'],
