@@ -146,7 +146,7 @@ class CashAdvanceReminders extends Component implements HasTable
                     $phone = $employee->contact_number ?? null;
 
                     if (! $phone) {
-                        Log::warning("SMS not sent: No phone number for user ID {$record->disbursementVoucher->user->id}");
+                        Log::warning("SMS not sent: No phone number for user ID {$record->disbursementVoucher->user->id} ");
 
                         return;
                     }
@@ -163,8 +163,9 @@ class CashAdvanceReminders extends Component implements HasTable
                         return;
                     }
 
-                    // Create message
-                    $message = "FMR Reminder: Your CA with DV #{$record->disbursement_voucher->dv_number} is due for liquidation.";
+                    $amount = number_format($record->disbursement_voucher->totalSum(), 2);
+
+                    $message = "FMR Reminder: Your Cash Advance (DV #{$record->disbursement_voucher->dv_number}) amounting to ₱{$amount} is now due for liquidation.";
 
                     // Dispatch SMS job
                     SendSmsJob::dispatch($formatted, $message);
