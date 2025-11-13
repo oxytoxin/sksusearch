@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
 use App\Http\Controllers\NotificationController;
+use App\Jobs\SendSmsJob;
 use App\Models\CaReminderStep;
 use App\Models\EmployeeInformation;
 use Filament\Forms\Components\DatePicker;
@@ -18,6 +19,7 @@ use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
@@ -38,23 +40,20 @@ class CashAdvanceReminders extends Component implements HasTable
         $this->auditor = EmployeeInformation::auditorUser();
     }
 
-protected function canViewFile($record, string $type): bool
-{
-    $requiredSteps = [
-        'FMR' => 2,
-        'FMD' => 3,
-        'SCO' => 4,
-        'ENDORSEMENT' => 5,
-        'FD' => 6,
-    ];
+    protected function canViewFile($record, string $type): bool
+    {
+        $requiredSteps = [
+            'FMR' => 2,
+            'FMD' => 3,
+            'SCO' => 4,
+            'ENDORSEMENT' => 5,
+            'FD' => 6,
+        ];
 
-    $requiredStep = $requiredSteps[$type] ?? 99;
+        $requiredStep = $requiredSteps[$type] ?? 99;
 
-    return $record->step > $requiredStep;
-}
-
-
-
+        return $record->step > $requiredStep;
+    }
 
     protected function getTableQuery(): Builder|Relation
     {
@@ -143,6 +142,33 @@ protected function canViewFile($record, string $type): bool
                         route('print.formal-management-reminder', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
+                    $employee = $record->disbursementVoucher->user->employee_information ?? null;
+                    $phone = $employee->contact_number ?? null;
+
+                    if (! $phone) {
+                        Log::warning("SMS not sent: No phone number for user ID {$record->disbursementVoucher->user->id}");
+
+                        return;
+                    }
+
+                    $sms = app(\App\Services\SmsService::class);
+                    $formatted = $sms->formatPhoneNumber($phone);
+
+                    // Validate number format
+                    if (! $formatted || strlen($formatted) < 12) {
+                        Log::warning("SMS not sent: Invalid number '{$phone}' for user ID {$record->disbursementVoucher->user->id}");
+
+                        return;
+                    }
+
+                    // Create message
+                    $message = "FMR Reminder: Your CA with DV #{$record->disbursement_voucher->dv_number} is due for liquidation.";
+
+                    // Dispatch SMS job
+                    SendSmsJob::dispatch($formatted, $message);
+
+                    Log::info("SMS queued for {$formatted} (user ID: {$record->disbursementVoucher->user->id})");
+
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 2 && $record->is_sent == 0),
             Action::make('sendFMD')->label('Send FMD')->icon('ri-send-plane-fill')
                 ->button()
@@ -393,36 +419,35 @@ protected function canViewFile($record, string $type): bool
                     ->color('success')
                     ->url(fn ($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record->disbursement_voucher]), true),
 
-                    ViewAction::make('viewFMR')
-    ->label('View FMR')
-    ->icon('heroicon-o-document-text')
-    ->url(fn ($record) => route('print.formal-management-reminder', $record->disbursement_voucher))
-    ->visible(fn ($record) => $this->canViewFile($record, 'FMR')),
+                ViewAction::make('viewFMR')
+                    ->label('View FMR')
+                    ->icon('heroicon-o-document-text')
+                    ->url(fn ($record) => route('print.formal-management-reminder', $record->disbursement_voucher))
+                    ->visible(fn ($record) => $this->canViewFile($record, 'FMR')),
 
-ViewAction::make('viewFMD')
-    ->label('View FMD')
-    ->icon('heroicon-o-document-text')
-    ->url(fn ($record) => route('print.formal-management-demand', $record->disbursement_voucher))
-    ->visible(fn ($record) => $this->canViewFile($record, 'FMD')),
+                ViewAction::make('viewFMD')
+                    ->label('View FMD')
+                    ->icon('heroicon-o-document-text')
+                    ->url(fn ($record) => route('print.formal-management-demand', $record->disbursement_voucher))
+                    ->visible(fn ($record) => $this->canViewFile($record, 'FMD')),
 
-ViewAction::make('viewSCO')
-    ->label('View SCO')
-    ->icon('heroicon-o-document-text')
-    ->url(fn ($record) => route('print.show-cause-order', $record->disbursement_voucher))
-    ->visible(fn ($record) => $this->canViewFile($record, 'SCO')),
+                ViewAction::make('viewSCO')
+                    ->label('View SCO')
+                    ->icon('heroicon-o-document-text')
+                    ->url(fn ($record) => route('print.show-cause-order', $record->disbursement_voucher))
+                    ->visible(fn ($record) => $this->canViewFile($record, 'SCO')),
 
-ViewAction::make('viewENDORSEMENT')
-    ->label('View Endorsement')
-    ->icon('heroicon-o-document-text')
-    ->url(fn ($record) => route('print.endorsement-for-fd', $record->disbursement_voucher))
-    ->visible(fn ($record) => $this->canViewFile($record, 'ENDORSEMENT')),
+                ViewAction::make('viewENDORSEMENT')
+                    ->label('View Endorsement')
+                    ->icon('heroicon-o-document-text')
+                    ->url(fn ($record) => route('print.endorsement-for-fd', $record->disbursement_voucher))
+                    ->visible(fn ($record) => $this->canViewFile($record, 'ENDORSEMENT')),
 
-ViewAction::make('viewFD')
-    ->label('View FD')
-    ->icon('heroicon-o-document-text')
-    ->url(fn ($record) => Storage::disk('public')->url($record->auditor_attachment ?? '#'))
-    ->visible(fn ($record) => $this->canViewFile($record, 'FD')),
-
+                ViewAction::make('viewFD')
+                    ->label('View FD')
+                    ->icon('heroicon-o-document-text')
+                    ->url(fn ($record) => Storage::disk('public')->url($record->auditor_attachment ?? '#'))
+                    ->visible(fn ($record) => $this->canViewFile($record, 'FD')),
 
             ]),
 
