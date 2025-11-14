@@ -223,39 +223,43 @@
                                 </th>
                             </tr>
                             {{-- TEMP --}}
-                            @foreach ($draftItems->where('budget_category_id', 1) as $item)
-                                <tr class="border-t border-gray-300">
-                                    <td
-                                        class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                        {{ $item->uacs ?? 'none' }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->account_title }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->particular }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->supply_code }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{ $item->total_quantity }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{ $item->uom }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->cost_per_unit }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->estimated_budget }}
-                                    </td>
-                                    @foreach (json_decode($item->quantity) as $quantity)
+                            @if ($draftItems)
+                                @foreach ($draftItems->where('budget_category_id', 1) as $item)
+                                    <tr class="border-t border-gray-300">
                                         <td
-                                            class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
-                                            {{ $quantity }}
+                                            class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                            {{ $item->uacs ?? 'none' }}
                                         </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->account_title }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->particular }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->supply_code }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->total_quantity }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                            {{ $item->uom }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->cost_per_unit }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->estimated_budget }}
+                                        </td>
+                                        @foreach (json_decode($item->quantity) as $quantity)
+                                            <td
+                                                class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
+                                                {{ $quantity }}
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            @endif
                             {{-- TEMP --}}
 
 
@@ -292,7 +296,7 @@
                                     @endforeach
                                 </tr>
                             @empty
-                                @if ($draftItems->where('budget_category_id', 1)->count() === 0)
+                                @if (!$draftItems || $draftItems->where('budget_category_id', 1)->count() === 0)
                                     <tr class="border-t border-gray-200">
                                         <th colspan="21" scope="colgroup"
                                             class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">
@@ -311,39 +315,43 @@
                                 </th>
                             </tr>
                             {{-- TEMP --}}
-                            @foreach ($draftItems->where('budget_category_id', 2) as $item)
-                                <tr class="border-t border-gray-300">
-                                    <td
-                                        class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                        {{ $item->uacs ?? 'none' }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->account_title }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->particular }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->supply_code }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{ $item->total_quantity }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{ $item->uom }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->cost_per_unit }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->estimated_budget }}
-                                    </td>
-                                    @foreach (json_decode($item->quantity) as $quantity)
+                            @if ($draftItems)
+                                @foreach ($draftItems->where('budget_category_id', 2) as $item)
+                                    <tr class="border-t border-gray-300">
                                         <td
-                                            class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
-                                            {{ $quantity }}
+                                            class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                            {{ $item->uacs ?? 'none' }}
                                         </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->account_title }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->particular }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->supply_code }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->total_quantity }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                            {{ $item->uom }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->cost_per_unit }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->estimated_budget }}
+                                        </td>
+                                        @foreach (json_decode($item->quantity) as $quantity)
+                                            <td
+                                                class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
+                                                {{ $quantity }}
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            @endif
                             {{-- TEMP --}}
                             @forelse ($record->wfpDetails->where('budget_category_id', 2) as $item)
                                 <tr class="border-t border-gray-300">
@@ -378,7 +386,7 @@
                                     @endforeach
                                 </tr>
                             @empty
-                                @if ($draftItems->where('budget_category_id', 2)->count() === 0)
+                                @if (!$draftItems || $draftItems->where('budget_category_id', 2)->count() === 0)
                                     <tr class="border-t border-gray-200">
                                         <th colspan="21" scope="colgroup"
                                             class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">
@@ -397,39 +405,43 @@
                                 </th>
                             </tr>
                             {{-- TEMP --}}
-                            @foreach ($draftItems->where('budget_category_id', 3) as $item)
-                                <tr class="border-t border-gray-300">
-                                    <td
-                                        class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                        {{ $item->uacs ?? 'none' }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->account_title }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->particular }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->supply_code }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{ $item->total_quantity }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{ $item->uom }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->cost_per_unit }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->estimated_budget }}
-                                    </td>
-                                    @foreach (json_decode($item->quantity) as $quantity)
+                            @if ($draftItems)
+                                @foreach ($draftItems?->where('budget_category_id', 3) as $item)
+                                    <tr class="border-t border-gray-300">
                                         <td
-                                            class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
-                                            {{ $quantity }}
+                                            class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                            {{ $item->uacs ?? 'none' }}
                                         </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->account_title }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->particular }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->supply_code }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->total_quantity }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                            {{ $item->uom }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->cost_per_unit }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->estimated_budget }}
+                                        </td>
+                                        @foreach (json_decode($item->quantity) as $quantity)
+                                            <td
+                                                class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
+                                                {{ $quantity }}
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            @endif
                             {{-- TEMP --}}
                             @forelse ($record->wfpDetails->where('budget_category_id', 3) as $item)
                                 <tr class="border-t border-gray-300">
@@ -464,7 +476,7 @@
                                     @endforeach
                                 </tr>
                             @empty
-                                @if ($draftItems->where('budget_category_id', 3)->count() === 0)
+                                @if (!$draftItems || $draftItems->where('budget_category_id', 3)->count() === 0)
                                     <tr class="border-t border-gray-200">
                                         <th colspan="21" scope="colgroup"
                                             class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">
@@ -483,39 +495,43 @@
                                 </th>
                             </tr>
                             {{-- TEMP --}}
-                            @foreach ($draftItems->where('budget_category_id', 4) as $item)
-                                <tr class="border-t border-gray-300">
-                                    <td
-                                        class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                        {{ $item->uacs ?? 'none' }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->account_title }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->particular }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->supply_code }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{ $item->total_quantity }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{ $item->uom }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->cost_per_unit }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->estimated_budget }}
-                                    </td>
-                                    @foreach (json_decode($item->quantity) as $quantity)
+                            @if ($draftItems)
+                                @foreach ($draftItems->where('budget_category_id', 4) as $item)
+                                    <tr class="border-t border-gray-300">
                                         <td
-                                            class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
-                                            {{ $quantity }}
+                                            class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                            {{ $item->uacs ?? 'none' }}
                                         </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->account_title }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->particular }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->supply_code }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->total_quantity }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                            {{ $item->uom }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->cost_per_unit }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->estimated_budget }}
+                                        </td>
+                                        @foreach (json_decode($item->quantity) as $quantity)
+                                            <td
+                                                class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
+                                                {{ $quantity }}
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            @endif
                             {{-- TEMP --}}
                             @forelse ($record->wfpDetails->where('budget_category_id', 4) as $item)
                                 <tr class="border-t border-gray-300">
@@ -550,7 +566,7 @@
                                     @endforeach
                                 </tr>
                             @empty
-                                @if ($draftItems->where('budget_category_id', 4)->count() === 0)
+                                @if (!$draftItems || $draftItems->where('budget_category_id', 4)->count() === 0)
                                     <tr class="border-t border-gray-200">
                                         <th colspan="21" scope="colgroup"
                                             class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">
@@ -570,39 +586,43 @@
                                 </th>
                             </tr>
                             {{-- TEMP --}}
-                            @foreach ($draftItems->where('budget_category_id', 5) as $item)
-                                <tr class="border-t border-gray-300">
-                                    <td
-                                        class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                        {{ $item->uacs ?? 'none' }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->account_title }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->particular }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->supply_code }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{ $item->total_quantity }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{ $item->uom }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->cost_per_unit }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->estimated_budget }}
-                                    </td>
-                                    @foreach (json_decode($item->quantity) as $quantity)
+                            @if ($draftItems)
+                                @foreach ($draftItems->where('budget_category_id', 5) as $item)
+                                    <tr class="border-t border-gray-300">
                                         <td
-                                            class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
-                                            {{ $quantity }}
+                                            class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                            {{ $item->uacs ?? 'none' }}
                                         </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->account_title }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->particular }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->supply_code }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->total_quantity }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                            {{ $item->uom }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->cost_per_unit }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->estimated_budget }}
+                                        </td>
+                                        @foreach (json_decode($item->quantity) as $quantity)
+                                            <td
+                                                class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
+                                                {{ $quantity }}
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            @endif
                             {{-- TEMP --}}
                             @forelse ($record->wfpDetails->where('budget_category_id', 5) as $item)
                                 <tr class="border-t border-gray-300">
@@ -637,7 +657,7 @@
                                     @endforeach
                                 </tr>
                             @empty
-                                @if ($draftItems->where('budget_category_id', 5)->count() === 0)
+                                @if (!$draftItems || $draftItems->where('budget_category_id', 5)->count() === 0)
                                     <tr class="border-t border-gray-200">
                                         <th colspan="21" scope="colgroup"
                                             class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">
@@ -656,39 +676,43 @@
                                 </th>
                             </tr>
                             {{-- TEMP --}}
-                            @foreach ($draftItems->where('budget_category_id', 6) as $item)
-                                <tr class="border-t border-gray-300">
-                                    <td
-                                        class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                                        {{ $item->uacs ?? 'none' }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->account_title }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->particular }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
-                                        {{ $item->supply_code }}
-                                    </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500 text-wrap">{{ $item->total_quantity }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">{{ $item->uom }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->cost_per_unit }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
-                                        {{ $item->estimated_budget }}
-                                    </td>
-                                    @foreach (json_decode($item->quantity) as $quantity)
+                            @if ($draftItems)
+                                @foreach ($draftItems->where('budget_category_id', 6) as $item)
+                                    <tr class="border-t border-gray-300">
                                         <td
-                                            class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
-                                            {{ $quantity }}
+                                            class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                                            {{ $item->uacs ?? 'none' }}
                                         </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->account_title }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->particular }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->supply_code }}
+                                        </td>
+                                        <td class="px-3 py-2 text-sm text-gray-500 text-wrap">
+                                            {{ $item->total_quantity }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-gray-500">
+                                            {{ $item->uom }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->cost_per_unit }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-2 text-sm text-right text-gray-500">
+                                            {{ $item->estimated_budget }}
+                                        </td>
+                                        @foreach (json_decode($item->quantity) as $quantity)
+                                            <td
+                                                class="whitespace-nowrap px-1 text-center py-2 text-sm text-gray-500 border-l border-gray-400">
+                                                {{ $quantity }}
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            @endif
                             {{-- TEMP --}}
                             @forelse ($record->wfpDetails->where('budget_category_id', 6) as $item)
                                 <tr class="border-t border-gray-300">
@@ -723,7 +747,7 @@
                                     @endforeach
                                 </tr>
                             @empty
-                                @if ($draftItems->where('budget_category_id', 6)->count() === 0)
+                                @if (!$draftItems || $draftItems->where('budget_category_id', 6)->count() === 0)
                                     <tr class="border-t border-gray-200">
                                         <th colspan="21" scope="colgroup"
                                             class="bg-gray-100 py-2 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-3">
