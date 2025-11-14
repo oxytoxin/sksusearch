@@ -111,6 +111,7 @@ class WfpReport extends Component
                 ->where('fund_drafts.fund_allocation_id', $this->record->costCenter->fundAllocations->first()->id)
                 ->whereNotIn('particular_id', $supplyIds)
                 ->get();
+
         }
 
 
@@ -139,13 +140,12 @@ class WfpReport extends Component
         }
 
         if(count($this->draftItems) > 0) {
-            $totalDraftItems = 0;
             foreach ($this->draftItems as $draftItem) {
                 $this->program += (int)$draftItem->total_quantity * (int)$draftItem->cost_per_unit;
             }
-            $this->current['regular_programmed'] = $this->program;
         }
 
+       $this->current['regular_programmed'] = $this->program;
 
 
         //HISTORY
