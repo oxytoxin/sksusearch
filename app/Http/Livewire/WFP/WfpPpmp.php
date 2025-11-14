@@ -5,6 +5,7 @@ namespace App\Http\Livewire\WFP;
 use App\Models\FundAllocation;
 use App\Models\SupplementalQuarter;
 use App\Models\Wfp;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class WfpPpmp extends Component
@@ -41,6 +42,8 @@ class WfpPpmp extends Component
         'regular_programmed' => 0,
         'balance' => 0,
     ];
+
+    public $draftItems = [];
 
 
     public function mount($record, $isSupplemental)
@@ -89,6 +92,14 @@ class WfpPpmp extends Component
             // PPMP ONLY
             $this->current['regular_programmed'] += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
         }
+
+        // if(count($this->draftItems) > 0) {
+        //     foreach ($this->draftItems as $draftItem) {
+        //        $this->current['regular_programmed'] += (int)$draftItem->total_quantity * (int)$draftItem->cost_per_unit;
+        //     }
+        // }
+
+
 
         foreach($this->oldRecords as $oldRecord) {
             foreach ($oldRecord->wfpDetails as $wfpDetail) {
