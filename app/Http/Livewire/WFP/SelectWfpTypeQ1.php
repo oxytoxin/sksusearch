@@ -224,7 +224,7 @@
                     ->query(function (Builder $query, array $data): Builder {
                         $this->data = $data;
                         return $query->whereHas('fundAllocations', function ($query) use ($data) {
-                                $query->where('wpf_type_id', $data['wfp_type'])->where('supplemental_quarter_id', $this->supplementalQuarterId)->where('is_locked', 1);
+                                $query->where('wpf_type_id', $data['wfp_type'])->where('supplemental_quarter_id', $this->supplementalQuarterId);
                             })
                             ->whereDoesntHave('wfp', function ($query) use ($data) {
                                 $query->where('supplemental_quarter_id', $this->supplementalQuarterId)
