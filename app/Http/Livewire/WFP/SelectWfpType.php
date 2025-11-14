@@ -159,7 +159,7 @@
                         return $query->whereDoesntHave('wfp', function ($query) use ($data) {
                             $query->where('wpf_type_id', $data['wfp_type']);
                         })->whereHas('fundAllocations', function ($query) use ($data) {
-                            $query->where('wpf_type_id', $data['wfp_type'])->where('is_supplemental',0)->where('is_locked', 1);
+                            $query->where('wpf_type_id', $data['wfp_type'])->where('is_supplemental',0);
                         });
                     }),
                 SelectFilter::make('mfo')
