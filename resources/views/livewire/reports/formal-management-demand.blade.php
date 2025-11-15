@@ -8,10 +8,8 @@
     </div>
 
 
-    <div class="flex mx-auto w-full justify-center">
+<div class="flex mx-auto w-full justify-center">
         <div class="document bg-white">
-
-
 
             <div id="printableDiv" class="p-6 bg-white border border-gray-300 max-w-3xl flex-1">
                 <x-sksu-header />
@@ -103,23 +101,12 @@
                 <div class="text-xs mt-4 text-gray-800">
                     <div class="grid grid-cols-3">
                         <div class="col-span-1  relative">
-                              <div class="mt-8">
+                                <x-signature-block
+    :name="App\Models\EmployeeInformation::accountantUser()->full_name"
+    :position="App\Models\EmployeeInformation::accountantUser()?->position->description . ' - ' . App\Models\EmployeeInformation::accountantUser()?->office->name"
+    :signature="App\Models\EmployeeInformation::accountantUser()->user->signature?->content"
 
-                                {{-- <hr class="border-t border-black mx-8"> --}}
-                                {{-- @dump(App\Models\EmployeeInformation::accountantUser()->toArray()) --}}
-                                <img src="{{ App\Models\EmployeeInformation::accountantUser()->user->signature?->content }}"
-                                    alt="" class="absolute  h-24 w-24 inset-x-16 bottom-[-1rem]">
-
-                            </div>
-                            <div class="text-center ">
-                                <p class="font-bold">{{ App\Models\EmployeeInformation::accountantUser()->full_name }}
-                                </p>
-                                <p>{{ App\Models\EmployeeInformation::accountantUser()?->position->description }}-{{ App\Models\EmployeeInformation::accountantUser()?->office->name }}
-                                </p>
-                            </div>
-
-
-
+/>
                         </div>
 
                         <div class="col-span-2 flex justify-between ">
