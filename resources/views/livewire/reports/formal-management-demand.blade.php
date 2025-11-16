@@ -1,14 +1,16 @@
 <div>
     <div class="flex justify-start w-full mb-4  space-x-2 ">
-        <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()" >   Back</x-filament-support::button>
-          <x-filament-support::button class="" type="button" color="primary" onclick="printDiv('printableDiv')" >Print Document</x-filament-support::button>
-          {{-- <button  class="px-4 py-2 bg-primary-500 text-white rounded text-sm"> --}}
+        <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()">
+            Back</x-filament-support::button>
+        <x-filament-support::button class="" type="button" color="primary" onclick="printDiv('printableDiv')">Print
+            Document</x-filament-support::button>
+        {{-- <button  class="px-4 py-2 bg-primary-500 text-white rounded text-sm"> --}}
 
         </button>
     </div>
 
 
-<div class="flex mx-auto w-full justify-center">
+    <div class="flex mx-auto w-full justify-center">
         <div class="document bg-white">
 
             <div id="printableDiv" class="p-6 bg-white border border-gray-300 max-w-3xl flex-1">
@@ -57,15 +59,15 @@
                     </ul>
                     <div class="mt-4 text-xs text-gray-800 leading-relaxed">
 
-                       <p>
-    Records also show that a prior reminder contained in
-    FMR No. {{ $record?->cash_advance_reminder?->fmr_number ?? 'xxxx-xxxx' }}
-    was issued to you on
-    {{ $record?->cash_advance_reminder?->fmr_date
-        ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y')
-        : '________' }}
-    in relation hereto.
-</p>
+                        <p>
+                            Records also show that a prior reminder contained in
+                            FMR No. {{ $record?->cash_advance_reminder?->fmr_number ?? 'xxxx-xxxx' }}
+                            was issued to you on
+                            {{ $record?->cash_advance_reminder?->fmr_date
+                                ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y')
+                                : '________' }}
+                            in relation hereto.
+                        </p>
 
 
 
@@ -101,12 +103,19 @@
                 <div class="text-xs mt-4 text-gray-800">
                     <div class="grid grid-cols-3">
                         <div class="col-span-1  relative">
-                                <x-signature-block
-    :name="App\Models\EmployeeInformation::accountantUser()->full_name"
-    :position="App\Models\EmployeeInformation::accountantUser()?->position->description . ' - ' . App\Models\EmployeeInformation::accountantUser()?->office->name"
-    :signature="App\Models\EmployeeInformation::accountantUser()->user->signature?->content"
+                            <x-signature-block :name="App\Models\EmployeeInformation::accountantUser()->full_name" :position="App\Models\EmployeeInformation::accountantUser()?->position->description .
+                                ' - ' .
+                                App\Models\EmployeeInformation::accountantUser()?->office->name" :signature="App\Models\EmployeeInformation::accountantUser()->user->signature?->content" />
 
-/>
+        {{-- @if($esign)
+        <x-esign-info
+            :name="$esign->sender_name"
+            :datetime="$esign->sent_at"
+            offsetX="7rem"
+            offsetY="-0.7rem"
+            textclass="text-[11px] leading-tight"
+        />
+    @endif --}}
                         </div>
 
                         <div class="col-span-2 flex justify-between ">
