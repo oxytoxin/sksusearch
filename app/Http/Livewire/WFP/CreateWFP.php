@@ -227,7 +227,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 'fundAllocations' => function ($query) use ($wfpType) {
                     $query->where('wpf_type_id', $this->wfp_param)->with(['categoryGroup','fundDrafts.draft_items']);
                 },
-
+                'wfp' => function ($query) use ($wfpType) {
+                    $query->where('wpf_type_id',$this->wfp_param)->with('wfpDetails');
+                },
             ])
                 ->where('id', $costCenter_id)
                 ->whereHas('fundAllocations', function ($query) use ($wfpType) {
@@ -381,7 +383,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     $all_current_allocation = $costCenterFundAllocations->filter(function ($allocation) {
                         return $allocation->supplemental_quarter_id === $this->supplementalQuarterId;
                     });
-
                     //
                     $this->current_balance = $costCenterFundAllocations
                         ->where('wpf_type_id', $wfpType)
