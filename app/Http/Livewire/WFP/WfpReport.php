@@ -141,7 +141,7 @@ class WfpReport extends Component
 
         if(count($this->draftItems) > 0) {
             foreach ($this->draftItems as $draftItem) {
-                $this->program += (int)$draftItem->total_quantity * (int)$draftItem->cost_per_unit;
+                $this->program += $draftItem->estimated_budget;
             }
         }
 

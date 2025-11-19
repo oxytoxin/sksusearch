@@ -215,6 +215,8 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         7 => 6
     ];
 
+    public $isEdit = false;
+
     public $categoryIds = [];
     public function mount($record, $wfpType, $isEdit, $isSupplemental)
     {
@@ -223,12 +225,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         $this->wfp_param = $wfpType;
 
         if ($isEdit == 1) {
+            $this->isEdit = true;
             $this->record = CostCenter::with([
                 'fundAllocations' => function ($query) use ($wfpType) {
-                    $query->where('wpf_type_id', $this->wfp_param)->with(['categoryGroup','fundDrafts.draft_items']);
+                    $query->where('wpf_type_id', $this->wfp_param)->with(['categoryGroup', 'fundDrafts.draft_items']);
                 },
                 'wfp' => function ($query) use ($wfpType) {
-                    $query->where('wpf_type_id',$this->wfp_param)->with('wfpDetails');
+                    $query->where('wpf_type_id', $this->wfp_param)->with('wfpDetails');
                 },
             ])
                 ->where('id', $costCenter_id)
@@ -247,15 +250,18 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                     $this->supplementalQuarterId
                                 )->orWhere('supplemental_quarter_id', null);
                             }
-                        });
+                        })->with(['categoryGroup', 'fundDrafts.draft_items']);
                 })->first();
+
+
+
         } else {
             $this->record = CostCenter::with([
                 'wfp' => function ($query) use ($wfpType) {
-                    $query->where('wpf_type_id',$this->wfp_param)->with('wfpDetails');
+                    $query->where('wpf_type_id', $this->wfp_param)->with('wfpDetails');
                 },
                 'fundAllocations' => function ($query) use ($wfpType) {
-                    $query->where('wpf_type_id',$this->wfp_param)->when(
+                    $query->where('wpf_type_id', $this->wfp_param)->when(
                         !is_null($this->supplementalQuarterId),
                         function ($query) {
                             $query->where('is_supplemental', 0)->orWhere(function ($query) {
@@ -266,7 +272,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                 )->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
                             });
                         }
-                    )->with(['categoryGroup','fundDrafts.draft_items']);
+                    )->with(['categoryGroup', 'fundDrafts.draft_items']);
                 }
             ])->where('id', $record)->whereHas('fundAllocations', function ($query) use ($wfpType) {
                 $query->where('wpf_type_id', $this->wfp_param);
@@ -286,7 +292,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 $wfpType
             )->where('supplemental_quarter_id', $this->supplementalQuarterId);
         } else {
-            $this->wfp_type = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->first()->wpfType;
+            $this->wfp_type = WpfType::findOrFail($wfpType);
             $this->wfp_fund = $this->record->fundAllocations->where(
                 'wpf_type_id',
                 $wfpType
@@ -503,7 +509,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     });
 
                     $this->current_balance = $costCenterFundAllocations
-                         ->where('wpf_type_id', $wfpType)
+                        ->where('wpf_type_id', $wfpType)
                         ->filter(function ($allocation) {
                             return $allocation->initial_amount > 0 && $allocation->categoryGroup?->is_active == 1;
                         })
@@ -600,8 +606,9 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }
         } else {
             //164
-            if ($isSupplemental) {
 
+            $categoryIds = $this->record->fundAllocations->first()->fundDrafts->first()->draft_items->pluck('title_group')->toArray();
+            if ($isSupplemental) {
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where(
                     'supplemental_quarter_id',
                     $this->supplementalQuarterId
@@ -670,34 +677,47 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                             )->where(
                                 'supplemental_quarter_id',
                                 $this->supplementalQuarterId
-                            )->first()->fundDrafts->first()->draft_amounts->map(function (
-                                $allocation
+                            )->first()->fundDrafts->first()->draft_items->map(function (
+                                $allocation, $initial
                             ) {
                                 return [
-                                    'category_group_id' => $allocation->category_group_id,
-                                    'category_group' => $allocation->category_group,
-                                    'initial_amount' => $allocation->initial_amount,
-                                    'current_total' => $allocation->current_total,
-                                    'balance' => $allocation->balance,
+                                 'category_group_id' => $allocation->title_group,
+                                'category_group' => $allocation->account_title,
+                                'initial_amount' => $initial,
+                                'current_total' => $allocation->estimated_budget,
+                                'balance' => 0,
                                 ];
                             })->toArray();
                         }
                     } else {
-                        $this->current_balance = $this->record->fundAllocations->where(
-                            'wpf_type_id',
-                            $wfpType
-                        )->where(
-                            'is_supplemental',
-                            0
-                        )->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) {
+                         $initial = $this->record->fundAllocations->where(
+                                'wpf_type_id',
+                                $wfpType
+                            )->where(
+                                'supplemental_quarter_id',
+                                $this->supplementalQuarterId
+                            )->first()->initial_amount;
+             $this->current_balance = $this->record
+                        ->fundAllocations
+                        ->where('wpf_type_id', $wfpType)
+                        ->where('is_supplemental', 0)
+                        ->first()
+                        ->fundDrafts
+                        ->first()
+                        ->draft_items
+                        ->groupBy('title_group') // distinct category IDs
+                        ->map(function ($items, $titleGroup) use ($initial) {
+                            $first = $items->first();
                             return [
-                                'category_group_id' => $allocation->category_group_id,
-                                'category_group' => $allocation->category_group,
-                                'initial_amount' => $allocation->initial_amount,
-                                'current_total' => $allocation->current_total,
-                                'balance' => $allocation->balance,
+                                'category_group_id' => $titleGroup,
+                                'category_group' => $first->account_title,
+                                'initial_amount' => $initial,
+                                'current_total' => $items->sum('estimated_budget'), // SUM duplicates
+                                'balance' => 0,
                             ];
-                        })->toArray();
+                        })
+                        ->values()
+                        ->toArray();
                     }
                 } else {
 
@@ -768,30 +788,40 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 // FIX
                 if (!is_null($fundDrafts) && count($fundDrafts) > 0) {
                     $draftItems = $this->record->fundAllocations->where('wpf_type_id', $wfpType)->where(
-                    'is_supplemental',
-                    0
-                )->first()->fundDrafts()->first()?->draft_items()->get();
+                        'is_supplemental',
+                        0
+                    )->first()->fundDrafts()->first()?->draft_items()->get();
 
-                 $this->categoryIds = $fundDrafts->pluck('category_group_id')->toArray();
+                    $this->categoryIds = $fundDrafts->pluck('category_group_id')->toArray();
                     if ($isSupplemental) {
-                        $this->current_balance = $this->record->fundAllocations->where(
-                            'wpf_type_id',
-                            $wfpType
-                        )->where(
-                            'supplemental_quarter_id',
-                            $this->supplementalQuarterId
-                        )->first()->fundDrafts->first()->draft_amounts->map(function (
-                            $allocation
-                        ) {
-                            return [
-                                'category_group_id' => $allocation->category_group_id,
-                                'category_group' => $allocation->category_group,
-                                'initial_amount' => $allocation->initial_amount,
-                                'current_total' => $allocation->current_total,
-                                'balance' => $allocation->balance,
-                            ];
-                        })->toArray();
-
+                         $initial = $this->record->fundAllocations->where(
+                                'wpf_type_id',
+                                $wfpType
+                            )->where(
+                                'supplemental_quarter_id',
+                                $this->supplementalQuarterId
+                            )->first()->initial_amount;
+                       $this->current_balance = $this->record
+                            ->fundAllocations
+                            ->where('wpf_type_id', $wfpType)
+                            ->where('supplemental_quarter_id', $this->supplementalQuarterId)
+                            ->first()
+                            ->fundDrafts
+                            ->first()
+                            ->draft_items
+                            ->groupBy('title_group') // distinct category id
+                            ->map(function ($items, $titleGroup) {
+                                $first = $items->first();
+                                return [
+                                    'category_group_id' => $titleGroup,
+                                    'category_group' => $first->account_title,
+                                    'initial_amount' => 0, // if you have a real $initial variable, I can include it
+                                    'current_total' => $items->sum('estimated_budget'), // sum duplicates
+                                    'balance' => 0,
+                                ];
+                            })
+                            ->values()
+                            ->toArray();
                     } else {
                         if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where(
                             'is_supplemental',
@@ -810,25 +840,27 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                                 $wfpType
                             )->where('is_supplemental', 0)->first()->initial_amount;
                         }
-                        $this->current_balance = $this->record->fundAllocations->where(
-                            'wpf_type_id',
-                            $wfpType
-                        )->where(
-                            'is_supplemental',
-                            0
-                        )->first()->fundDrafts->first()->draft_amounts->map(function ($allocation) use (
-                            $initial,
-                            $draftItems
-                        ) {
-                            return [
-                                'category_group_id' => $allocation->category_group_id,
-                                'category_group' => $allocation->category_group,
-                                'initial_amount' => $initial,
-                                'current_total' => $draftItems->where('title_group', $allocation->category_group_id)->sum('estimated_budget'),
-                                'balance' => $allocation->balance,
-                            ];
-                        })->toArray();
-
+                        $this->current_balance = $this->record
+                            ->fundAllocations
+                            ->where('wpf_type_id', $wfpType)
+                            ->where('is_supplemental', 0)
+                            ->first()
+                            ->fundDrafts
+                            ->first()
+                            ->draft_items
+                            ->groupBy('title_group') // group by category_group_id
+                            ->map(function ($items, $titleGroup) use ($initial) {
+                                $first = $items->first();
+                                return [
+                                    'category_group_id' => $titleGroup,
+                                    'category_group' => $first->account_title,
+                                    'initial_amount' => $initial,
+                                    'current_total' => $items->sum('estimated_budget'), // sum duplicates
+                                    'balance' => 0,
+                                ];
+                            })
+                            ->values()
+                            ->toArray();
                     }
                 } else {
                     $initial = $this->record->fundAllocations->where(
@@ -887,9 +919,11 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
         })->get();
         $this->ps_total_quantity = 0;
         $this->ps_quantity = array_fill(0, 12, 0);
+        $this->loadDraftItems($isSupplemental);
+    }
 
-
-        //if has draft
+    public function loadDraftItems($isSupplemental)
+    {
         if ($isSupplemental) {
             if ($this->record->fundAllocations->where(
                 'wpf_type_id',
@@ -908,7 +942,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 1;
+                    return  $this->isEdit ? $item->budget_category_id == 1 :( $item->budget_category_id == 1 && in_array($this->categoryIds, $item->title_group));
                 })->map(function ($item) {
                     $this->supplies[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -940,7 +974,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 2;
+                    return  $this->isEdit ? $item->budget_category_id == 1 :( $item->budget_category_id == 1 && in_array($this->categoryIds, $item->title_group));
                 })->map(function ($item) {
                     $this->mooe[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -972,7 +1006,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 3;
+                    return  $item->budget_category_id == 3;
                 })->map(function ($item) {
                     $this->trainings[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1004,7 +1038,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 4;
+                    return  $item->budget_category_id == 4;
                 })->map(function ($item) {
                     $this->machines[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1036,7 +1070,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 5;
+                    return  $item->budget_category_id == 5;
                 })->map(function ($item) {
                     $this->buildings[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1068,7 +1102,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 6;
+                    return  $item->budget_category_id == 6;
                 })->map(function ($item) {
                     $this->ps[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1101,7 +1135,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 1;
+                    return  $item->budget_category_id == 1;
                 })->map(function ($item) {
                     $this->supplies[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1128,7 +1162,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 2;
+                    return  $this->isEdit ? $item->budget_category_id == 1 :( $item->budget_category_id == 1 && in_array($this->categoryIds, $item->title_group));
                 })->map(function ($item) {
                     $this->mooe[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1156,7 +1190,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 3;
+                    return  $item->budget_category_id == 3;
                 })->map(function ($item) {
                     $this->trainings[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1184,7 +1218,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 4;
+                    return  $item->budget_category_id == 4;
                 })->map(function ($item) {
                     $this->machines[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1211,7 +1245,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 5;
+                    return  $item->budget_category_id == 5;
                 })->map(function ($item) {
                     $this->buildings[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1238,7 +1272,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                    return in_array($item->title_group, $this->categoryIds) && $item->budget_category_id == 6;
+                    return  $item->budget_category_id == 6;
                 })->map(function ($item) {
                     $this->ps[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1262,12 +1296,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 });
             }
         }
-
-        //source of fund
-        // if($this->wfp_fund->id > 3)
-        // {
-        //     $this->source_fund = 'TUITION FEE - RESEARCH FUND';
-        // }
     }
 
     protected function getFormSchema(): array
@@ -3448,7 +3476,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedTrainingQuantity()
     {
         $training = $this->training_category_attr;
-         $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
@@ -3505,7 +3533,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedTrainingCostPerUnit()
     {
         $training = $this->training_category_attr;
-      $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
@@ -4387,7 +4415,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedMachineCostPerUnit()
     {
         $machine = $this->machine_category_attr;
-     $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
 
         switch ($budget_category_id) {
             case 1:
@@ -5222,7 +5250,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedBuildingQuantity()
     {
         $building = $this->building_category_attr;
-     $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
 
         switch ($budget_category_id) {
             case 1:
@@ -5280,7 +5308,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedBuildingCostPerUnit()
     {
         $building = $this->building_category_attr;
-      $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
 
         switch ($budget_category_id) {
             case 1:
@@ -6111,7 +6139,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedPsQuantity()
     {
         $ps = $this->ps_category_attr;
-       $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
@@ -6171,7 +6199,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public function updatedPsCostPerUnit()
     {
         $ps = $this->ps_category_attr;
-       $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
+        $budget_category_id = $this->budgetCategoryTabIds[$this->global_index];
         switch ($budget_category_id) {
             case 1:
                 $this->calculateSuppliesTotalQuantity();
@@ -8413,15 +8441,13 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                         }
                     }
                 }
-                if(!is_null($draft_item))
-                {
+                if (!is_null($draft_item)) {
                     $draft_item->delete();
-                     // Remove the supply at the given index
+                    // Remove the supply at the given index
                     unset($this->ps[$index]);
                     // Reset the array indices to avoid undefined index issues
                     $this->ps = array_values($this->ps);
                 }
-
             }
         }
     }
