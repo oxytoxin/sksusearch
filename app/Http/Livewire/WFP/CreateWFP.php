@@ -606,8 +606,6 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
             }
         } else {
             //164
-
-            $categoryIds = $this->record->fundAllocations->first()->fundDrafts->first()->draft_items->pluck('title_group')->toArray();
             if ($isSupplemental) {
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where(
                     'supplemental_quarter_id',
