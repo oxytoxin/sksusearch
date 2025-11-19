@@ -605,6 +605,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 }
             }
         } else {
+
             //164
             if ($isSupplemental) {
                 if ($this->record->fundAllocations->where('wpf_type_id', $wfpType)->where(
@@ -940,7 +941,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return  $this->isEdit ? $item->budget_category_id == 1 :( $item->budget_category_id == 1 && in_array($this->categoryIds, $item->title_group));
+                    return  $this->isEdit ? $item->budget_category_id == 1 :( $item->budget_category_id == 1 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->supplies[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -972,7 +973,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return  $this->isEdit ? $item->budget_category_id == 2 :( $item->budget_category_id == 2 && in_array($this->categoryIds, $item->title_group));
+                    return  $this->isEdit ? $item->budget_category_id == 2 :( $item->budget_category_id == 2 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->mooe[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1004,7 +1005,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return  $this->isEdit ? $item->budget_category_id == 3 :( $item->budget_category_id == 3 && in_array($this->categoryIds, $item->title_group));
+                    return  $this->isEdit ? $item->budget_category_id == 3 :( $item->budget_category_id == 3 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->trainings[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1036,7 +1037,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                     return  $this->isEdit ? $item->budget_category_id == 4 :( $item->budget_category_id == 4 && in_array($this->categoryIds, $item->title_group));
+                     return  $this->isEdit ? $item->budget_category_id == 4 :( $item->budget_category_id == 4 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->machines[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1068,7 +1069,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                    return  $this->isEdit ? $item->budget_category_id == 5 :( $item->budget_category_id == 5 && in_array($this->categoryIds, $item->title_group));
+                    return  $this->isEdit ? $item->budget_category_id == 5 :( $item->budget_category_id == 5 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->buildings[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1100,7 +1101,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 )->first()->fundDrafts->first()->draft_items->filter(function (
                     $item
                 ) {
-                   return  $this->isEdit ? $item->budget_category_id == 6 :( $item->budget_category_id == 6 && in_array($this->categoryIds, $item->title_group));
+                   return  $this->isEdit ? $item->budget_category_id == 6 :( $item->budget_category_id == 6 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->ps[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1133,7 +1134,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                    return  $this->isEdit ? $item->budget_category_id == 1 :( $item->budget_category_id == 1 && in_array($this->categoryIds, $item->title_group));
+                    return  $this->isEdit ? $item->budget_category_id == 1 :( $item->budget_category_id == 1 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->supplies[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1160,7 +1161,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                   return  $this->isEdit ? $item->budget_category_id == 2 :( $item->budget_category_id == 2 && in_array($this->categoryIds, $item->title_group));
+                   return  $this->isEdit ? $item->budget_category_id == 2 :( $item->budget_category_id == 2 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->mooe[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1188,7 +1189,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                     return  $this->isEdit ? $item->budget_category_id == 3 :( $item->budget_category_id == 3 && in_array($this->categoryIds, $item->title_group));
+                     return  $this->isEdit ? $item->budget_category_id == 3 :( $item->budget_category_id == 3 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->trainings[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1216,7 +1217,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                      return  $this->isEdit ? $item->budget_category_id == 4 :( $item->budget_category_id == 4 && in_array($this->categoryIds, $item->title_group));
+                      return  $this->isEdit ? $item->budget_category_id == 4 :( $item->budget_category_id == 4 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->machines[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1243,7 +1244,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                     return  $this->isEdit ? $item->budget_category_id == 5 :( $item->budget_category_id == 5 && in_array($this->categoryIds, $item->title_group));
+                     return  $this->isEdit ? $item->budget_category_id == 5 :( $item->budget_category_id == 5 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->buildings[] = [
                         'budget_category_id' => $item->budget_category_id,
@@ -1270,7 +1271,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                     'wpf_type_id',
                     $this->wfp_param
                 )->first()->fundDrafts->first()->draft_items->filter(function ($item) {
-                     return  $this->isEdit ? $item->budget_category_id == 6 :( $item->budget_category_id == 6 && in_array($this->categoryIds, $item->title_group));
+                     return  $this->isEdit ? $item->budget_category_id == 6 :( $item->budget_category_id == 6 && in_array($item->title_group, $this->categoryIds));
                 })->map(function ($item) {
                     $this->ps[] = [
                         'budget_category_id' => $item->budget_category_id,
