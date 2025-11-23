@@ -505,7 +505,8 @@
         </a>
         <!-- Current: "bg-primary-100 text-primary-900", Default: "bg-white text-primary-600 hover:bg-primary-50 hover:text-primary-900" -->
         <a class="group flex w-full items-center rounded-md py-2 pr-2 text-left text-sm font-medium text-primary-600 hover:bg-primary-50 hover:text-primary-900 focus:outline-none focus:ring-2 focus:ring-primary-500"
-           href="{{ config('app.v2_url') . '/cashier/report-of-checks-issued' }}" aria-controls="sub-menu-1"
+           href="{{ config('app.v2_url') . '/cashier/report-of-checks-issued' }}" target="_blank"
+           aria-controls="sub-menu-1"
            aria-expanded="false">
             <!-- Expanded: "text-primary-400 rotate-90", Collapsed: "text-primary-300" -->
             <svg class="" aria-hidden="true" :class="open ?
