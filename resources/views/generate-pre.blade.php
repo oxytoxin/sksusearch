@@ -49,7 +49,11 @@
                 </div>
                 <div x-data="{ selectedType: '{{ request()->input('selectedType') || 1 }}' }" class="flex my-2">
                     <select x-model="selectedType" name="selectedType" id="selectedType"
-                        x-on:change="window.location.href = '{{ request()->fullUrl() }}&selectedType=' + $event.target.value"
+                        x-on:change="
+        let url = new URL(window.location.href);
+        url.searchParams.set('selectedType', $event.target.value);
+        window.location.href = url.toString();
+    "
                         class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
                         @foreach ($wfp_types as $item)
                             <option value="{{ $item->id }}">
