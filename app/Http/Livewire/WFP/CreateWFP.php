@@ -220,6 +220,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
     public $categoryIds = [];
     public function mount($record, $wfpType, $isEdit, $isSupplemental)
     {
+
         $this->is_supplemental = $isSupplemental;
         $costCenter_id = Wfp::where('cost_center_id', $record)->first()?->cost_center_id;
         $this->wfp_param = $wfpType;
@@ -1307,7 +1308,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
                 ->getSearchResultsUsing(function (string $search) {
                     return Supply::whereHas('categoryItems', function ($query) {
                         $query->where('budget_category_id', $this->budgetCategoryTabIds[$this->global_index]);
-                    })->where('is_active', operator: 1)
+                    })->where('is_active',  1)
                         ->when(!is_null($search), function ($query) use ($search) {
                             $query->where('particulars', 'like', "%{$search}%");
                         })
