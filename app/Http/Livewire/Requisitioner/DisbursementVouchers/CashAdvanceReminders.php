@@ -153,23 +153,14 @@ class CashAdvanceReminders extends Component implements HasTable
 
                     // $phone = '09366303145';
 
-                    $sms = app(\App\Services\SmsService::class);
-                    $formatted = $sms->formatPhoneNumber($phone);
+                    $amount = number_format($record->disbursement_voucher->total_sum, 2);
 
-                    // Validate number format
-                    if (! $formatted || strlen($formatted) < 12) {
-                        Log::warning("SMS not sent: Invalid number '{$phone}' for user ID {$record->disbursementVoucher->user->id}");
+                    $message = "FMR Reminder: Your Cash Advance (DV #{$record->disbursement_voucher->dv_number}) amounting to ₱{$amount} is now due for liquidation.";
 
-                        return;
-                    }
-$amount = number_format($record->disbursement_voucher->total_sum, 2);
+                    // Dispatch SMS job (formatting and validation handled by SmsService)
+                    SendSmsJob::dispatch($phone, $message);
 
-$message = "FMR Reminder: Your Cash Advance (DV #{$record->disbursement_voucher->dv_number}) amounting to ₱{$amount} is now due for liquidation.";
-
-                    // Dispatch SMS job
-                    SendSmsJob::dispatch($formatted, $message);
-
-                    Log::info("SMS queued for {$formatted} (user ID: {$record->disbursementVoucher->user->id})");
+                    Log::info("SMS queued for {$phone} (user ID: {$record->disbursementVoucher->user->id})");
 
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 2 && $record->is_sent == 0),
             Action::make('sendFMD')->label('Send FMD')->icon('ri-send-plane-fill')

@@ -51,6 +51,11 @@ class SmsService
         try {
             $formattedNumber = $this->formatPhoneNumber($number);
 
+            // Validate API key is configured
+            if (empty($this->apiKey)) {
+                throw new \Exception('Semaphore API key is not configured');
+            }
+
             $payload = [
                 'apikey' => $this->apiKey,
                 'number' => $formattedNumber,
@@ -58,16 +63,63 @@ class SmsService
                 // 'sendername' => $this->senderName, // optional
             ];
 
-            Log::info('Semaphore SMS Request:', $payload);
+            Log::info('Semaphore SMS Request:', [
+                'number' => $formattedNumber,
+                'message_length' => strlen($message)
+            ]);
 
-            $response = Http::asForm()
+            $response = Http::timeout(30)
+                ->asForm()
                 ->post('https://api.semaphore.co/api/v4/messages', $payload);
+
+            // Check HTTP status code
+            if (!$response->successful()) {
+                Log::error('Semaphore API HTTP Error', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+
+                return [
+                    'error' => true,
+                    'message' => 'HTTP ' . $response->status() . ': ' . $response->body(),
+                ];
+            }
 
             $responseData = $response->json();
 
+            // Validate response structure
+            if (!is_array($responseData)) {
+                Log::error('Semaphore API Invalid Response Format', [
+                    'response' => $response->body()
+                ]);
+
+                return [
+                    'error' => true,
+                    'message' => 'Invalid API response format',
+                ];
+            }
+
             Log::info('Semaphore SMS Response:', $responseData);
 
+            // Check for API-level errors
+            if (isset($responseData['error'])) {
+                Log::error('Semaphore API Error', [
+                    'error' => $responseData['error']
+                ]);
+
+                return [
+                    'error' => true,
+                    'message' => $responseData['error'],
+                ];
+            }
+
             return $responseData;
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('Semaphore SMS Connection Failed: ' . $e->getMessage());
+            return [
+                'error' => true,
+                'message' => 'Connection error: ' . $e->getMessage(),
+            ];
         } catch (\Exception $e) {
             Log::error('Semaphore SMS Failed: ' . $e->getMessage());
             return [
