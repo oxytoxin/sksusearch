@@ -152,8 +152,16 @@ class FuelRequestIndex extends Component implements HasTable
                                 ->label('REQUESTED VALUES')
                                 ->columnSpan(2)
                                 ->content(function ($record) {
-                                    $unitPrice = $record->requested_unit_price ? '₱' . number_format($record->requested_unit_price, 2) : 'Not set';
-                                    $totalAmount = $record->requested_total_amount ? '₱' . number_format($record->requested_total_amount, 2) : 'Not set';
+                                    // Smart money formatting
+                                    $formatMoney = function($value) {
+                                        if ($value == floor($value)) {
+                                            return number_format($value, 0);
+                                        }
+                                        return number_format($value, 2);
+                                    };
+
+                                    $unitPrice = $record->requested_unit_price ? '₱' . $formatMoney($record->requested_unit_price) : 'Not set';
+                                    $totalAmount = $record->requested_total_amount ? '₱' . $formatMoney($record->requested_total_amount) : 'Not set';
 
                                     return new \Illuminate\Support\HtmlString("
                                         <div class='text-sm space-y-1 bg-gray-50 dark:bg-gray-800 p-3 rounded'>
@@ -244,29 +252,48 @@ class FuelRequestIndex extends Component implements HasTable
                 ->color('primary')
                 ->modalHeading('Actual Values - Comparison')
                 ->modalWidth('5xl')
-                ->modalContent(fn ($record) => new \Illuminate\Support\HtmlString("
-                    <div class='p-6'>
-                        <div class='grid grid-cols-2 gap-6'>
-                            <div class='bg-gray-100 p-4 rounded'>
-                                <h3 class='font-bold mb-3'>REQUESTED</h3>
-                                <div><strong>Quantity:</strong> {$record->quantity} {$record->unit}</div>
-                                <div><strong>Article:</strong> {$record->article}</div>
-                                <div><strong>Unit Price:</strong> ₱" . number_format($record->requested_unit_price ?? 0, 2) . "</div>
-                                <div><strong>Total:</strong> ₱" . number_format($record->requested_total_amount ?? 0, 2) . "</div>
-                            </div>
-                            <div class='bg-green-100 p-4 rounded'>
-                                <h3 class='font-bold mb-3'>ACTUAL</h3>
-                                <div><strong>Quantity:</strong> {$record->actual_quantity} {$record->unit}</div>
-                                <div><strong>Unit Price:</strong> ₱" . number_format($record->actual_unit_price, 2) . "</div>
-                                <div><strong>Total:</strong> ₱" . number_format($record->actual_total_amount, 2) . "</div>
-                                <div><strong>OR Number:</strong> {$record->actual_or_number}</div>
-                                <div><strong>Date:</strong> {$record->actual_date}</div>
-                                <div><strong>Time:</strong> {$record->actual_time}</div>
-                                <div><strong>Attendant:</strong> {$record->actual_supplier_attendant}</div>
+                ->modalContent(function ($record) {
+                    // Smart money formatting: show decimals only if needed
+                    $formatMoney = function($value) {
+                        if ($value == floor($value)) {
+                            return number_format($value, 0); // No decimals: 1,000
+                        }
+                        return number_format($value, 2); // With decimals: 55.50
+                    };
+
+                    $reqUnitPrice = $record->requested_unit_price ? '₱' . $formatMoney($record->requested_unit_price) : 'Not set';
+                    $reqTotal = $record->requested_total_amount ? '₱' . $formatMoney($record->requested_total_amount) : 'Not set';
+                    $actUnitPrice = '₱' . $formatMoney($record->actual_unit_price);
+                    $actTotal = '₱' . $formatMoney($record->actual_total_amount);
+
+                    // Format date and time to be human readable
+                    $actDate = \Carbon\Carbon::parse($record->actual_date)->format('F d, Y'); // November 27, 2025
+                    $actTime = \Carbon\Carbon::parse($record->actual_time)->format('g:i A'); // 2:30 PM
+
+                    return new \Illuminate\Support\HtmlString("
+                        <div class='p-6'>
+                            <div class='grid grid-cols-2 gap-6'>
+                                <div class='bg-gray-100 p-4 rounded'>
+                                    <h3 class='font-bold mb-3'>REQUESTED</h3>
+                                    <div><strong>Quantity:</strong> {$record->quantity} {$record->unit}</div>
+                                    <div><strong>Article:</strong> {$record->article}</div>
+                                    <div><strong>Unit Price:</strong> {$reqUnitPrice}</div>
+                                    <div><strong>Total:</strong> {$reqTotal}</div>
+                                </div>
+                                <div class='bg-green-100 p-4 rounded'>
+                                    <h3 class='font-bold mb-3'>ACTUAL</h3>
+                                    <div><strong>Quantity:</strong> {$record->actual_quantity} {$record->unit}</div>
+                                    <div><strong>Unit Price:</strong> {$actUnitPrice}</div>
+                                    <div><strong>Total:</strong> {$actTotal}</div>
+                                    <div><strong>OR Number:</strong> {$record->actual_or_number}</div>
+                                    <div><strong>Date:</strong> {$actDate}</div>
+                                    <div><strong>Time:</strong> {$actTime}</div>
+                                    <div><strong>Attendant:</strong> {$record->actual_supplier_attendant}</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                "))
+                    ");
+                })
                 ->action(fn () => null)
                 ->modalButton('Close')
                 ->visible(fn ($record) => $record->is_liquidated),
