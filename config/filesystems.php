@@ -50,10 +50,14 @@ return [
         ],
 
         'remarks' => [
-            'driver' => 'local',
-            'root' => storage_path('app/remarks'),
-            'url' => env('APP_URL') . '/storage/remarks',
-            'visibility' => 'public',
+            'driver' => 's3',
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_DEFAULT_REGION'),
+            'bucket' => env('R2_BUCKET'),
+            'url' => env('R2_URL'),
+            'endpoint' => env('R2_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
 

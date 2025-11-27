@@ -7,6 +7,10 @@ use Illuminate\Console\Command;
 use Storage;
 
 use Exception;
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
 class MigrateFilesToR2Command extends Command
 {
     protected $signature = 'migrate-to-r2';
@@ -22,17 +26,27 @@ class MigrateFilesToR2Command extends Command
     public function handle(): int
     {
         try {
-            $localDisk = Storage::disk('local');
-            $allFiles = $localDisk->allFiles();
+            $rootPath = storage_path('app');
+            $files = [];
 
-            foreach ($allFiles as $file) {
-                MigrateFilesToR2::dispatch($file);
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($rootPath, FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS)
+            );
+
+            foreach ($iterator as $fileInfo) {
+                if ($fileInfo->isFile()) {
+                    // Relative path for dispatching
+                    $relativePath = ltrim(str_replace($rootPath, '', $fileInfo->getPathname()), '/');
+                    $files[] = $relativePath;
+
+                    MigrateFilesToR2::dispatch($relativePath);
+                }
             }
 
-            $this->info('✅ File migration jobs dispatched successfully (' . count($allFiles) . ' files).');
+            $this->info("✅ File migration jobs dispatched: " . count($files));
             return Command::SUCCESS;
         } catch (Exception $e) {
-            $this->error('❌ Error dispatching jobs: ' . $e->getMessage());
+            $this->error("❌ Error: " . $e->getMessage());
             return Command::FAILURE;
         }
     }
