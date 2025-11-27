@@ -6,6 +6,8 @@
     use App\Models\FundCluster;
     use App\Models\Mop;
     use App\Models\TravelOrderType;
+    use Filament\Forms\Components\Grid;
+    use Filament\Forms\Components\Placeholder;
     use Filament\Forms\Components\Textarea;
     use Illuminate\Support\Facades\DB;
     use App\Forms\Components\Flatpickr;
@@ -235,6 +237,12 @@
                     })
                     ->form(function () {
                         return [
+                            Grid::make(2)
+                                ->schema([
+                                    Placeholder::make('dv_number')->label('DV Number')->content(fn($record) => $record->dv_number ?? 'N/A'),
+                                    Placeholder::make('ors_burs')->label('ORS/BURS')->content(fn($record) => $record->ors_burs ?? 'N/A'),
+                                ]),
+                            Placeholder::make('fund_cluster')->label('Fund Cluster')->content(fn($record) => $record->fund_cluster->name ?? 'N/A'),
                             TextInput::make('cheque_number')
                                 ->label('Cheque number/ADA')
                                 ->required(),
@@ -352,7 +360,7 @@
                                 ->required(),
                             Select::make('category_item_budget_id')
                                 ->label('UACS Code')
-                                ->options(CategoryItemBudget::pluck('uacs_code', 'id'))
+                                ->options(CategoryItemBudget::selectRaw("id, concat(uacs_code, ' - ', name) as code")->pluck('code', 'id'))
                                 ->preload()
                                 ->searchable()
                                 ->required()

@@ -70,7 +70,8 @@
 
         protected function getTableQuery()
         {
-            $query_test = CostCenter::query()->with([
+            $query_test = CostCenter::query()
+                ->with([
                 'fundAllocations' => function ($query) {
                     $query->with('fundDrafts')->where('is_supplemental', 0)->orWhere(function ($query) {
                         $query->where('supplemental_quarter_id', '!=', null)->where('supplemental_quarter_id', '<=',
@@ -80,12 +81,6 @@
                     $query->where('wpf_type_id', $this->data['wfp_type'])->with('wfpDetails');
                 }, 'fundClusterWFP', 'mfo', 'mfoFee', 'office'
             ])
-                ->whereHas('fundAllocations', function ($query) {
-                    $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
-                })
-                ->whereDoesntHave('wfp', function ($query) {
-                    $query->where('supplemental_quarter_id', $this->supplementalQuarterId);
-                })
                 ->where('fund_cluster_id', $this->fund_cluster)
                 ->whereIn('id', $this->cost_centers);
             return $query_test;
@@ -229,9 +224,13 @@
                     ->query(function (Builder $query, array $data): Builder {
                         $this->data = $data;
                         return $query->whereHas('fundAllocations', function ($query) use ($data) {
-                            $query->where('wpf_type_id', $data['wfp_type'])->where('is_supplemental', 1);
-                        });
-                    }),
+                                $query->where('wpf_type_id', $data['wfp_type'])->where('supplemental_quarter_id', $this->supplementalQuarterId);
+                            })
+                            ->whereDoesntHave('wfp', function ($query) use ($data) {
+                                $query->where('supplemental_quarter_id', $this->supplementalQuarterId)
+                                    ->where('wpf_type_id', $data['wfp_type']);
+                            });
+                    })->default(1),
                 SelectFilter::make('mfo')
                     ->label('MFO')
                     ->relationship('mfo', 'name')

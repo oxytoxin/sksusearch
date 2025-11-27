@@ -22,7 +22,7 @@ class GeneratePpmp extends Component
     public $title;
     public $total;
     public $wfp_types;
-    public $selectedType;
+    public $selectedType = 1;
     public $fund_allocation;
     public $total_allocated;
     public $total_programmed;
@@ -57,7 +57,6 @@ class GeneratePpmp extends Component
         if (strpos($this->sksuLabel, '164') !== false) {
             $this->is164 = true;
         }
-        if (is_null($this->selectedType)) $this->selectedType = 1;
 
         if ($this->fundClusterWfpId === 2) {
             $this->exportFund = "163";

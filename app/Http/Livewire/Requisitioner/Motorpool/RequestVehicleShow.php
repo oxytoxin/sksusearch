@@ -288,9 +288,8 @@ class RequestVehicleShow extends Component implements HasForms
                 $this->assignVehicleModal = false;
                 $this->emit('refreshComponent');
             } else {
-                $request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $this->request_schedule->id)->get();
                 $vehicle = Vehicle::find($vehicleId);
-                $date = Carbon::parse($request_schedule_date_and_time->travel_date)->format('F d, Y');
+                $date = Carbon::parse($conflict->travel_date)->format('F d, Y');
                 $carbonDate = Carbon::createFromFormat('F d, Y', $date);
                 $year = $carbonDate->year;
                 $month = $carbonDate->month;

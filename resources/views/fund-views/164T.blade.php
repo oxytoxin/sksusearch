@@ -11,7 +11,7 @@
                     Export Excel
                 </button>
                 <a type="button" target="_blank"
-                    href="/export/cost-center?supplementalQuarterId={{ $supplementalQuarterId }}&is_supplemental={{ $is_q1 ? 1 : 0 }}&fund_cluster_id=4&wfp_type_id={{ $selectedType }}&m_f_o_s_id={{ $mfoId }}&fileName={{ str_replace(' ', '_', $title) }}.xlsx"
+                    href="/export/cost-center?supplementalQuarterId={{ $supplementalQuarterId }}&is_supplemental={{ $is_q1 ? 1 : 0 }}&fund_cluster_id={{ $fundClusterWfpId }}&wfp_type_id={{ $selectedType }}&m_f_o_s_id={{ $mfoId }}&fileName={{ str_replace(' ', '_', $title) }}.xlsx"
                     class="flex hover:bg-green-600 p-2 bg-green-700 rounded-md font-light capitalize text-white text-sm">
                     Cost Center Export
                 </a>

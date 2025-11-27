@@ -6,6 +6,7 @@ use App\Models\FundAllocation;
 use App\Models\SupplementalQuarter;
 use App\Models\Wfp;
 use App\Models\WpfType;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class WfpReport extends Component
@@ -24,7 +25,7 @@ class WfpReport extends Component
 
     public $is164 = null;
 
-    protected $queryString = ['supplementalQuarterId', 'wfpType', 'costCenterId','is164'];
+    protected $queryString = ['supplementalQuarterId', 'wfpType', 'costCenterId', 'is164'];
     public $oldRecords = [];
     public $history = [
         'regular_allocation' => 0,
@@ -43,11 +44,12 @@ class WfpReport extends Component
         'regular_programmed' => 0,
     ];
 
+    public $draftItems = [];
+
     public $currentSupplementalQuarter = null;
     public $prevSupplementalQuarter = null;
     public function mount($record, $isSupplemental)
     {
-
         $this->isSupplemental = $isSupplemental;
         $wfpType = WpfType::find($this->wfpType);
         $this->currentSupplementalQuarter = SupplementalQuarter::find($this->supplementalQuarterId);
@@ -59,27 +61,30 @@ class WfpReport extends Component
         abort_unless(!empty($wfpType), 404);
 
         $fundAllocationCategoryIds = FundAllocation::where('cost_center_id', $this->costCenterId)->where('wpf_type_id', $this->wfpType)
-                ->where('supplemental_quarter_id', $this->supplementalQuarterId)
-                ->pluck('category_group_id')->toArray();
+            ->where('supplemental_quarter_id', $this->supplementalQuarterId)
+            ->pluck('category_group_id')->toArray();
         // RETRIEVE OLD AND CURRENT WFP
         $workFinalcialPlans = [];
         if ($isSupplemental) {
             $workFinalcialPlans = Wfp::with(['costCenter' => [
                 'fundAllocations' => function ($query) {
-                    $query->where('wpf_type_id', $this->wfpType)->where(function ($q) {
-                        $q->where('is_supplemental', 0)->orWhere(function ($query) {
-                            $query->where('supplemental_quarter_id', '!=', null)->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
+                    $query->where('wpf_type_id', $this->wfpType)
+                        ->where(function ($q) {
+                            $q->where('is_supplemental', 0)
+                                ->orWhere(function ($query) {
+                                    $query->where('supplemental_quarter_id', '!=', null)
+                                        ->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
+                                });
                         });
-                    });
                 }
-            ], 'wfpType', 'wfpDetails'=>function($query) use($fundAllocationCategoryIds){
+            ], 'wfpType', 'wfpDetails' => function ($query) use ($fundAllocationCategoryIds) {
                 $query->when(is_null($this->is164), function ($query) use ($fundAllocationCategoryIds) {
                     $query->whereIn('category_group_id', $fundAllocationCategoryIds);
                 });
             }])
                 ->where('wpf_type_id', $this->wfpType)
-                 ->where('cost_center_id', $this->costCenterId)
-                 ->where(function($q){
+                ->where('cost_center_id', $this->costCenterId)
+                ->where(function ($q) {
                     $q->where('is_supplemental', 0)
                         ->orWhere(function ($query) {
                             $query->where('supplemental_quarter_id', '!=', null)->where('supplemental_quarter_id', '<=', $this->supplementalQuarterId);
@@ -97,7 +102,18 @@ class WfpReport extends Component
                 ->where('is_supplemental', 0)->get();
         }
 
+
         $this->record = $workFinalcialPlans->where('id', $record)->first();
+        if (!$isSupplemental) {
+            $supplyIds = $this->record->wfpDetails->pluck('supply_id')->toArray();
+            $this->draftItems = DB::table('fund_draft_items')
+                ->join('fund_drafts', 'fund_draft_items.fund_draft_id', '=', 'fund_drafts.id')
+                ->where('fund_drafts.fund_allocation_id', $this->record->costCenter->fundAllocations->first()->id)
+                ->whereNotIn('particular_id', $supplyIds)
+                ->get();
+
+        }
+
 
         $this->oldRecords = $workFinalcialPlans->filter(function ($wfp) use ($record) {
             return ($wfp->supplemental_quarter_id < $this->supplementalQuarterId && $wfp->supplemental_quarter_id !== null) || $wfp->is_supplemental === 0;
@@ -123,8 +139,13 @@ class WfpReport extends Component
             $this->program += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
         }
 
-        $this->current['regular_programmed'] = $this->program;
+        if(count($this->draftItems) > 0) {
+            foreach ($this->draftItems as $draftItem) {
+                $this->program += $draftItem->estimated_budget;
+            }
+        }
 
+       $this->current['regular_programmed'] = $this->program;
 
 
         //HISTORY

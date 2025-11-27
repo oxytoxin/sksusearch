@@ -89,21 +89,38 @@
                 }
 
                 if (count($this->prev_allocations) > 0) {
-                    if ($this->supplementalQuarterId == 1) {
+
+                    // if ($this->supplementalQuarterId == 1) {
+                    //     $this->selectedType = $this->record->fundAllocations->where('wpf_type_id',
+                    //         $wfpType)->where('is_supplemental', 0)->first()?->wpf_type_id;
+                    //     $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id',
+                    //         $this->selectedType)->where('is_supplemental', 0)->first()?->initial_amount;
+                    //     $this->fund_description = $this->record->fundAllocations->where('is_supplemental',
+                    //         0)->first()?->description;
+                    // } else {
+                    //     $this->selectedType = $this->record->fundAllocations->where('supplemental_quarter_id',
+                    //         $this->supplementalQuarterId)->first()?->wpf_type_id;
+                    //     $this->fundInitialAmount = $this->record->fundAllocations->where('supplemental_quarter_id',
+                    //         $this->supplementalQuarterId)->first()?->initial_amount;
+                    //     $this->fund_description = $this->record->fundAllocations->where('supplemental_quarter_id',
+                    //         $this->supplementalQuarterId)->first()?->description;
+                    // }
+                     if (is_null($this->supplementalQuarterId)){
                         $this->selectedType = $this->record->fundAllocations->where('wpf_type_id',
-                            $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
+                            $wfpType)->where('is_supplemental', 0)->first()?->wpf_type_id;
                         $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id',
-                            $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
+                            $this->selectedType)->where('is_supplemental', 0)->first()?->initial_amount;
                         $this->fund_description = $this->record->fundAllocations->where('is_supplemental',
-                            0)->first()->description;
+                            0)->first()?->description;
                     } else {
                         $this->selectedType = $this->record->fundAllocations->where('supplemental_quarter_id',
-                            $this->supplementalQuarterId)->first()->wpf_type_id;
+                            $this->supplementalQuarterId)->first()?->wpf_type_id;
                         $this->fundInitialAmount = $this->record->fundAllocations->where('supplemental_quarter_id',
-                            $this->supplementalQuarterId)->first()->initial_amount;
+                            $this->supplementalQuarterId)->first()?->initial_amount;
                         $this->fund_description = $this->record->fundAllocations->where('supplemental_quarter_id',
-                            $this->supplementalQuarterId)->first()->description;
+                            $this->supplementalQuarterId)->first()?->description;
                     }
+
                     $this->supplemental_quarter = SupplementalQuarter::find($this->supplementalQuarterId);
 
                     foreach ($this->record->wfp->filter(function ($wfp) {
@@ -180,7 +197,6 @@
                     $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
                 }
             } else {
-
                 $this->record = CostCenter::find($record)->load('fundAllocations');
                 $this->amounts = $this->record->fundAllocations->where('wpf_type_id',
                     $wfpType)->where('is_supplemental', 1)->pluck('initial_amount', 'category_group_id')->toArray();
@@ -190,12 +206,11 @@
                         0)->where('initial_amount', '>', 0);
                 })->where('is_active', 1)->get();
                 $this->wfp_type = WpfType::all();
-                $this->selectedType = $this->record->fundAllocations->where('wpf_type_id',
-                    $wfpType)->where('is_supplemental', 0)->first()->wpf_type_id;
+                $this->selectedType = $wfpType;
                 $this->fundInitialAmount = $this->record->fundAllocations->where('wpf_type_id',
-                    $this->selectedType)->where('is_supplemental', 0)->first()->initial_amount;
+                    $this->selectedType)->where('is_supplemental', 0)->first()?->initial_amount;
                 $this->fund_description = $this->record->fundAllocations->where('is_supplemental',
-                    0)->first()->description;
+                    0)->first()?->description;
                 $this->supplemental_quarter = SupplementalQuarter::where('is_active', 1)->first();
                 foreach ($this->record->wfp->where('wpf_type_id', $this->selectedType)->where('is_supplemental',
                     0)->where('cost_center_id', $this->record->id) as $wfp) {
@@ -235,9 +250,9 @@
                 $this->balance_164 = $this->fundInitialAmount - array_sum($this->programmed);
 
                 $this->supplemental_allocation_description = $this->record->fundAllocations->where('wpf_type_id',
-                    $wfpType)->where('is_supplemental', 1)->first()->description;
+                    $wfpType)->where('is_supplemental', 1)->first()?->description;
                 $this->supplemental_allocation = $this->record->fundAllocations->where('wpf_type_id',
-                    $wfpType)->where('is_supplemental', 1)->first()->initial_amount;
+                    $wfpType)->where('is_supplemental', 1)->first()?->initial_amount;
                 $this->sub_total_164 = $this->balance_164 + $this->supplemental_allocation;
                 $this->balance_164_q1 = $this->sub_total_164 - array_sum($this->programmed_supplemental);
             }
@@ -333,20 +348,13 @@
         public function editSupplementalFund()
         {
             foreach ($this->amounts as $categoryGroupId => $amount) {
-                // FundAllocation::create([
-                //     'cost_center_id' => $this->record->id,
-                //     'wpf_type_id' => $this->selectedType,
-                //     'supplemental_quarter_id' => $this->supplemental_quarter->id,
-                //     'fund_cluster_id' => $this->record->fundClusterWFP->id,
-                //     'category_group_id' => $categoryGroupId,
-                //     'initial_amount' => $amount,
-                //     'is_supplemental' => 1,
-                // ]);
+
+
 
                 $fundAllocation = FundAllocation::where('category_group_id', $categoryGroupId)
                     ->where('cost_center_id', $this->record->id)
                     ->where('wpf_type_id', $this->selectedType)
-                    ->where('supplemental_quarter_id', $this->supplemental_quarter->id)
+                    ->where('supplemental_quarter_id', $this->supplementalQuarterId)
                     ->where('fund_cluster_id', $this->record->fundClusterWFP->id)
                     ->first();
                 if (!empty($fundAllocation)) {
@@ -357,7 +365,7 @@
                     FundAllocation::create([
                         'cost_center_id' => $this->record->id,
                         'wpf_type_id' => $this->selectedType,
-                        'supplemental_quarter_id' => $this->supplemental_quarter->id,
+                        'supplemental_quarter_id' => $this->supplementalQuarterId,
                         'fund_cluster_id' => $this->record->fundClusterWFP->id,
                         'category_group_id' => $categoryGroupId,
                         'initial_amount' => $amount,
