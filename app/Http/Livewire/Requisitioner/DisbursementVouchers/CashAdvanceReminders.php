@@ -157,8 +157,14 @@ class CashAdvanceReminders extends Component implements HasTable
 
                     $message = "FMR Reminder: Your Cash Advance (DV #{$record->disbursement_voucher->dv_number}) amounting to ₱{$amount} is now due for liquidation.";
 
-                    // Dispatch SMS job (formatting and validation handled by SmsService)
-                    SendSmsJob::dispatch($phone, $message);
+                    // Dispatch SMS job with context and user IDs
+                    SendSmsJob::dispatch(
+                        $phone,
+                        $message,
+                        'FMR',  // context
+                        $record->disbursementVoucher->user->id,  // recipient user_id
+                        Auth::id()  // sender_id
+                    );
 
                     Log::info("SMS queued for {$phone} (user ID: {$record->disbursementVoucher->user->id})");
 

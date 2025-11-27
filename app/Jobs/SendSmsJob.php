@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\SmsLog;
 use App\Services\SmsService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,6 +17,9 @@ class SendSmsJob implements ShouldQueue
 
     public $number;
     public $message;
+    public $context;
+    public $userId;
+    public $senderId;
 
     /**
      * The number of times the job may be attempted.
@@ -43,10 +47,18 @@ class SendSmsJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $number, string $message)
-    {
+    public function __construct(
+        string $number,
+        string $message,
+        ?string $context = null,
+        ?int $userId = null,
+        ?int $senderId = null
+    ) {
         $this->number = $number;
         $this->message = $message;
+        $this->context = $context;
+        $this->userId = $userId;
+        $this->senderId = $senderId;
     }
 
     /**
@@ -61,29 +73,58 @@ class SendSmsJob implements ShouldQueue
             'attempt' => $this->attempts()
         ]);
 
+        // Create or find existing SMS log
+        $smsLog = SmsLog::firstOrCreate(
+            [
+                'phone_number' => $this->number,
+                'message' => $this->message,
+                'status' => 'pending',
+            ],
+            [
+                'context' => $this->context,
+                'user_id' => $this->userId,
+                'sender_id' => $this->senderId,
+            ]
+        );
+
+        // Update attempt count
+        $smsLog->increment('attempts');
+
         $result = $smsService->sendSms(
             $this->number,
             $this->message
         );
 
-        // Check if the result indicates an error
-        if (isset($result['error']) && $result['error'] === true) {
-            throw new \Exception('SMS sending failed: ' . ($result['message'] ?? 'Unknown error'));
+        // Store formatted phone number from service
+        if (isset($result['formatted_number'])) {
+            $smsLog->formatted_phone_number = $result['formatted_number'];
+            $smsLog->save();
         }
 
-        // Check Semaphore API response format for failures
-        if (isset($result[0]['status']) && $result[0]['status'] === 'failed') {
-            throw new \Exception('Semaphore API returned failed status: ' . ($result[0]['message'] ?? 'Unknown error'));
+        // Check if there's an error (new standardized format)
+        // $result['error'] is now a STRING (error message), not boolean
+        if (!empty($result['error'])) {
+            $smsLog->update([
+                'error_message' => $result['error'],
+                'api_response' => $result,
+            ]);
+
+            throw new \Exception('SMS sending failed: ' . $result['error']);
         }
 
-        // Check for HTTP error status
-        if (isset($result['status']) && $result['status'] === 'error') {
-            throw new \Exception('Semaphore API error: ' . ($result['message'] ?? 'Unknown error'));
-        }
+        // Success - update log
+        $smsLog->update([
+            'status' => 'sent',
+            'message_id' => $result['message_id'] ?? null,
+            'api_response' => $result,
+            'sent_at' => now(),
+            'error_message' => null,
+        ]);
 
         Log::info('SMS sent successfully', [
             'number' => $this->number,
-            'message_id' => $result[0]['message_id'] ?? null
+            'message_id' => $result['message_id'] ?? null,
+            'log_id' => $smsLog->id
         ]);
     }
 
@@ -102,9 +143,22 @@ class SendSmsJob implements ShouldQueue
             'attempts' => $this->attempts()
         ]);
 
+        // Update SMS log to failed status
+        $smsLog = SmsLog::where('phone_number', $this->number)
+            ->where('message', $this->message)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($smsLog) {
+            $smsLog->update([
+                'status' => 'failed',
+                'error_message' => $exception->getMessage(),
+                'failed_at' => now(),
+            ]);
+        }
+
         // You can add additional failure handling here:
         // - Send notification to admin
-        // - Store failed SMS in database
         // - Trigger alert system
     }
 }
