@@ -1,5 +1,28 @@
 # 📱 Complete SMS System Guide
 
+📦 SMS System Folder Structure
+app/
+ ├── Jobs/
+ │    └── SendSmsJob.php
+ ├── Models/
+ │    └── SmsLog.php
+ ├── Services/
+ │    └── SmsService.php
+ │
+ └── Services/Sms/
+      ├── Contracts/
+      │    └── SmsProviderInterface.php
+      ├── Providers/
+      │    ├── SemaphoreProvider.php
+      │    ├── TwilioProvider.php
+      │    ├── MoviderProvider.php
+      │    ├── M360Provider.php
+      │    └── VonageProvider.php (optional)
+      └── Helpers/
+           └── SmsResponse.php
+
+.env → config/services.php → SmsService → resolveProvider() → Provider Class
+
 > **Everything You Need to Know About the SMS System**
 >
 > From Installation to Production - Complete Reference
