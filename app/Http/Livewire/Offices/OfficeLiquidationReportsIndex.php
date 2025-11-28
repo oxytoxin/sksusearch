@@ -22,6 +22,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Tables\Concerns\InteractsWithTable;
+use App\Jobs\SendSmsJob;
 
 class OfficeLiquidationReportsIndex extends Component implements HasTable
 {
@@ -248,6 +249,25 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
                     'description' => 'Liquidation Report certified.',
                 ]);
                 DB::commit();
+
+                // // Send SMS notification
+                // $record->load(['disbursement_voucher.requested_by.employee_information']);
+                // $trackingNumber = $record->tracking_number;
+                // $message = "Your LR with ref. no. {$trackingNumber} has been approved.";
+
+                // // Send to the user who requested the disbursement voucher
+                // $requestedBy = $record->disbursement_voucher->requested_by;
+                // if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                //     SendSmsJob::dispatch(
+                //         '09366303145',
+                //         // $requestedBy->employee_information->contact_number,
+                //         $message,
+                //         'liquidation_report_approved',
+                //         $requestedBy->id,
+                //         auth()->id()
+                //     );
+                // }
+
                 Notification::make()->title('Liquidation Report certified.')->success()->send();
             })
                 ->visible(fn ($record) => $record->current_step_id == 8000 && !$record->for_cancellation && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id)
