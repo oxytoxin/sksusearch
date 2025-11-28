@@ -717,6 +717,93 @@ class CashAdvanceReminders extends Component implements HasTable
 
                     $this->emit('historyCreated');
 
+                    // // ========== SMS NOTIFICATION START (FORMAL DEMAND) ==========
+                    // try {
+                    //     // Validate required relationships exist
+                    //     if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
+                    //         Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
+                    //             'ca_reminder_id' => $record->id,
+                    //             'context' => 'FD'
+                    //         ]);
+                    //     } else {
+                    //         // Get payee (recipient of FD)
+                    //         $payee = $record->disbursementVoucher->user;
+                    //         $payeeEmployee = $payee->employee_information ?? null;
+                    //         $payeePhone = $payeeEmployee->contact_number ?? null;
+
+                    //         // For production: use actual phone number
+                    //         // For testing: uncomment below
+                    //         // $payeePhone = "09366303145";
+
+                    //         // Check if phone number exists
+                    //         if (!$payeePhone) {
+                    //             Log::warning("SMS not sent: No phone number for payee", [
+                    //                 'user_id' => $payee->id,
+                    //                 'user_name' => $payee->name,
+                    //                 'context' => 'FD'
+                    //             ]);
+                    //         } else {
+                    //             // Prepare SMS data with null safety
+                    //             $dv = $record->disbursement_voucher;
+                    //             $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
+                    //             $checkNumber = $dv->cheque_number ?? 'N/A';
+
+                    //             // Get FD reference number - use file name or generate from DV number
+                    //             $fileName = $record->auditor_attachment ? basename($record->auditor_attachment, '.pdf') : null;
+                    //             $fdRefNumber = $fileName ?? "FD-{$dv->dv_number}";
+
+                    //             // Get FMR, FMD, and Memorandum numbers
+                    //             $fmrNumber = $record->fmr_number ?? 'N/A';
+                    //             $fmdNumber = $record->fmd_number ?? 'N/A';
+                    //             $memorandumNumber = $record->memorandum_number ?? 'N/A';
+
+                    //             // Get purposes with empty check
+                    //             $particulars = $dv->disbursement_voucher_particulars;
+                    //             if ($particulars && $particulars->count() > 0) {
+                    //                 $purposes = $particulars->pluck('purpose')->filter()->join(', ');
+                    //             } else {
+                    //                 $purposes = 'No purpose specified';
+                    //             }
+
+                    //             // Ensure purposes is not empty
+                    //             if (empty(trim($purposes))) {
+                    //                 $purposes = 'No purpose specified';
+                    //             }
+
+                    //             // Build SMS message for FD
+                    //             $message = "The Commission on Audit has electronically served your Formal Demand with ref. no. {$fdRefNumber} for your failure to liquidate your cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". The cash advance remains unliquidated despite service of notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
+
+                    //             // Dispatch SMS job with context and user IDs
+                    //             SendSmsJob::dispatch(
+                    //                 $payeePhone,
+                    //                 $message,
+                    //                 'FD',  // context
+                    //                 $payee->id,  // recipient user_id
+                    //                 Auth::id()  // sender_id (auditor)
+                    //             );
+
+                    //             Log::info("SMS queued successfully for FD", [
+                    //                 'phone' => $payeePhone,
+                    //                 'user_id' => $payee->id,
+                    //                 'user_name' => $payee->name,
+                    //                 'dv_number' => $dv->dv_number ?? 'N/A',
+                    //                 'fd_ref_number' => $fdRefNumber,
+                    //                 'context' => 'FD'
+                    //             ]);
+                    //         }
+                    //     }
+                    // } catch (\Exception $e) {
+                    //     Log::error("SMS notification failed for FD", [
+                    //         'error' => $e->getMessage(),
+                    //         'line' => $e->getLine(),
+                    //         'file' => $e->getFile(),
+                    //         'ca_reminder_id' => $record->id ?? null,
+                    //         'context' => 'FD'
+                    //     ]);
+                    //     // Don't throw - allow the main FD upload action to complete successfully
+                    // }
+                    // // ========== SMS NOTIFICATION END ==========
+
                     Notification::make()
                         ->title('Formal Demand Uploaded')
                         ->body('Notification sent to '.$record->disbursementVoucher->user->name)
