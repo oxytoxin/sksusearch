@@ -535,6 +535,120 @@ class CashAdvanceReminders extends Component implements HasTable
                         route('print.endorsement-for-fd', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
+
+                    // // ========== SMS NOTIFICATION START (ENDORSEMENT - TWO RECIPIENTS) ==========
+                    // try {
+                    //     // Validate required relationships exist
+                    //     if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
+                    //         Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
+                    //             'ca_reminder_id' => $record->id,
+                    //             'context' => 'ENDORSEMENT'
+                    //         ]);
+                    //     } else {
+                    //         // Prepare common SMS data with null safety
+                    //         $dv = $record->disbursement_voucher;
+                    //         $payee = $dv->user;
+                    //         $payeeName = $payee->name ?? 'Unknown';
+                    //         $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
+                    //         $checkNumber = $dv->cheque_number ?? 'N/A';
+
+                    //         // Get FMR, FMD, and Memorandum numbers
+                    //         $fmrNumber = $record->fmr_number ?? 'N/A';
+                    //         $fmdNumber = $record->fmd_number ?? 'N/A';
+                    //         $memorandumNumber = $record->memorandum_number ?? 'N/A';
+
+                    //         // ===== SMS 1: TO PAYEE (Person with unliquidated cash advance) =====
+                    //         $payeeEmployee = $payee->employee_information ?? null;
+                    //         $payeePhone = $payeeEmployee->contact_number ?? null;
+
+                    //         // For production: use actual phone number
+                    //         // For testing: uncomment below
+                    //         // $payeePhone = "09366303145";
+
+                    //         if (!$payeePhone) {
+                    //             Log::warning("SMS not sent to payee: No phone number", [
+                    //                 'user_id' => $payee->id,
+                    //                 'user_name' => $payeeName,
+                    //                 'context' => 'ENDORSEMENT_PAYEE'
+                    //             ]);
+                    //         } else {
+                    //             // Build SMS message for PAYEE
+                    //             $payeeMessage = "Your unliquidated cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} has been endorsed to the Resident Auditor. The cash advance remains unliquidated despite service of notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
+
+                    //             // Dispatch SMS to payee
+                    //             SendSmsJob::dispatch(
+                    //                 $payeePhone,
+                    //                 $payeeMessage,
+                    //                 'ENDORSEMENT_PAYEE',  // context
+                    //                 $payee->id,  // recipient user_id
+                    //                 Auth::id()  // sender_id
+                    //             );
+
+                    //             Log::info("SMS queued successfully to payee", [
+                    //                 'phone' => $payeePhone,
+                    //                 'user_id' => $payee->id,
+                    //                 'user_name' => $payeeName,
+                    //                 'dv_number' => $dv->dv_number ?? 'N/A',
+                    //                 'context' => 'ENDORSEMENT_PAYEE'
+                    //             ]);
+                    //         }
+
+                    //         // ===== SMS 2: TO AUDITOR (Resident Auditor) =====
+                    //         if (!$this->auditor || !$this->auditor->user) {
+                    //             Log::warning("SMS not sent to auditor: Missing auditor relationship", [
+                    //                 'ca_reminder_id' => $record->id,
+                    //                 'context' => 'ENDORSEMENT_AUDITOR'
+                    //             ]);
+                    //         } else {
+                    //             $auditorUser = $this->auditor->user;
+                    //             $auditorEmployee = $auditorUser->employee_information ?? null;
+                    //             $auditorPhone = $auditorEmployee->contact_number ?? null;
+
+                    //             // For production: use actual phone number
+                    //             // For testing: uncomment below
+                    //             // $auditorPhone = "09366303145";
+
+                    //             if (!$auditorPhone) {
+                    //                 Log::warning("SMS not sent to auditor: No phone number", [
+                    //                     'user_id' => $auditorUser->id,
+                    //                     'user_name' => $auditorUser->name,
+                    //                     'context' => 'ENDORSEMENT_AUDITOR'
+                    //                 ]);
+                    //             } else {
+                    //                 // Build SMS message for AUDITOR
+                    //                 $auditorMessage = "The unliquidated cash advance of {$payeeName} under check/ADA number {$checkNumber} amounting to ₱{$amount} has been endorsed to you by the Office of the President. The payee had previously been issued notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
+
+                    //                 // Dispatch SMS to auditor
+                    //                 SendSmsJob::dispatch(
+                    //                     $auditorPhone,
+                    //                     $auditorMessage,
+                    //                     'ENDORSEMENT_AUDITOR',  // context
+                    //                     $auditorUser->id,  // recipient user_id
+                    //                     Auth::id()  // sender_id
+                    //                 );
+
+                    //                 Log::info("SMS queued successfully to auditor", [
+                    //                     'phone' => $auditorPhone,
+                    //                     'user_id' => $auditorUser->id,
+                    //                     'user_name' => $auditorUser->name,
+                    //                     'payee_name' => $payeeName,
+                    //                     'dv_number' => $dv->dv_number ?? 'N/A',
+                    //                     'context' => 'ENDORSEMENT_AUDITOR'
+                    //                 ]);
+                    //             }
+                    //         }
+                    //     }
+                    // } catch (\Exception $e) {
+                    //     Log::error("SMS notification failed for endorsement", [
+                    //         'error' => $e->getMessage(),
+                    //         'line' => $e->getLine(),
+                    //         'file' => $e->getFile(),
+                    //         'ca_reminder_id' => $record->id ?? null,
+                    //         'context' => 'ENDORSEMENT'
+                    //     ]);
+                    //     // Don't throw - allow the main endorsement action to complete successfully
+                    // }
+                    // // ========== SMS NOTIFICATION END ==========
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 5 && $record->is_sent == 0),
             Action::make('uploadFD')
                 ->label('Upload FD')
