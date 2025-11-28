@@ -146,6 +146,31 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
+
+                // // Send SMS notification
+                // $record->load(['disbursement_voucher.requested_by.employee_information']);
+                // $trackingNumber = $record->tracking_number;
+                // $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                // $remarks = $data['remarks'] ?? 'No remarks provided';
+
+                // // Strip HTML tags from remarks if it's from RichEditor
+                // $remarks = strip_tags($remarks);
+
+                // $message = "Your LR with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
+
+                // // Send to the user who requested the disbursement voucher
+                // $requestedBy = $record->disbursement_voucher->requested_by;
+                // if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                //     SendSmsJob::dispatch(
+                //         '09366303145',
+                //         // $requestedBy->employee_information->contact_number,
+                //         $message,
+                //         'liquidation_report_returned',
+                //         $requestedBy->id,
+                //         auth()->id()
+                //     );
+                // }
+
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
