@@ -19,6 +19,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Livewire\Component;
+use App\Jobs\SendSmsJob;
 
 class PettyCashVouchersCreate extends Component implements HasForms
 {
@@ -119,6 +120,25 @@ class PettyCashVouchersCreate extends Component implements HasForms
             ]);
             $balance = $new_balance;
         }
+
+        // // Send SMS notification to requisitioner
+        // $pcv->load(['requisitioner.employee_information']);
+        // $trackingNumber = $pcv->tracking_number;
+        // $amountFormatted = number_format($amount, 2);
+        // $message = "Petty cash in the amount of P{$amountFormatted} has been issued to you with PCV ref. no. {$trackingNumber}. Please liquidate immediately.";
+
+        // $requisitioner = $pcv->requisitioner;
+        // if ($requisitioner && $requisitioner->employee_information && !empty($requisitioner->employee_information->contact_number)) {
+        //     SendSmsJob::dispatch(
+        //         '09366303145',
+        //         // $requisitioner->employee_information->contact_number,
+        //         $message,
+        //         'petty_cash_voucher_issued',
+        //         $requisitioner->id,
+        //         auth()->id()
+        //     );
+        // }
+
         DB::commit();
         Notification::make()->title('Petty Cash Voucher request created.')->success()->send();
         redirect()->route('pcv.index');
