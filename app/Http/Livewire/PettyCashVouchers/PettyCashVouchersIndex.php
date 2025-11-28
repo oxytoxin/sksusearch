@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use App\Jobs\SendSmsJob;
 
 class PettyCashVouchersIndex extends Component implements HasTable
 {
@@ -83,6 +84,41 @@ class PettyCashVouchersIndex extends Component implements HasTable
                             ]);
                         }
                     }
+
+                    // Send SMS notification to requisitioner
+                    $record->load(['requisitioner.employee_information']);
+                    $trackingNumber = $record->tracking_number;
+                    $amountPaidFormatted = number_format($data['amount_paid'], 2);
+
+                    // Determine if it's a refund or reimbursement
+                    $netAmount = $record->amount_granted - $data['amount_paid'];
+                    $netAmountFormatted = number_format(abs($netAmount), 2);
+
+                    if ($netAmount > 0) {
+                        // Refund case (user returns money)
+                        $refundReimbursementText = "and P{$netAmountFormatted} refunded";
+                    } elseif ($netAmount < 0) {
+                        // Reimbursement case (user needs more money)
+                        $refundReimbursementText = "and P{$netAmountFormatted} reimbursed";
+                    } else {
+                        // Exact amount
+                        $refundReimbursementText = "with no refund or reimbursement";
+                    }
+
+                    $message = "Your petty cash with PCV ref. no. {$trackingNumber} has been liquidated for P{$amountPaidFormatted} {$refundReimbursementText}.";
+
+                    $requisitioner = $record->requisitioner;
+                    if ($requisitioner && $requisitioner->employee_information && !empty($requisitioner->employee_information->contact_number)) {
+                        SendSmsJob::dispatch(
+                            '09366303145',
+                            // $requisitioner->employee_information->contact_number,
+                            $message,
+                            'petty_cash_voucher_liquidated',
+                            $requisitioner->id,
+                            auth()->id()
+                        );
+                    }
+
                     DB::commit();
                     Notification::make()->title('Petty Cash Voucher liquidated.')->success()->send();
                 })
