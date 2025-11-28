@@ -2,27 +2,29 @@
 
 namespace App\Http\Livewire\Requisitioner\TravelOrders;
 
-use App\Models\EmployeeInformation;
-use App\Models\PhilippineCity;
-use App\Models\PhilippineProvince;
-use App\Models\PhilippineRegion;
+use App\Models\User;
+use Livewire\Component;
+use App\Jobs\SendSmsJob;
 use App\Models\TravelOrder;
+use App\Models\PhilippineCity;
 use App\Models\TravelOrderType;
-use Awcodes\FilamentTableRepeater\Components\TableRepeater;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\FileUpload;
+use App\Models\PhilippineRegion;
+use App\Models\PhilippineProvince;
+use Illuminate\Support\Facades\DB;
+use App\Models\EmployeeInformation;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
-use Livewire\Component;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Awcodes\FilamentTableRepeater\Components\TableRepeater;
 
 class TravelOrdersCreate extends Component implements HasForms
 {
@@ -202,6 +204,8 @@ class TravelOrdersCreate extends Component implements HasForms
 
     public function save()
     {
+
+
         $this->form->validate();
         if (in_array(auth()->user()->id, $this->data['applicants'])) {
             DB::beginTransaction();
@@ -216,6 +220,29 @@ class TravelOrdersCreate extends Component implements HasForms
                 }
 
                 $to->signatories()->sync($signatories);
+
+                // Send SMS notifications to all signatories
+                $signatoryUsers = User::whereIn('id', array_keys($signatories))
+                    ->with('employee_information')
+                    ->get();
+
+                $makerName = auth()->user()->employee_information->full_name;
+                $message = "A travel order and its accompanying itinerary have been submitted to the SEARCH system by {$makerName} for your approval. Tracking Code: {$to->tracking_code}";
+
+
+                foreach ($signatoryUsers as $signatory) {
+                    // Check if employee information and contact number exist
+                    if ($signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
+                        SendSmsJob::dispatch(
+                            $signatory->employee_information->contact_number,
+                            $message,
+                            'travel_order_signatory_notification',
+                            $signatory->id,
+                            auth()->id()
+                        );
+                    }
+                }
+
                 DB::commit();
 
                 Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
