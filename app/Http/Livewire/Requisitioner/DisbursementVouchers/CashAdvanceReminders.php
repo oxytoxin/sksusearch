@@ -130,7 +130,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
                     $this->emit('historyCreated');
 
-                    // Send FMR
+
                     NotificationController::sendCASystemReminder(
                         'FMR',
                         'Formal Management Reminder',
@@ -142,31 +142,82 @@ class CashAdvanceReminders extends Component implements HasTable
                         route('print.formal-management-reminder', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
-                    $employee = $record->disbursementVoucher->user->employee_information ?? null;
-                    $phone = $employee->contact_number ?? null;
 
-                    if (! $phone) {
-                        Log::warning("SMS not sent: No phone number for user ID {$record->disbursementVoucher->user->id} ");
+                    // // ========== SMS NOTIFICATION START ==========
+                    // try {
+                    //     // Validate required relationships exist
+                    //     if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
+                    //         Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
+                    //             'ca_reminder_id' => $record->id
+                    //         ]);
+                    //     } else {
+                    //         // Get employee phone number
+                    //         $user = $record->disbursementVoucher->user;
+                    //         $employee = $user->employee_information ?? null;
 
-                        return;
-                    }
+                    //         // For production: use actual phone number
+                    //         $phone = $employee->contact_number ?? null;
+                    //         // For testing: uncomment below
+                    //         // $phone = "09366303145";
 
-                    // $phone = '09366303145';
+                    //         // Check if phone number exists
+                    //         if (!$phone) {
+                    //             Log::warning("SMS not sent: No phone number for user", [
+                    //                 'user_id' => $user->id,
+                    //                 'user_name' => $user->name
+                    //             ]);
+                    //         } else {
+                    //             // Prepare SMS data with null safety
+                    //             $dv = $record->disbursement_voucher;
+                    //             $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
+                    //             $checkNumber = $dv->cheque_number ?? 'N/A';
+                    //             $liquidationDeadline = $record->liquidation_period_end_date
+                    //                 ? \Carbon\Carbon::parse($record->liquidation_period_end_date)->format('M d, Y')
+                    //                 : 'N/A';
 
-                    $amount = number_format($record->disbursement_voucher->total_sum, 2);
+                    //             // Get purposes with empty check
+                    //             $particulars = $dv->disbursement_voucher_particulars;
+                    //             if ($particulars && $particulars->count() > 0) {
+                    //                 $purposes = $particulars->pluck('purpose')->filter()->join(', ');
+                    //             } else {
+                    //                 $purposes = 'No purpose specified';
+                    //             }
 
-                    $message = "FMR Reminder: Your Cash Advance (DV #{$record->disbursement_voucher->dv_number}) amounting to ₱{$amount} is now due for liquidation.";
+                    //             // Ensure purposes is not empty
+                    //             if (empty(trim($purposes))) {
+                    //                 $purposes = 'No purpose specified';
+                    //             }
 
-                    // Dispatch SMS job with context and user IDs
-                    SendSmsJob::dispatch(
-                        $phone,
-                        $message,
-                        'FMR',  // context
-                        $record->disbursementVoucher->user->id,  // recipient user_id
-                        Auth::id()  // sender_id
-                    );
+                    //             // Build SMS message
+                    //             $message = "FMR No. {$data['fmr_number']} has been sent to you for your unliquidated cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". Your liquidation deadline is on {$liquidationDeadline}.";
 
-                    Log::info("SMS queued for {$phone} (user ID: {$record->disbursementVoucher->user->id})");
+                    //             // Dispatch SMS job with context and user IDs
+                    //             SendSmsJob::dispatch(
+                    //                 $phone,
+                    //                 $message,
+                    //                 'FMR',  // context
+                    //                 $user->id,  // recipient user_id
+                    //                 Auth::id()  // sender_id
+                    //             );
+
+                    //             Log::info("SMS queued successfully", [
+                    //                 'phone' => $phone,
+                    //                 'user_id' => $user->id,
+                    //                 'dv_number' => $dv->dv_number ?? 'N/A',
+                    //                 'fmr_number' => $data['fmr_number']
+                    //             ]);
+                    //         }
+                    //     }
+                    // } catch (\Exception $e) {
+                    //     Log::error("SMS notification failed", [
+                    //         'error' => $e->getMessage(),
+                    //         'line' => $e->getLine(),
+                    //         'file' => $e->getFile(),
+                    //         'ca_reminder_id' => $record->id ?? null
+                    //     ]);
+                    //     // Don't throw - allow the main FMR action to complete successfully
+                    // }
+                    // // ========== SMS NOTIFICATION END ==========
 
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 2 && $record->is_sent == 0),
             Action::make('sendFMD')->label('Send FMD')->icon('ri-send-plane-fill')
