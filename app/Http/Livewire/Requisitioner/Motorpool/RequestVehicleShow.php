@@ -443,7 +443,7 @@ class RequestVehicleShow extends Component implements HasForms
                 // Send SMS to all applicants
                 $applicants = $this->request_schedule->applicants()->with('employee_information')->get();
 
-              
+
                 foreach ($applicants as $applicant) {
                     if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
                         SendSmsJob::dispatch(
@@ -494,6 +494,10 @@ class RequestVehicleShow extends Component implements HasForms
     {
         DB::beginTransaction();
 
+        // Get old driver details before changing
+        $oldDriver = EmployeeInformation::find($this->request_schedule->driver_id);
+        $oldDriverName = $oldDriver->full_name ?? 'N/A';
+
         $driverId = $this->change_driver;
 
         foreach ($this->request_schedule_date_and_time as $item) {
@@ -516,6 +520,78 @@ class RequestVehicleShow extends Component implements HasForms
                 $this->request_schedule->driver_id = $this->change_driver;
                 $this->request_schedule->save();
                 $item->save();
+
+                // Load necessary relationships for SMS
+                $this->request_schedule->load([
+                    'travel_order.philippine_region',
+                    'travel_order.philippine_province',
+                    'travel_order.philippine_city',
+                    'philippine_region',
+                    'philippine_province',
+                    'philippine_city',
+                    'driver',
+                    'date_and_times',
+                    'applicants.employee_information'
+                ]);
+
+                // Get new driver details
+                $newDriverName = $this->request_schedule->driver->full_name ?? 'N/A';
+
+                // Determine tracking code and destination
+                $trackingCode = null;
+                if ($this->request_schedule->travel_order) {
+                    $trackingCode = $this->request_schedule->travel_order->tracking_code;
+                    $destination = $this->request_schedule->travel_order->destination;
+                } else {
+                    $destinationParts = [];
+                    if ($this->request_schedule->philippine_region) {
+                        $destinationParts[] = $this->request_schedule->philippine_region->region_description;
+                    }
+                    if ($this->request_schedule->philippine_province) {
+                        $destinationParts[] = $this->request_schedule->philippine_province->province_description;
+                    }
+                    if ($this->request_schedule->philippine_city) {
+                        $destinationParts[] = $this->request_schedule->philippine_city->city_municipality_description;
+                    }
+                    if ($this->request_schedule->other_details) {
+                        $destinationParts[] = $this->request_schedule->other_details;
+                    }
+                    $destination = !empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
+                }
+
+                // Get date range
+                $dates = $this->request_schedule->date_and_times;
+                $dateRange = 'N/A';
+                if ($dates->isNotEmpty()) {
+                    $firstDate = Carbon::parse($dates->min('travel_date'))->format('F d, Y');
+                    $lastDate = Carbon::parse($dates->max('travel_date'))->format('F d, Y');
+                    $dateRange = $firstDate === $lastDate ? $firstDate : "{$firstDate} to {$lastDate}";
+                }
+
+                // Build the message based on whether it has a travel order
+                if ($this->request_schedule->travel_order) {
+                    $message = "Your driver for TO number {$trackingCode} to {$destination} on {$dateRange} has been changed from {$oldDriverName} to {$newDriverName}. Please closely coordinate with the General Services Office.";
+                } else {
+                    $message = "Your driver for travel to {$destination} on {$dateRange} has been changed from {$oldDriverName} to {$newDriverName}. Please closely coordinate with the General Services Office.";
+                }
+
+                // Send SMS to all applicants
+                $applicants = $this->request_schedule->applicants()->with('employee_information')->get();
+
+               
+
+                foreach ($applicants as $applicant) {
+                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
+                        SendSmsJob::dispatch(
+                            '09366303145',
+                            // $applicant->employee_information->contact_number,
+                            $message,
+                            'driver_changed',
+                            $applicant->id,
+                            auth()->id()
+                        );
+                    }
+                }
 
                 $this->dialog()->success(
                     $title = 'Success',
