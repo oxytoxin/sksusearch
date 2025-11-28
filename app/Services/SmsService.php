@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Helpers\SmsResponse;
 use App\Services\Sms\Contracts\SmsProviderInterface;
 use App\Services\Sms\Providers\SemaphoreProvider;
-use App\Services\Sms\Providers\TwilioProvider;
+
 use Illuminate\Support\Facades\Log;
 
 class SmsService
@@ -26,7 +26,7 @@ class SmsService
 
         $providers = [
             'semaphore' => SemaphoreProvider::class,
-         
+
         ];
 
         if (!isset($providers[$providerName])) {
