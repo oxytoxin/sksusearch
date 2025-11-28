@@ -354,8 +354,12 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function confirmChangeVehicle()
     {
-
         DB::beginTransaction();
+
+        // Get old vehicle details before changing
+        $oldVehicle = Vehicle::find($this->request_schedule->vehicle_id);
+        $oldVehicleModel = $oldVehicle->model ?? 'N/A';
+        $oldVehiclePlate = $oldVehicle->plate_number ?? 'N/A';
 
         $vehicleId = $this->change_vehicle;
 
@@ -380,6 +384,78 @@ class RequestVehicleShow extends Component implements HasForms
                 $this->request_schedule->save();
                 $item->vehicle_id = $this->change_vehicle;
                 $item->save();
+
+                // Load necessary relationships for SMS
+                $this->request_schedule->load([
+                    'travel_order.philippine_region',
+                    'travel_order.philippine_province',
+                    'travel_order.philippine_city',
+                    'philippine_region',
+                    'philippine_province',
+                    'philippine_city',
+                    'vehicle',
+                    'date_and_times',
+                    'applicants.employee_information'
+                ]);
+
+                // Get new vehicle details
+                $newVehicleModel = $this->request_schedule->vehicle->model ?? 'N/A';
+                $newVehiclePlate = $this->request_schedule->vehicle->plate_number ?? 'N/A';
+
+                // Determine tracking code and destination
+                $trackingCode = null;
+                if ($this->request_schedule->travel_order) {
+                    $trackingCode = $this->request_schedule->travel_order->tracking_code;
+                    $destination = $this->request_schedule->travel_order->destination;
+                } else {
+                    $destinationParts = [];
+                    if ($this->request_schedule->philippine_region) {
+                        $destinationParts[] = $this->request_schedule->philippine_region->region_description;
+                    }
+                    if ($this->request_schedule->philippine_province) {
+                        $destinationParts[] = $this->request_schedule->philippine_province->province_description;
+                    }
+                    if ($this->request_schedule->philippine_city) {
+                        $destinationParts[] = $this->request_schedule->philippine_city->city_municipality_description;
+                    }
+                    if ($this->request_schedule->other_details) {
+                        $destinationParts[] = $this->request_schedule->other_details;
+                    }
+                    $destination = !empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
+                }
+
+                // Get date range
+                $dates = $this->request_schedule->date_and_times;
+                $dateRange = 'N/A';
+                if ($dates->isNotEmpty()) {
+                    $firstDate = Carbon::parse($dates->min('travel_date'))->format('F d, Y');
+                    $lastDate = Carbon::parse($dates->max('travel_date'))->format('F d, Y');
+                    $dateRange = $firstDate === $lastDate ? $firstDate : "{$firstDate} to {$lastDate}";
+                }
+
+                // Build the message based on whether it has a travel order
+                if ($this->request_schedule->travel_order) {
+                    $message = "Your vehicle for TO number {$trackingCode} to {$destination} on {$dateRange} has been changed from {$oldVehicleModel} with plate no. {$oldVehiclePlate} to {$newVehicleModel} with plate no. {$newVehiclePlate}. Please closely coordinate with the General Services Office.";
+                } else {
+                    $message = "Your vehicle for travel to {$destination} on {$dateRange} has been changed from {$oldVehicleModel} with plate no. {$oldVehiclePlate} to {$newVehicleModel} with plate no. {$newVehiclePlate}. Please closely coordinate with the General Services Office.";
+                }
+
+                // Send SMS to all applicants
+                $applicants = $this->request_schedule->applicants()->with('employee_information')->get();
+
+              
+                foreach ($applicants as $applicant) {
+                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
+                        SendSmsJob::dispatch(
+                            '09366303145',
+                            // $applicant->employee_information->contact_number,
+                            $message,
+                            'vehicle_changed',
+                            $applicant->id,
+                            auth()->id()
+                        );
+                    }
+                }
 
                 $this->dialog()->success(
                     $title = 'Success',
