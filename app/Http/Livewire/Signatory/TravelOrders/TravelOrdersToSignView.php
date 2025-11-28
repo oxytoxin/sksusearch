@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Signatory\TravelOrders;
 
+use App\Jobs\SendSmsJob;
 use App\Models\Itinerary;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
@@ -20,6 +21,7 @@ class TravelOrdersToSignView extends Component
     public TravelOrder $travel_order;
 
     public $modal = false;
+
     public $modalRejection = false;
 
     public $limit = 3;
@@ -27,7 +29,9 @@ class TravelOrdersToSignView extends Component
     public $note = '';
 
     public $from_oic = false;
+
     public $oic = false;
+
     public $oic_signatory;
 
     public function mount()
@@ -35,7 +39,7 @@ class TravelOrdersToSignView extends Component
         $this->travel_order->load(['applicants.employee_information', 'request_schedule']);
         if (request('from_oic')) {
             $this->from_oic = (bool) request('from_oic');
-            $this->oic_signatory =  (int) request('oic_signatory');
+            $this->oic_signatory = (int) request('oic_signatory');
         }
     }
 
@@ -44,12 +48,12 @@ class TravelOrdersToSignView extends Component
         $this->travel_order->refresh();
         if ($this->travel_order->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
             $this->travel_order->update([
-                'travel_order_type_id' => TravelOrderType::OFFICIAL_TIME
+                'travel_order_type_id' => TravelOrderType::OFFICIAL_TIME,
             ]);
             $this->travel_order->sidenotes()->create(['content' => 'Travel order type changed to Official Time.', 'user_id' => auth()->id()]);
         } else {
             $this->travel_order->update([
-                'travel_order_type_id' => TravelOrderType::OFFICIAL_BUSINESS
+                'travel_order_type_id' => TravelOrderType::OFFICIAL_BUSINESS,
             ]);
             $this->travel_order->sidenotes()->create(['content' => 'Travel order type changed to Official Business leading to cancellation.', 'user_id' => auth()->id()]);
             $this->rejectFinal(rejectedDueToConversion: true);
@@ -63,7 +67,6 @@ class TravelOrdersToSignView extends Component
             ->body("Travel Order Type has been changed to {$this->travel_order->travel_order_type->name}.")
             ->send();
     }
-
 
     public function render()
     {
@@ -102,14 +105,12 @@ class TravelOrdersToSignView extends Component
         );
     }
 
-    public function showDialog()
-    {
-    }
+    public function showDialog() {}
 
     public function approveItinerary(Itinerary $itinerary)
     {
         $itinerary->update([
-            'approved_at' => now()
+            'approved_at' => now(),
         ]);
     }
 
@@ -141,11 +142,32 @@ class TravelOrdersToSignView extends Component
     {
         if ($this->from_oic) {
             $this->travel_order->signatories()->updateExistingPivot($this->oic_signatory, ['is_approved' => true]);
-            $this->travel_order->sidenotes()->create(['content' => 'Travel order approved as OIC for: ' . User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order approved as OIC for: '.User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
+            $officerName = User::find($this->oic_signatory)?->employee_information->full_name;
         } else {
             $this->travel_order->signatories()->updateExistingPivot(auth()->id(), ['is_approved' => true]);
             $this->travel_order->sidenotes()->create(['content' => 'Travel order approved.', 'user_id' => auth()->id()]);
+            $officerName = auth()->user()->employee_information->full_name;
         }
+
+        // Send SMS notifications to all applicants
+        $applicants = $this->travel_order->applicants()->with('employee_information')->get();
+        $message = "Your travel order with ref. no. {$this->travel_order->tracking_code} has been approved by {$officerName}.";
+
+        foreach ($applicants as $applicant) {
+            if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+
+                SendSmsJob::dispatch(
+                    '09366303145',
+                    // $applicant->employee_information->contact_number,
+                    $message,
+                    'travel_order_approved',
+                    $applicant->id,
+                    $this->from_oic ? $this->oic_signatory : auth()->id()
+                );
+            }
+        }
+
         $this->travel_order->refresh();
         $this->dialog()->success(
             $title = 'Approved',
@@ -153,15 +175,16 @@ class TravelOrdersToSignView extends Component
             $icon = 'success',
         );
     }
+
     public function reject()
     {
         $this->validate(['rejectionNote' => 'required|min:10']);
         $this->modalRejection = false;
         $this->dialog()->id('custom')->confirm([
-            "icon" => 'question',
-            "iconColor" => 'text-primary-500',
-            'accept'  => [
-                'label'  => 'Proceed',
+            'icon' => 'question',
+            'iconColor' => 'text-primary-500',
+            'accept' => [
+                'label' => 'Proceed',
                 'method' => 'rejectFinal',
             ],
         ]);
@@ -171,21 +194,45 @@ class TravelOrdersToSignView extends Component
     {
         if ($this->from_oic) {
             $this->travel_order->signatories()->updateExistingPivot($this->oic_signatory, ['is_approved' => 2]);
-            $this->travel_order->sidenotes()->create(['content' => 'Travel order rejected as OIC for: ' . User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
-            if (!$rejectedDueToConversion)
-                $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : ' . $this->rejectionNote, 'user_id' => auth()->id()]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order rejected as OIC for: '.User::find($this->oic_signatory)?->employee_information->full_name, 'user_id' => auth()->id()]);
+            if (! $rejectedDueToConversion) {
+                $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : '.$this->rejectionNote, 'user_id' => auth()->id()]);
+            }
+            $officerName = User::find($this->oic_signatory)?->employee_information->full_name;
         } else {
             $this->travel_order->signatories()->updateExistingPivot(auth()->id(), ['is_approved' => 2]);
             $this->travel_order->sidenotes()->create(['content' => 'Travel order rejected.', 'user_id' => auth()->id()]);
-            if (!$rejectedDueToConversion)
-                $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : ' . $this->rejectionNote, 'user_id' => auth()->id()]);
+            if (! $rejectedDueToConversion) {
+                $this->travel_order->sidenotes()->create(['content' => 'Travel order Rejected for this/these reason/s : '.$this->rejectionNote, 'user_id' => auth()->id()]);
+            }
+            $officerName = auth()->user()->employee_information->full_name;
         }
-        if (!$rejectedDueToConversion)
+
+        // Send SMS notifications to all applicants
+        $applicants = $this->travel_order->applicants()->with('employee_information')->get();
+        $message = "Your travel order with ref. no. {$this->travel_order->tracking_code} has been rejected by {$officerName}.";
+
+        foreach ($applicants as $applicant) {
+            if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+
+                SendSmsJob::dispatch(
+                    '09366303145',
+                    // $applicant->employee_information->contact_number,
+                    $message,
+                    'travel_order_rejected',
+                    $applicant->id,
+                    $this->from_oic ? $this->oic_signatory : auth()->id()
+                );
+            }
+        }
+
+        if (! $rejectedDueToConversion) {
             $this->dialog()->success(
                 $title = 'Operation Completed',
                 $description = 'Travel order rejected!',
                 $icon = 'success',
             );
+        }
         $this->travel_order->refresh();
     }
 }
