@@ -17,6 +17,9 @@
     use Illuminate\Database\Eloquent\Builder;
     use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Filters\Filter;
+    use App\Jobs\SendSmsJob;
+    use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\Facades\Log;
 
     class WfpSubmissions extends Component implements HasTable
     {
@@ -121,7 +124,129 @@
                     ->color('warning')
                     ->button()
                     ->icon('heroicon-o-check-circle')
-                    ->action(fn($record) => $record->update(['is_approved' => 1]))
+                    ->action(function ($record) {
+                        $record->update(['is_approved' => 1]);
+
+                        // ========== SMS NOTIFICATION START ==========
+                        // COMMENTED OUT - TO BE CONFIRMED BY ACCOUNTANT
+                        // try {
+                        //     // Validate WFP record exists
+                        //     if (!$record) {
+                        //         Log::warning('SMS notification skipped: WFP record not found', [
+                        //             'context' => 'WFP_APPROVAL'
+                        //         ]);
+                        //     } else {
+                        //         // Check if cost center relationship exists
+                        //         if (!$record->costCenter) {
+                        //             Log::warning('SMS notification skipped: Cost center not found for WFP', [
+                        //                 'wfp_id' => $record->id,
+                        //                 'context' => 'WFP_APPROVAL'
+                        //             ]);
+                        //         } else {
+                        //             $costCenter = $record->costCenter;
+                        //
+                        //             // Check if office relationship exists
+                        //             if (!$costCenter->office) {
+                        //                 Log::warning('SMS notification skipped: Office not found for cost center', [
+                        //                     'cost_center_id' => $costCenter->id,
+                        //                     'cost_center_name' => $costCenter->name,
+                        //                     'wfp_id' => $record->id,
+                        //                     'context' => 'WFP_APPROVAL'
+                        //                 ]);
+                        //             } else {
+                        //                 $office = $costCenter->office;
+                        //
+                        //                 // Check if head employee exists
+                        //                 if (!$office->head_employee) {
+                        //                     Log::warning('SMS notification skipped: Head employee not found for office', [
+                        //                         'office_id' => $office->id,
+                        //                         'office_name' => $office->office_name ?? 'N/A',
+                        //                         'cost_center_id' => $costCenter->id,
+                        //                         'wfp_id' => $record->id,
+                        //                         'context' => 'WFP_APPROVAL'
+                        //                     ]);
+                        //                 } else {
+                        //                     $headEmployee = $office->head_employee;
+                        //
+                        //                     // Check if user relationship exists
+                        //                     if (!$headEmployee->user) {
+                        //                         Log::warning('SMS notification skipped: User not found for head employee', [
+                        //                             'employee_id' => $headEmployee->id,
+                        //                             'employee_name' => $headEmployee->first_name . ' ' . $headEmployee->last_name,
+                        //                             'office_id' => $office->id,
+                        //                             'wfp_id' => $record->id,
+                        //                             'context' => 'WFP_APPROVAL'
+                        //                         ]);
+                        //                     } else {
+                        //                         $user = $headEmployee->user;
+                        //
+                        //                         // Get phone number with null safety
+                        //                         $phone = $headEmployee->contact_number ?? null;
+                        //                         // $phone = "09366303145"; // TEST PHONE - Uncomment for testing
+                        //
+                        //                         if (!$phone) {
+                        //                             Log::warning('SMS notification skipped: No contact number for head employee', [
+                        //                                 'user_id' => $user->id,
+                        //                                 'user_name' => $user->name,
+                        //                                 'employee_id' => $headEmployee->id,
+                        //                                 'wfp_id' => $record->id,
+                        //                                 'context' => 'WFP_APPROVAL'
+                        //                             ]);
+                        //                         } else {
+                        //                             // Prepare data with null safety
+                        //                             $programmedAmount = $record->program_allocated ?? 0;
+                        //                             $totalAllocation = $record->total_allocated_fund ?? 0;
+                        //                             $programmedFormatted = $programmedAmount > 0 ? number_format($programmedAmount, 2) : '0.00';
+                        //                             $totalFormatted = $totalAllocation > 0 ? number_format($totalAllocation, 2) : '0.00';
+                        //
+                        //                             $fundName = $record->fundClusterWfp->name ?? 'N/A';
+                        //                             $mfoName = $costCenter->mfo->name ?? 'N/A';
+                        //                             $costCenterName = $costCenter->name ?? 'N/A';
+                        //
+                        //                             // Get WFP period name
+                        //                             $wfpPeriod = $record->wfpType ? $record->wfpType->name : 'N/A';
+                        //
+                        //                             // Build SMS message
+                        //                             $message = "Your expenditure programming under Fund {$fundName} {$mfoName} {$costCenterName} for the financial period {$wfpPeriod} has been approved. You programmed ₱{$programmedFormatted} out of your total allocation of ₱{$totalFormatted}.";
+                        //
+                        //                             // Dispatch SMS job
+                        //                             SendSmsJob::dispatch(
+                        //                                 $phone,
+                        //                                 $message,
+                        //                                 'WFP_APPROVAL',
+                        //                                 $user->id,
+                        //                                 Auth::id()
+                        //                             );
+                        //
+                        //                             Log::info('WFP approval SMS queued successfully', [
+                        //                                 'phone' => $phone,
+                        //                                 'user_id' => $user->id,
+                        //                                 'user_name' => $user->name,
+                        //                                 'wfp_id' => $record->id,
+                        //                                 'cost_center_id' => $costCenter->id,
+                        //                                 'cost_center_name' => $costCenterName,
+                        //                                 'programmed_amount' => $programmedFormatted,
+                        //                                 'total_allocation' => $totalFormatted,
+                        //                                 'wfp_period' => $wfpPeriod,
+                        //                                 'context' => 'WFP_APPROVAL'
+                        //                             ]);
+                        //                         }
+                        //                     }
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // } catch (\Exception $e) {
+                        //     Log::error('WFP approval SMS notification failed', [
+                        //         'error' => $e->getMessage(),
+                        //         'line' => $e->getLine(),
+                        //         'file' => $e->getFile(),
+                        //         'wfp_id' => $record->id ?? null,
+                        //         'context' => 'WFP_APPROVAL'
+                        //     ]);
+                        // }
+                        // ========== SMS NOTIFICATION END ==========
+                    })
                     ->requiresConfirmation()
                     ->visible(fn($record) => $record->is_approved === 0 && !$this->isPresident),
                 Action::make('modify')
