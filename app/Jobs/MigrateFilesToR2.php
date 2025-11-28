@@ -13,6 +13,7 @@ class MigrateFilesToR2 implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+     public $timeout = 180;
     /**
      * Create a new job instance.
      */
