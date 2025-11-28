@@ -230,18 +230,20 @@ class TravelOrdersCreate extends Component implements HasForms
                 $message = "A travel order and its accompanying itinerary have been submitted to the SEARCH system by {$makerName} for your approval. Tracking Code: {$to->tracking_code}";
 
 
-                foreach ($signatoryUsers as $signatory) {
-                    // Check if employee information and contact number exist
-                    if ($signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
-                        SendSmsJob::dispatch(
-                            "09366303145",
-                            // $signatory->employee_information->contact_number,
-                            $message,
-                            'travel_order_signatory_notification',
-                            $signatory->id,
-                            auth()->id()
-                        );
-                    }
+                // ========== SMS NOTIFICATION (COMMENTED OUT) ==========
+                // foreach ($signatoryUsers as $signatory) {
+                //     // Check if employee information and contact number exist
+                //     if ($signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
+                //         SendSmsJob::dispatch(
+                //             "09366303145",
+                //             // $signatory->employee_information->contact_number,
+                //             $message,
+                //             'travel_order_signatory_notification',
+                //             $signatory->id,
+                //             auth()->id()
+                //         );
+                //     }
+                // ========== SMS NOTIFICATION END ==========
                 }
 
                 DB::commit();

@@ -444,18 +444,20 @@ class RequestVehicleShow extends Component implements HasForms
                 $applicants = $this->request_schedule->applicants()->with('employee_information')->get();
 
 
-                foreach ($applicants as $applicant) {
-                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
-                        SendSmsJob::dispatch(
-                            '09366303145',
-                            // $applicant->employee_information->contact_number,
-                            $message,
-                            'vehicle_changed',
-                            $applicant->id,
-                            auth()->id()
-                        );
-                    }
-                }
+                // ========== SMS NOTIFICATION (COMMENTED OUT) ==========
+                // foreach ($applicants as $applicant) {
+                //     if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
+                //         SendSmsJob::dispatch(
+                //             '09366303145',
+                //             // $applicant->employee_information->contact_number,
+                //             $message,
+                //             'vehicle_changed',
+                //             $applicant->id,
+                //             auth()->id()
+                //         );
+                //     }
+                // }
+                // ========== SMS NOTIFICATION END ==========
 
                 $this->dialog()->success(
                     $title = 'Success',
@@ -578,20 +580,20 @@ class RequestVehicleShow extends Component implements HasForms
                 // Send SMS to all applicants
                 $applicants = $this->request_schedule->applicants()->with('employee_information')->get();
 
-               
-
-                foreach ($applicants as $applicant) {
-                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
-                        SendSmsJob::dispatch(
-                            '09366303145',
-                            // $applicant->employee_information->contact_number,
-                            $message,
-                            'driver_changed',
-                            $applicant->id,
-                            auth()->id()
-                        );
-                    }
-                }
+                // ========== SMS NOTIFICATION (COMMENTED OUT) ==========
+                // foreach ($applicants as $applicant) {
+                //     if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
+                //         SendSmsJob::dispatch(
+                //             '09366303145',
+                //             // $applicant->employee_information->contact_number,
+                //             $message,
+                //             'driver_changed',
+                //             $applicant->id,
+                //             auth()->id()
+                //         );
+                //     }
+                // }
+                // ========== SMS NOTIFICATION END ==========
 
                 $this->dialog()->success(
                     $title = 'Success',
@@ -709,18 +711,20 @@ class RequestVehicleShow extends Component implements HasForms
         //     'request_schedule' => $this->request_schedule->toArray(),
         // ]);
 
-        foreach ($applicants as $applicant) {
-            if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
-                SendSmsJob::dispatch(
-                    '09366303145',
-                    // $applicant->employee_information->contact_number,
-                    $message,
-                    'vehicle_driver_confirmed',
-                    $applicant->id,
-                    auth()->id()
-                );
-            }
-        }
+        // ========== SMS NOTIFICATION (COMMENTED OUT) ==========
+        // foreach ($applicants as $applicant) {
+        //     if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+        //         SendSmsJob::dispatch(
+        //             '09366303145',
+        //             // $applicant->employee_information->contact_number,
+        //             $message,
+        //             'vehicle_driver_confirmed',
+        //             $applicant->id,
+        //             auth()->id()
+        //         );
+        //     }
+        // }
+        // ========== SMS NOTIFICATION END ==========
 
         $this->dialog()->success(
             $title = 'Success',
