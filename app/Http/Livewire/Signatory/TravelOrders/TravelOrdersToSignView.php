@@ -45,13 +45,37 @@ class TravelOrdersToSignView extends Component
 
     public function toggleTravelOrderType()
     {
+
         $this->travel_order->refresh();
+        $officerName = $this->from_oic
+            ? User::find($this->oic_signatory)?->employee_information->full_name
+            : auth()->user()->employee_information->full_name;
+
         if ($this->travel_order->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+            // dd($this->travel_order->travel_order_type_id, TravelOrderType::OFFICIAL_TIME, 'OFFICIAL_TIME');
             $this->travel_order->update([
                 'travel_order_type_id' => TravelOrderType::OFFICIAL_TIME,
             ]);
             $this->travel_order->sidenotes()->create(['content' => 'Travel order type changed to Official Time.', 'user_id' => auth()->id()]);
+
+            // Send SMS notifications to all applicants
+            $applicants = $this->travel_order->applicants()->with('employee_information')->get();
+            $message = "Your travel on official business has been converted by {$officerName} to one on official time. No travel allowances shall be granted.";
+
+            foreach ($applicants as $applicant) {
+                if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        '09366303145',
+                        // $applicant->employee_information->contact_number,
+                        $message,
+                        'travel_order_type_converted',
+                        $applicant->id,
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            }
         } else {
+            // dd($this->travel_order->travel_order_type_id, TravelOrderType::OFFICIAL_BUSINESS, 'OFFICIAL_BUSINESS');
             $this->travel_order->update([
                 'travel_order_type_id' => TravelOrderType::OFFICIAL_BUSINESS,
             ]);
