@@ -33,7 +33,7 @@ return [
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => config('app_url'). '/auth/google/callback',
+        'redirect' => config('app_url').'/auth/google/callback',
     ],
     'sms' => [
         // Which SMS provider to use: 'semaphore', 'twilio', etc.
@@ -51,7 +51,7 @@ return [
 
     'semaphore' => [
         'api_key' => env('SEMAPHORE_API_KEY'),
-        'sender_name' => env('SEMAPHORE_SENDER_NAME', 'HIMS'),
+        'sender_name' => env('SEMAPHORE_SENDER_NAME', 'himsservice'),
     ],
 
     'twilio' => [
