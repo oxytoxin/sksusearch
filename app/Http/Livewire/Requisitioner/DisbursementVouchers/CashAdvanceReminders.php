@@ -404,6 +404,91 @@ class CashAdvanceReminders extends Component implements HasTable
                         route('print.show-cause-order', $record->disbursement_voucher),
                         $record->disbursement_voucher
                     );
+
+                    // // ========== SMS NOTIFICATION START ==========
+                    // try {
+                    //     // Validate required relationships exist
+                    //     if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
+                    //         Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
+                    //             'ca_reminder_id' => $record->id,
+                    //             'context' => 'SCO'
+                    //         ]);
+                    //     } else {
+                    //         // Get employee phone number
+                    //         $user = $record->disbursementVoucher->user;
+                    //         $employee = $user->employee_information ?? null;
+
+                    //         // For production: use actual phone number
+                    //         $phone = $employee->contact_number ?? null;
+                    //         // For testing: uncomment below
+                    //         // $phone = "09366303145";
+
+                    //         // Check if phone number exists
+                    //         if (!$phone) {
+                    //             Log::warning("SMS not sent: No phone number for user", [
+                    //                 'user_id' => $user->id,
+                    //                 'user_name' => $user->name,
+                    //                 'context' => 'SCO'
+                    //             ]);
+                    //         } else {
+                    //             // Prepare SMS data with null safety
+                    //             $dv = $record->disbursement_voucher;
+                    //             $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
+                    //             $checkNumber = $dv->cheque_number ?? 'N/A';
+
+                    //             // Get liquidation deadline - for SCO it's "was on" (past tense)
+                    //             $liquidationDeadline = $record->liquidation_period_end_date   ? \Carbon\Carbon::parse($record->liquidation_period_end_date)->format('M d, Y')  : 'N/A';
+
+                    //             // Get FMR and FMD numbers (earlier notices)
+                    //             $fmrNumber = $record->fmr_number ?? 'N/A';
+                    //             $fmdNumber = $record->fmd_number ?? 'N/A';
+
+                    //             // Get purposes with empty check
+                    //             $particulars = $dv->disbursement_voucher_particulars;
+                    //             if ($particulars && $particulars->count() > 0) {
+                    //                 $purposes = $particulars->pluck('purpose')->filter()->join(', ');
+                    //             } else {
+                    //                 $purposes = 'No purpose specified';
+                    //             }
+
+                    //             // Ensure purposes is not empty
+                    //             if (empty(trim($purposes))) {
+                    //                 $purposes = 'No purpose specified';
+                    //             }
+
+                    //             // Build SMS message for SCO
+                    //             $message = "Memorandum No. {$data['memorandum_number']} has been sent to you, ordering you to show cause for your failure to liquidate your cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". Your liquidation deadline was on {$liquidationDeadline}. Earlier notices in the form of FMR No. {$fmrNumber} and FMD No. {$fmdNumber} were already sent to you.";
+
+                    //             // Dispatch SMS job with context and user IDs
+                    //             SendSmsJob::dispatch(
+                    //                 $phone,
+                    //                 $message,
+                    //                 'SCO',  // context
+                    //                 $user->id,  // recipient user_id
+                    //                 Auth::id()  // sender_id
+                    //             );
+
+                    //             Log::info("SMS queued successfully", [
+                    //                 'phone' => $phone,
+                    //                 'user_id' => $user->id,
+                    //                 'dv_number' => $dv->dv_number ?? 'N/A',
+                    //                 'memorandum_number' => $data['memorandum_number'],
+                    //                 'fmr_number' => $fmrNumber,
+                    //                 'fmd_number' => $fmdNumber
+                    //             ]);
+                    //         }
+                    //     }
+                    // } catch (\Exception $e) {
+                    //     Log::error("SMS notification failed", [
+                    //         'error' => $e->getMessage(),
+                    //         'line' => $e->getLine(),
+                    //         'file' => $e->getFile(),
+                    //         'ca_reminder_id' => $record->id ?? null,
+                    //         'context' => 'SCO'
+                    //     ]);
+                    //     // Don't throw - allow the main SCO action to complete successfully
+                    // }
+                    // // ========== SMS NOTIFICATION END ==========
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 4 && $record->is_sent == 0),
             Action::make('sendFD')->label('Endorse FD')->icon('ri-send-plane-fill')
                 ->button()
