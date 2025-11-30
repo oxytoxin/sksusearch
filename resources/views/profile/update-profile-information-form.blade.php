@@ -25,7 +25,7 @@
 
         <!-- Contact Number -->
         <div class="col-span-6 sm:col-span-4">
-            <h4 class="block text-sm font-medium text-gray-700">Contact Number: {{ $this->user->employee_information->contact_number == null ? 'N/A' : $this->user->employee_information->contact_number }}</h4>
+            <h4 class="block text-sm font-medium text-gray-700">Contact Number: {{ $this->user->employee_information->contact_number == null ? 'N/A' : $this->user->employee_information->contact_number }} <button type="button" class="ml-2 font-semibold text-primary-600 underline" onclick="Livewire.emit('openContactNumberModal')">Update</button></h4>
         </div>
 
         <!-- Email -->
