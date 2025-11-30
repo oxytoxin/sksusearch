@@ -107,18 +107,18 @@ class PettyCashVouchersIndex extends Component implements HasTable
 
                     $message = "Your petty cash with PCV ref. no. {$trackingNumber} has been liquidated for P{$amountPaidFormatted} {$refundReimbursementText}.";
 
-                    // ========== SMS NOTIFICATION (COMMENTED OUT) ==========
-                    // $requisitioner = $record->requisitioner;
-                    // if ($requisitioner && $requisitioner->employee_information && !empty($requisitioner->employee_information->contact_number)) {
-                    //     SendSmsJob::dispatch(
-                    //         '09366303145',
-                    //         // $requisitioner->employee_information->contact_number,
-                    //         $message,
-                    //         'petty_cash_voucher_liquidated',
-                    //         $requisitioner->id,
-                    //         auth()->id()
-                    //     );
-                    // }
+                    // ========== SMS NOTIFICATION ==========
+                    $requisitioner = $record->requisitioner;
+                    if ($requisitioner && $requisitioner->employee_information && !empty($requisitioner->employee_information->contact_number)) {
+                        SendSmsJob::dispatch(
+                            '09366303145',  // TEST PHONE - Remove this line for production
+                            // $requisitioner->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                            $message,
+                            'petty_cash_voucher_liquidated',
+                            $requisitioner->id,
+                            auth()->id()
+                        );
+                    }
                     // ========== SMS NOTIFICATION END ==========
 
                     DB::commit();

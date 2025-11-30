@@ -121,23 +121,25 @@ class PettyCashVouchersCreate extends Component implements HasForms
             $balance = $new_balance;
         }
 
-        // // Send SMS notification to requisitioner
-        // $pcv->load(['requisitioner.employee_information']);
-        // $trackingNumber = $pcv->tracking_number;
-        // $amountFormatted = number_format($amount, 2);
-        // $message = "Petty cash in the amount of P{$amountFormatted} has been issued to you with PCV ref. no. {$trackingNumber}. Please liquidate immediately.";
+        // ========== SMS NOTIFICATION ==========
+        // Send SMS notification to requisitioner
+        $pcv->load(['requisitioner.employee_information']);
+        $trackingNumber = $pcv->tracking_number;
+        $amountFormatted = number_format($amount, 2);
+        $message = "Petty cash in the amount of P{$amountFormatted} has been issued to you with PCV ref. no. {$trackingNumber}. Please liquidate immediately.";
 
-        // $requisitioner = $pcv->requisitioner;
-        // if ($requisitioner && $requisitioner->employee_information && !empty($requisitioner->employee_information->contact_number)) {
-        //     SendSmsJob::dispatch(
-        //         '09366303145',
-        //         // $requisitioner->employee_information->contact_number,
-        //         $message,
-        //         'petty_cash_voucher_issued',
-        //         $requisitioner->id,
-        //         auth()->id()
-        //     );
-        // }
+        $requisitioner = $pcv->requisitioner;
+        if ($requisitioner && $requisitioner->employee_information && !empty($requisitioner->employee_information->contact_number)) {
+            SendSmsJob::dispatch(
+                '09366303145',  // TEST PHONE - Remove this line for production
+                // $requisitioner->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                $message,
+                'petty_cash_voucher_issued',
+                $requisitioner->id,
+                auth()->id()
+            );
+        }
+        // ========== SMS NOTIFICATION END ==========
 
         DB::commit();
         Notification::make()->title('Petty Cash Voucher request created.')->success()->send();
