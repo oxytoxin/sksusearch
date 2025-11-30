@@ -1,3 +1,29 @@
+@php
+    $branch = 'unknown';
+
+    if (!app()->environment('production') && function_exists('shell_exec')) {
+        $output = @shell_exec('git rev-parse --abbrev-ref HEAD');
+        if (is_string($output) && trim($output) !== '') {
+            $branch = trim($output);
+        }
+    }
+
+    $shouldShowBanner = !app()->environment('production') && $branch !== 'master';
+@endphp
+
+@if ($shouldShowBanner)
+    <div class="bg-red-600 text-white text-xs py-0.5 px-3 text-center font-medium shadow">
+        <div class="flex justify-center items-center gap-3">
+            <span class="text-[11px]"> Environment: <strong>{{ app()->environment() }}</strong></span>
+            <span class="text-[11px]"> Branch: (<strong>{{ $branch }})</strong></span>
+            <span class=" text-[10px] opacity-90 animate-pulse ">
+              This is a testing stage.
+            </span>
+        </div>
+    </div>
+@endif
+
+
 <nav class="sticky top-0 z-10 border-b border-gray-100 bg-primary-500" x-data="{ open: false }">
     <!-- Primary Navigation Menu -->
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
