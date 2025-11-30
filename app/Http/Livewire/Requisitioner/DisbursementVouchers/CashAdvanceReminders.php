@@ -143,81 +143,81 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
 
-                    // // ========== SMS NOTIFICATION START ==========
-                    // try {
-                    //     // Validate required relationships exist
-                    //     if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
-                    //         Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
-                    //             'ca_reminder_id' => $record->id
-                    //         ]);
-                    //     } else {
-                    //         // Get employee phone number
-                    //         $user = $record->disbursementVoucher->user;
-                    //         $employee = $user->employee_information ?? null;
+                    // ========== SMS NOTIFICATION START ==========
+                    try {
+                        // Validate required relationships exist
+                        if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
+                            Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
+                                'ca_reminder_id' => $record->id
+                            ]);
+                        } else {
+                            // Get employee phone number
+                            $user = $record->disbursementVoucher->user;
+                            $employee = $user->employee_information ?? null;
 
-                    //         // For production: use actual phone number
-                    //         $phone = $employee->contact_number ?? null;
-                    //         // For testing: uncomment below
-                    //         // $phone = "09366303145";
+                            // For production: use actual phone number
+                            // $phone = $employee->contact_number ?? null;
+                            // For testing: uncomment below
+                            $phone = "09366303145";
 
-                    //         // Check if phone number exists
-                    //         if (!$phone) {
-                    //             Log::warning("SMS not sent: No phone number for user", [
-                    //                 'user_id' => $user->id,
-                    //                 'user_name' => $user->name
-                    //             ]);
-                    //         } else {
-                    //             // Prepare SMS data with null safety
-                    //             $dv = $record->disbursement_voucher;
-                    //             $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
-                    //             $checkNumber = $dv->cheque_number ?? 'N/A';
-                    //             $liquidationDeadline = $record->liquidation_period_end_date
-                    //                 ? \Carbon\Carbon::parse($record->liquidation_period_end_date)->format('M d, Y')
-                    //                 : 'N/A';
+                            // Check if phone number exists
+                            if (!$phone) {
+                                Log::warning("SMS not sent: No phone number for user", [
+                                    'user_id' => $user->id,
+                                    'user_name' => $user->name
+                                ]);
+                            } else {
+                                // Prepare SMS data with null safety
+                                $dv = $record->disbursement_voucher;
+                                $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
+                                $checkNumber = $dv->cheque_number ?? 'N/A';
+                                $liquidationDeadline = $record->liquidation_period_end_date
+                                    ? \Carbon\Carbon::parse($record->liquidation_period_end_date)->format('M d, Y')
+                                    : 'N/A';
 
-                    //             // Get purposes with empty check
-                    //             $particulars = $dv->disbursement_voucher_particulars;
-                    //             if ($particulars && $particulars->count() > 0) {
-                    //                 $purposes = $particulars->pluck('purpose')->filter()->join(', ');
-                    //             } else {
-                    //                 $purposes = 'No purpose specified';
-                    //             }
+                                // Get purposes with empty check
+                                $particulars = $dv->disbursement_voucher_particulars;
+                                if ($particulars && $particulars->count() > 0) {
+                                    $purposes = $particulars->pluck('purpose')->filter()->join(', ');
+                                } else {
+                                    $purposes = 'No purpose specified';
+                                }
 
-                    //             // Ensure purposes is not empty
-                    //             if (empty(trim($purposes))) {
-                    //                 $purposes = 'No purpose specified';
-                    //             }
+                                // Ensure purposes is not empty
+                                if (empty(trim($purposes))) {
+                                    $purposes = 'No purpose specified';
+                                }
 
-                    //             // Build SMS message
-                    //             $message = "FMR No. {$data['fmr_number']} has been sent to you for your unliquidated cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". Your liquidation deadline is on {$liquidationDeadline}.";
+                                // Build SMS message
+                                $message = "FMR No. {$data['fmr_number']} has been sent to you for your unliquidated cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". Your liquidation deadline is on {$liquidationDeadline}.";
 
-                    //             // Dispatch SMS job with context and user IDs
-                    //             SendSmsJob::dispatch(
-                    //                 $phone,
-                    //                 $message,
-                    //                 'FMR',  // context
-                    //                 $user->id,  // recipient user_id
-                    //                 Auth::id()  // sender_id
-                    //             );
+                                // Dispatch SMS job with context and user IDs
+                                SendSmsJob::dispatch(
+                                    $phone,
+                                    $message,
+                                    'FMR',  // context
+                                    $user->id,  // recipient user_id
+                                    Auth::id()  // sender_id
+                                );
 
-                    //             Log::info("SMS queued successfully", [
-                    //                 'phone' => $phone,
-                    //                 'user_id' => $user->id,
-                    //                 'dv_number' => $dv->dv_number ?? 'N/A',
-                    //                 'fmr_number' => $data['fmr_number']
-                    //             ]);
-                    //         }
-                    //     }
-                    // } catch (\Exception $e) {
-                    //     Log::error("SMS notification failed", [
-                    //         'error' => $e->getMessage(),
-                    //         'line' => $e->getLine(),
-                    //         'file' => $e->getFile(),
-                    //         'ca_reminder_id' => $record->id ?? null
-                    //     ]);
-                    //     // Don't throw - allow the main FMR action to complete successfully
-                    // }
-                    // // ========== SMS NOTIFICATION END ==========
+                                Log::info("SMS queued successfully", [
+                                    'phone' => $phone,
+                                    'user_id' => $user->id,
+                                    'dv_number' => $dv->dv_number ?? 'N/A',
+                                    'fmr_number' => $data['fmr_number']
+                                ]);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("SMS notification failed", [
+                            'error' => $e->getMessage(),
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile(),
+                            'ca_reminder_id' => $record->id ?? null
+                        ]);
+                        // Don't throw - allow the main FMR action to complete successfully
+                    }
+                    // ========== SMS NOTIFICATION END ==========
 
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 2 && $record->is_sent == 0),
             Action::make('sendFMD')->label('Send FMD')->icon('ri-send-plane-fill')
@@ -271,88 +271,88 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
 
-                    // // ========== SMS NOTIFICATION START ==========
-                    // try {
-                    //     // Validate required relationships exist
-                    //     if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
-                    //         Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
-                    //             'ca_reminder_id' => $record->id,
-                    //             'context' => 'FMD'
-                    //         ]);
-                    //     } else {
-                    //         // Get employee phone number
-                    //         $user = $record->disbursementVoucher->user;
-                    //         $employee = $user->employee_information ?? null;
+                    // ========== SMS NOTIFICATION START ==========
+                    try {
+                        // Validate required relationships exist
+                        if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
+                            Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
+                                'ca_reminder_id' => $record->id,
+                                'context' => 'FMD'
+                            ]);
+                        } else {
+                            // Get employee phone number
+                            $user = $record->disbursementVoucher->user;
+                            $employee = $user->employee_information ?? null;
 
-                    //         // For production: use actual phone number
-                    //         $phone = $employee->contact_number ?? null;
-                    //         // For testing: uncomment below
-                    //         // $phone = "09366303145";
+                            // For production: use actual phone number
+                            // $phone = $employee->contact_number ?? null;
+                            // For testing: uncomment below
+                            $phone = "09366303145";
 
-                    //         // Check if phone number exists
-                    //         if (!$phone) {
-                    //             Log::warning("SMS not sent: No phone number for user", [
-                    //                 'user_id' => $user->id,
-                    //                 'user_name' => $user->name,
-                    //                 'context' => 'FMD'
-                    //             ]);
-                    //         } else {
-                    //             // Prepare SMS data with null safety
-                    //             $dv = $record->disbursement_voucher;
-                    //             $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
-                    //             $checkNumber = $dv->cheque_number ?? 'N/A';
+                            // Check if phone number exists
+                            if (!$phone) {
+                                Log::warning("SMS not sent: No phone number for user", [
+                                    'user_id' => $user->id,
+                                    'user_name' => $user->name,
+                                    'context' => 'FMD'
+                                ]);
+                            } else {
+                                // Prepare SMS data with null safety
+                                $dv = $record->disbursement_voucher;
+                                $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
+                                $checkNumber = $dv->cheque_number ?? 'N/A';
 
-                    //             // Get liquidation deadline - for FMD it's "was on" (past tense)
-                    //             $liquidationDeadline = $record->liquidation_period_end_date ? \Carbon\Carbon::parse($record->liquidation_period_end_date)->format('M d, Y') : 'N/A';
+                                // Get liquidation deadline - for FMD it's "was on" (past tense)
+                                $liquidationDeadline = $record->liquidation_period_end_date ? \Carbon\Carbon::parse($record->liquidation_period_end_date)->format('M d, Y') : 'N/A';
 
-                    //             // Get FMR number (earlier reminder)
-                    //             $fmrNumber = $record->fmr_number ?? 'N/A';
+                                // Get FMR number (earlier reminder)
+                                $fmrNumber = $record->fmr_number ?? 'N/A';
 
-                    //             // Get purposes with empty check
-                    //             $particulars = $dv->disbursement_voucher_particulars;
-                    //             if ($particulars && $particulars->count() > 0) {
-                    //                 $purposes = $particulars->pluck('purpose')->filter()->join(', ');
-                    //             } else {
-                    //                 $purposes = 'No purpose specified';
-                    //             }
+                                // Get purposes with empty check
+                                $particulars = $dv->disbursement_voucher_particulars;
+                                if ($particulars && $particulars->count() > 0) {
+                                    $purposes = $particulars->pluck('purpose')->filter()->join(', ');
+                                } else {
+                                    $purposes = 'No purpose specified';
+                                }
 
-                    //             // Ensure purposes is not empty
-                    //             if (empty(trim($purposes))) {
-                    //                 $purposes = 'No purpose specified';
-                    //             }
+                                // Ensure purposes is not empty
+                                if (empty(trim($purposes))) {
+                                    $purposes = 'No purpose specified';
+                                }
 
-                    //             // Build SMS message for FMD
-                    //             $message = "FMD No. {$data['fmd_number']} has been sent to you for your unliquidated cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". Your liquidation deadline was on {$liquidationDeadline}. FMR No. {$fmrNumber} was earlier sent to you as a reminder.";
+                                // Build SMS message for FMD
+                                $message = "FMD No. {$data['fmd_number']} has been sent to you for your unliquidated cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". Your liquidation deadline was on {$liquidationDeadline}. FMR No. {$fmrNumber} was earlier sent to you as a reminder.";
 
-                    //             // Dispatch SMS job with context and user IDs
-                    //             SendSmsJob::dispatch(
-                    //                 $phone,
-                    //                 $message,
-                    //                 'FMD',  // context
-                    //                 $user->id,  // recipient user_id
-                    //                 Auth::id()  // sender_id
-                    //             );
+                                // Dispatch SMS job with context and user IDs
+                                SendSmsJob::dispatch(
+                                    $phone,
+                                    $message,
+                                    'FMD',  // context
+                                    $user->id,  // recipient user_id
+                                    Auth::id()  // sender_id
+                                );
 
-                    //             Log::info("SMS queued successfully", [
-                    //                 'phone' => $phone,
-                    //                 'user_id' => $user->id,
-                    //                 'dv_number' => $dv->dv_number ?? 'N/A',
-                    //                 'fmd_number' => $data['fmd_number'],
-                    //                 'fmr_number' => $fmrNumber
-                    //             ]);
-                    //         }
-                    //     }
-                    // } catch (\Exception $e) {
-                    //     Log::error("SMS notification failed", [
-                    //         'error' => $e->getMessage(),
-                    //         'line' => $e->getLine(),
-                    //         'file' => $e->getFile(),
-                    //         'ca_reminder_id' => $record->id ?? null,
-                    //         'context' => 'FMD'
-                    //     ]);
-                    //     // Don't throw - allow the main FMD action to complete successfully
-                    // }
-                    // // ========== SMS NOTIFICATION END ==========
+                                Log::info("SMS queued successfully", [
+                                    'phone' => $phone,
+                                    'user_id' => $user->id,
+                                    'dv_number' => $dv->dv_number ?? 'N/A',
+                                    'fmd_number' => $data['fmd_number'],
+                                    'fmr_number' => $fmrNumber
+                                ]);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("SMS notification failed", [
+                            'error' => $e->getMessage(),
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile(),
+                            'ca_reminder_id' => $record->id ?? null,
+                            'context' => 'FMD'
+                        ]);
+                        // Don't throw - allow the main FMD action to complete successfully
+                    }
+                    // ========== SMS NOTIFICATION END ==========
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 3 && $record->is_sent == 0),
             Action::make('sendSOC')->label('Send SCO')->icon('ri-send-plane-fill')
                 ->button()
@@ -405,90 +405,90 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
 
-                    // // ========== SMS NOTIFICATION START ==========
-                    // try {
-                    //     // Validate required relationships exist
-                    //     if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
-                    //         Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
-                    //             'ca_reminder_id' => $record->id,
-                    //             'context' => 'SCO'
-                    //         ]);
-                    //     } else {
-                    //         // Get employee phone number
-                    //         $user = $record->disbursementVoucher->user;
-                    //         $employee = $user->employee_information ?? null;
+                    // ========== SMS NOTIFICATION START ==========
+                    try {
+                        // Validate required relationships exist
+                        if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
+                            Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
+                                'ca_reminder_id' => $record->id,
+                                'context' => 'SCO'
+                            ]);
+                        } else {
+                            // Get employee phone number
+                            $user = $record->disbursementVoucher->user;
+                            $employee = $user->employee_information ?? null;
 
-                    //         // For production: use actual phone number
-                    //         $phone = $employee->contact_number ?? null;
-                    //         // For testing: uncomment below
-                    //         // $phone = "09366303145";
+                            // For production: use actual phone number
+                            // $phone = $employee->contact_number ?? null;
+                            // For testing: uncomment below
+                            $phone = "09366303145";
 
-                    //         // Check if phone number exists
-                    //         if (!$phone) {
-                    //             Log::warning("SMS not sent: No phone number for user", [
-                    //                 'user_id' => $user->id,
-                    //                 'user_name' => $user->name,
-                    //                 'context' => 'SCO'
-                    //             ]);
-                    //         } else {
-                    //             // Prepare SMS data with null safety
-                    //             $dv = $record->disbursement_voucher;
-                    //             $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
-                    //             $checkNumber = $dv->cheque_number ?? 'N/A';
+                            // Check if phone number exists
+                            if (!$phone) {
+                                Log::warning("SMS not sent: No phone number for user", [
+                                    'user_id' => $user->id,
+                                    'user_name' => $user->name,
+                                    'context' => 'SCO'
+                                ]);
+                            } else {
+                                // Prepare SMS data with null safety
+                                $dv = $record->disbursement_voucher;
+                                $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
+                                $checkNumber = $dv->cheque_number ?? 'N/A';
 
-                    //             // Get liquidation deadline - for SCO it's "was on" (past tense)
-                    //             $liquidationDeadline = $record->liquidation_period_end_date   ? \Carbon\Carbon::parse($record->liquidation_period_end_date)->format('M d, Y')  : 'N/A';
+                                // Get liquidation deadline - for SCO it's "was on" (past tense)
+                                $liquidationDeadline = $record->liquidation_period_end_date   ? \Carbon\Carbon::parse($record->liquidation_period_end_date)->format('M d, Y')  : 'N/A';
 
-                    //             // Get FMR and FMD numbers (earlier notices)
-                    //             $fmrNumber = $record->fmr_number ?? 'N/A';
-                    //             $fmdNumber = $record->fmd_number ?? 'N/A';
+                                // Get FMR and FMD numbers (earlier notices)
+                                $fmrNumber = $record->fmr_number ?? 'N/A';
+                                $fmdNumber = $record->fmd_number ?? 'N/A';
 
-                    //             // Get purposes with empty check
-                    //             $particulars = $dv->disbursement_voucher_particulars;
-                    //             if ($particulars && $particulars->count() > 0) {
-                    //                 $purposes = $particulars->pluck('purpose')->filter()->join(', ');
-                    //             } else {
-                    //                 $purposes = 'No purpose specified';
-                    //             }
+                                // Get purposes with empty check
+                                $particulars = $dv->disbursement_voucher_particulars;
+                                if ($particulars && $particulars->count() > 0) {
+                                    $purposes = $particulars->pluck('purpose')->filter()->join(', ');
+                                } else {
+                                    $purposes = 'No purpose specified';
+                                }
 
-                    //             // Ensure purposes is not empty
-                    //             if (empty(trim($purposes))) {
-                    //                 $purposes = 'No purpose specified';
-                    //             }
+                                // Ensure purposes is not empty
+                                if (empty(trim($purposes))) {
+                                    $purposes = 'No purpose specified';
+                                }
 
-                    //             // Build SMS message for SCO
-                    //             $message = "Memorandum No. {$data['memorandum_number']} has been sent to you, ordering you to show cause for your failure to liquidate your cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". Your liquidation deadline was on {$liquidationDeadline}. Earlier notices in the form of FMR No. {$fmrNumber} and FMD No. {$fmdNumber} were already sent to you.";
+                                // Build SMS message for SCO
+                                $message = "Memorandum No. {$data['memorandum_number']} has been sent to you, ordering you to show cause for your failure to liquidate your cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". Your liquidation deadline was on {$liquidationDeadline}. Earlier notices in the form of FMR No. {$fmrNumber} and FMD No. {$fmdNumber} were already sent to you.";
 
-                    //             // Dispatch SMS job with context and user IDs
-                    //             SendSmsJob::dispatch(
-                    //                 $phone,
-                    //                 $message,
-                    //                 'SCO',  // context
-                    //                 $user->id,  // recipient user_id
-                    //                 Auth::id()  // sender_id
-                    //             );
+                                // Dispatch SMS job with context and user IDs
+                                SendSmsJob::dispatch(
+                                    $phone,
+                                    $message,
+                                    'SCO',  // context
+                                    $user->id,  // recipient user_id
+                                    Auth::id()  // sender_id
+                                );
 
-                    //             Log::info("SMS queued successfully", [
-                    //                 'phone' => $phone,
-                    //                 'user_id' => $user->id,
-                    //                 'dv_number' => $dv->dv_number ?? 'N/A',
-                    //                 'memorandum_number' => $data['memorandum_number'],
-                    //                 'fmr_number' => $fmrNumber,
-                    //                 'fmd_number' => $fmdNumber
-                    //             ]);
-                    //         }
-                    //     }
-                    // } catch (\Exception $e) {
-                    //     Log::error("SMS notification failed", [
-                    //         'error' => $e->getMessage(),
-                    //         'line' => $e->getLine(),
-                    //         'file' => $e->getFile(),
-                    //         'ca_reminder_id' => $record->id ?? null,
-                    //         'context' => 'SCO'
-                    //     ]);
-                    //     // Don't throw - allow the main SCO action to complete successfully
-                    // }
-                    // // ========== SMS NOTIFICATION END ==========
+                                Log::info("SMS queued successfully", [
+                                    'phone' => $phone,
+                                    'user_id' => $user->id,
+                                    'dv_number' => $dv->dv_number ?? 'N/A',
+                                    'memorandum_number' => $data['memorandum_number'],
+                                    'fmr_number' => $fmrNumber,
+                                    'fmd_number' => $fmdNumber
+                                ]);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("SMS notification failed", [
+                            'error' => $e->getMessage(),
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile(),
+                            'ca_reminder_id' => $record->id ?? null,
+                            'context' => 'SCO'
+                        ]);
+                        // Don't throw - allow the main SCO action to complete successfully
+                    }
+                    // ========== SMS NOTIFICATION END ==========
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 4 && $record->is_sent == 0),
             Action::make('sendFD')->label('Endorse FD')->icon('ri-send-plane-fill')
                 ->button()
@@ -536,119 +536,119 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
 
-                    // // ========== SMS NOTIFICATION START (ENDORSEMENT - TWO RECIPIENTS) ==========
-                    // try {
-                    //     // Validate required relationships exist
-                    //     if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
-                    //         Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
-                    //             'ca_reminder_id' => $record->id,
-                    //             'context' => 'ENDORSEMENT'
-                    //         ]);
-                    //     } else {
-                    //         // Prepare common SMS data with null safety
-                    //         $dv = $record->disbursement_voucher;
-                    //         $payee = $dv->user;
-                    //         $payeeName = $payee->name ?? 'Unknown';
-                    //         $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
-                    //         $checkNumber = $dv->cheque_number ?? 'N/A';
+                    // ========== SMS NOTIFICATION START (ENDORSEMENT - TWO RECIPIENTS) ==========
+                    try {
+                        // Validate required relationships exist
+                        if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
+                            Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
+                                'ca_reminder_id' => $record->id,
+                                'context' => 'ENDORSEMENT'
+                            ]);
+                        } else {
+                            // Prepare common SMS data with null safety
+                            $dv = $record->disbursement_voucher;
+                            $payee = $dv->user;
+                            $payeeName = $payee->name ?? 'Unknown';
+                            $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
+                            $checkNumber = $dv->cheque_number ?? 'N/A';
 
-                    //         // Get FMR, FMD, and Memorandum numbers
-                    //         $fmrNumber = $record->fmr_number ?? 'N/A';
-                    //         $fmdNumber = $record->fmd_number ?? 'N/A';
-                    //         $memorandumNumber = $record->memorandum_number ?? 'N/A';
+                            // Get FMR, FMD, and Memorandum numbers
+                            $fmrNumber = $record->fmr_number ?? 'N/A';
+                            $fmdNumber = $record->fmd_number ?? 'N/A';
+                            $memorandumNumber = $record->memorandum_number ?? 'N/A';
 
-                    //         // ===== SMS 1: TO PAYEE (Person with unliquidated cash advance) =====
-                    //         $payeeEmployee = $payee->employee_information ?? null;
-                    //         $payeePhone = $payeeEmployee->contact_number ?? null;
+                            // ===== SMS 1: TO PAYEE (Person with unliquidated cash advance) =====
+                            $payeeEmployee = $payee->employee_information ?? null;
+                            // $payeePhone = $payeeEmployee->contact_number ?? null;
 
-                    //         // For production: use actual phone number
-                    //         // For testing: uncomment below
-                    //         // $payeePhone = "09366303145";
+                            // For production: use actual phone number
+                            // For testing: uncomment below
+                            $payeePhone = "09366303145";
 
-                    //         if (!$payeePhone) {
-                    //             Log::warning("SMS not sent to payee: No phone number", [
-                    //                 'user_id' => $payee->id,
-                    //                 'user_name' => $payeeName,
-                    //                 'context' => 'ENDORSEMENT_PAYEE'
-                    //             ]);
-                    //         } else {
-                    //             // Build SMS message for PAYEE
-                    //             $payeeMessage = "Your unliquidated cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} has been endorsed to the Resident Auditor. The cash advance remains unliquidated despite service of notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
+                            if (!$payeePhone) {
+                                Log::warning("SMS not sent to payee: No phone number", [
+                                    'user_id' => $payee->id,
+                                    'user_name' => $payeeName,
+                                    'context' => 'ENDORSEMENT_PAYEE'
+                                ]);
+                            } else {
+                                // Build SMS message for PAYEE
+                                $payeeMessage = "Your unliquidated cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} has been endorsed to the Resident Auditor. The cash advance remains unliquidated despite service of notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
 
-                    //             // Dispatch SMS to payee
-                    //             SendSmsJob::dispatch(
-                    //                 $payeePhone,
-                    //                 $payeeMessage,
-                    //                 'ENDORSEMENT_PAYEE',  // context
-                    //                 $payee->id,  // recipient user_id
-                    //                 Auth::id()  // sender_id
-                    //             );
+                                // Dispatch SMS to payee
+                                SendSmsJob::dispatch(
+                                    $payeePhone,
+                                    $payeeMessage,
+                                    'ENDORSEMENT_PAYEE',  // context
+                                    $payee->id,  // recipient user_id
+                                    Auth::id()  // sender_id
+                                );
 
-                    //             Log::info("SMS queued successfully to payee", [
-                    //                 'phone' => $payeePhone,
-                    //                 'user_id' => $payee->id,
-                    //                 'user_name' => $payeeName,
-                    //                 'dv_number' => $dv->dv_number ?? 'N/A',
-                    //                 'context' => 'ENDORSEMENT_PAYEE'
-                    //             ]);
-                    //         }
+                                Log::info("SMS queued successfully to payee", [
+                                    'phone' => $payeePhone,
+                                    'user_id' => $payee->id,
+                                    'user_name' => $payeeName,
+                                    'dv_number' => $dv->dv_number ?? 'N/A',
+                                    'context' => 'ENDORSEMENT_PAYEE'
+                                ]);
+                            }
 
-                    //         // ===== SMS 2: TO AUDITOR (Resident Auditor) =====
-                    //         if (!$this->auditor || !$this->auditor->user) {
-                    //             Log::warning("SMS not sent to auditor: Missing auditor relationship", [
-                    //                 'ca_reminder_id' => $record->id,
-                    //                 'context' => 'ENDORSEMENT_AUDITOR'
-                    //             ]);
-                    //         } else {
-                    //             $auditorUser = $this->auditor->user;
-                    //             $auditorEmployee = $auditorUser->employee_information ?? null;
-                    //             $auditorPhone = $auditorEmployee->contact_number ?? null;
+                            // ===== SMS 2: TO AUDITOR (Resident Auditor) =====
+                            if (!$this->auditor || !$this->auditor->user) {
+                                Log::warning("SMS not sent to auditor: Missing auditor relationship", [
+                                    'ca_reminder_id' => $record->id,
+                                    'context' => 'ENDORSEMENT_AUDITOR'
+                                ]);
+                            } else {
+                                $auditorUser = $this->auditor->user;
+                                $auditorEmployee = $auditorUser->employee_information ?? null;
+                                // $auditorPhone = $auditorEmployee->contact_number ?? null;
 
-                    //             // For production: use actual phone number
-                    //             // For testing: uncomment below
-                    //             // $auditorPhone = "09366303145";
+                                // For production: use actual phone number
+                                // For testing: uncomment below
+                                $auditorPhone = "09366303145";
 
-                    //             if (!$auditorPhone) {
-                    //                 Log::warning("SMS not sent to auditor: No phone number", [
-                    //                     'user_id' => $auditorUser->id,
-                    //                     'user_name' => $auditorUser->name,
-                    //                     'context' => 'ENDORSEMENT_AUDITOR'
-                    //                 ]);
-                    //             } else {
-                    //                 // Build SMS message for AUDITOR
-                    //                 $auditorMessage = "The unliquidated cash advance of {$payeeName} under check/ADA number {$checkNumber} amounting to ₱{$amount} has been endorsed to you by the Office of the President. The payee had previously been issued notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
+                                if (!$auditorPhone) {
+                                    Log::warning("SMS not sent to auditor: No phone number", [
+                                        'user_id' => $auditorUser->id,
+                                        'user_name' => $auditorUser->name,
+                                        'context' => 'ENDORSEMENT_AUDITOR'
+                                    ]);
+                                } else {
+                                    // Build SMS message for AUDITOR
+                                    $auditorMessage = "The unliquidated cash advance of {$payeeName} under check/ADA number {$checkNumber} amounting to ₱{$amount} has been endorsed to you by the Office of the President. The payee had previously been issued notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
 
-                    //                 // Dispatch SMS to auditor
-                    //                 SendSmsJob::dispatch(
-                    //                     $auditorPhone,
-                    //                     $auditorMessage,
-                    //                     'ENDORSEMENT_AUDITOR',  // context
-                    //                     $auditorUser->id,  // recipient user_id
-                    //                     Auth::id()  // sender_id
-                    //                 );
+                                    // Dispatch SMS to auditor
+                                    SendSmsJob::dispatch(
+                                        $auditorPhone,
+                                        $auditorMessage,
+                                        'ENDORSEMENT_AUDITOR',  // context
+                                        $auditorUser->id,  // recipient user_id
+                                        Auth::id()  // sender_id
+                                    );
 
-                    //                 Log::info("SMS queued successfully to auditor", [
-                    //                     'phone' => $auditorPhone,
-                    //                     'user_id' => $auditorUser->id,
-                    //                     'user_name' => $auditorUser->name,
-                    //                     'payee_name' => $payeeName,
-                    //                     'dv_number' => $dv->dv_number ?? 'N/A',
-                    //                     'context' => 'ENDORSEMENT_AUDITOR'
-                    //                 ]);
-                    //             }
-                    //         }
-                    //     }
-                    // } catch (\Exception $e) {
-                    //     Log::error("SMS notification failed for endorsement", [
-                    //         'error' => $e->getMessage(),
-                    //         'line' => $e->getLine(),
-                    //         'file' => $e->getFile(),
-                    //         'ca_reminder_id' => $record->id ?? null,
-                    //         'context' => 'ENDORSEMENT'
-                    //     ]);
-                    //     // Don't throw - allow the main endorsement action to complete successfully
-                    // }
-                    // // ========== SMS NOTIFICATION END ==========
+                                    Log::info("SMS queued successfully to auditor", [
+                                        'phone' => $auditorPhone,
+                                        'user_id' => $auditorUser->id,
+                                        'user_name' => $auditorUser->name,
+                                        'payee_name' => $payeeName,
+                                        'dv_number' => $dv->dv_number ?? 'N/A',
+                                        'context' => 'ENDORSEMENT_AUDITOR'
+                                    ]);
+                                }
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("SMS notification failed for endorsement", [
+                            'error' => $e->getMessage(),
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile(),
+                            'ca_reminder_id' => $record->id ?? null,
+                            'context' => 'ENDORSEMENT'
+                        ]);
+                        // Don't throw - allow the main endorsement action to complete successfully
+                    }
+                    // ========== SMS NOTIFICATION END ==========
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 5 && $record->is_sent == 0),
             Action::make('uploadFD')
                 ->label('Upload FD')
@@ -717,92 +717,92 @@ class CashAdvanceReminders extends Component implements HasTable
 
                     $this->emit('historyCreated');
 
-                    // // ========== SMS NOTIFICATION START (FORMAL DEMAND) ==========
-                    // try {
-                    //     // Validate required relationships exist
-                    //     if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
-                    //         Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
-                    //             'ca_reminder_id' => $record->id,
-                    //             'context' => 'FD'
-                    //         ]);
-                    //     } else {
-                    //         // Get payee (recipient of FD)
-                    //         $payee = $record->disbursementVoucher->user;
-                    //         $payeeEmployee = $payee->employee_information ?? null;
-                    //         $payeePhone = $payeeEmployee->contact_number ?? null;
+                    // ========== SMS NOTIFICATION START (FORMAL DEMAND) ==========
+                    try {
+                        // Validate required relationships exist
+                        if (!$record->disbursementVoucher || !$record->disbursementVoucher->user) {
+                            Log::warning("SMS not sent: Missing disbursement voucher or user relationship", [
+                                'ca_reminder_id' => $record->id,
+                                'context' => 'FD'
+                            ]);
+                        } else {
+                            // Get payee (recipient of FD)
+                            $payee = $record->disbursementVoucher->user;
+                            $payeeEmployee = $payee->employee_information ?? null;
+                            // $payeePhone = $payeeEmployee->contact_number ?? null;
 
-                    //         // For production: use actual phone number
-                    //         // For testing: uncomment below
-                    //         // $payeePhone = "09366303145";
+                            // For production: use actual phone number
+                            // For testing: uncomment below
+                            $payeePhone = "09366303145";
 
-                    //         // Check if phone number exists
-                    //         if (!$payeePhone) {
-                    //             Log::warning("SMS not sent: No phone number for payee", [
-                    //                 'user_id' => $payee->id,
-                    //                 'user_name' => $payee->name,
-                    //                 'context' => 'FD'
-                    //             ]);
-                    //         } else {
-                    //             // Prepare SMS data with null safety
-                    //             $dv = $record->disbursement_voucher;
-                    //             $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
-                    //             $checkNumber = $dv->cheque_number ?? 'N/A';
+                            // Check if phone number exists
+                            if (!$payeePhone) {
+                                Log::warning("SMS not sent: No phone number for payee", [
+                                    'user_id' => $payee->id,
+                                    'user_name' => $payee->name,
+                                    'context' => 'FD'
+                                ]);
+                            } else {
+                                // Prepare SMS data with null safety
+                                $dv = $record->disbursement_voucher;
+                                $amount = $dv->total_sum ? number_format($dv->total_sum, 2) : '0.00';
+                                $checkNumber = $dv->cheque_number ?? 'N/A';
 
-                    //             // Get FD reference number - use file name or generate from DV number
-                    //             $fileName = $record->auditor_attachment ? basename($record->auditor_attachment, '.pdf') : null;
-                    //             $fdRefNumber = $fileName ?? "FD-{$dv->dv_number}";
+                                // Get FD reference number - use file name or generate from DV number
+                                $fileName = $record->auditor_attachment ? basename($record->auditor_attachment, '.pdf') : null;
+                                $fdRefNumber = $fileName ?? "FD-{$dv->dv_number}";
 
-                    //             // Get FMR, FMD, and Memorandum numbers
-                    //             $fmrNumber = $record->fmr_number ?? 'N/A';
-                    //             $fmdNumber = $record->fmd_number ?? 'N/A';
-                    //             $memorandumNumber = $record->memorandum_number ?? 'N/A';
+                                // Get FMR, FMD, and Memorandum numbers
+                                $fmrNumber = $record->fmr_number ?? 'N/A';
+                                $fmdNumber = $record->fmd_number ?? 'N/A';
+                                $memorandumNumber = $record->memorandum_number ?? 'N/A';
 
-                    //             // Get purposes with empty check
-                    //             $particulars = $dv->disbursement_voucher_particulars;
-                    //             if ($particulars && $particulars->count() > 0) {
-                    //                 $purposes = $particulars->pluck('purpose')->filter()->join(', ');
-                    //             } else {
-                    //                 $purposes = 'No purpose specified';
-                    //             }
+                                // Get purposes with empty check
+                                $particulars = $dv->disbursement_voucher_particulars;
+                                if ($particulars && $particulars->count() > 0) {
+                                    $purposes = $particulars->pluck('purpose')->filter()->join(', ');
+                                } else {
+                                    $purposes = 'No purpose specified';
+                                }
 
-                    //             // Ensure purposes is not empty
-                    //             if (empty(trim($purposes))) {
-                    //                 $purposes = 'No purpose specified';
-                    //             }
+                                // Ensure purposes is not empty
+                                if (empty(trim($purposes))) {
+                                    $purposes = 'No purpose specified';
+                                }
 
-                    //             // Build SMS message for FD
-                    //             $message = "The Commission on Audit has electronically served your Formal Demand with ref. no. {$fdRefNumber} for your failure to liquidate your cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". The cash advance remains unliquidated despite service of notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
+                                // Build SMS message for FD
+                                $message = "The Commission on Audit has electronically served your Formal Demand with ref. no. {$fdRefNumber} for your failure to liquidate your cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} for the following purpose: \"{$purposes}\". The cash advance remains unliquidated despite service of notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
 
-                    //             // Dispatch SMS job with context and user IDs
-                    //             SendSmsJob::dispatch(
-                    //                 $payeePhone,
-                    //                 $message,
-                    //                 'FD',  // context
-                    //                 $payee->id,  // recipient user_id
-                    //                 Auth::id()  // sender_id (auditor)
-                    //             );
+                                // Dispatch SMS job with context and user IDs
+                                SendSmsJob::dispatch(
+                                    $payeePhone,
+                                    $message,
+                                    'FD',  // context
+                                    $payee->id,  // recipient user_id
+                                    Auth::id()  // sender_id (auditor)
+                                );
 
-                    //             Log::info("SMS queued successfully for FD", [
-                    //                 'phone' => $payeePhone,
-                    //                 'user_id' => $payee->id,
-                    //                 'user_name' => $payee->name,
-                    //                 'dv_number' => $dv->dv_number ?? 'N/A',
-                    //                 'fd_ref_number' => $fdRefNumber,
-                    //                 'context' => 'FD'
-                    //             ]);
-                    //         }
-                    //     }
-                    // } catch (\Exception $e) {
-                    //     Log::error("SMS notification failed for FD", [
-                    //         'error' => $e->getMessage(),
-                    //         'line' => $e->getLine(),
-                    //         'file' => $e->getFile(),
-                    //         'ca_reminder_id' => $record->id ?? null,
-                    //         'context' => 'FD'
-                    //     ]);
-                    //     // Don't throw - allow the main FD upload action to complete successfully
-                    // }
-                    // // ========== SMS NOTIFICATION END ==========
+                                Log::info("SMS queued successfully for FD", [
+                                    'phone' => $payeePhone,
+                                    'user_id' => $payee->id,
+                                    'user_name' => $payee->name,
+                                    'dv_number' => $dv->dv_number ?? 'N/A',
+                                    'fd_ref_number' => $fdRefNumber,
+                                    'context' => 'FD'
+                                ]);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("SMS notification failed for FD", [
+                            'error' => $e->getMessage(),
+                            'line' => $e->getLine(),
+                            'file' => $e->getFile(),
+                            'ca_reminder_id' => $record->id ?? null,
+                            'context' => 'FD'
+                        ]);
+                        // Don't throw - allow the main FD upload action to complete successfully
+                    }
+                    // ========== SMS NOTIFICATION END ==========
 
                     Notification::make()
                         ->title('Formal Demand Uploaded')
