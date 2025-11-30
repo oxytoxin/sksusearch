@@ -920,21 +920,23 @@
                 'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
             ]);
 
-            // // Send SMS notification to signatory
-            // $makerName = auth()->user()->employee_information->full_name ?? 'User';
-            // $message = "A DV has been submitted to the SEARCH system by {$makerName} for your approval.";
+            // ========== SMS NOTIFICATION ==========
+            // Send SMS notification to signatory
+            $makerName = auth()->user()->employee_information->full_name ?? 'User';
+            $message = "A DV has been submitted to the SEARCH system by {$makerName} for your approval.";
 
-            // $signatory = $dv->signatory;
-            // if ($signatory && $signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
-            //     SendSmsJob::dispatch(
-            //         '09366303145',
-            //         // $signatory->employee_information->contact_number,
-            //         $message,
-            //         'disbursement_voucher_submitted',
-            //         $signatory->id,
-            //         auth()->id()
-            //     );
-            // }
+            $signatory = $dv->signatory;
+            if ($signatory && $signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
+                SendSmsJob::dispatch(
+                    '09366303145',  // TEST PHONE - Remove this line for production
+                    // $signatory->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                    $message,
+                    'disbursement_voucher_submitted',
+                    $signatory->id,
+                    auth()->id()
+                );
+            }
+            // ========== SMS NOTIFICATION END ==========
 
             DB::commit();
             Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
