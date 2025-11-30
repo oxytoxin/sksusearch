@@ -1,3 +1,25 @@
+@php
+    $branch = 'unknown';
+
+    // Detect branch for all except production
+    if (! app()->environment('production') && function_exists('shell_exec')) {
+        $output = @shell_exec('git rev-parse --abbrev-ref HEAD');
+
+        if (is_string($output) && trim($output) !== '') {
+            $branch = trim($output);
+        }
+    }
+
+    $shouldShowBanner = ! app()->environment('production') && $branch !== 'master';
+@endphp
+
+@if ($shouldShowBanner)
+    <div class="bg-orange-600 text-white text-sm py-2 px-4 text-center font-medium shadow-md">
+        🔧 ENV: {{ app()->environment() }} — Branch:
+        <span class="font-bold">{{ $branch }}</span>
+    </div>
+@endif
+
 <nav class="sticky top-0 z-10 border-b border-gray-100 bg-primary-500" x-data="{ open: false }">
     <!-- Primary Navigation Menu -->
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
