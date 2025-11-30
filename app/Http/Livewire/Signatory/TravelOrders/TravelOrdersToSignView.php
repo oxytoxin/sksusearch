@@ -62,19 +62,19 @@ class TravelOrdersToSignView extends Component
             $applicants = $this->travel_order->applicants()->with('employee_information')->get();
             $message = "Your travel on official business has been converted by {$officerName} to one on official time. No travel allowances shall be granted.";
 
-            // ========== SMS NOTIFICATION (COMMENTED OUT) ==========
-            // foreach ($applicants as $applicant) {
-            //     if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
-            //         SendSmsJob::dispatch(
-            //             '09366303145',
-            //             // $applicant->employee_information->contact_number,
-            //             $message,
-            //             'travel_order_type_converted',
-            //             $applicant->id,
-            //             $this->from_oic ? $this->oic_signatory : auth()->id()
-            //         );
-            //     }
-            // }
+            // ========== SMS NOTIFICATION ==========
+            foreach ($applicants as $applicant) {
+                if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        '09366303145',  // TEST PHONE - Remove this line for production
+                        // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                        $message,
+                        'travel_order_type_converted',
+                        $applicant->id,
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            }
             // ========== SMS NOTIFICATION END ==========
         } else {
             // dd($this->travel_order->travel_order_type_id, TravelOrderType::OFFICIAL_BUSINESS, 'OFFICIAL_BUSINESS');
@@ -180,20 +180,19 @@ class TravelOrdersToSignView extends Component
         $applicants = $this->travel_order->applicants()->with('employee_information')->get();
         $message = "Your travel order with ref. no. {$this->travel_order->tracking_code} has been approved by {$officerName}.";
 
-        // ========== SMS NOTIFICATION (COMMENTED OUT) ==========
-        // foreach ($applicants as $applicant) {
-        //     if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
-        //
-        //         SendSmsJob::dispatch(
-        //             '09366303145',
-        //             // $applicant->employee_information->contact_number,
-        //             $message,
-        //             'travel_order_approved',
-        //             $applicant->id,
-        //             $this->from_oic ? $this->oic_signatory : auth()->id()
-        //         );
-        //     }
-        // }
+        // ========== SMS NOTIFICATION ==========
+        foreach ($applicants as $applicant) {
+            if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+                SendSmsJob::dispatch(
+                    '09366303145',  // TEST PHONE - Remove this line for production
+                    // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                    $message,
+                    'travel_order_approved',
+                    $applicant->id,
+                    $this->from_oic ? $this->oic_signatory : auth()->id()
+                );
+            }
+        }
         // ========== SMS NOTIFICATION END ==========
 
         $this->travel_order->refresh();
@@ -240,20 +239,19 @@ class TravelOrdersToSignView extends Component
         $applicants = $this->travel_order->applicants()->with('employee_information')->get();
         $message = "Your travel order with ref. no. {$this->travel_order->tracking_code} has been rejected by {$officerName}.";
 
-        // ========== SMS NOTIFICATION (COMMENTED OUT) ==========
-        // foreach ($applicants as $applicant) {
-        //     if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
-        //
-        //         SendSmsJob::dispatch(
-        //             '09366303145',
-        //             // $applicant->employee_information->contact_number,
-        //             $message,
-        //             'travel_order_rejected',
-        //             $applicant->id,
-        //             $this->from_oic ? $this->oic_signatory : auth()->id()
-        //         );
-        //     }
-        // }
+        // ========== SMS NOTIFICATION ==========
+        foreach ($applicants as $applicant) {
+            if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+                SendSmsJob::dispatch(
+                    '09366303145',  // TEST PHONE - Remove this line for production
+                    // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                    $message,
+                    'travel_order_rejected',
+                    $applicant->id,
+                    $this->from_oic ? $this->oic_signatory : auth()->id()
+                );
+            }
+        }
         // ========== SMS NOTIFICATION END ==========
 
         if (! $rejectedDueToConversion) {
