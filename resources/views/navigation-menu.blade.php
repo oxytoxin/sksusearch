@@ -16,12 +16,14 @@
     <div class="bg-red-600 text-white text-xs py-0.5 px-3 text-center font-medium shadow">
         <div class="flex justify-center items-center gap-3">
             <span class="text-[11px]">Branch: <strong>{{ $branch }}</strong></span>
+
             <span class="italic text-[10px] opacity-90">
-                Notice: This is a testing version.
+                This is a test version. If something looks different from expected, please verify you are viewing the correct version.
             </span>
         </div>
     </div>
 @endif
+
 
 
 <nav class="sticky top-0 z-10 border-b border-gray-100 bg-primary-500" x-data="{ open: false }">
