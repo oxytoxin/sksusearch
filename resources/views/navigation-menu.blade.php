@@ -8,22 +8,32 @@
         }
     }
 
-    // Show banner on ANY branch except master/main
-    $shouldShowBanner = !in_array($branch, ['master', 'main']);
+
+    $database = config('database.connections.mysql.database');
+
+
+    $shouldShowBanner = ! in_array($branch, ['master', 'main']);
 @endphp
 
 @if ($shouldShowBanner)
     <div class="bg-orange-600 text-white text-xs py-0.5 px-3 text-center font-medium shadow">
         <div class="flex justify-center items-center gap-3">
-            <span class="text-[11px]">Branch: <strong>{{ $branch }}</strong></span>
+
+            <span class="text-[11px]">
+                Branch: <strong>{{ $branch }}</strong>
+            </span>
+
+            <span class="text-[11px]">
+                | DB: <strong>{{ $database }}</strong>
+            </span>
 
             <span class="italic text-[10px] opacity-90">
-                This is a test version. If something looks different from expected, please verify you are viewing the
-                correct version.
+                This is a test version. Differences from the final system may occur.
             </span>
         </div>
     </div>
 @endif
+
 
 
 
