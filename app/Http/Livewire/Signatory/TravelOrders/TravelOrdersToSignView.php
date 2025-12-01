@@ -176,26 +176,36 @@ class TravelOrdersToSignView extends Component
             $officerName = auth()->user()->employee_information->full_name;
         }
 
-        // Send SMS notifications to all applicants
-        $applicants = $this->travel_order->applicants()->with('employee_information')->get();
-        $message = "Your travel order with ref. no. {$this->travel_order->tracking_code} has been approved by {$officerName}.";
-
-        // ========== SMS NOTIFICATION ==========
-        foreach ($applicants as $applicant) {
-            if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
-                SendSmsJob::dispatch(
-                    '09366303145',  // TEST PHONE - Remove this line for production
-                    // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
-                    $message,
-                    'travel_order_approved',
-                    $applicant->id,
-                    $this->from_oic ? $this->oic_signatory : auth()->id()
-                );
-            }
-        }
-        // ========== SMS NOTIFICATION END ==========
-
+        // Refresh to get updated signatory approval status
         $this->travel_order->refresh();
+
+        // Check if ALL signatories have approved (only send SMS on final approval)
+        $allApproved = $this->travel_order->signatories()
+            ->wherePivot('is_approved', 1)
+            ->count() === $this->travel_order->signatories()->count();
+
+        // Only send SMS if this is the FINAL approval (all signatories approved)
+        if ($allApproved) {
+            // Send SMS notifications to all applicants
+            $applicants = $this->travel_order->applicants()->with('employee_information')->get();
+            $message = "Your travel order with ref. no. {$this->travel_order->tracking_code} has been approved by {$officerName}.";
+
+            // ========== SMS NOTIFICATION ==========
+            foreach ($applicants as $applicant) {
+                if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        '09366303145',  // TEST PHONE - Remove this line for production
+                        // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                        $message,
+                        'travel_order_approved',
+                        $applicant->id,
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            }
+            // ========== SMS NOTIFICATION END ==========
+        }
+
         $this->dialog()->success(
             $title = 'Approved',
             $description = 'Travel order approved!',
