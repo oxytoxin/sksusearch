@@ -30,7 +30,7 @@ class ArchiveDocumentsCreate extends Component implements HasForms
     protected function getFormSchema()
     {
         return [
-            Grid::make(4)->schema([            
+            Grid::make(4)->schema([
             Select::make('disbursement_voucher_id')
                 ->columnSpan(4)
                 ->label('Disbursement Voucher')
@@ -59,7 +59,7 @@ class ArchiveDocumentsCreate extends Component implements HasForms
                 ->label('Payee')
                 ->disabled()
                 ->required(),
-           
+
             TextInput::make('dv_number')
                 ->columnSpan(2)
                 ->label('DV Number')
@@ -81,7 +81,6 @@ class ArchiveDocumentsCreate extends Component implements HasForms
                 ->required(),
             FileUpload::make('attachment')
                 ->multiple()
-                ->acceptedFileTypes(['application/pdf'])
                 ->enableOpen()
                 ->enableReordering()
                 ->columnSpan(4)
@@ -91,11 +90,11 @@ class ArchiveDocumentsCreate extends Component implements HasForms
 
     public function save()
     {
-        
+
         $this->validate();
         DB::beginTransaction();
         $dv = DisbursementVoucher::findOrFail($this->disbursement_voucher_id);
-        foreach($this->attachment as $document){            
+        foreach($this->attachment as $document){
             $dv->scanned_documents()->create(
                 [
                     "path"=>$document->storeAs('scanned_documents',now()->format("HismdY-").$document->getClientOriginalName()),
@@ -118,7 +117,7 @@ class ArchiveDocumentsCreate extends Component implements HasForms
         Notification::make()->title('Operation Success')->body('Documents have been archived successfully')->success()->send();
 
         return redirect()->route('archiver.archive-doc.create');
-    
+
     }
 
     public function render()

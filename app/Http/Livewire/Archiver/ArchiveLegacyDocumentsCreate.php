@@ -164,7 +164,6 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
                     ->enableOpen()
                     ->multiple()
                     ->preserveFilenames()
-                    ->acceptedFileTypes(['application/pdf'])
                     ->reactive()
                     ->disk('scanned_documents')
                     ->columnSpan(4)
