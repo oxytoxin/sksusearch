@@ -81,8 +81,26 @@ class TravelOrdersToSignView extends Component
             $this->travel_order->update([
                 'travel_order_type_id' => TravelOrderType::OFFICIAL_BUSINESS,
             ]);
-            $this->travel_order->sidenotes()->create(['content' => 'Travel order type changed to Official Business leading to cancellation.', 'user_id' => auth()->id()]);
-            $this->rejectFinal(rejectedDueToConversion: true);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order type changed to Official Business.', 'user_id' => auth()->id()]);
+
+            // Send SMS notifications to all applicants
+            $applicants = $this->travel_order->applicants()->with('employee_information')->get();
+            $message = "Your travel on official time has been converted by {$officerName} to one on official business. Travel allowances will be granted.";
+
+            // ========== SMS NOTIFICATION ==========
+            foreach ($applicants as $applicant) {
+                if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        '09366303145',  // TEST PHONE - Remove this line for production
+                        // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                        $message,
+                        'travel_order_type_converted',
+                        $applicant->id,
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            }
+            // ========== SMS NOTIFICATION END ==========
         }
 
         $this->travel_order->refresh();
