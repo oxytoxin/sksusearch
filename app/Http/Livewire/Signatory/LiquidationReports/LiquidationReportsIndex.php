@@ -20,6 +20,7 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Support\HtmlString;
+use App\Jobs\SendSmsJob;
 
 class LiquidationReportsIndex extends Component implements HasTable
 {
@@ -140,6 +141,32 @@ class LiquidationReportsIndex extends Component implements HasTable
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
+
+                // ========== SMS NOTIFICATION ==========
+                $record->load(['disbursement_voucher.user.employee_information']);
+                $trackingNumber = $record->tracking_number;
+                $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                $remarks = $data['remarks'] ?? 'No remarks provided';
+
+                // Strip HTML tags from remarks if it's from RichEditor
+                $remarks = strip_tags($remarks);
+
+                $message = "Your LR with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
+
+                // Send to the user who requested the disbursement voucher
+                $requestedBy = $record->disbursement_voucher->user;
+                if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        '09366303145',  // TEST PHONE - Remove this line for production
+                        // $requestedBy->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                        $message,
+                        'liquidation_report_returned',
+                        $requestedBy->id,
+                        auth()->id()
+                    );
+                }
+                // ========== SMS NOTIFICATION END ==========
+
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
