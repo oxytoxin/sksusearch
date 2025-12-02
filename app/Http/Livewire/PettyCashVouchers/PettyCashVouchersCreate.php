@@ -131,7 +131,7 @@ class PettyCashVouchersCreate extends Component implements HasForms
         $requisitioner = $pcv->requisitioner;
         if ($requisitioner && $requisitioner->employee_information && !empty($requisitioner->employee_information->contact_number)) {
             SendSmsJob::dispatch(
-                '09366303145',  // TEST PHONE - Remove this line for production
+                '09273464891',  // TEST PHONE - Remove this line for production
                 // $requisitioner->employee_information->contact_number,  // PRODUCTION - Uncomment this
                 $message,
                 'petty_cash_voucher_issued',

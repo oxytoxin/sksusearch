@@ -182,7 +182,7 @@
                         //
                         //                         // Get phone number with null safety
                         //                         $phone = $headEmployee->contact_number ?? null;
-                        //                         // $phone = "09366303145"; // TEST PHONE - Uncomment for testing
+                        //                         // $phone = "09273464891"; // TEST PHONE - Uncomment for testing
                         //
                         //                         if (!$phone) {
                         //                             Log::warning('SMS notification skipped: No contact number for head employee', [
@@ -325,7 +325,7 @@
                         //
                         //                         // Get phone number with null safety
                         //                         $phone = $headEmployee->contact_number ?? null;
-                        //                         // $phone = "09366303145"; // TEST PHONE - Uncomment for testing
+                        //                         // $phone = "09273464891"; // TEST PHONE - Uncomment for testing
                         //
                         //                         if (!$phone) {
                         //                             Log::warning('SMS notification skipped: No contact number for head employee', [

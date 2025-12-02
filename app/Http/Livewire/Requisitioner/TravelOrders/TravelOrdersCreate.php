@@ -234,7 +234,7 @@ class TravelOrdersCreate extends Component implements HasForms
                     // Check if employee information and contact number exist
                     if ($signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
                         SendSmsJob::dispatch(
-                            "09366303145",  // TEST PHONE - Remove this line for production
+                            "09273464891",  // TEST PHONE - Remove this line for production
                             // $signatory->employee_information->contact_number,  // PRODUCTION - Uncomment this
                             $message,
                             'travel_order_signatory_notification',

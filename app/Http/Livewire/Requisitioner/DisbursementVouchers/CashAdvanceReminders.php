@@ -158,7 +158,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             // For production: use actual phone number
                             // $phone = $employee->contact_number ?? null;
                             // For testing: uncomment below
-                            $phone = "09366303145";
+                            $phone = "09273464891";
 
                             // Check if phone number exists
                             if (!$phone) {
@@ -287,7 +287,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             // For production: use actual phone number
                             // $phone = $employee->contact_number ?? null;
                             // For testing: uncomment below
-                            $phone = "09366303145";
+                            $phone = "09273464891";
 
                             // Check if phone number exists
                             if (!$phone) {
@@ -421,7 +421,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             // For production: use actual phone number
                             // $phone = $employee->contact_number ?? null;
                             // For testing: uncomment below
-                            $phone = "09366303145";
+                            $phone = "09273464891";
 
                             // Check if phone number exists
                             if (!$phone) {
@@ -563,7 +563,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
                             // For production: use actual phone number
                             // For testing: uncomment below
-                            $payeePhone = "09366303145";
+                            $payeePhone = "09273464891";
 
                             if (!$payeePhone) {
                                 Log::warning("SMS not sent to payee: No phone number", [
@@ -606,7 +606,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
                                 // For production: use actual phone number
                                 // For testing: uncomment below
-                                $auditorPhone = "09366303145";
+                                $auditorPhone = "09273464891";
 
                                 if (!$auditorPhone) {
                                     Log::warning("SMS not sent to auditor: No phone number", [
@@ -733,7 +733,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
                             // For production: use actual phone number
                             // For testing: uncomment below
-                            $payeePhone = "09366303145";
+                            $payeePhone = "09273464891";
 
                             // Check if phone number exists
                             if (!$payeePhone) {
