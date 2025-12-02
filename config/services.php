@@ -54,6 +54,11 @@ return [
         'sender_name' => env('SEMAPHORE_SENDER_NAME', 'himsservice'),
     ],
 
+    'philsms' => [
+        'api_token' => env('PHILSMS_API_TOKEN'),
+        'sender_id' => env('PHILSMS_SENDER_ID', 'PhilSMS'),
+    ],
+
     'twilio' => [
         'account_sid' => env('TWILIO_ACCOUNT_SID'),
         'auth_token' => env('TWILIO_AUTH_TOKEN'),
