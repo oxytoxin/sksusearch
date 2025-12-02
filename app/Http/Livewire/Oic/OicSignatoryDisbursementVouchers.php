@@ -151,8 +151,9 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
                 $remarks = $data['remarks'] ?? 'No remarks provided';
 
-                // Strip HTML tags from remarks if it's from RichEditor
+                // Strip HTML tags and decode HTML entities from remarks
                 $remarks = strip_tags($remarks);
+                $remarks = html_entity_decode($remarks, ENT_QUOTES, 'UTF-8');
 
                 $message = "Your DV with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
 
