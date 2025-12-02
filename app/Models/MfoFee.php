@@ -25,5 +25,4 @@
         {
             return $this->belongsTo(CostCenter::class, 'cost_center_id');
         }
-
     }
