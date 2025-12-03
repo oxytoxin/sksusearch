@@ -377,7 +377,7 @@ class RequestVehicleCreate extends Component implements HasForms
                         'travel_order_id' => $this->travel_order_id == '' ? null : $this->travel_order_id,
                         'driver_id' => $this->driver_id,
                         'requested_by_id' => auth()->user()->id,
-                        'vehicle_id' => $this->vehicle_id,
+                        'vehicle_id' => $this->vehicle_id ?? null,
                         'purpose' => $this->purpose,
                         'philippine_region_id' => PhilippineRegion::firstWhere('region_code', $this->region_code)?->id,
                         'philippine_province_id' => PhilippineProvince::firstWhere('province_code', $this->province_code)?->id,
@@ -392,7 +392,7 @@ class RequestVehicleCreate extends Component implements HasForms
                     foreach ($dates_and_time as $item) {
                         RequestScheduleTimeAndDate::create([
                             'request_schedule_id' => $rq->id,
-                            'vehicle_id' => $this->vehicle_id == null ? null : $this->vehicle_id,
+                            'vehicle_id' => $this->vehicle_id ?? null,
                             'travel_date' => $item['date'],
                             'time_from' => $item['time_from'],
                             'time_to' => $item['time_to'],
