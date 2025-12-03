@@ -228,7 +228,7 @@ class RequestVehicleCreate extends Component implements HasForms
                 ->searchable()
                 ->reactive()
                 ->visible(fn ($get) => $get('is_vehicle_preferred') == true)
-                ->required(),
+                ->required(fn ($get) => $get('is_vehicle_preferred') == true),
         ];
     }
 

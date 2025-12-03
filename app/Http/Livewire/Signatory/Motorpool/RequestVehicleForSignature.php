@@ -8,8 +8,9 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\ViewAction; 
+use Filament\Tables\Actions\ViewAction;
 use App\Models\RequestSchedule;
+use Filament\Tables\Columns\ViewColumn;
 
 class RequestVehicleForSignature extends Component implements HasTable
 {
@@ -23,6 +24,7 @@ class RequestVehicleForSignature extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
+            ViewColumn::make('passengers')->view('tables.columns.passengers'),
             Tables\Columns\TextColumn::make('purpose')
                 ->wrap()
                 ->searchable(),
@@ -37,7 +39,7 @@ class RequestVehicleForSignature extends Component implements HasTable
                 ->sortable()
                 ->searchable(),
             Tables\Columns\TextColumn::make('status')
-                ->searchable(),    
+                ->searchable(),
         ];
     }
 
