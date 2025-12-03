@@ -172,7 +172,7 @@ class RequestVehicleShow extends Component implements HasForms
                     ->where(function ($query) use ($vehicleId) {
                         $query->where('vehicle_id', $vehicleId)
                             ->when(!is_null($this->request_schedule->driver_id), function ($query) {
-                                $query->where('driver_id', $this->request_schedule->driver_id);
+                                $query->orWhere('driver_id', $this->request_schedule->driver_id);
                             });
                     });
             })
