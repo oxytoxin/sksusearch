@@ -49,7 +49,7 @@
                             {{ $request->time_start == null || $request->time_end == null ? 'Not yet set' : \Carbon\Carbon::parse($request->time_start)->format('h: i A') . ' to ' . \Carbon\Carbon::parse($request->time_end)->format('h: i A') }}
                         </p> --}}
                         <p class="mt-1 text-sm text-primary-500">Vehicle :
-                            {{ $request->vehicle_id == null ? 'Not yet set' : $request->vehicle->campus->name . ' - ' . $request->vehicle->model }}
+                            {{ $request->vehicle_id == null ? 'Not yet set' : $request->vehicle->campus->name . ' - ' . $request->vehicle->model . ' (' . $request->vehicle->plate_number . ')' }}
                             @if (($is_president || $is_motorpool_head) && $request->vehicle_id == null)
                                 <button class="italic underline ml-2"
                                     wire:click="$set('assignVehicleModal',true)">(Assign Vehicle)</button>
@@ -438,7 +438,7 @@
                 <x-native-select label="Vehicle" wire:model="assign_vehicle">
                     <option>Select Vehicle</option>
                     @foreach ($vehicles as $vehicle)
-                        <option value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }}
+                        <option value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }} - ({{ $vehicle->plate_number }})
                         </option>
                     @endforeach
                 </x-native-select>
@@ -463,7 +463,7 @@
                 <x-native-select label="Vehicle" wire:model="change_vehicle">
                     <option>Select Vehicle</option>
                     @foreach ($vehicles_for_update as $vehicle)
-                        <option value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }}
+                        <option value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }} - ({{ $vehicle->plate_number }})
                         </option>
                     @endforeach
                 </x-native-select>

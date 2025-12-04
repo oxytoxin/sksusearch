@@ -56,10 +56,11 @@ class ViewSchedules extends Component
             $startDateTime = date('Y-m-d H:i', strtotime($event->travel_date . ' ' . $event->time_from));
             $endDateTime = date('Y-m-d H:i', strtotime($event->travel_date . ' ' . $event->time_to));
             $formattedEvents[] = [
-                'title' => $event->request_schedule->other_details != null ? $event->request_schedule->other_details . ', ' . $event->request_schedule->philippine_city->city_municipality_description . ', ' .
-                            $event->request_schedule->philippine_province->province_description . ', ' . $event->request_schedule->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_from)) . ' - ' . date('g:i A', strtotime($event->time_to)) . ')' :
-                            $event->request_schedule->philippine_city->city_municipality_description . ', ' .
-                            $event->request_schedule->philippine_province->province_description . ', ' . $event->request_schedule->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_from)) . ' - ' . date('g:i A', strtotime($event->time_to)) . ')',
+                // 'title' => $event->request_schedule->other_details != null ? $event->request_schedule->other_details . ', ' . $event->request_schedule->philippine_city->city_municipality_description . ', ' .
+                //             $event->request_schedule->philippine_province->province_description . ', ' . $event->request_schedule->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_from)) . ' - ' . date('g:i A', strtotime($event->time_to)) . ')' :
+                //             $event->request_schedule->philippine_city->city_municipality_description . ', ' .
+                //             $event->request_schedule->philippine_province->province_description . ', ' . $event->request_schedule->philippine_region->region_description . ' (' . date('g:i A', strtotime($event->time_from)) . ' - ' . date('g:i A', strtotime($event->time_to)) . ')',
+                'title' => $event->request_schedule->vehicle->model . ' - ' . $event->request_schedule->philippine_city->city_municipality_description,
                 'start' =>  $startDateTime,
                 'end' => $endDateTime,
                 'purpose' => $event->request_schedule->purpose,
