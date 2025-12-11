@@ -332,7 +332,6 @@ $message = "FMR Reminder: Your Cash Advance (DV #{$record->disbursement_voucher-
                         ->preserveFilenames()
                         ->disk('public')
                         ->directory('fd')
-                        ->acceptedFileTypes(['application/pdf'])
                         ->helperText('Only PDF files are allowed.'),
                     DatePicker::make('auditor_deadline')
                         ->label('Deadline')

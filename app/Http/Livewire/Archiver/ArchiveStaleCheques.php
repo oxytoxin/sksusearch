@@ -59,14 +59,14 @@ class ArchiveStaleCheques extends Component implements  HasForms
                             ->columnSpan(1),
 
                             Flatpickr::make('cheque_date')
-                            ->label('Cheque Date') 
+                            ->label('Cheque Date')
                             ->disableTime()
                             ->required()
                             ->visible()
                             ->columnSpan(1),
 
                             Select::make("cheque_state")
-                            ->label('Cheque State') 
+                            ->label('Cheque State')
                             ->required()
                             ->preload()
                             ->options([
@@ -81,19 +81,18 @@ class ArchiveStaleCheques extends Component implements  HasForms
                                 'lg' => 2,
                                 ]
                             ),
-                            
+
                             FileUpload::make('attachment')
                             ->enableOpen()
                             ->required()
                             ->preserveFilenames()
-                            ->acceptedFileTypes(['application/pdf'])
                             ->reactive()
                             ->disk('scanned_documents')
                             ->columnSpan([
                                 'default' => 1,
                                 'sm' => 2,
                                 'md' => 2,
-                                'lg' => 2,])  
+                                'lg' => 2,])
                         ]
                     )
                 ]
@@ -102,11 +101,11 @@ class ArchiveStaleCheques extends Component implements  HasForms
     }
     public function mount()
     {
-      
+
         $this->form->fill();
-    
+
     }
-    
+
     public function save()
     {
         $this->validate();
@@ -122,7 +121,7 @@ class ArchiveStaleCheques extends Component implements  HasForms
         ]);
 
         //save Files from fileupload
-        foreach($this->attachment as $document){            
+        foreach($this->attachment as $document){
             $archiveCheque->scanned_documents()->create(
                 [
                     "path"=>$document->storeAs('scanned_documents',now()->format("HismdY-").$document->getClientOriginalName()),
