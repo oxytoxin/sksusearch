@@ -191,30 +191,66 @@ class RequestVehicleShow extends Component implements HasForms
         $vehicleId = $this->assign_vehicle;
         $this->request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $this->request_schedule->id)->get();
         foreach ($this->request_schedule_date_and_time as $item) {
-            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId) {
-                $query->where('status', 'Approved')
-                    ->where(function ($query) use ($vehicleId) {
-                        $query->where('vehicle_id', $vehicleId)
-                            ->when(!is_null($this->request_schedule->driver_id), function ($query) {
-                                $query->where('driver_id', $this->request_schedule->driver_id);
-                            });
-                    });
-            })
-                ->where('travel_date', $item->travel_date)
-                ->where(function ($query) use ($item) {
-                    $query->where(function ($q) use ($item) {
-                        $q->whereTime('time_from', '<=', $item->time_from)
-                            ->whereTime('time_to', '>', $item->time_from);
-                    })->orWhere(function ($q) use ($item) {
-                        $q->whereTime('time_from', '<', $item->time_to)
-                            ->whereTime('time_to', '>=', $item->time_to);
-                    })->orWhere(function ($q) use ($item) {
-                        $q->whereTime('time_from', '>=', $item->time_from)
-                            ->whereTime('time_to', '<=', $item->time_to);
-                    });
-                })
-                ->where('id', '!=', $item->id)
-                ->first();
+            // $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId) {
+            //     $query->where('status', 'Approved')
+            //         ->where(function ($query) use ($vehicleId) {
+            //             $query->where('vehicle_id', $vehicleId)
+            //                 ->when(!is_null($this->request_schedule->driver_id), function ($query) {
+            //                     $query->orWhere('driver_id', $this->request_schedule->driver_id);
+            //                 });
+            //         });
+            // })
+            //     ->where('travel_date', $item->travel_date)
+            //     ->where(function ($query) use ($item) {
+            //         $query->where(function ($q) use ($item) {
+            //             $q->whereTime('time_from', '<=', $item->time_from)
+            //                 ->whereTime('time_to', '>', $item->time_from);
+            //         })->orWhere(function ($q) use ($item) {
+            //             $q->whereTime('time_from', '<', $item->time_to)
+            //                 ->whereTime('time_to', '>=', $item->time_to);
+            //         })->orWhere(function ($q) use ($item) {
+            //             $q->whereTime('time_from', '>=', $item->time_from)
+            //                 ->whereTime('time_to', '<=', $item->time_to);
+            //         });
+            //     })
+            //     ->where('id', '!=', $item->id)
+            //     ->first();
+
+               $driverId = $this->request_schedule->driver_id;
+
+$conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId, $driverId) {
+        $query->where('status', 'Approved')
+            ->where(function ($q) use ($vehicleId, $driverId) {
+                $q->where('vehicle_id', $vehicleId);
+
+                if (!is_null($driverId)) {
+                    $q->orWhere('driver_id', $driverId);
+                }
+            });
+    })
+    ->where('travel_date', $item->travel_date)
+    ->where(function ($q) use ($item) {
+
+        // CASE 1: Existing overlaps the start of NEW
+        $q->where(function ($sub) use ($item) {
+            $sub->whereTime('time_from', '<=', $item->time_from)
+                ->whereTime('time_to', '>', $item->time_from);
+        })
+
+        // CASE 2: Existing overlaps the end of NEW
+        ->orWhere(function ($sub) use ($item) {
+            $sub->whereTime('time_from', '<', $item->time_to)
+                ->whereTime('time_to', '>=', $item->time_to);
+        })
+
+        // CASE 3: Existing is fully inside NEW
+        ->orWhere(function ($sub) use ($item) {
+            $sub->whereTime('time_from', '>=', $item->time_from)
+                ->whereTime('time_to', '<=', $item->time_to);
+        });
+    })
+    ->where('id', '!=', $item->id)
+    ->first();
             if (! $conflict) {
                 $this->request_schedule->status = 'Approved';
                 $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');

@@ -98,19 +98,21 @@ class FuelRequestIndex extends Component implements HasTable
                                 ->required()
                                 ->reactive()
                                 ->prefix('₱')
+                                ->step(0.01)
                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                     $quantity = $get('quantity');
                                     if ($state && $quantity) {
-                                        $set('requested_total_amount', $state * $quantity);
+                                        $total = round($state * $quantity, 2);
+                                        $set('requested_total_amount', number_format($total, 2, '.', ','));
                                     }
                                 }),
                             Forms\Components\TextInput::make('requested_total_amount')
                                 ->label('Requested Total Amount')
-                                ->numeric()
                                 ->required()
                                 ->prefix('₱')
                                 ->disabled()
-                                ->dehydrated(),
+                                ->dehydrated()
+                                ->formatStateUsing(fn ($state) => $state ? number_format($state, 2, '.', ',') : '0.00'),
                         ]),
                 ])
                 ->mountUsing(function ($form, $record) {
@@ -123,7 +125,7 @@ class FuelRequestIndex extends Component implements HasTable
                 })
                 ->action(function (array $data, $record) {
                     // Auto-calculate total amount
-                    $data['requested_total_amount'] = $data['requested_unit_price'] * $record->quantity;
+                    $data['requested_total_amount'] = round($data['requested_unit_price'] * $record->quantity, 2);
 
                     $record->update([
                         'requested_unit_price' => $data['requested_unit_price'],
@@ -187,7 +189,8 @@ class FuelRequestIndex extends Component implements HasTable
                                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                             $price = $get('actual_unit_price');
                                             if ($state && $price) {
-                                                $set('actual_total_amount', $state * $price);
+                                                $total = round($state * $price, 2);
+                                                $set('actual_total_amount', number_format($total, 2, '.', ','));
                                             }
                                         }),
                                     Forms\Components\TextInput::make('actual_unit_price')
@@ -196,19 +199,21 @@ class FuelRequestIndex extends Component implements HasTable
                                         ->required()
                                         ->reactive()
                                         ->prefix('₱')
+                                        ->step(0.01)
                                         ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                             $quantity = $get('actual_quantity');
                                             if ($state && $quantity) {
-                                                $set('actual_total_amount', $state * $quantity);
+                                                $total = round($state * $quantity, 2);
+                                                $set('actual_total_amount', number_format($total, 2, '.', ','));
                                             }
                                         }),
                                     Forms\Components\TextInput::make('actual_total_amount')
                                         ->label('Actual Total Amount')
-                                        ->numeric()
                                         ->required()
                                         ->prefix('₱')
                                         ->disabled()
-                                        ->dehydrated(),
+                                        ->dehydrated()
+                                        ->formatStateUsing(fn ($state) => $state ? number_format($state, 2, '.', ',') : '0.00'),
                                     Forms\Components\TextInput::make('actual_or_number')
                                         ->label('OR Number')
                                         ->required()
@@ -231,7 +236,7 @@ class FuelRequestIndex extends Component implements HasTable
                 ])
                 ->action(function (array $data, $record) {
                     // Auto-calculate total amount
-                    $data['actual_total_amount'] = $data['actual_quantity'] * $data['actual_unit_price'];
+                    $data['actual_total_amount'] = round($data['actual_quantity'] * $data['actual_unit_price'], 2);
                     $data['is_liquidated'] = true;
 
                     $record->update($data);
