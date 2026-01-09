@@ -329,7 +329,6 @@ class CashAdvanceReminders extends Component implements HasTable
                         ->preserveFilenames()
                         ->disk('public')
                         ->directory('fd')
-                        ->acceptedFileTypes(['application/pdf'])
                         ->helperText('Only PDF files are allowed.'),
                     DatePicker::make('auditor_deadline')
                         ->label('Deadline')

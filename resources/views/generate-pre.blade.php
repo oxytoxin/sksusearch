@@ -47,7 +47,7 @@
                         @endforeach
                     </nav>
                 </div>
-                <div x-data="{ selectedType: '{{ request()->input('selectedType') || 1 }}' }" class="flex my-2">
+                <div x-data="{ selectedType: '{{ request()->input('selectedType') ?? 1 }}' }" class="flex my-2">
                     <select x-model="selectedType" name="selectedType" id="selectedType"
                         x-on:change="
         let url = new URL(window.location.href);

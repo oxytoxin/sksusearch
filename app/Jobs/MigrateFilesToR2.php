@@ -13,6 +13,7 @@ class MigrateFilesToR2 implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+     public $timeout = 600;
     /**
      * Create a new job instance.
      */
@@ -30,11 +31,9 @@ class MigrateFilesToR2 implements ShouldQueue
         $r2Disk = Storage::disk('s3');
         $file = $this->file;
 
-        if (!$r2Disk->exists($file)) {
-            $r2Disk->put($file, $localDisk->get($file));
-            logger("✅ Migrated: {$file}");
-        } else {
-            logger("⚠️ Skipped (already exists): {$file}");
-        }
+        // No existence check — always overwrite
+        $r2Disk->put($file, $localDisk->get($file));
+
+        logger("🔁 Uploaded (overwrote if existed): {$file}");
     }
 }

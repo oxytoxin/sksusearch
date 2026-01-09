@@ -9,7 +9,6 @@ class MFO extends Model
 {
     use HasFactory;
     protected $guarded = [];
-
     public function costCenters()
     {
         return $this->hasMany(CostCenter::class);
