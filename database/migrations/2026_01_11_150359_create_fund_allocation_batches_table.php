@@ -21,7 +21,6 @@ return new class extends Migration
             $table->foreignId('supplemental_quarter_id')->nullable()->references('id')->on('supplemental_quarters');
             $table->boolean('is_supplemental')->default(false);
             $table->boolean('is_locked')->default(false);
-            $table->string('status')->default('draft'); // draft, pending, approved, for_modification
             $table->boolean('acknowledged')->default(true);
             $table->boolean('is_forwared')->default(false);
             $table->unsignedBigInteger('forwarded_to_supplemental_quarter')->nullable();
