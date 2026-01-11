@@ -25,29 +25,30 @@ class MigrateFilesToR2Command extends Command
      */
     public function handle(): int
     {
-        try {
-            $rootPath = storage_path('app');
-            $files = [];
+        // try {
+        //     $rootPath = storage_path('app');
+        //     $files = [];
 
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($rootPath, FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS)
-            );
+        //     $iterator = new RecursiveIteratorIterator(
+        //         new RecursiveDirectoryIterator($rootPath, FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS)
+        //     );
 
-            foreach ($iterator as $fileInfo) {
-                if ($fileInfo->isFile()) {
-                    // Relative path for dispatching
-                    $relativePath = ltrim(str_replace($rootPath, '', $fileInfo->getPathname()), '/');
-                    $files[] = $relativePath;
+        //     foreach ($iterator as $fileInfo) {
+        //         if ($fileInfo->isFile()) {
+        //             // Relative path for dispatching
+        //             $relativePath = ltrim(str_replace($rootPath, '', $fileInfo->getPathname()), '/');
+        //             $files[] = $relativePath;
 
-                    MigrateFilesToR2::dispatch($relativePath);
-                }
-            }
+        //             MigrateFilesToR2::dispatch($relativePath);
+        //         }
+        //     }
 
-            $this->info("✅ File migration jobs dispatched: " . count($files));
-            return Command::SUCCESS;
-        } catch (Exception $e) {
-            $this->error("❌ Error: " . $e->getMessage());
-            return Command::FAILURE;
-        }
+        //     $this->info("✅ File migration jobs dispatched: " . count($files));
+        //     return Command::SUCCESS;
+        // } catch (Exception $e) {
+        //     $this->error("❌ Error: " . $e->getMessage());
+        //     return Command::FAILURE;
+        // }
+        return Command::SUCCESS;
     }
 }
