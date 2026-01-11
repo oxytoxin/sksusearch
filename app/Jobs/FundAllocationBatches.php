@@ -39,6 +39,7 @@ class FundAllocationBatches implements ShouldQueue
                 'fund_cluster_id' => $this->fundAllocation->fund_cluster_id,
                 'supplemental_quarter_id' => $this->fundAllocation->supplemental_quarter_id,
                 'is_supplemental' => is_null($this->fundAllocation->supplemental_quarter_id) ? 0 : 1,
+                'is_locked' => $this->fundAllocation->is_locked,
                 'created_at' => $this->fundAllocation->created_at,
                 'updated_at' => $this->fundAllocation->updated_at
         ]);
