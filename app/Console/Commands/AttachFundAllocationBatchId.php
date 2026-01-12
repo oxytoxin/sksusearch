@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Jobs\FundAllocationBatches;
+use App\Jobs\WfpStatusUpdate;
 use App\Models\FundAllocation;
+use App\Models\Wfp;
 
 class AttachFundAllocationBatchId extends Command
 {
@@ -29,7 +31,6 @@ class AttachFundAllocationBatchId extends Command
      */
     public function handle()
     {
-
         $data =  FundAllocation::query()
             ->fromSub(function ($query) {
                 $query->from('fund_allocations')
@@ -51,6 +52,8 @@ class AttachFundAllocationBatchId extends Command
         foreach ($data as $key => $value) {
             FundAllocationBatches::dispatch($value);
         }
+
+
         return Command::SUCCESS;
     }
 }

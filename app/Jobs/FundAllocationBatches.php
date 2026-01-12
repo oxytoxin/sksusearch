@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\FundAllocation;
 use App\Models\FundAllocationBatch;
+use App\Models\Wfp;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -45,6 +46,13 @@ class FundAllocationBatches implements ShouldQueue
         ]);
 
         FundAllocation::where('cost_center_id', $this->fundAllocation->cost_center_id)
+            ->where('wpf_type_id', $this->fundAllocation->wpf_type_id)
+            ->where('fund_cluster_id', $this->fundAllocation->fund_cluster_id)
+            ->where('supplemental_quarter_id', $this->fundAllocation->supplemental_quarter_id)
+            ->where('is_supplemental', is_null($this->fundAllocation->supplemental_quarter_id) ? 0 : 1)
+             ->update(['fund_allocation_batch_id' => $batch->id]);
+
+       Wfp::where('cost_center_id', $this->fundAllocation->cost_center_id)
             ->where('wpf_type_id', $this->fundAllocation->wpf_type_id)
             ->where('fund_cluster_id', $this->fundAllocation->fund_cluster_id)
             ->where('supplemental_quarter_id', $this->fundAllocation->supplemental_quarter_id)
