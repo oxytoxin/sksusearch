@@ -31,10 +31,10 @@ class AttachWfpId extends Command
      */
     public function handle()
     {
-        // $data = FundAllocation::whereHas('fundDrafts')->with('fundDrafts.draft_items')->get();
-        // foreach ($data as $key => $value) {
-        //     AttachWfpIdToFundDraftItems::dispatch($value);
-        // }
+        $data = FundAllocation::whereHas('fundDrafts')->with('fundDrafts.draft_items')->get();
+        foreach ($data as $key => $value) {
+            AttachWfpIdToFundDraftItems::dispatch($value);
+        }
         return Command::SUCCESS;
     }
 }
