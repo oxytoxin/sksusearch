@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\WFP;
 
 use App\Models\FundAllocation;
+use App\Models\FundDraftItem;
 use App\Models\SupplementalQuarter;
 use App\Models\Wfp;
 use Livewire\Component;
@@ -83,7 +84,7 @@ class WfpPpmp extends Component
             });
        }
 
-        $this->wfpDetails = $this->record->wfpDetails->where('is_ppmp',1);
+        $this->wfpDetails = FundDraftItem::where('wfp_id', $this->record->id)->where('ppmp',1)->get();
 
         foreach ($this->wfpDetails as $wfpDetail) {
             // PPMP ONLY
