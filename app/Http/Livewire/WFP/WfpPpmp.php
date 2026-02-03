@@ -86,6 +86,7 @@ class WfpPpmp extends Component
 
         $this->wfpDetails = FundDraftItem::where('wfp_id', $this->record->id)->where('ppmp',1)->get();
 
+
         foreach ($this->wfpDetails as $wfpDetail) {
             // PPMP ONLY
             $this->current['regular_programmed'] += $wfpDetail->total_quantity * $wfpDetail->cost_per_unit;
