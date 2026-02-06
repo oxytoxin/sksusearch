@@ -155,7 +155,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             $user = $record->disbursementVoucher->user;
                             $employee = $user->employee_information ?? null;
 
-                            $phone = $employee->contact_number ?? null;
+                            $phone = $employee?->contact_number;
 
                             // Check if phone number exists
                             if (!$phone) {
@@ -281,7 +281,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             $user = $record->disbursementVoucher->user;
                             $employee = $user->employee_information ?? null;
 
-                            $phone = $employee->contact_number ?? null;
+                            $phone = $employee?->contact_number;
 
                             // Check if phone number exists
                             if (!$phone) {
@@ -412,7 +412,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             $user = $record->disbursementVoucher->user;
                             $employee = $user->employee_information ?? null;
 
-                            $phone = $employee->contact_number ?? null;
+                            $phone = $employee?->contact_number;
 
                             // Check if phone number exists
                             if (!$phone) {
@@ -550,7 +550,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
                             // ===== SMS 1: TO PAYEE (Person with unliquidated cash advance) =====
                             $payeeEmployee = $payee->employee_information ?? null;
-                            $payeePhone = $payeeEmployee->contact_number ?? null;
+                            $payeePhone = $payeeEmployee?->contact_number;
 
                             if (!$payeePhone) {
                                 Log::warning("SMS not sent to payee: No phone number", [
@@ -589,7 +589,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             } else {
                                 $auditorUser = $this->auditor->user;
                                 $auditorEmployee = $auditorUser->employee_information ?? null;
-                                $auditorPhone = $auditorEmployee->contact_number ?? null;
+                                $auditorPhone = $auditorEmployee?->contact_number;
 
                                 if (!$auditorPhone) {
                                     Log::warning("SMS not sent to auditor: No phone number", [
@@ -711,7 +711,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             // Get payee (recipient of FD)
                             $payee = $record->disbursementVoucher->user;
                             $payeeEmployee = $payee->employee_information ?? null;
-                            $payeePhone = $payeeEmployee->contact_number ?? null;
+                            $payeePhone = $payeeEmployee?->contact_number;
 
                             // Check if phone number exists
                             if (!$payeePhone) {
