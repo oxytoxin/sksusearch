@@ -1,6 +1,7 @@
 <div>
-    <div class="flex justify-start w-full mb-4  space-x-2">
-          <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()" >   Back</x-filament-support::button>
+    <div class="flex justify-start w-full mb-4 space-x-2">
+        <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()">
+            Back</x-filament-support::button>
         <button onclick="printDiv('printableDiv')" class="px-4 py-2 bg-primary-500 text-white rounded text-sm">
             Print Document
         </button>
@@ -83,40 +84,40 @@
                         <p class="mt-6">For your guidance and immediate compliance.</p>
                     </div>
 
-                    <div class="mt-6 text-xs text-gray-800  relative  ">
-                          <img src="{{ App\Models\EmployeeInformation::accountantUser()->user->signature?->content }}"
-                                    alt="" class="absolute  h-24 w-24 inset-x-2 bottom-[-1rem] ">
-                        <div class="mt-14 text-xs text-gray-800 ">
-                            <p class="font-bold">{{ App\Models\EmployeeInformation::accountantUser()->full_name }}</p>
-                            <p>{{ App\Models\EmployeeInformation::accountantUser()?->position->description }}-{{ App\Models\EmployeeInformation::accountantUser()?->office->name }}
-                            </p>
+                    <div>
+
+                        <div class="mt-6">
+
                         </div>
-
-                        <div class="mt-10 w-64 mb-2 "></div>
-                        {{-- <div class="mt-12 border-b w-64 mb-2 border-gray-800"></div> --}}
+                        <x-signature-block :name="App\Models\EmployeeInformation::accountantUser()->full_name" :position="App\Models\EmployeeInformation::accountantUser()?->position->description .
+                            ' - ' .
+                            App\Models\EmployeeInformation::accountantUser()?->office->name" :signature="App\Models\EmployeeInformation::accountantUser()->user->signature?->content" />
                     </div>
+                    <div class="mt-6">
+                        <div class=" text-xs text-gray-800">
 
-                    <div class=" text-xs text-gray-800">
-
-                        <p><sup>1</sup> Section 5.1.1, COA Circular No. 97-002 dated February 10, 1997</p>
-                        <p><sup>2</sup> Section 5.1.3, Ibid.</p>
-                        <p><sup>3</sup> Ibid.</p>
-                        <p><sup>4</sup> Section 1, COA Circular No. 2012-004 dated November 28, 2012</p>
+                            <p><sup>1</sup> Section 5.1.1, COA Circular No. 97-002 dated February 10, 1997</p>
+                            <p><sup>2</sup> Section 5.1.3, Ibid.</p>
+                            <p><sup>3</sup> Ibid.</p>
+                            <p><sup>4</sup> Section 1, COA Circular No. 2012-004 dated November 28, 2012</p>
+                        </div>
                     </div>
-                </div>
-            </div> <!-- Closing for document div -->
-        </div> <!-- Closing for center alignment div -->
+                </div> <!-- Closing for document div -->
+            </div> <!-- Closing for center alignment div -->
+        </div>
+         <livewire:requisitioner.message-reply-section :disbursement_voucher="$record" />
 
-        <livewire:requisitioner.message-reply-section :disbursement_voucher="$record" />
+    </div>
 
-        <script>
-            function printDiv(divName) {
-                var printContents = document.getElementById(divName).innerHTML;
-                var originalContents = document.body.innerHTML;
-                document.body.innerHTML = printContents;
-                window.print();
-                document.body.innerHTML = originalContents;
-            }
-        </script>
 
-    </div> <!-- Closing for main div -->
+
+    <script>
+        function printDiv(divName) {
+            var printContents = document.getElementById(divName).innerHTML;
+            var originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+        }
+    </script>
+</div> <!-- Closing for main div -->
