@@ -66,8 +66,7 @@ class TravelOrdersToSignView extends Component
             foreach ($applicants as $applicant) {
                 if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
                     SendSmsJob::dispatch(
-                        '09273464891',  // TEST PHONE - Remove this line for production
-                        // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                        $applicant->employee_information->contact_number,
                         $message,
                         'travel_order_type_converted',
                         $applicant->id,
@@ -91,8 +90,7 @@ class TravelOrdersToSignView extends Component
             foreach ($applicants as $applicant) {
                 if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
                     SendSmsJob::dispatch(
-                        '09273464891',  // TEST PHONE - Remove this line for production
-                        // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                        $applicant->employee_information->contact_number,
                         $message,
                         'travel_order_type_converted',
                         $applicant->id,
@@ -212,8 +210,7 @@ class TravelOrdersToSignView extends Component
             foreach ($applicants as $applicant) {
                 if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
                     SendSmsJob::dispatch(
-                        '09273464891',  // TEST PHONE - Remove this line for production
-                        // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                        $applicant->employee_information->contact_number,
                         $message,
                         'travel_order_approved',
                         $applicant->id,
@@ -271,8 +268,7 @@ class TravelOrdersToSignView extends Component
         foreach ($applicants as $applicant) {
             if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
                 SendSmsJob::dispatch(
-                    '09273464891',  // TEST PHONE - Remove this line for production
-                    // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                    $applicant->employee_information->contact_number,
                     $message,
                     'travel_order_rejected',
                     $applicant->id,

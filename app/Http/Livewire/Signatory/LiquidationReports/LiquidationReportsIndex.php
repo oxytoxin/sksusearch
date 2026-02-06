@@ -158,8 +158,7 @@ class LiquidationReportsIndex extends Component implements HasTable
                 $requestedBy = $record->disbursement_voucher->user;
                 if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
                     SendSmsJob::dispatch(
-                        '09273464891',  // TEST PHONE - Remove this line for production
-                        // $requestedBy->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                        $requestedBy->employee_information->contact_number,
                         $message,
                         'liquidation_report_returned',
                         $requestedBy->id,

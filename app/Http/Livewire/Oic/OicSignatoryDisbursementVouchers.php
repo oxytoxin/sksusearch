@@ -161,8 +161,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 $requestedBy = $record->user;
                 if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
                     SendSmsJob::dispatch(
-                        '09273464891',  // TEST PHONE - Remove this line for production
-                        // $requestedBy->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                        $requestedBy->employee_information->contact_number,
                         $message,
                         'disbursement_voucher_returned',
                         $requestedBy->id,

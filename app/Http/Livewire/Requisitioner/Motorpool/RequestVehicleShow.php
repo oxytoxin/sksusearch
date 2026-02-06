@@ -485,8 +485,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                 foreach ($applicants as $applicant) {
                     if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
                         SendSmsJob::dispatch(
-                            '09273464891',  // TEST PHONE - Remove this line for production
-                            // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                            $applicant->employee_information->contact_number,
                             $message,
                             'vehicle_changed',
                             $applicant->id,
@@ -621,8 +620,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                 foreach ($applicants as $applicant) {
                     if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
                         SendSmsJob::dispatch(
-                            '09273464891',  // TEST PHONE - Remove this line for production
-                            // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                            $applicant->employee_information->contact_number,
                             $message,
                             'driver_changed',
                             $applicant->id,
@@ -752,8 +750,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
         foreach ($applicants as $applicant) {
             if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
                 SendSmsJob::dispatch(
-                    '09273464891',  // TEST PHONE - Remove this line for production
-                    // $applicant->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                    $applicant->employee_information->contact_number,
                     $message,
                     'vehicle_driver_confirmed',
                     $applicant->id,

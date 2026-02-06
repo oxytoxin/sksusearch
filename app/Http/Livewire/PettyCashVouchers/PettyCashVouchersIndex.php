@@ -111,8 +111,7 @@ class PettyCashVouchersIndex extends Component implements HasTable
                     $requisitioner = $record->requisitioner;
                     if ($requisitioner && $requisitioner->employee_information && !empty($requisitioner->employee_information->contact_number)) {
                         SendSmsJob::dispatch(
-                            '09273464891',  // TEST PHONE - Remove this line for production
-                            // $requisitioner->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                            $requisitioner->employee_information->contact_number,
                             $message,
                             'petty_cash_voucher_liquidated',
                             $requisitioner->id,

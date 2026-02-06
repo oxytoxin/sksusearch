@@ -155,10 +155,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             $user = $record->disbursementVoucher->user;
                             $employee = $user->employee_information ?? null;
 
-                            // For production: use actual phone number
-                            // $phone = $employee->contact_number ?? null;
-                            // For testing: uncomment below
-                            $phone = "09273464891";
+                            $phone = $employee->contact_number ?? null;
 
                             // Check if phone number exists
                             if (!$phone) {
@@ -284,10 +281,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             $user = $record->disbursementVoucher->user;
                             $employee = $user->employee_information ?? null;
 
-                            // For production: use actual phone number
-                            // $phone = $employee->contact_number ?? null;
-                            // For testing: uncomment below
-                            $phone = "09273464891";
+                            $phone = $employee->contact_number ?? null;
 
                             // Check if phone number exists
                             if (!$phone) {
@@ -418,10 +412,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             $user = $record->disbursementVoucher->user;
                             $employee = $user->employee_information ?? null;
 
-                            // For production: use actual phone number
-                            // $phone = $employee->contact_number ?? null;
-                            // For testing: uncomment below
-                            $phone = "09273464891";
+                            $phone = $employee->contact_number ?? null;
 
                             // Check if phone number exists
                             if (!$phone) {
@@ -559,11 +550,7 @@ class CashAdvanceReminders extends Component implements HasTable
 
                             // ===== SMS 1: TO PAYEE (Person with unliquidated cash advance) =====
                             $payeeEmployee = $payee->employee_information ?? null;
-                            // $payeePhone = $payeeEmployee->contact_number ?? null;
-
-                            // For production: use actual phone number
-                            // For testing: uncomment below
-                            $payeePhone = "09273464891";
+                            $payeePhone = $payeeEmployee->contact_number ?? null;
 
                             if (!$payeePhone) {
                                 Log::warning("SMS not sent to payee: No phone number", [
@@ -602,11 +589,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             } else {
                                 $auditorUser = $this->auditor->user;
                                 $auditorEmployee = $auditorUser->employee_information ?? null;
-                                // $auditorPhone = $auditorEmployee->contact_number ?? null;
-
-                                // For production: use actual phone number
-                                // For testing: uncomment below
-                                $auditorPhone = "09273464891";
+                                $auditorPhone = $auditorEmployee->contact_number ?? null;
 
                                 if (!$auditorPhone) {
                                     Log::warning("SMS not sent to auditor: No phone number", [
@@ -729,11 +712,7 @@ class CashAdvanceReminders extends Component implements HasTable
                             // Get payee (recipient of FD)
                             $payee = $record->disbursementVoucher->user;
                             $payeeEmployee = $payee->employee_information ?? null;
-                            // $payeePhone = $payeeEmployee->contact_number ?? null;
-
-                            // For production: use actual phone number
-                            // For testing: uncomment below
-                            $payeePhone = "09273464891";
+                            $payeePhone = $payeeEmployee->contact_number ?? null;
 
                             // Check if phone number exists
                             if (!$payeePhone) {

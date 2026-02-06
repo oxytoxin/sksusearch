@@ -928,8 +928,7 @@
             $signatory = $dv->signatory;
             if ($signatory && $signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
                 SendSmsJob::dispatch(
-                    '09273464891',  // TEST PHONE - Remove this line for production
-                    // $signatory->employee_information->contact_number,  // PRODUCTION - Uncomment this
+                    $signatory->employee_information->contact_number,
                     $message,
                     'disbursement_voucher_submitted',
                     $signatory->id,
