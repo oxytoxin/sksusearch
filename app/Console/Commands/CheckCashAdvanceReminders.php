@@ -53,26 +53,19 @@ class CheckCashAdvanceReminders extends Command
 
         foreach ($cashAdvances as $record) {
 
-            //$record->created_at plus 5mins
-            $updated_at = Carbon::parse($record->updated_at);
-            $updated_at_deadline = $updated_at->addMinutes(2);
-
             // check if within the deadline
             $liquidationDeadline = Carbon::parse($record->liquidation_period_end_date);
             $receiver = EmployeeInformation::accountantUser();
             $president = EmployeeInformation::presidentUser();
             $auditor = EmployeeInformation::auditorUser();
 
-            //step 1
-            //step 2
-            //step 3
-            //step 4
-            //step 5
-            //step 6
+            // ===== TEST MODE (2 minutes) - Uncomment below for testing =====
+            // $updated_at = Carbon::parse($record->updated_at);
+            // $updated_at_deadline = $updated_at->addMinutes(2);
+            // if ($now->greaterThanOrEqualTo($updated_at_deadline)) {
 
-
-            // if ($now->greaterThanOrEqualTo($liquidationDeadline)) {
-            if ($now->greaterThanOrEqualTo($updated_at_deadline)) {
+            // ===== PRODUCTION MODE - Using actual liquidation deadline =====
+            if ($now->greaterThanOrEqualTo($liquidationDeadline)) {
                 switch ($record->step) {
                     case 1:
                         NotificationController::sendCASystemReminder(

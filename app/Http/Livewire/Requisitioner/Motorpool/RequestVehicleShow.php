@@ -2,53 +2,77 @@
 
 namespace App\Http\Livewire\Requisitioner\Motorpool;
 
-use DB;
-use Carbon\Carbon;
-use App\Models\Vehicle;
-use Livewire\Component;
-use App\Models\Position;
-use WireUi\Traits\Actions;
-use App\Models\RequestSchedule;
 use App\Forms\Components\Flatpickr;
+use App\Jobs\SendSmsJob;
 use App\Models\EmployeeInformation;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Components\Repeater;
-use Filament\Notifications\Notification;
-use Filament\Forms\Components\DatePicker;
+use App\Models\Position;
+use App\Models\RequestSchedule;
 use App\Models\RequestScheduleTimeAndDate;
-use Filament\Notifications\Actions\Action;
+use App\Models\Vehicle;
+use Carbon\Carbon;
+use DB;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification;
+use Livewire\Component;
+use WireUi\Traits\Actions;
 
 class RequestVehicleShow extends Component implements HasForms
 {
-    use InteractsWithForms;
     use Actions;
+    use InteractsWithForms;
+
     public $request;
+
     public $request_schedule;
+
     public $request_schedule_date_and_time;
+
     public $travel_dates;
+
     public $available_travel_dates;
+
     public $remarks;
+
     public $driver_lists;
+
     public $driverss;
+
     public $assigned_driver;
+
     public $vehicless;
+
     public $assign_vehicle;
+
     public $change_vehicle;
+
     public $change_driver;
+
     public $time_start;
+
     public $time_end;
+
     public $travelDates = [];
+
     public $date_and_time = [];
+
     public $scheduleTimes;
 
-    //modals
+    // modals
     public $modifyDates = false;
+
     public $rejectModal = false;
+
     public $assignDriverModal = false;
+
     public $assignVehicleModal = false;
+
     public $modifyVehicleModal = false;
+
     public $modifyDriverModal = false;
 
     protected $rules = [
@@ -82,7 +106,7 @@ class RequestVehicleShow extends Component implements HasForms
                 ],
             ];
         }
-        //dd($data);
+
 
         $this->date_and_time = $data;
         $this->request = RequestSchedule::find($request);
@@ -118,7 +142,7 @@ class RequestVehicleShow extends Component implements HasForms
         // Do something with the $data array
         // For example, you can save it to the database or perform any other operations.
 
-        //dd($data); // Display the data for testing purposes
+        // dd($data); // Display the data for testing purposes
     }
 
     protected function getFormSchema(): array
@@ -145,8 +169,8 @@ class RequestVehicleShow extends Component implements HasForms
                                         ->disableDate()
                                         ->reactive()
                                         ->required(),
-                                ])
-                        ])->createItemButtonLabel('Add time')
+                                ]),
+                        ])->createItemButtonLabel('Add time'),
                 ])->reactive()->disableItemCreation(),
         ];
     }
@@ -155,10 +179,10 @@ class RequestVehicleShow extends Component implements HasForms
     {
         $this->request_schedule = RequestSchedule::find($id);
         $this->dialog()->confirm([
-            'title'       => 'Are you sure you want to approve this request?',
+            'title' => 'Are you sure you want to approve this request?',
             'acceptLabel' => 'Yes, approve it',
-            'method'      => 'confirmApprove',
-            'params'      => 'Saved',
+            'method' => 'confirmApprove',
+            'params' => 'Saved',
         ]);
     }
 
@@ -192,27 +216,42 @@ class RequestVehicleShow extends Component implements HasForms
             //     ->where('id', '!=', $item->id)
             //     ->first();
 
-                $driverId = $this->request_schedule->driver_id;
-                $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId, $driverId) {
-                        $query->where('status', 'Approved')
-                            ->where(function ($q) use ($vehicleId, $driverId) {
-                                    // Check for vehicle OR driver conflict
-                                    $q->where('vehicle_id', $vehicleId);
+               $driverId = $this->request_schedule->driver_id;
 
-                                    if (!is_null($driverId)) {
-                                        $q->orWhere('driver_id', $driverId);
-                                    }
-                            });
-                    })
-                    ->where('travel_date', $item->travel_date)
-                    ->where(function ($q) use ($item) {
-                        // Time overlap rule (universal)
-                        $q->whereTime('time_from', '<', $item->time_to)
-                        ->whereTime('time_to', '>', $item->time_from);
-                    })
-                    ->where('id', '!=', $item->id) // ignore current record
-                    ->first();
-            if (!$conflict) {
+$conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId, $driverId) {
+        $query->where('status', 'Approved')
+            ->where(function ($q) use ($vehicleId, $driverId) {
+                $q->where('vehicle_id', $vehicleId);
+
+                if (!is_null($driverId)) {
+                    $q->orWhere('driver_id', $driverId);
+                }
+            });
+    })
+    ->where('travel_date', $item->travel_date)
+    ->where(function ($q) use ($item) {
+
+        // CASE 1: Existing overlaps the start of NEW
+        $q->where(function ($sub) use ($item) {
+            $sub->whereTime('time_from', '<=', $item->time_from)
+                ->whereTime('time_to', '>', $item->time_from);
+        })
+
+        // CASE 2: Existing overlaps the end of NEW
+        ->orWhere(function ($sub) use ($item) {
+            $sub->whereTime('time_from', '<', $item->time_to)
+                ->whereTime('time_to', '>=', $item->time_to);
+        })
+
+        // CASE 3: Existing is fully inside NEW
+        ->orWhere(function ($sub) use ($item) {
+            $sub->whereTime('time_from', '>=', $item->time_from)
+                ->whereTime('time_to', '<=', $item->time_to);
+        });
+    })
+    ->where('id', '!=', $item->id)
+    ->first();
+            if (! $conflict) {
                 $this->request_schedule->status = 'Approved';
                 $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
                 $this->request_schedule->save();
@@ -220,6 +259,7 @@ class RequestVehicleShow extends Component implements HasForms
                     $title = 'Success',
                     $description = 'Request for vehicle has been approved'
                 );
+
                 return redirect()->route('signatory.motorpool.signed');
             } else {
                 $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
@@ -229,6 +269,7 @@ class RequestVehicleShow extends Component implements HasForms
                     $title = 'Operation Failed',
                     $description = "The vehicle is unavailable on {$date} between {$time_from} and {$time_to} due to a conflict in the approved schedules."
                 );
+
                 return;
             }
         }
@@ -241,10 +282,10 @@ class RequestVehicleShow extends Component implements HasForms
             'remarks' => 'required',
         ]);
         $this->dialog()->confirm([
-            'title'       => 'Are you sure you want to reject this request?',
+            'title' => 'Are you sure you want to reject this request?',
             'acceptLabel' => 'Yes, reject it',
-            'method'      => 'confirmReject',
-            'params'      => 'Saved',
+            'method' => 'confirmReject',
+            'params' => 'Saved',
         ]);
     }
 
@@ -258,6 +299,7 @@ class RequestVehicleShow extends Component implements HasForms
             $title = 'Success',
             $description = 'Request for vehicle has been rejected'
         );
+
         return redirect()->route('signatory.motorpool.signed');
     }
 
@@ -269,10 +311,10 @@ class RequestVehicleShow extends Component implements HasForms
             'assign_vehicle' => 'required',
         ]);
         $this->dialog()->confirm([
-            'title'       => 'Are you sure you want to assign this vehicle?',
+            'title' => 'Are you sure you want to assign this vehicle?',
             'acceptLabel' => 'Yes',
-            'method'      => 'confirmVehicle',
-            'params'      => 'Saved',
+            'method' => 'confirmVehicle',
+            'params' => 'Saved',
         ]);
     }
 
@@ -298,7 +340,7 @@ class RequestVehicleShow extends Component implements HasForms
                 })
                 ->first();
 
-            if (!$conflict) {
+            if (! $conflict) {
                 $this->request_schedule->vehicle_id = $this->assign_vehicle;
                 $this->request_schedule->save();
                 $item->vehicle_id = $this->assign_vehicle;
@@ -320,7 +362,7 @@ class RequestVehicleShow extends Component implements HasForms
                     ->actions([
                         Action::make('view')
                             ->button()
-                            ->url(route('motorpool.view-schedule',  ['year' => $year, 'month' => $month, 'vehicle' => $vehicleId]), shouldOpenInNewTab: true),
+                            ->url(route('motorpool.view-schedule', ['year' => $year, 'month' => $month, 'vehicle' => $vehicleId]), shouldOpenInNewTab: true),
                     ])->persistent()
                     ->danger()->send();
                 // $this->dialog()->error(
@@ -341,17 +383,21 @@ class RequestVehicleShow extends Component implements HasForms
             'change_vehicle' => 'required',
         ]);
         $this->dialog()->confirm([
-            'title'       => 'Are you sure you want to assign this vehicle?',
+            'title' => 'Are you sure you want to assign this vehicle?',
             'acceptLabel' => 'Yes',
-            'method'      => 'confirmChangeVehicle',
-            'params'      => 'Saved',
+            'method' => 'confirmChangeVehicle',
+            'params' => 'Saved',
         ]);
     }
 
     public function confirmChangeVehicle()
     {
-
         DB::beginTransaction();
+
+        // Get old vehicle details before changing
+        $oldVehicle = Vehicle::find($this->request_schedule->vehicle_id);
+        $oldVehicleModel = $oldVehicle->model ?? 'N/A';
+        $oldVehiclePlate = $oldVehicle->plate_number ?? 'N/A';
 
         $vehicleId = $this->change_vehicle;
 
@@ -371,11 +417,83 @@ class RequestVehicleShow extends Component implements HasForms
                 })
                 ->first();
 
-            if (!$conflict) {
+            if (! $conflict) {
                 $this->request_schedule->vehicle_id = $this->change_vehicle;
                 $this->request_schedule->save();
                 $item->vehicle_id = $this->change_vehicle;
                 $item->save();
+
+                // Load necessary relationships for SMS
+                $this->request_schedule->load([
+                    'travel_order.philippine_region',
+                    'travel_order.philippine_province',
+                    'travel_order.philippine_city',
+                    'philippine_region',
+                    'philippine_province',
+                    'philippine_city',
+                    'vehicle',
+                    'date_and_times',
+                    'applicants.employee_information'
+                ]);
+
+                // Get new vehicle details
+                $newVehicleModel = $this->request_schedule->vehicle->model ?? 'N/A';
+                $newVehiclePlate = $this->request_schedule->vehicle->plate_number ?? 'N/A';
+
+                // Determine tracking code and destination
+                $trackingCode = null;
+                if ($this->request_schedule->travel_order) {
+                    $trackingCode = $this->request_schedule->travel_order->tracking_code;
+                    $destination = $this->request_schedule->travel_order->destination;
+                } else {
+                    $destinationParts = [];
+                    if ($this->request_schedule->philippine_region) {
+                        $destinationParts[] = $this->request_schedule->philippine_region->region_description;
+                    }
+                    if ($this->request_schedule->philippine_province) {
+                        $destinationParts[] = $this->request_schedule->philippine_province->province_description;
+                    }
+                    if ($this->request_schedule->philippine_city) {
+                        $destinationParts[] = $this->request_schedule->philippine_city->city_municipality_description;
+                    }
+                    if ($this->request_schedule->other_details) {
+                        $destinationParts[] = $this->request_schedule->other_details;
+                    }
+                    $destination = !empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
+                }
+
+                // Get date range
+                $dates = $this->request_schedule->date_and_times;
+                $dateRange = 'N/A';
+                if ($dates->isNotEmpty()) {
+                    $firstDate = Carbon::parse($dates->min('travel_date'))->format('F d, Y');
+                    $lastDate = Carbon::parse($dates->max('travel_date'))->format('F d, Y');
+                    $dateRange = $firstDate === $lastDate ? $firstDate : "{$firstDate} to {$lastDate}";
+                }
+
+                // Build the message based on whether it has a travel order
+                if ($this->request_schedule->travel_order) {
+                    $message = "Your vehicle for TO number {$trackingCode} to {$destination} on {$dateRange} has been changed from {$oldVehicleModel} with plate no. {$oldVehiclePlate} to {$newVehicleModel} with plate no. {$newVehiclePlate}. Please closely coordinate with the General Services Office.";
+                } else {
+                    $message = "Your vehicle for travel to {$destination} on {$dateRange} has been changed from {$oldVehicleModel} with plate no. {$oldVehiclePlate} to {$newVehicleModel} with plate no. {$newVehiclePlate}. Please closely coordinate with the General Services Office.";
+                }
+
+                // Send SMS to all applicants
+                $applicants = $this->request_schedule->applicants()->with('employee_information')->get();
+
+                // ========== SMS NOTIFICATION ==========
+                foreach ($applicants as $applicant) {
+                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
+                        SendSmsJob::dispatch(
+                            $applicant->employee_information->contact_number,
+                            $message,
+                            'vehicle_changed',
+                            $applicant->id,
+                            auth()->id()
+                        );
+                    }
+                }
+                // ========== SMS NOTIFICATION END ==========
 
                 $this->dialog()->success(
                     $title = 'Success',
@@ -395,22 +513,28 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function changeDriver($id)
     {
+
+
         $this->request_schedule = RequestSchedule::find($id);
         $this->request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $id)->get();
         $this->validate([
             'change_driver' => 'required',
         ]);
         $this->dialog()->confirm([
-            'title'       => 'Are you sure you want to assign this driver?',
+            'title' => 'Are you sure you want to assign this driver?',
             'acceptLabel' => 'Yes',
-            'method'      => 'confirmChangeDriver',
-            'params'      => 'Saved',
+            'method' => 'confirmChangeDriver',
+            'params' => 'Saved',
         ]);
     }
 
     public function confirmChangeDriver()
     {
         DB::beginTransaction();
+
+        // Get old driver details before changing
+        $oldDriver = EmployeeInformation::find($this->request_schedule->driver_id);
+        $oldDriverName = $oldDriver->full_name ?? 'N/A';
 
         $driverId = $this->change_driver;
 
@@ -430,10 +554,81 @@ class RequestVehicleShow extends Component implements HasForms
                 })
                 ->first();
 
-            if (!$conflict) {
+            if (! $conflict) {
                 $this->request_schedule->driver_id = $this->change_driver;
                 $this->request_schedule->save();
                 $item->save();
+
+                // Load necessary relationships for SMS
+                $this->request_schedule->load([
+                    'travel_order.philippine_region',
+                    'travel_order.philippine_province',
+                    'travel_order.philippine_city',
+                    'philippine_region',
+                    'philippine_province',
+                    'philippine_city',
+                    'driver',
+                    'date_and_times',
+                    'applicants.employee_information'
+                ]);
+
+                // Get new driver details
+                $newDriverName = $this->request_schedule->driver->full_name ?? 'N/A';
+
+                // Determine tracking code and destination
+                $trackingCode = null;
+                if ($this->request_schedule->travel_order) {
+                    $trackingCode = $this->request_schedule->travel_order->tracking_code;
+                    $destination = $this->request_schedule->travel_order->destination;
+                } else {
+                    $destinationParts = [];
+                    if ($this->request_schedule->philippine_region) {
+                        $destinationParts[] = $this->request_schedule->philippine_region->region_description;
+                    }
+                    if ($this->request_schedule->philippine_province) {
+                        $destinationParts[] = $this->request_schedule->philippine_province->province_description;
+                    }
+                    if ($this->request_schedule->philippine_city) {
+                        $destinationParts[] = $this->request_schedule->philippine_city->city_municipality_description;
+                    }
+                    if ($this->request_schedule->other_details) {
+                        $destinationParts[] = $this->request_schedule->other_details;
+                    }
+                    $destination = !empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
+                }
+
+                // Get date range
+                $dates = $this->request_schedule->date_and_times;
+                $dateRange = 'N/A';
+                if ($dates->isNotEmpty()) {
+                    $firstDate = Carbon::parse($dates->min('travel_date'))->format('F d, Y');
+                    $lastDate = Carbon::parse($dates->max('travel_date'))->format('F d, Y');
+                    $dateRange = $firstDate === $lastDate ? $firstDate : "{$firstDate} to {$lastDate}";
+                }
+
+                // Build the message based on whether it has a travel order
+                if ($this->request_schedule->travel_order) {
+                    $message = "Your driver for TO number {$trackingCode} to {$destination} on {$dateRange} has been changed from {$oldDriverName} to {$newDriverName}. Please closely coordinate with the General Services Office.";
+                } else {
+                    $message = "Your driver for travel to {$destination} on {$dateRange} has been changed from {$oldDriverName} to {$newDriverName}. Please closely coordinate with the General Services Office.";
+                }
+
+                // Send SMS to all applicants
+                $applicants = $this->request_schedule->applicants()->with('employee_information')->get();
+
+                // ========== SMS NOTIFICATION ==========
+                foreach ($applicants as $applicant) {
+                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
+                        SendSmsJob::dispatch(
+                            $applicant->employee_information->contact_number,
+                            $message,
+                            'driver_changed',
+                            $applicant->id,
+                            auth()->id()
+                        );
+                    }
+                }
+                // ========== SMS NOTIFICATION END ==========
 
                 $this->dialog()->success(
                     $title = 'Success',
@@ -453,15 +648,17 @@ class RequestVehicleShow extends Component implements HasForms
 
     public function assignDriver($id)
     {
+
+
         $this->request_schedule = RequestSchedule::find($id);
         $this->validate([
             'assigned_driver' => 'required',
         ]);
         $this->dialog()->confirm([
-            'title'       => 'Are you sure you want to assign this driver?',
+            'title' => 'Are you sure you want to assign this driver?',
             'acceptLabel' => 'Yes',
-            'method'      => 'confirmDriver',
-            'params'      => 'Saved',
+            'method' => 'confirmDriver',
+            'params' => 'Saved',
         ]);
     }
 
@@ -469,10 +666,105 @@ class RequestVehicleShow extends Component implements HasForms
     {
         $this->request_schedule->driver_id = $this->assigned_driver;
         $this->request_schedule->save();
+
+        // Load necessary relationships
+        $this->request_schedule->load([
+            'travel_order.philippine_region',
+            'travel_order.philippine_province',
+            'travel_order.philippine_city',
+            'philippine_region',
+            'philippine_province',
+            'philippine_city',
+            'vehicle',
+            'driver',
+            'date_and_times',
+            'applicants.employee_information'
+        ]);
+
+        // Determine tracking code and destination based on whether it has a travel order
+        $trackingCode = null;
+        if ($this->request_schedule->travel_order) {
+            // Has Travel Order - use TO tracking code
+            $trackingCode = $this->request_schedule->travel_order->tracking_code;
+            $destination = $this->request_schedule->travel_order->destination;
+        } else {
+            // No Travel Order - build destination from request_schedule location fields
+            $destinationParts = [];
+            if ($this->request_schedule->philippine_region) {
+                $destinationParts[] = $this->request_schedule->philippine_region->region_description;
+            }
+            if ($this->request_schedule->philippine_province) {
+                $destinationParts[] = $this->request_schedule->philippine_province->province_description;
+            }
+            if ($this->request_schedule->philippine_city) {
+                $destinationParts[] = $this->request_schedule->philippine_city->city_municipality_description;
+            }
+            if ($this->request_schedule->other_details) {
+                $destinationParts[] = $this->request_schedule->other_details;
+            }
+            $destination = !empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
+        }
+
+        // Get date range from date_and_times
+        $dates = $this->request_schedule->date_and_times;
+        $dateRange = 'N/A';
+        if ($dates->isNotEmpty()) {
+            $firstDate = Carbon::parse($dates->min('travel_date'))->format('F d, Y');
+            $lastDate = Carbon::parse($dates->max('travel_date'))->format('F d, Y');
+            $dateRange = $firstDate === $lastDate ? $firstDate : "{$firstDate} to {$lastDate}";
+        }
+
+        // Get vehicle details
+        $vehicleModel = $this->request_schedule->vehicle->model ?? 'N/A';
+        $vehiclePlate = $this->request_schedule->vehicle->plate_number ?? 'N/A';
+
+        // Get driver name
+        $driverName = $this->request_schedule->driver->full_name ?? 'N/A';
+
+        // Build the message based on whether it has a travel order
+        if ($this->request_schedule->travel_order) {
+            // With Travel Order - include TO number
+            $message = "Your vehicle request with TO number {$trackingCode} to {$destination} on {$dateRange} has been approved. Your vehicle is {$vehicleModel} with plate no. {$vehiclePlate} and your driver is {$driverName}. Emergencies and other unfavorable circumstances may result in changes so closely coordinate with the General Services Office.";
+        } else {
+            // Without Travel Order - don't mention TO number
+            $message = "Your vehicle request to {$destination} on {$dateRange} has been approved. Your vehicle is {$vehicleModel} with plate no. {$vehiclePlate} and your driver is {$driverName}. Emergencies and other unfavorable circumstances may result in changes so closely coordinate with the General Services Office.";
+        }
+
+        // Send SMS to all applicants
+        $applicants = $this->request_schedule->applicants()->with('employee_information')->get();
+
+        // dd([
+        //     'has_travel_order' => $this->request_schedule->travel_order ? 'YES' : 'NO',
+        //     'message' => $message,
+        //     'applicants' => $applicants->toArray(),
+        //     'tracking_code' => $trackingCode,
+        //     'destination' => $destination,
+        //     'date_range' => $dateRange,
+        //     'vehicle_model' => $vehicleModel,
+        //     'vehicle_plate' => $vehiclePlate,
+        //     'driver_name' => $driverName,
+        //     'request_schedule' => $this->request_schedule->toArray(),
+        // ]);
+
+        // ========== SMS NOTIFICATION ==========
+        foreach ($applicants as $applicant) {
+            if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+                SendSmsJob::dispatch(
+                    $applicant->employee_information->contact_number,
+                    $message,
+                    'vehicle_driver_confirmed',
+                    $applicant->id,
+                    auth()->id()
+                );
+            }
+        }
+        // ========== SMS NOTIFICATION END ==========
+
         $this->dialog()->success(
             $title = 'Success',
             $description = 'Driver is assigned'
         );
+
         return redirect()->route('motorpool.request.index');
     }
 
@@ -495,7 +787,7 @@ class RequestVehicleShow extends Component implements HasForms
                 }
             }
 
-            if (!$hasTime) {
+            if (! $hasTime) {
                 $result[] = [
                     'date' => $date,
                     'time_from' => null,
@@ -506,7 +798,6 @@ class RequestVehicleShow extends Component implements HasForms
 
         return $result;
     }
-
 
     public function updateTravelDates()
     {
@@ -537,7 +828,7 @@ class RequestVehicleShow extends Component implements HasForms
                     });
                 })
                 ->first();
-            if (!$conflict) {
+            if (! $conflict) {
                 // Insert or update the remaining dates
                 foreach ($dates_and_time as $item) {
                     RequestScheduleTimeAndDate::updateOrCreate(
@@ -546,7 +837,7 @@ class RequestVehicleShow extends Component implements HasForms
                             'travel_date' => $item['date'],
                         ],
                         [
-                            'vehicle_id' =>  $vehicleId,
+                            'vehicle_id' => $vehicleId,
                             'time_from' => $item['time_from'],
                             'time_to' => $item['time_to'],
                         ]
@@ -560,6 +851,7 @@ class RequestVehicleShow extends Component implements HasForms
                     $title = 'Operation Failed',
                     $description = "The date {$date} - ({$time_from} to  {$time_to}) has a conflict in the approved schedules"
                 );
+
                 return;
             }
         }
@@ -579,11 +871,12 @@ class RequestVehicleShow extends Component implements HasForms
             ->whereHas('office', function ($query) {
                 return $query->where('campus_id', '=', auth()->user()->employee_information->office->campus_id);
             })->get();
-        //$this->vehicles = Vehicle::where('campus_id', auth()->user()->employee_information->office->campus_id)->get();
+
+        // $this->vehicles = Vehicle::where('campus_id', auth()->user()->employee_information->office->campus_id)->get();
         return view('livewire.requisitioner.motorpool.request-vehicle-show', [
-            'vehicles' =>  Vehicle::get(),
-            'vehicles_for_update' =>  Vehicle::whereNotIn('id', [$this->request->vehicle_id])->get(),
-            'drivers_for_update' =>  EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))->whereNotIn('id', [$this->request->driver_id])->get(),
+            'vehicles' => Vehicle::get(),
+            'vehicles_for_update' => Vehicle::whereNotIn('id', [$this->request->vehicle_id])->get(),
+            'drivers_for_update' => EmployeeInformation::where('position_id', Position::where('description', 'Driver')->pluck('id'))->whereNotIn('id', [$this->request->driver_id])->get(),
             'drivers' => $this->driver_lists,
         ]);
     }

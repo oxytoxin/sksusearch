@@ -13,6 +13,18 @@
                 <x-jet-section-border />
             @endif
 
+            @livewire('requisitioner.prompt-contact-number')
+
+            @push('scripts')
+            <script>
+                window.addEventListener('contact-number-updated', event => {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                });
+            </script>
+            @endpush
+
             @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
                 {{-- <div class="mt-10 sm:mt-0">
                     @livewire('profile.update-password-form')

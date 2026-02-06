@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\SmsResponse;
 use App\Services\Sms\Contracts\SmsProviderInterface;
 use App\Services\Sms\Providers\SemaphoreProvider;
+use App\Services\Sms\Providers\PhilSmsProvider;
 
 use Illuminate\Support\Facades\Log;
 
@@ -26,7 +27,7 @@ class SmsService
 
         $providers = [
             'semaphore' => SemaphoreProvider::class,
-
+            'philsms' => PhilSmsProvider::class,
         ];
 
         if (!isset($providers[$providerName])) {

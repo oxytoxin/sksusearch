@@ -20,6 +20,7 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Support\HtmlString;
+use App\Jobs\SendSmsJob;
 
 class LiquidationReportsIndex extends Component implements HasTable
 {
@@ -140,6 +141,32 @@ class LiquidationReportsIndex extends Component implements HasTable
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
+
+                // ========== SMS NOTIFICATION ==========
+                $record->load(['disbursement_voucher.user.employee_information']);
+                $trackingNumber = $record->tracking_number;
+                $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                $remarks = $data['remarks'] ?? 'No remarks provided';
+
+                // Strip HTML tags and decode HTML entities from remarks
+                $remarks = strip_tags($remarks);
+                $remarks = html_entity_decode($remarks, ENT_QUOTES, 'UTF-8');
+
+                $message = "Your LR with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
+
+                // Send to the user who requested the disbursement voucher
+                $requestedBy = $record->disbursement_voucher->user;
+                if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        $requestedBy->employee_information->contact_number,
+                        $message,
+                        'liquidation_report_returned',
+                        $requestedBy->id,
+                        auth()->id()
+                    );
+                }
+                // ========== SMS NOTIFICATION END ==========
+
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')

@@ -22,6 +22,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Tables\Concerns\InteractsWithTable;
+use App\Jobs\SendSmsJob;
 
 class OfficeLiquidationReportsIndex extends Component implements HasTable
 {
@@ -145,6 +146,32 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
+
+                // ========== SMS NOTIFICATION ==========
+                $record->load(['disbursement_voucher.user.employee_information']);
+                $trackingNumber = $record->tracking_number;
+                $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                $remarks = $data['remarks'] ?? 'No remarks provided';
+
+                // Strip HTML tags and decode HTML entities from remarks
+                $remarks = strip_tags($remarks);
+                $remarks = html_entity_decode($remarks, ENT_QUOTES, 'UTF-8');
+
+                $message = "Your LR with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
+
+                // Send to the user who requested the disbursement voucher
+                $requestedBy = $record->disbursement_voucher->user;
+                if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        $requestedBy->employee_information->contact_number,
+                        $message,
+                        'liquidation_report_returned',
+                        $requestedBy->id,
+                        auth()->id()
+                    );
+                }
+                // ========== SMS NOTIFICATION END ==========
+
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
@@ -248,6 +275,25 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
                     'description' => 'Liquidation Report certified.',
                 ]);
                 DB::commit();
+
+                // ========== SMS NOTIFICATION ==========
+                $record->load(['disbursement_voucher.user.employee_information']);
+                $trackingNumber = $record->tracking_number;
+                $message = "Your LR with ref. no. {$trackingNumber} has been approved.";
+
+                // Send to the user who requested the disbursement voucher
+                $requestedBy = $record->disbursement_voucher->user;
+                if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        $requestedBy->employee_information->contact_number,
+                        $message,
+                        'liquidation_report_approved',
+                        $requestedBy->id,
+                        auth()->id()
+                    );
+                }
+                // ========== SMS NOTIFICATION END ==========
+
                 Notification::make()->title('Liquidation Report certified.')->success()->send();
             })
                 ->visible(fn ($record) => $record->current_step_id == 8000 && !$record->for_cancellation && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id)
