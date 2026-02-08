@@ -42,10 +42,13 @@ Route::middleware([
     Route::get('/wfp-types', WFPTypes::class)->name('wfp-types');
     // Route::get('/fund-allocation/{filter?}', FundAllocation::class)->name('fund-allocation');
     Route::view('/fund-allocation/{filter?}', 'fund-allocations')->name('fund-allocation');
+    // Route::redirect('/fund-allocation/{filter?}', config('app.wfp_url'))->name('fund-allocation');
+
 
     Route::get('/assign-personnel', AssignPersonnel::class)->name('assign-personnel');
     Route::get('/create-wfp/{record}/{wfpType}/{isEdit}/{isSupplemental}', CreateWFP::class)->name('create-wfp');
-    Route::view('/select-wfp', 'select-wfp-type')->name('select-wfp');
+    // Route::view('/select-wfp', 'select-wfp-type')->name('select-wfp');
+    Route::redirect('/select-wfp', config('app.wfp_url').'/wfp/fund-allocation-batches')->name('select-wfp');
     // Route::get('/wfp-history', WFPHistory::class)->name('wfp-history');
     Route::view('/wfp-history', 'wfp-history')->name('wfp-history');
 
