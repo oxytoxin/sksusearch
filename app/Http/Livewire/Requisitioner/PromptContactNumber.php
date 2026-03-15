@@ -10,9 +10,30 @@ use Illuminate\Support\Facades\DB;
 class PromptContactNumber extends Component
 {
     public $contact_number;
+    public $showModal = false;
+
+    protected $listeners = ['openContactNumberModal' => 'openModal'];
+
+    public function mount()
+    {
+        $this->contact_number = auth()->user()->employee_information->contact_number;
+    }
+
     public function render()
     {
         return view('livewire.requisitioner.prompt-contact-number');
+    }
+
+    public function openModal()
+    {
+        $this->contact_number = auth()->user()->employee_information->contact_number;
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
+        $this->reset('contact_number');
     }
 
     public function saveNumber()
@@ -30,7 +51,8 @@ class PromptContactNumber extends Component
                 'contact_number' => $this->contact_number,
             ]);
         DB::commit();
-        Notification::make()->title('Operation Success')->body('Contact Number was added to your account.')->success()->send();
-        return redirect()->route('requisitioner.dashboard');
+        Notification::make()->title('Operation Success')->body('Contact Number was saved to your account.')->success()->send();
+        $this->showModal = false;
+        $this->dispatchBrowserEvent('contact-number-updated');
     }
 }

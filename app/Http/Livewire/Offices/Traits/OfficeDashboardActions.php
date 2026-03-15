@@ -28,6 +28,7 @@
     use Filament\Forms\Components\RichEditor;
     use Filament\Forms\Components\CheckboxList;
     use Carbon\Carbon;
+    use App\Jobs\SendSmsJob;
 
     trait OfficeDashboardActions
     {
@@ -224,6 +225,24 @@
                     $receiver = $record->user;
                     NotificationController::cashAdvanceCreation(Auth::user(), $receiver, $record);
 
+                    // ========== SMS NOTIFICATION ==========
+                    // Send SMS notification
+                    $record->load(['user.employee_information']);
+                    $trackingNumber = $record->tracking_number;
+                    $chequeNumber = $data['cheque_number'];
+                    $message = "Your DV with ref. no. {$trackingNumber} is ready for disbursement with check/ADA number {$chequeNumber}.";
+
+                    $requestedBy = $record->user;
+                    if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                        SendSmsJob::dispatch(
+                            $requestedBy->employee_information->contact_number,
+                            $message,
+                            'disbursement_voucher_ready',
+                            $requestedBy->id,
+                            auth()->id()
+                        );
+                    }
+                    // ========== SMS NOTIFICATION END ==========
 
                     DB::commit();
                     Notification::make()->title('Cheque/ADA made for requisitioner.')->success()->send();

@@ -14,6 +14,9 @@
         <div wire:ignore>
             <div id="calendar"></div>
         </div>
+        <div id="fc-tooltip"
+            class="hidden absolute z-50 bg-primary-600 text-white text-xs px-3 py-2 rounded-md shadow-lg pointer-events-none transition-opacity duration-150">
+        </div>
     </div>
     <!-- Modal -->
     <div class="modal" id="myModal">
@@ -110,12 +113,41 @@
                     eventColor: '#0a5200',
                     eventDisplay: 'block',
                     events: {!! json_encode($events) !!},
+                    eventMouseEnter: function(info) {
+                    const tooltip = document.getElementById('fc-tooltip');
+
+                    let tooltipContent = `
+                        <div class="font-semibold">${info.event.title}</div>
+                        <div class="text-gray-200 text-md">${info.event.extendedProps.purpose ?? ''}</div>
+                    `;
+
+                    tooltip.innerHTML = tooltipContent;
+                    tooltip.classList.remove('hidden');
+
+                    function moveTooltip(e) {
+                        tooltip.style.top = (e.pageY + 15) + 'px';
+                        tooltip.style.left = (e.pageX + 15) + 'px';
+                    }
+
+                    document.addEventListener('mousemove', moveTooltip);
+                    info.el._moveTooltip = moveTooltip;
+                },
+
+                eventMouseLeave: function(info) {
+                    const tooltip = document.getElementById('fc-tooltip');
+                    tooltip.classList.add('hidden');
+
+                    if (info.el._moveTooltip) {
+                        document.removeEventListener('mousemove', info.el._moveTooltip);
+                        delete info.el._moveTooltip;
+                    }
+                },
                     eventClick: function(info) {
                         // Display additional information in a modal-like dialog
                         var modal = document.getElementById('myModal');
                         var modalTitle = document.getElementById('modalTitle');
                         var modalBody = document.getElementById('modalBody');
-                        var end_time = info.event.end != null ? info.event.end.toLocaleTimeString() : info.event.start.toLocaleTimeString() 
+                        var end_time = info.event.end != null ? info.event.end.toLocaleTimeString() : info.event.start.toLocaleTimeString()
                         const options = { month: 'long', day: 'numeric', year: 'numeric' };
                         const formattedDateFrom = info.event.start.toLocaleString('en-US', options);
                         const formattedDateTo = info.event.end != null ? info.event.end.toLocaleString('en-US', options) : info.event.start.toLocaleString('en-US', options);

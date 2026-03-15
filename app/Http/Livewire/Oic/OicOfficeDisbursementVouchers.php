@@ -18,6 +18,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
+use App\Jobs\SendSmsJob;
 
 class OicOfficeDisbursementVouchers extends Component implements HasTable
 {
@@ -103,6 +104,32 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
+
+                // ========== SMS NOTIFICATION ==========
+                $record->load(['user.employee_information']);
+                $trackingNumber = $record->tracking_number;
+                $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                $remarks = $data['remarks'] ?? 'No remarks provided';
+
+                // Strip HTML tags and decode HTML entities from remarks
+                $remarks = strip_tags($remarks);
+                $remarks = html_entity_decode($remarks, ENT_QUOTES, 'UTF-8');
+
+                $message = "Your DV with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
+
+                // Send to the user who requested the disbursement voucher
+                $requestedBy = $record->user;
+                if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        $requestedBy->employee_information->contact_number,
+                        $message,
+                        'disbursement_voucher_returned',
+                        $requestedBy->id,
+                        auth()->id()
+                    );
+                }
+                // ========== SMS NOTIFICATION END ==========
+
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')

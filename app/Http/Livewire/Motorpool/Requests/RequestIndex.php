@@ -10,6 +10,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\ViewAction;
 use Livewire\Component;
+use Filament\Tables\Columns\ViewColumn;
 
 class RequestIndex extends Component implements HasTable
 {
@@ -23,9 +24,10 @@ class RequestIndex extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
+            ViewColumn::make('passengers')->view('tables.columns.passengers'),
             Tables\Columns\TextColumn::make('purpose')
                 ->searchable()
-                ->wrap(),
+                ->wrap()->limit(40),
             Tables\Columns\TextColumn::make('vehicle.model')
                 ->label('Vehicle')
                 ->sortable()

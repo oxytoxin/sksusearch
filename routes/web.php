@@ -13,6 +13,8 @@
     use App\Http\Controllers\HomeController;
     use App\Http\Controllers\NotificationController;
     use App\Http\Livewire\Shared\TravelCompletedCertificatePrint;
+use App\Models\FundAllocation;
+use Illuminate\Support\Facades\DB;
 
     /*
     |--------------------------------------------------------------------------
@@ -75,4 +77,26 @@
         return view('reports.endorsement-for-f-d', [
             'record' => DisbursementVoucher::first()
         ]);
+    });
+
+
+   Route::get('/fund-allocation-batch', function () {
+        $data =  FundAllocation::query()
+    ->fromSub(function ($query) {
+        $query->from('fund_allocations')
+            ->selectRaw('
+                *,
+                ROW_NUMBER() OVER (
+                    PARTITION BY
+                        cost_center_id,
+                        supplemental_quarter_id,
+                        fund_cluster_id,
+                        wpf_type_id
+                    ORDER BY id ASC
+                ) as rn
+            ');
+    }, 't')
+    ->where('rn', 1)
+    ->get();
+    return response()->json($data);
     });

@@ -85,16 +85,15 @@
 
                         <p class="mt-4">We look forward to your usual support.</p>
 
-                        <div class="mt-12"></div>
-                        <div class="relative mt-6">
+                        <div class="mt-6"></div>
+                        <x-signature-block
+    :name="App\Models\EmployeeInformation::presidentUser()->full_name"
+    :position="'University President'"
+    :signature="App\Models\EmployeeInformation::presidentUser()->user->signature?->content"
+    offsetX="0.25rem"
+    offsetY="-1rem"
+/>
 
-                             <img src="{{ App\Models\EmployeeInformation::presidentUser()->user->signature?->content }}"
-                                    alt="" class="absolute  h-24 w-24 inset-x-1 bottom-[-1rem]">
-
-                            <p class="mt-6 font-bold">{{ App\Models\EmployeeInformation::presidentUser()->full_name }}</p>
-                        </div>
-
-                        <p>University President</p>
                     </div>
                 </div>
             </div>
