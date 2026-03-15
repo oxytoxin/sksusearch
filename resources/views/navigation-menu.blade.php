@@ -1,4 +1,4 @@
-@php
+{{-- @php
     $branch = 'unknown';
 
     if (function_exists('shell_exec')) {
@@ -33,9 +33,7 @@
         </div>
     </div>
 @endif
-
-
-
+ --}}
 
 <nav class="sticky top-0 z-10 border-b border-gray-100 bg-primary-500" x-data="{ open: false }">
     <!-- Primary Navigation Menu -->
