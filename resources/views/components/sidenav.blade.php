@@ -399,10 +399,10 @@
                 x-transition:enter='transition ease-out duration-300' x-transition:enter-start='opacity-0 scale-95'
                 x-transition:enter-end='opacity-100 scale-100' x-transition:leave='transition ease-in duration-300'
                 x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'>
-                {{-- <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium  bg-primary-100 text-primary-900"
+                <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium  bg-primary-100 text-primary-900"
                     href="{{ config('app.wfp_url') }}/dashboard">
                     ✨Try new WFP✨
-                </a> --}}
+                </a>
                 <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                     href="{{ route('wfp.pricelist-document') }}">
                     Pricelist Document
@@ -421,8 +421,12 @@
                     </a>
                 @endif
                 @if ($isFinance || $is_reizza || $is_nolaila)
-                    <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                    {{-- <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.wfp-submissions', 1) }}">
+                        WFP Submissions
+                    </a> --}}
+                    <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                        href="{{ config('app.wfp_url') }}/wfp/wfps/submitted/wfp">
                         WFP Submissions
                     </a>
                 @endif
@@ -455,8 +459,12 @@
                     </a>
                 @endif
                 @if (($isOfficeHead && $costCenterExist) || $isAssignedPersonnel)
-                    <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                    {{-- <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.select-wfp') }}">
+                        Create WFP
+                    </a> --}}
+                    <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                        href="{{ config('app.wfp_url') }}/wfp/fund-allocation-batches">
                         Create WFP
                     </a>
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
@@ -468,9 +476,13 @@
                         Report Supply
                     </a>
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                        href="{{ config('app.wfp_url') }}/wfp/wfps/submitted/wfp">
+                        WFP Submissions
+                    </a>
+                    {{-- <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.wfp-history') }}">
                         WFP History
-                    </a>
+                    </a> --}}
                 @endif
                 @if ($isSupply)
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
