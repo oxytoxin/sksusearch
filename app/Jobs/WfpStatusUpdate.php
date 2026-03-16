@@ -40,7 +40,10 @@ class WfpStatusUpdate implements ShouldQueue
         }elseif($this->wfp->is_approved == 500) {
             $status = 'for_modification';
         }
-        $this->wfp->transaction_status = $status;
-        $this->wfp->save();
+        $this->wfp->update([
+            'approved_at' => $this->wfp->updated_at,
+            'status_last_updated_at' => $this->wfp->updated_at,
+            'transaction_status' => $status
+        ]);
     }
 }
