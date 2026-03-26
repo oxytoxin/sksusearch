@@ -458,6 +458,10 @@
                         Assign Personnel
                     </a>
                 @endif
+                <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                    href="{{ route('wfp.request-supply-list') }}">
+                    Request Supply
+                </a>
                 @if (($isOfficeHead && $costCenterExist) || $isAssignedPersonnel)
                     {{-- <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.select-wfp') }}">
@@ -467,10 +471,7 @@
                         href="{{ config('app.wfp_url') }}/wfp/fund-allocation-batches">
                         Create WFP
                     </a>
-                    <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
-                        href="{{ route('wfp.request-supply-list') }}">
-                        Request Supply
-                    </a>
+
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.report-supply-list') }}">
                         Report Supply
