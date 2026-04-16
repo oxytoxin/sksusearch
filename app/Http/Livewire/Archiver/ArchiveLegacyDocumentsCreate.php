@@ -205,6 +205,7 @@ class ArchiveLegacyDocumentsCreate extends Component implements HasForms
             'cheque_date' => $this->cheque_date,
             'cheque_state' => $this->cheque_state,
             'document_category' => $this->document_category,
+            'uploader_id' => auth()->user()->id
         ]);
 
         //save Files from fileupload
