@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Archiver;
 use Filament\Forms;
 use Livewire\Component;
 use App\Models\FundCluster;
+use App\Models\EmployeeInformation;
 use Livewire\WithPagination;
 use App\Models\LegacyDocument;
 use App\Models\DisbursementVoucher;
@@ -60,6 +61,9 @@ class ViewLegacyDocuments extends Component implements HasTable
                 '2' => 'Cancelled',
                 '3' => 'Stale',
             ]),
+            SelectFilter::make('uploader_id')
+            ->label('Uploader')
+            ->options(fn () => EmployeeInformation::where('position_id', 24)->pluck('full_name', 'user_id')->toArray()),
             Filter::make('created_at')
             ->form([
                 Forms\Components\DatePicker::make('created_from')->label('Uploaded From'),
@@ -141,9 +145,14 @@ class ViewLegacyDocuments extends Component implements HasTable
                     '2' => 'Liquidation Report',
                 ])
                 ->searchable()->sortable(),
+            TextColumn::make('uploader.name')
+                ->label('Uploaded By')
+                ->searchable()
+                ->sortable(),
             TextColumn::make('created_at')
-                ->label('Date uploaded')
-                ->searchable()->date(),
+                ->label('Date Uploaded')
+                ->dateTime('M d, Y h:i A')
+                ->sortable(),
 
         ];
     }
