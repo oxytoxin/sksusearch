@@ -31,9 +31,9 @@ class ViewLegacyDocuments extends Component implements HasTable
 
     public function mount($document_code)
     {
-     if($document_code !=""){
-        $this->form->fill(["tableSearchQuery"=>$document_code]);
-     }
+        if ($document_code != "") {
+            $this->form->fill(["tableSearchQuery" => $document_code]);
+        }
     }
 
 
@@ -47,39 +47,39 @@ class ViewLegacyDocuments extends Component implements HasTable
     {
         return [
             MultiSelectFilter::make('document_category')
-            ->options([
-                '1' => 'Disbursement Voucher',
-                '2' => 'Liquidation Report',
-            ]),
+                ->options([
+                    '1' => 'Disbursement Voucher',
+                    '2' => 'Liquidation Report',
+                ]),
             MultiSelectFilter::make('fund_cluster_name')
-            ->label('Fund Cluster')
-             ->options(fn () => FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id')->toArray())
-            ->relationship('fund_cluster', 'name'),
+                ->label('Fund Cluster')
+                ->options(fn() => FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id')->toArray())
+                ->relationship('fund_cluster', 'name'),
             MultiSelectFilter::make('cheque_state')
-            ->options([
-                '1' => 'Encashed',
-                '2' => 'Cancelled',
-                '3' => 'Stale',
-            ]),
+                ->options([
+                    '1' => 'Encashed',
+                    '2' => 'Cancelled',
+                    '3' => 'Stale',
+                ]),
             SelectFilter::make('uploader_id')
-            ->label('Uploader')
-            ->options(fn () => EmployeeInformation::where('position_id', 24)->pluck('full_name', 'user_id')->toArray()),
+                ->label('Uploader')
+                ->options(fn() => EmployeeInformation::where('position_id', 24)->pluck('full_name', 'user_id')->toArray()),
             Filter::make('created_at')
-            ->form([
-                Forms\Components\DatePicker::make('created_from')->label('Uploaded From'),
-                Forms\Components\DatePicker::make('created_until')->label('Uploaded To'),
-            ])
-            ->query(function (Builder $query, array $data): Builder {
-                return $query
-                    ->when(
-                        $data['created_from'],
-                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                    )
-                    ->when(
-                        $data['created_until'],
-                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                    );
-            })
+                ->form([
+                    Forms\Components\DatePicker::make('created_from')->label('Uploaded From'),
+                    Forms\Components\DatePicker::make('created_until')->label('Uploaded To'),
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['created_from'],
+                            fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['created_until'],
+                            fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                        );
+                })
         ];
     }
 
@@ -145,7 +145,7 @@ class ViewLegacyDocuments extends Component implements HasTable
                     '2' => 'Liquidation Report',
                 ])
                 ->searchable()->sortable(),
-            TextColumn::make('uploader.name')
+            TextColumn::make('uploader.email')
                 ->label('Uploaded By')
                 ->searchable()
                 ->sortable(),
@@ -161,10 +161,10 @@ class ViewLegacyDocuments extends Component implements HasTable
     {
         return [
             Action::make('legacy_document_details')
-                    ->label('View Legacy Document Counts')
-                    ->button()
-                    ->icon('ri-list-ordered')
-                    ->url(route('archiver.legacy-docs-count')),
+                ->label('View Legacy Document Counts')
+                ->button()
+                ->icon('ri-list-ordered')
+                ->url(route('archiver.legacy-docs-count')),
         ];
     }
 
@@ -175,24 +175,24 @@ class ViewLegacyDocuments extends Component implements HasTable
                 ViewAction::make('legacy_document_details')
                     ->label('View Details')
                     ->icon('ri-list-check-2')
-                    ->modalContent(fn ($record) => view('components.archiver.tables.columns.legacy-document-details', [
+                    ->modalContent(fn($record) => view('components.archiver.tables.columns.legacy-document-details', [
                         'legacy_document' => $record,
                     ])),
                 ViewAction::make('legacy_document_preview')
                     ->label('View Scanned Documents')
-                    ->url(fn (LegacyDocument $record): string => route('archiver.view-scanned-docs-lgc', [$record,0]))
+                    ->url(fn(LegacyDocument $record): string => route('archiver.view-scanned-docs-lgc', [$record, 0]))
                     ->icon('ri-file-copy-2-line'),
                 ViewAction::make('legacy_document_generate_qr')
                     ->label('Generate QR')
                     ->modalHeading('QR CODE')
-                    ->modalContent(fn ($record) => view('components.archiver.tables.columns.legacy-document-qr', [
+                    ->modalContent(fn($record) => view('components.archiver.tables.columns.legacy-document-qr', [
                         'legacy_document' => $record,
                     ]))
                     ->modalWidth('xs')
                     ->icon('ri-qr-code-line'),
                 ViewAction::make('legacy_document_edit')
                     ->label('Edit')
-                    ->url(fn (LegacyDocument $record): string => route('archiver.archive-leg-doc.update', [$record]))
+                    ->url(fn(LegacyDocument $record): string => route('archiver.archive-leg-doc.update', [$record]))
                     ->icon('ri-edit-2-line'),
             ])->icon('ri-flashlight-fill'),
 
