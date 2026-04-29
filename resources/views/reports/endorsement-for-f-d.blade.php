@@ -32,7 +32,7 @@
             <ul class="list-decimal pl-6 mt-2">
                 <li>Formal Management Reminder, FMR No.  {{ $record?->cash_advance_reminder?->fmr_number ??'' }} dated {{ $record?->cash_advance_reminder?->fmr_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y') : '' }}</li>
                 <li>Formal Management Demand, FMD No. {{ $record?->cash_advance_reminder->fmd_number ??'' }} dated {{ $record?->cash_advance_reminder?->fmd_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmd_date)->format('F d, Y') : '' }}</li>
-                <li>Show Cause Order, Office of the President Memo No. {{ $record->cash_advance_reminder->memorandum_number }}, s. {{ $record?->cash_advance_reminder?->sco_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco_date)->format('Y') : 'xx' }} dated {{ $record?->cash_advance_reminder?->sco_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco_date)->format('F d, Y') : '' }}</li>
+                <li>Show Cause Order, Office of the President Memo No. {{ $record?->cash_advance_reminder?->memorandum_number ?? '' }}, s. {{ $record?->cash_advance_reminder?->sco_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco_date)->format('Y') : '' }} dated {{ $record?->cash_advance_reminder?->sco_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco_date)->format('F d, Y') : '' }}</li>
             </ul>
 
             <p class="mt-4">

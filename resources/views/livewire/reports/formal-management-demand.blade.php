@@ -61,11 +61,11 @@
 
                         <p>
                             Records also show that a prior reminder contained in
-                            FMR No. {{ $record?->cash_advance_reminder?->fmr_number ?? 'xxxx-xxxx' }}
+                            FMR No. {{ $record?->cash_advance_reminder?->fmr_number ?? '' }}
                             was issued to you on
                             {{ $record?->cash_advance_reminder?->fmr_date
                                 ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y')
-                                : '________' }}
+                                : '' }}
                             in relation hereto.
                         </p>
 

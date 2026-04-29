@@ -17,7 +17,7 @@
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12 "> Re:</p>
-                <div class=""> Demand Liquidated Advance</div>
+                <div class=""> Demand to liquidate cash advance</div>
             </div>
             <div class="flex justify-start font-bold">
                 <p class="label min-w-12 "> Date:</p>
@@ -51,9 +51,13 @@
             <div class="mt-4 text-xs text-gray-800 leading-relaxed">
 
 
-                <p>Records also show that a prior reminder contained in FMR No. xxxx-xxxx was issued to you on
-                    &lt;Date&gt; in
-                    relation hereto.</p>
+                <p>Records also show that a prior reminder contained in
+                    FMR No. {{ $record?->cash_advance_reminder?->fmr_number ?? '' }}
+                    was issued to you on
+                    {{ $record?->cash_advance_reminder?->fmr_date
+                        ? \Carbon\Carbon::parse($record->cash_advance_reminder->fmr_date)->format('F d, Y')
+                        : '' }}
+                    in relation hereto.</p>
 
                 <p class="mt-4">In view of the foregoing premises, you are hereby ordered to effect the immediate
                     liquidation of the cash advance described above. You are given the following alternatives, which must be

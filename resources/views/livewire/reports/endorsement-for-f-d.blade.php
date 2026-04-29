@@ -56,7 +56,7 @@
                             </li>
                             <li>Show Cause Order, Office of the President Memo No.
                                 {{ $record->cash_advance_reminder->memorandum_number ?? '' }}, s.
-                                {{ $record?->cash_advance_reminder?->sco_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco_date)->format('Y') : 'xx' }}
+                                {{ $record?->cash_advance_reminder?->sco_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco_date)->format('Y') : '' }}
                                 dated
                                 {{ $record?->cash_advance_reminder?->sco_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco_date)->format('F d, Y') : '' }}
                             </li>
