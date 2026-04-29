@@ -120,10 +120,10 @@
                         <span class="text-md ml-3 tracking-wide text-black">University President</span>
                         </div>
                         <div class="flex -space-y-1 mb-10 justify-center">
-                            REMARKS: 
+                            REMARKS:
                         </div>
                         </div>
-                        
+
                         <div class="mt-16">
                         <div class="flex -space-y-1 mb-10 justify-end">
                             <div class="border-b border-black block w-1/2"></div>
@@ -135,14 +135,14 @@
                     </div>
                 </div>
                 <div id="contents" class="flex h-auto w-full px-6 ml-2 pt-2 print:pt-1 print:text-12">
-              
+
                 </div>
 
             </div>
             <div class="m-2">
 
                 <div id="contents" class="flex h-auto w-full px-6 ml-2 pt-2 print:pt-1 print:text-12">
-                  
+
                 </div>
 
             </div>
