@@ -20,6 +20,27 @@ class CaReminderStep extends Model implements HasMedia
         'is_sent',
         'title',
         'message',
+        'fmr_number',
+        'fmd_number',
+        'memorandum_number',
+        'fmr_date',
+        'fmd_date',
+        'sco_date',
+        'fd_date',
+        'user_id',
+        'auditor_attachment',
+        'auditor_deadline',
+    ];
+
+    protected $casts = [
+        'is_sent'                     => 'boolean',
+        'voucher_end_date'            => 'date',
+        'liquidation_period_end_date' => 'date',
+        'auditor_deadline'            => 'date',
+        'fmr_date'                    => 'datetime',
+        'fmd_date'                    => 'datetime',
+        'sco_date'                    => 'datetime',
+        'fd_date'                     => 'datetime',
     ];
 
     public function caReminderStepHistories()
