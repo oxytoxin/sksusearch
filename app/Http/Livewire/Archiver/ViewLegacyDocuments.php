@@ -86,10 +86,16 @@ class ViewLegacyDocuments extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
+             TextColumn::make('created_at')
+                ->label('Date Uploaded')
+                ->dateTime('M d, Y')
+                ->sortable(),
             TextColumn::make('document_code')
                 ->label('Document Code')
                 ->searchable()
                 ->sortable(),
+
+
 
             TextColumn::make('dv_number')
                 ->label('DV Number')
@@ -148,10 +154,6 @@ class ViewLegacyDocuments extends Component implements HasTable
             TextColumn::make('uploader.email')
                 ->label('Uploaded By')
                 ->searchable()
-                ->sortable(),
-            TextColumn::make('created_at')
-                ->label('Date Uploaded')
-                ->dateTime('M d, Y h:i A')
                 ->sortable(),
 
         ];
