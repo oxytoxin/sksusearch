@@ -10,6 +10,10 @@ class AttachmentsController extends Controller
 {
     public function download(Attachment $attachment)
     {
-        return Storage::download($attachment->path, $attachment->file_name);
+        if (!Storage::disk('public')->exists($attachment->path)) {
+            abort(404, 'Attachment file is missing from storage.');
+        }
+
+        return Storage::disk('public')->download($attachment->path, $attachment->file_name);
     }
 }
