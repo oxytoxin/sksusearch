@@ -14,10 +14,16 @@
             @endif
 
             @livewire('requisitioner.prompt-contact-number')
+            @livewire('requisitioner.update-signature-modal')
 
             @push('scripts')
             <script>
                 window.addEventListener('contact-number-updated', event => {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                });
+                window.addEventListener('signature-updated', event => {
                     setTimeout(() => {
                         window.location.reload();
                     }, 1000);

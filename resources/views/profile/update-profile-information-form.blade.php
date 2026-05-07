@@ -34,7 +34,7 @@
         </div>
 
         <div class="col-span-6 sm:col-span-4">
-            <h4 class="block text-sm font-medium text-gray-700">Signature <a class="ml-2 font-semibold text-primary-600 underline" href="{{ route('requisitioner.signature') }}">Update</a></h4>
+            <h4 class="block text-sm font-medium text-gray-700">Signature <button type="button" class="ml-2 font-semibold text-primary-600 underline" onclick="Livewire.emit('openSignatureModal')">Update</button></h4>
             <img src="{{ $this->user->signature?->content }}" alt="">
         </div>
     </x-slot>
