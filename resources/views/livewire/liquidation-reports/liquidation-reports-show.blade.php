@@ -14,9 +14,10 @@
                         <div class="relative right-0">
                             <div class="m-auto flex justify-center items-center flex-col">
                                 <img class="w-12"
-                                     src="https://api.qrserver.com/v1/create-qr-code/?data={{ $liquidation_report->tracking_number }}&amp;size=100x100"
-                                     title="" alt=""/>
-                                <span class="font-xs flex justify-center text-[11px]">{{ $liquidation_report->tracking_number }}</span>
+                                    src="https://api.qrserver.com/v1/create-qr-code/?data={{ $liquidation_report->tracking_number }}&amp;size=100x100"
+                                    title="" alt="" />
+                                <span
+                                    class="font-xs flex justify-center text-[11px]">{{ $liquidation_report->tracking_number }}</span>
                             </div>
                         </div>
                     </div>
@@ -79,9 +80,10 @@
             </div>
             <div class="flex text-sm divide-x-2 divide-black">
                 <h4 class="flex-1 p-1">AMOUNT OF CASH ADVANCE PER DV NO.
-                    <span class="border-b border-black">{{ $liquidation_report->disbursement_voucher->dv_number }}</span>
+                    <span
+                        class="border-b border-black">{{ $liquidation_report->disbursement_voucher->dv_number }}</span>
                     DTD.<span
-                            class="border-b border-black">{{ $liquidation_report->disbursement_voucher->created_at->format('m/d/Y') }}</span>
+                        class="border-b border-black">{{ $liquidation_report->disbursement_voucher->created_at->format('m/d/Y') }}</span>
                 </h4>
                 <h4 class="w-1/3 p-1 px-4 text-right">
                     {{ Akaunting\Money\Money::PHP($liquidation_report->disbursement_voucher->total_amount, true) }}
@@ -92,7 +94,7 @@
                     <h4 class="flex-1 p-1">AMOUNT REFUNDED PER OR NO.
                         <span class="border-b border-black">{{ $refund_particular['or_number'] }}</span>
                         DTD.<span
-                                class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
+                            class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
                     </h4>
                     <h4 class="w-1/3 p-1 pl-12 text-left">
                         {{ Akaunting\Money\Money::PHP($refund_particular['amount'] ? $refund_particular['amount'] : 0, true) }}
@@ -130,13 +132,8 @@
                         <span class="text-sm">Certified: Correctness of the above data</span>
                     </div>
                     <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
-                        <x-signature-block
-                            :signature="$liquidation_report->requisitioner->signature?->content"
-                            width="10rem"
-                            maxHeight="3.5rem"
-                            bottom="100%"
-                            translateY="3.5rem"
-                        />
+                        <x-signature-block :signature="$liquidation_report->requisitioner->signature?->content" width="10rem" maxHeight="3.5rem" bottom="100%"
+                            translateY="3.5rem" />
                         <p class="w-full text-center border-b border-black">
                             {{ $liquidation_report->requisitioner->employee_information->full_name }}
                         </p>
@@ -156,14 +153,9 @@
                         <span class="text-sm">Certified: Purpose of travel / cash advance duly accomplished</span>
                     </div>
                     <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
-                        @if($liquidation_report->current_step_id > 4000 || $liquidation_report->signatory_date)
-                            <x-signature-block
-                                :signature="$liquidation_report->signatory->signature?->content"
-                                width="10rem"
-                                maxHeight="3.5rem"
-                                bottom="100%"
-                                translateY="3.5rem"
-                            />
+                        @if ($liquidation_report->current_step_id > 4000 || $liquidation_report->signatory_date)
+                            <x-signature-block :signature="$liquidation_report->signatory->signature?->content" width="10rem" maxHeight="3.5rem" bottom="100%"
+                                translateY="3.5rem" />
                         @endif
                         <p class="w-full text-center border-b border-black">
                             {{ $liquidation_report->signatory->employee_information->full_name }}</p>
@@ -173,7 +165,7 @@
                     <div class="flex gap-2 px-4">
                         <p>Date:</p>
                         <p class="flex-1 text-center border-b border-black">
-                            @if($liquidation_report->signatory_date)
+                            @if ($liquidation_report->signatory_date)
                                 {{ $liquidation_report->signatory_date->format('m/d/Y') }}
                             @endif
                         </p>
@@ -186,14 +178,9 @@
                         <span class="text-sm">Certified: Supporting documents complete and proper</span>
                     </div>
                     <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
-                        @if($liquidation_report->certified_by_accountant)
-                            <x-signature-block
-                                :signature="$accountant?->user?->signature?->content"
-                                width="10rem"
-                                maxHeight="3.5rem"
-                                bottom="100%"
-                                translateY="3.5rem"
-                            />
+                        @if ($liquidation_report->certified_by_accountant)
+                            <x-signature-block :signature="$accountant?->user?->signature?->content" width="10rem" maxHeight="3.5rem" bottom="100%"
+                                translateY="3.5rem" />
                         @endif
                         <p class="w-full text-center border-b border-black">{{ $accountant?->full_name }}</p>
                         <p>Signature over Printed Name</p>
@@ -202,7 +189,7 @@
                     <div class="flex gap-2 px-4">
                         <p>Date:</p>
                         <p class="flex-1 text-center border-b border-black">
-                            @if($liquidation_report->certified_by_accountant && $liquidation_report->journal_date)
+                            @if ($liquidation_report->certified_by_accountant && $liquidation_report->journal_date)
                                 {{ $liquidation_report->journal_date->format('m/d/Y') }}
                             @endif
                         </p>
@@ -210,7 +197,7 @@
                 </div>
             </div>
             <div class="border-t col-span-8 text-xs text-center italic border-black w-full">
-                <p>The original copy of this document appears in electronic form.</p>
+                <p>This is an electronic rendering; the original copy is in printed form.</p>
             </div>
         </div>
     </div>
@@ -224,11 +211,13 @@
             size: A4 portrait;
             margin: 5mm;
         }
+
         @media print {
             #dvPrint {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
+
             #dvPrint img {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
