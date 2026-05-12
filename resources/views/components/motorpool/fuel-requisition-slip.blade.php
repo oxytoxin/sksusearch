@@ -140,7 +140,7 @@
                                 <span class="text-sm font-semibold tracking-wide text-black">Requested By : / Driver:
                                 </span>
                                 <span
-                                    class="text-sm font-semibold tracking-wide text-black">{{ $fuel_request->user->name }}</span>
+                                    class="text-sm font-semibold tracking-wide text-black">{{ $fuel_request->requested_by_employee?->full_name }}</span>
                             </div>
                         </div>
                     </div>

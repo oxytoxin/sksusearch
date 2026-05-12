@@ -24,7 +24,7 @@ class FuelRequestIndex extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            Tables\Columns\TextColumn::make('user.name')
+            Tables\Columns\TextColumn::make('requested_by_employee.full_name')
                 ->label('Requested By')
                 ->searchable()
                 ->wrap(),

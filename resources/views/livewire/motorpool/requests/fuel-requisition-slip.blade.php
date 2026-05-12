@@ -458,7 +458,7 @@
                                     <span class="text-sm font-semibold tracking-wide text-black">Requested By : /
                                         Driver: </span>
                                     <span
-                                        class="text-sm font-semibold tracking-wide text-black">{{ $request->user->name }}</span>
+                                        class="text-sm font-semibold tracking-wide text-black">{{ $request->requested_by_employee?->full_name }}</span>
                                 </div>
                             </div>
                         </div>
