@@ -12,6 +12,15 @@ class PromptSignature extends Component
     use WithFileUploads;
 
     public $uploadedSignature;
+    public $activeTab = 'draw';
+
+    public function setActiveTab($tab)
+    {
+        if (in_array($tab, ['draw', 'upload'])) {
+            $this->activeTab = $tab;
+            $this->resetErrorBag();
+        }
+    }
 
     public function render()
     {
