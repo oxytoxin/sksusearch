@@ -187,7 +187,7 @@
                             @php
                                 $full_name = explode(',', $disbursement_voucher->signatory->employee_information->full_name)[0];
                             @endphp
-                            @if($disbursement_voucher->signatory->signature?->content)
+                            @if($disbursement_voucher->current_step_id >= 5000 && $disbursement_voucher->signatory->signature?->content)
                                 <img src="{{ $disbursement_voucher->signatory->signature->content }}" alt="signature"
                                     class="absolute left-1/2 -translate-x-1/2"
                                     style="width: 14rem; height: auto; max-height: 7rem; object-fit: contain; top: -3.6rem;">
@@ -278,7 +278,7 @@
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                             <span class="mx-auto my-auto flex print:text-12">Signature</span>
                         </div>
-                        @if($accountant?->user?->signature?->content)
+                        @if($disbursement_voucher->current_step_id >= 14000 && $accountant?->user?->signature?->content)
                             <img src="{{ $accountant->user->signature->content }}" alt="signature"
                                 class="absolute"
                                 style="width: 8rem; height: auto; max-height: 3rem; object-fit: contain; left: 5rem; top: -0.5rem;">
@@ -288,7 +288,7 @@
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                             <span class="mx-auto my-auto flex print:text-12">Signature</span>
                         </div>
-                        @if($president?->user?->signature?->content)
+                        @if($disbursement_voucher->current_step_id >= 16000 && $president?->user?->signature?->content)
                             <img src="{{ $president->user->signature->content }}" alt="signature"
                                 class="absolute"
                                 style="width: 8rem; height: auto; max-height: 3rem; object-fit: contain; left: 5rem; top: -0.5rem;">
