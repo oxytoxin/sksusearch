@@ -16,7 +16,7 @@
                     </div>
                     <img class="h-20" src="{{ asset('images/headerlogo2.png') }}" alt="headerlogo2">
                 </div>
-                <img class="w-24" src="{{ new chillerlan\QRCode\QRCode()->render($travel_order->tracking_code) }}"
+                <img class="w-24" src="{{ (new chillerlan\QRCode\QRCode())->render($travel_order->tracking_code) }}"
                     alt="qr" />
 
             </div>
