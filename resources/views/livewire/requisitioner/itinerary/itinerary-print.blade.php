@@ -170,7 +170,7 @@
                 <div class="col-start-7 text-center">
                     <div class="relative inline-block px-16">
                         <x-signature-block
-                            :signature="$immediate_signatory->signature?->content"
+                            :signature="$immediate_signatory->pivot->is_approved ? $immediate_signatory->signature?->content : null"
                             width="10rem"
                             maxHeight="5rem"
                             bottom="100%"
