@@ -3,7 +3,14 @@
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="flex-shrink-0 w-full max-w-lg" x-data="{ sig: null }" x-init="sig = new SignaturePad(document.querySelector('#signature'))">
+                <div class="flex-shrink-0 w-full max-w-lg" x-data="{ sig: null }" x-init="$nextTick(() => {
+                    const canvas = document.querySelector('#signature');
+                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                    canvas.width = canvas.offsetWidth * ratio;
+                    canvas.height = canvas.offsetHeight * ratio;
+                    canvas.getContext('2d').scale(ratio, ratio);
+                    sig = new SignaturePad(canvas);
+                })">
                     <div class="relative w-full flex-shrink-0 overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl">
 
                         {{-- Close button — only shown when the user already has a signature.
@@ -33,7 +40,7 @@
                                 <li>Use your <strong>mouse</strong> on a computer, or your <strong>finger / stylus</strong> on a touch device.</li>
                                 <li>Press <strong>Clear</strong> to start over, then <strong>Save Drawing</strong> when done.</li>
                             </ul>
-                            <canvas class="mx-auto bg-red-200 w-full" id="signature" height="300"></canvas>
+                            <canvas class="block bg-red-200 w-full rounded" id="signature" style="height: 220px;"></canvas>
                             <div class="mt-3 flex items-center justify-evenly gap-4">
                                 <x-filament-support::button class="w-full" type="button" color="danger" @click="sig.clear()">Clear</x-filament-support::button>
                                 <x-filament-support::button class="w-full" type="button" wire:target="saveSignature" @click="$wire.saveSignature(sig.toDataURL('image/png'))">Save Drawing</x-filament-support::button>

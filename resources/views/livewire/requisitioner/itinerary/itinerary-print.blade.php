@@ -147,20 +147,39 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="flex pt-32 justify-evenly w-full">
+            <div class="flex pt-16 justify-evenly w-full">
                 <div class="col-start-2 text-center">
-                    <div class="flex flex-col w-full pt-5 border-t-2 border-black px-16">
-                        <span class="font-extrabold capitalize print:text-sm">{{ $itinerary->user->name }}</span>
-                        <span class="text-xs font-extrabold capitalize print:text-12">{{ $itinerary->user->employee_information->position?->description }},
-                            {{ $itinerary->user->employee_information->office->name }}
-                        </span>
+                    <div class="relative inline-block px-16">
+                        @if($itinerary->user->signature?->content)
+                            <img src="{{ $itinerary->user->signature->content }}" alt="signature"
+                                class="absolute left-1/2 -translate-x-1/2 bottom-full mb-[-1.5rem]"
+                                style="width: 10rem; height: auto; max-height: 5rem; object-fit: contain;">
+                        @endif
+                        <div>
+                            <span class="font-extrabold capitalize print:text-sm">{{ $itinerary->user->name }}</span>
+                            <br>
+                            <span class="text-xs font-extrabold capitalize print:text-12">
+                                {{ $itinerary->user->employee_information->position?->description }},
+                                {{ $itinerary->user->employee_information->office->name }}
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-start-7 text-center">
-                    <div class="flex flex-col w-full pt-5 border-t-2 border-black px-16">
-                        <span class="font-extrabold capitalize print:text-sm">{{ $immediate_signatory->name }}</span>
-                        <span class="text-xs font-extrabold capitalize print:text-12">{{ $immediate_signatory->employee_information->position?->description }},
-                            {{ $immediate_signatory->employee_information->office->name }}</span>
+                    <div class="relative inline-block px-16">
+                        @if($immediate_signatory->signature?->content)
+                            <img src="{{ $immediate_signatory->signature->content }}" alt="signature"
+                                class="absolute left-1/2 -translate-x-1/2 bottom-full mb-[-1.5rem]"
+                                style="width: 10rem; height: auto; max-height: 5rem; object-fit: contain;">
+                        @endif
+                        <div>
+                            <span class="font-extrabold capitalize print:text-sm">{{ $immediate_signatory->name }}</span>
+                            <br>
+                            <span class="text-xs font-extrabold capitalize print:text-12">
+                                {{ $immediate_signatory->employee_information->position?->description }},
+                                {{ $immediate_signatory->employee_information->office->name }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -35,6 +35,7 @@ use App\Http\Livewire\Requisitioner\DisbursementVouchers\DisbursementVouchersUnl
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
+    'ensure.signature',
 ])->prefix('requisitioner')->name('requisitioner.')->group(function () {
     Route::get('dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
     Route::get('/require-contact-number', PromptContactNumber::class)->name('contact-number');

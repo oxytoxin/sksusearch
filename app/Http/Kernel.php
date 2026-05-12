@@ -64,6 +64,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'check.voucher.subtype' => \App\Http\Middleware\CheckVoucherSubtype::class,
-    
+        'ensure.signature' => \App\Http\Middleware\EnsureUserHasSignature::class,
     ];
 }

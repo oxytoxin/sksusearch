@@ -92,9 +92,18 @@ class SemaphoreProvider implements SmsProviderInterface
                 );
             }
 
-            // Success
+            // Success - but verify message_id exists
+            if (!isset($responseData[0]['message_id'])) {
+                Log::warning('Semaphore SMS: No message_id in response', $responseData);
+                return SmsResponse::error(
+                    'SMS not sent: No message_id in response (check API key configuration)',
+                    $formattedNumber,
+                    $responseData
+                );
+            }
+
             return SmsResponse::success(
-                $responseData[0]['message_id'] ?? null,
+                $responseData[0]['message_id'],
                 $formattedNumber,
                 $responseData
             );

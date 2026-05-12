@@ -32,6 +32,12 @@
         <div class="min-h-screen bg-primary-100">
             @auth
                 @livewire('navigation-menu')
+
+                {{-- Auto-show signature modal if user has no signature --}}
+                @if(!auth()->user()->signature()->exists())
+                    @livewire('requisitioner.prompt-signature')
+                @endif
+
                 <div>
                     <!-- Static sidebar for desktop -->
                     <div class="hidden md:fixed md:flex md:h-full md:w-64 md:flex-col">

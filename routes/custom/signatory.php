@@ -16,6 +16,7 @@ use App\Http\Livewire\Signatory\Motorpool\RequestVehicleSigned;
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
+    'ensure.signature',
 ])->prefix('signatory')->name('signatory.')->group(function () {
     Route::get('my-dashboard', function () {
         return view('dashboard');
