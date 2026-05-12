@@ -13,12 +13,27 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
 
     protected function getTableQuery()
     {
-        return TravelOrder::query()->whereRelation('signatories', 'user_id', auth()->id())->latest();
+        return TravelOrder::query()
+            ->with('applicants')
+            ->whereRelation('signatories', 'user_id', auth()->id())
+            ->latest();
     }
 
     protected function getTableColumns(): array
     {
         return [
+            Tables\Columns\TextColumn::make('applicants_list')
+                ->label('Applicant(s)')
+                ->getStateUsing(fn ($record) => $record->applicants->pluck('name')->join(', '))
+                ->limit(30)
+                ->searchable(query: function ($query, string $search) {
+                    return $query->whereHas('applicants', function ($q) use ($search) {
+                        $q->whereHas('employee_information', function ($eq) use ($search) {
+                            $eq->where('first_name', 'like', "%{$search}%")
+                              ->orWhere('last_name', 'like', "%{$search}%");
+                        });
+                    });
+                }),
             Tables\Columns\TextColumn::make('purpose')->limit(20)->searchable(),
             Tables\Columns\TextColumn::make('date_from')->label('From')->date()->searchable(),
             Tables\Columns\TextColumn::make('date_to')->label('To')->date()->searchable(),
