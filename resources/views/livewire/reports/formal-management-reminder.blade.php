@@ -81,17 +81,26 @@
                             of records.
                         </p>
 
-                        <p class="mt-6">For your guidance and immediate compliance.</p>
+                        <p class="mt-6 mb-12">For your guidance and immediate compliance.</p>
                     </div>
 
-                    <div>
-
-                        <div class="mt-6">
-
+                    @php
+                        $accountant = App\Models\EmployeeInformation::accountantUser();
+                    @endphp
+                    <div class="text-xs mt-16 text-gray-800">
+                        <div class="relative inline-block">
+                            <x-signature-block
+                                :signature="$accountant?->user?->signature?->content"
+                                width="10rem"
+                                maxHeight="4rem"
+                                left="0"
+                                translateX="0"
+                                bottom="100%"
+                                translateY="1rem"
+                            />
+                            <p class="font-bold uppercase">{{ $accountant?->full_name ?? '[ACCOUNTANT]' }}</p>
+                            <p>{{ $accountant?->position?->description ?? 'Accountant III' }}</p>
                         </div>
-                        <x-signature-block :name="App\Models\EmployeeInformation::accountantUser()->full_name" :position="App\Models\EmployeeInformation::accountantUser()?->position->description .
-                            ' - ' .
-                            App\Models\EmployeeInformation::accountantUser()?->office->name" :signature="App\Models\EmployeeInformation::accountantUser()->user->signature?->content" />
                     </div>
                     <div class="mt-6">
                         <div class=" text-xs text-gray-800">
