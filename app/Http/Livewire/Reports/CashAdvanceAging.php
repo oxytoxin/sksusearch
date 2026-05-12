@@ -2,45 +2,29 @@
 
 namespace App\Http\Livewire\Reports;
 
+use App\Exports\CashAdvanceAgingExport;
 use App\Models\CaReminderStep;
 use App\Models\Office;
-use Carbon\Carbon;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\Layout;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Maatwebsite\Excel\Facades\Excel;
 
-class CashAdvanceAging extends Component
+class CashAdvanceAging extends Component implements HasTable
 {
-    public string $bucket = 'all';
-
-    public $officeId = null;
-
-    public string $search = '';
-
-    protected $queryString = ['bucket', 'officeId', 'search'];
+    use InteractsWithTable;
 
     public function mount(): void
     {
         abort_unless($this->userIsAuthorized(), 403);
-    }
-
-    public function updatingBucket(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatingOfficeId(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatingSearch(): void
-    {
-        $this->resetPage();
-    }
-
-    public function resetPage(): void
-    {
-        // No pagination yet; placeholder kept for consistency if added later.
     }
 
     protected function userIsAuthorized(): bool
@@ -50,7 +34,10 @@ class CashAdvanceAging extends Component
             return false;
         }
 
-        return $this->isAccountant($info) || $this->isFinance($info) || $this->isPresident($info);
+        return $this->isAccountant($info)
+            || $this->isFinance($info)
+            || $this->isPresident($info)
+            || $this->isAuditor($info);
     }
 
     protected function isAccountant($info): bool
@@ -68,55 +55,203 @@ class CashAdvanceAging extends Component
         return $info->office_id == 51 && $info->position_id == 34;
     }
 
-    protected function baseQuery()
+    protected function isAuditor($info): bool
+    {
+        return $info->office_id == 61 && $info->position_id == 31;
+    }
+
+    protected function daysOverdueExpression(): string
+    {
+        return 'GREATEST(DATEDIFF(CURDATE(), ca_reminder_steps.liquidation_period_end_date), 0)';
+    }
+
+    protected function baseQuery(): Builder
     {
         return CaReminderStep::query()
-            ->whereHas('disbursement_voucher', function ($q) {
+            ->whereHas('disbursementVoucher', function ($q) {
                 $q->whereDoesntHave('liquidation_report', fn ($lr) => $lr->whereNull('cancelled_at'))
                     ->whereRelation('voucher_subtype', 'voucher_type_id', 1)
                     ->where('voucher_subtype_id', '!=', 69)
                     ->whereNotNull('cheque_number');
             })
             ->whereNotNull('liquidation_period_end_date')
+            ->where('liquidation_period_end_date', '<', today());
+    }
+
+    protected function getTableQuery(): Builder|Relation
+    {
+        return $this->baseQuery()
+            ->select('ca_reminder_steps.*')
+            ->selectRaw($this->daysOverdueExpression().' as days_overdue')
             ->with([
-                'disbursement_voucher.user.employee_information.office',
-                'disbursement_voucher.disbursement_voucher_particulars',
+                'disbursementVoucher.user.employee_information.office',
+                'disbursementVoucher.disbursement_voucher_particulars',
             ]);
     }
 
-    protected function buildRows()
+    protected function getTableColumns(): array
     {
-        $today = Carbon::today();
+        return [
+            TextColumn::make('disbursementVoucher.dv_number')
+                ->label('DV No.')
+                ->searchable()
+                ->sortable(),
 
-        $rows = $this->baseQuery()->get()->map(function ($step) use ($today) {
-            $dv = $step->disbursement_voucher;
-            $deadline = $step->liquidation_period_end_date
-                ? Carbon::parse($step->liquidation_period_end_date)
-                : null;
+            TextColumn::make('disbursementVoucher.tracking_number')
+                ->label('Tracking No.')
+                ->searchable()
+                ->sortable(),
 
-            $daysOverdue = $deadline && $deadline->lt($today)
-                ? $deadline->diffInDays($today)
-                : 0;
+            TextColumn::make('disbursementVoucher.user.name')
+                ->label('Owner')
+                ->searchable()
+                ->sortable()
+                ->wrap(),
 
-            return (object) [
-                'id' => $step->id,
-                'dv' => $dv,
-                'step' => $step,
-                'dv_number' => $dv?->dv_number,
-                'tracking_number' => $dv?->tracking_number,
-                'owner_name' => $dv?->user?->name,
-                'office_id' => $dv?->user?->employee_information?->office_id,
-                'office_name' => $dv?->user?->employee_information?->office?->name,
-                'date_granted' => $dv?->created_at,
-                'amount' => $dv?->total_sum,
-                'liquidation_deadline' => $deadline,
-                'days_overdue' => $daysOverdue,
-                'bucket' => $this->bucketFor($daysOverdue),
-                'current_stage' => $this->stageFor($step),
-            ];
-        });
+            TextColumn::make('disbursementVoucher.user.employee_information.office.name')
+                ->label('Office')
+                ->searchable()
+                ->sortable()
+                ->wrap(),
 
-        return $rows;
+            TextColumn::make('disbursementVoucher.created_at')
+                ->label('Date Granted')
+                ->date('M d, Y')
+                ->sortable(),
+
+            TextColumn::make('disbursementVoucher.totalSum')
+                ->label('Amount')
+                ->money('PHP', true)
+                ->alignRight(),
+
+            TextColumn::make('liquidation_period_end_date')
+                ->label('Liquidation Deadline')
+                ->date('M d, Y')
+                ->sortable(),
+
+            TextColumn::make('days_overdue')
+                ->label('Days Overdue')
+                ->alignRight()
+                ->sortable(query: function (Builder $query, string $direction): Builder {
+                    return $query->orderByRaw($this->daysOverdueExpression().' '.$direction);
+                }),
+
+            BadgeColumn::make('bucket')
+                ->label('Bucket')
+                ->getStateUsing(fn ($record) => $this->bucketFor((int) ($record->days_overdue ?? 0)))
+                ->colors([
+                    'primary' => static fn ($state): bool => $state === '0-30',
+                    'warning' => static fn ($state): bool => $state === '31-60',
+                    'secondary' => static fn ($state): bool => $state === '61-90',
+                    'danger' => static fn ($state): bool => $state === '90+',
+                ]),
+
+            BadgeColumn::make('current_stage')
+                ->label('Stage')
+                ->getStateUsing(fn ($record) => $this->stageFor((int) $record->step))
+                ->colors([
+                    'primary' => static fn ($state): bool => $state === 'Initial',
+                    'warning' => static fn ($state): bool => in_array($state, ['FMR', 'FMD']),
+                    'secondary' => static fn ($state): bool => in_array($state, ['SCO', 'Endorsed']),
+                    'danger' => static fn ($state): bool => in_array($state, ['FD', 'FD Uploaded']),
+                ]),
+        ];
+    }
+
+    protected function getTableFilters(): array
+    {
+        return [
+            SelectFilter::make('bucket')
+                ->label('Aging Bucket')
+                ->options([
+                    '0-30' => '0 – 30 days',
+                    '31-60' => '31 – 60 days',
+                    '61-90' => '61 – 90 days',
+                    '90+' => '90+ days',
+                ])
+                ->query(function (Builder $query, $state) {
+                    if (blank($state)) {
+                        return $query;
+                    }
+                    $expr = $this->daysOverdueExpression();
+
+                    return match ($state) {
+                        '0-30'  => $query->whereRaw("$expr BETWEEN 0 AND 30"),
+                        '31-60' => $query->whereRaw("$expr BETWEEN 31 AND 60"),
+                        '61-90' => $query->whereRaw("$expr BETWEEN 61 AND 90"),
+                        '90+'   => $query->whereRaw("$expr > 90"),
+                        default => $query,
+                    };
+                }),
+
+            SelectFilter::make('office_id')
+                ->label('Office')
+                ->searchable()
+                ->options(Office::orderBy('name')->pluck('name', 'id'))
+                ->query(function (Builder $query, $state) {
+                    if (blank($state)) {
+                        return $query;
+                    }
+
+                    return $query->whereHas('disbursementVoucher.user.employee_information', function ($q) use ($state) {
+                        $q->where('office_id', $state);
+                    });
+                }),
+        ];
+    }
+
+    protected function getTableFiltersLayout(): ?string
+    {
+        return Layout::AboveContent;
+    }
+
+    protected function getDefaultTableSortColumn(): ?string
+    {
+        return 'days_overdue';
+    }
+
+    protected function getDefaultTableSortDirection(): ?string
+    {
+        return 'desc';
+    }
+
+    protected function getTableRecordsPerPageSelectOptions(): array
+    {
+        return [10, 25, 50, 100];
+    }
+
+    protected function getTableEmptyStateHeading(): ?string
+    {
+        return 'No unliquidated cash advances';
+    }
+
+    protected function getTableEmptyStateDescription(): ?string
+    {
+        return 'Nothing matches the current filters.';
+    }
+
+    protected function getTableEmptyStateIcon(): ?string
+    {
+        return 'heroicon-o-document-text';
+    }
+
+    protected function getTableHeaderActions(): array
+    {
+        return [
+            Action::make('export')
+                ->label('Export Excel')
+                ->icon('heroicon-s-document-download')
+                ->color('primary')
+                ->button()
+                ->action(function () {
+                    $filename = 'cash-advance-aging-'.now()->format('Ymd-His').'.xlsx';
+
+                    return Excel::download(
+                        new CashAdvanceAgingExport($this->getFilteredTableQuery()),
+                        $filename,
+                    );
+                }),
+        ];
     }
 
     protected function bucketFor(int $days): string
@@ -134,9 +269,9 @@ class CashAdvanceAging extends Component
         return '90+';
     }
 
-    protected function stageFor($step): string
+    protected function stageFor(int $step): string
     {
-        return match ((int) $step->step) {
+        return match ($step) {
             1 => 'Initial',
             2 => 'FMR',
             3 => 'FMD',
@@ -148,64 +283,51 @@ class CashAdvanceAging extends Component
         };
     }
 
-    public function getAllRowsProperty()
-    {
-        return $this->buildRows();
-    }
-
-    public function getRowsProperty()
-    {
-        $rows = $this->all_rows;
-        $bucket = $this->bucket;
-        $officeId = $this->officeId;
-        $search = trim(strtolower($this->search));
-
-        return $rows->filter(function ($row) use ($bucket, $officeId, $search) {
-            if ($bucket !== 'all' && $row->bucket !== $bucket) {
-                return false;
-            }
-            if ($officeId && (int) $row->office_id !== (int) $officeId) {
-                return false;
-            }
-            if ($search !== '') {
-                $haystack = strtolower(($row->dv_number ?? '') . ' ' . ($row->tracking_number ?? '') . ' ' . ($row->owner_name ?? ''));
-                if (!str_contains($haystack, $search)) {
-                    return false;
-                }
-            }
-
-            return true;
-        })->values();
-    }
-
     public function getBucketCountsProperty(): array
     {
-        $rows = $this->all_rows;
+        $expr = $this->daysOverdueExpression();
 
-        $buckets = ['0-30', '31-60', '61-90', '90+'];
-        $summary = [];
-        foreach ($buckets as $b) {
-            $matching = $rows->where('bucket', $b);
-            $summary[$b] = [
-                'count' => $matching->count(),
-                'total' => $matching->sum('amount'),
-            ];
+        $rows = $this->baseQuery()
+            ->selectRaw("
+                CASE
+                    WHEN $expr <= 30 THEN '0-30'
+                    WHEN $expr <= 60 THEN '31-60'
+                    WHEN $expr <= 90 THEN '61-90'
+                    ELSE '90+'
+                END as bucket,
+                COUNT(*) as cnt,
+                SUM(COALESCE((
+                    SELECT SUM(final_amount)
+                    FROM disbursement_voucher_particulars
+                    WHERE disbursement_voucher_id = ca_reminder_steps.disbursement_voucher_id
+                ), 0)) as total
+            ")
+            ->groupBy('bucket')
+            ->get();
+
+        $summary = [
+            '0-30'  => ['count' => 0, 'total' => 0.0],
+            '31-60' => ['count' => 0, 'total' => 0.0],
+            '61-90' => ['count' => 0, 'total' => 0.0],
+            '90+'   => ['count' => 0, 'total' => 0.0],
+        ];
+
+        foreach ($rows as $r) {
+            if (isset($summary[$r->bucket])) {
+                $summary[$r->bucket] = [
+                    'count' => (int) $r->cnt,
+                    'total' => (float) $r->total,
+                ];
+            }
         }
 
         return $summary;
     }
 
-    public function getOfficesProperty()
-    {
-        return Office::orderBy('name')->get(['id', 'name']);
-    }
-
     public function render()
     {
         return view('livewire.reports.cash-advance-aging', [
-            'rows' => $this->rows,
             'bucketCounts' => $this->bucket_counts,
-            'offices' => $this->offices,
         ]);
     }
 }
