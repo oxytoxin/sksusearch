@@ -1,26 +1,27 @@
-@props(['name', 'position' => null, 'signature', 'offsetY' => '-1.2rem', 'size' => '6rem', 'gap' => '1rem'])
+@props([
+    'signature' => null,
+    'width' => '10rem',
+    'maxHeight' => '4rem',
+    'top' => null,
+    'bottom' => null,
+    'left' => '50%',
+    'translateX' => '-50%',
+    'translateY' => '0',
+])
 
-<div class="relative inline-block text-center ">
-
-    {{-- Signature Image --}}
-    <img src="{{ $signature }}" alt="signature" class="absolute left-1/2 -translate-x-1/2"
+@if($signature)
+    <img src="{{ $signature }}" alt="signature"
+        class="absolute print:!opacity-100"
         style="
-            width: {{ $size }};
-            height: {{ $size }};
-            bottom: {{ $offsetY }};
+            width: {{ $width }};
+            height: auto;
+            max-height: {{ $maxHeight }};
+            object-fit: contain;
+            left: {{ $left }};
+            transform: translateX({{ $translateX }}) translateY({{ $translateY }});
+            @if($top) top: {{ $top }}; @endif
+            @if($bottom) bottom: {{ $bottom }}; @endif
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         ">
-
-    {{-- Space so signature does not overlap text too low --}}
-    <div style="height: {{ $gap }}"></div>
-
-    {{-- NAME --}}
-    <p class="font-bold text-sm leading-tight">
-        {{ $name }}
-    </p>
-
-    {{-- Position (optional) --}}
-    @if ($position)
-        <p class="text-xs leading-tight">{{ $position }}</p>
-    @endif
-
-</div>
+@endif

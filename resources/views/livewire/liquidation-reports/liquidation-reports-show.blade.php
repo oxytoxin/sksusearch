@@ -123,12 +123,20 @@
 
             </div>
             <div class="flex text-xs divide-x-2 divide-black">
+                {{-- Section A: Claimant - Always shows signature (they created the report) --}}
                 <div class="flex flex-col w-1/3 h-48 pb-1">
                     <div>
                         <span class="p-1 border-b-2 border-r-2 border-black">A</span>
                         <span class="text-sm">Certified: Correctness of the above data</span>
                     </div>
-                    <div class="flex flex-col items-center justify-center flex-1 px-4">
+                    <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
+                        <x-signature-block
+                            :signature="$liquidation_report->requisitioner->signature?->content"
+                            width="10rem"
+                            maxHeight="3.5rem"
+                            bottom="100%"
+                            translateY="3.5rem"
+                        />
                         <p class="w-full text-center border-b border-black">
                             {{ $liquidation_report->requisitioner->employee_information->full_name }}
                         </p>
@@ -141,12 +149,22 @@
                         </p>
                     </div>
                 </div>
+                {{-- Section B: Signatory - Shows signature when forwarded past step 4000 --}}
                 <div class="flex flex-col w-1/3 h-48 pb-1">
                     <div>
                         <span class="p-1 border-b-2 border-r-2 border-black">B</span>
                         <span class="text-sm">Certified: Purpose of travel / cash advance duly accomplished</span>
                     </div>
-                    <div class="flex flex-col items-center justify-center flex-1 px-4">
+                    <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
+                        @if($liquidation_report->current_step_id > 4000 || $liquidation_report->signatory_date)
+                            <x-signature-block
+                                :signature="$liquidation_report->signatory->signature?->content"
+                                width="10rem"
+                                maxHeight="3.5rem"
+                                bottom="100%"
+                                translateY="3.5rem"
+                            />
+                        @endif
                         <p class="w-full text-center border-b border-black">
                             {{ $liquidation_report->signatory->employee_information->full_name }}</p>
                         <p>Signature over Printed Name</p>
@@ -155,22 +173,38 @@
                     <div class="flex gap-2 px-4">
                         <p>Date:</p>
                         <p class="flex-1 text-center border-b border-black">
+                            @if($liquidation_report->signatory_date)
+                                {{ $liquidation_report->signatory_date->format('m/d/Y') }}
+                            @endif
                         </p>
                     </div>
                 </div>
+                {{-- Section C: Accountant - Shows signature when certified_by_accountant is true --}}
                 <div class="flex flex-col w-1/3 h-48 pb-1">
                     <div>
                         <span class="p-1 border-b-2 border-r-2 border-black">C</span>
                         <span class="text-sm">Certified: Supporting documents complete and proper</span>
                     </div>
-                    <div class="flex flex-col items-center justify-center flex-1 px-4">
-                        <p class="w-full text-center border-b border-black">JESHER Y. PALOMARIA</p>
+                    <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
+                        @if($liquidation_report->certified_by_accountant)
+                            <x-signature-block
+                                :signature="$accountant?->user?->signature?->content"
+                                width="10rem"
+                                maxHeight="3.5rem"
+                                bottom="100%"
+                                translateY="3.5rem"
+                            />
+                        @endif
+                        <p class="w-full text-center border-b border-black">{{ $accountant?->full_name }}</p>
                         <p>Signature over Printed Name</p>
                         <p>Head, Accounting Division Unit</p>
                     </div>
                     <div class="flex gap-2 px-4">
                         <p>Date:</p>
                         <p class="flex-1 text-center border-b border-black">
+                            @if($liquidation_report->certified_by_accountant && $liquidation_report->journal_date)
+                                {{ $liquidation_report->journal_date->format('m/d/Y') }}
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -187,9 +221,19 @@
 
     <style>
         @page {
-            size: auto;
-            size: A4;
-            margin: 0mm;
+            size: A4 portrait;
+            margin: 5mm;
+        }
+        @media print {
+            #dvPrint {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #dvPrint img {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                image-rendering: crisp-edges;
+            }
         }
     </style>
     @push('scripts')

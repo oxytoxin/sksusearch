@@ -6,35 +6,38 @@ use Illuminate\View\Component;
 
 class SignatureBlock extends Component
 {
+    public $signature;
+    public $width;
+    public $maxHeight;
+    public $top;
+    public $bottom;
+    public $left;
+    public $translateX;
+    public $translateY;
 
-    public $name ;
-    public $position;
-    public $signature ;
-    public $offsetY;
-    public $offsetX ;
-    public $size;
-    public $gap;
     /**
      * Create a new component instance.
      *
      * @return void
      */
     public function __construct(
-        $name,
-        $signature,
-        $position = null,
-        $offsetY = '-1.2rem',
-        $offsetX = '0rem',
-        $size = '6rem',
-        $gap = '1rem',
+        $signature = null,
+        $width = '10rem',
+        $maxHeight = '4rem',
+        $top = null,
+        $bottom = null,
+        $left = '50%',
+        $translateX = '-50%',
+        $translateY = '0',
     ) {
-        $this->name = $name;
-        $this->position = $position;
         $this->signature = $signature;
-        $this->offsetY = $offsetY;
-        $this->offsetX = $offsetX;
-        $this->size = $size;
-        $this->gap = $gap;
+        $this->width = $width;
+        $this->maxHeight = $maxHeight;
+        $this->top = $top;
+        $this->bottom = $bottom;
+        $this->left = $left;
+        $this->translateX = $translateX;
+        $this->translateY = $translateY;
     }
 
     /**

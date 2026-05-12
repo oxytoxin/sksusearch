@@ -1,7 +1,7 @@
 <x-app-layout>
     <div>
         <div
-                class="mx-auto flex max-w-[90%] border-collapse print:block print:h-[297mm] print:max-h-[297mm] print:w-[220mm] print:max-w-[220mm]"
+                class="mx-auto flex max-w-[90%] border-collapse print:block print:w-[210mm] print:max-w-[210mm] print:overflow-hidden"
                 id="dvPrint">
             <div class="grid border-collapse grid-cols-8 border-4 border-black">
                 <div class="col-span-6 border border-black">
@@ -134,28 +134,28 @@
                     </div>
                 </div>
                 <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-10">
-                    <div class="h-44 w-1/2 border-r-2 border-black pl-2 text-left">
+                    <div class="h-40 w-1/2 border-r-2 border-black pl-2 text-left">
                         <div class="flex flex-col">
                             @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
                                 <span>{{ $particular->purpose }}</span>
                             @endforeach
                         </div>
                     </div>
-                    <div class="h-44 w-64 border-r-2 border-black text-center">
+                    <div class="h-40 w-64 border-r-2 border-black text-center">
                         <div class="flex flex-col">
                             @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
                                 <span>{{ $disbursement_voucher->responsibility_center }}</span>
                             @endforeach
                         </div>
                     </div>
-                    <div class="h-44 w-36 border-r-2 border-black text-center">
+                    <div class="h-40 w-36 border-r-2 border-black text-center">
                         <div class="flex flex-col">
                             @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
                                 <span>{{ $particular->mfo_pap }}</span>
                             @endforeach
                         </div>
                     </div>
-                    <div class="h-44 w-36 text-right">
+                    <div class="h-40 w-36 text-right">
                         <div class="flex flex-col">
                             @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
                                 <span>{{ number_format($particular->amount, 2) }}</span>
@@ -187,10 +187,13 @@
                             @php
                                 $full_name = explode(',', $disbursement_voucher->signatory->employee_information->full_name)[0];
                             @endphp
-                            @if($disbursement_voucher->current_step_id >= 5000 && $disbursement_voucher->signatory->signature?->content)
-                                <img src="{{ $disbursement_voucher->signatory->signature->content }}" alt="signature"
-                                    class="absolute left-1/2 -translate-x-1/2"
-                                    style="width: 14rem; height: auto; max-height: 7rem; object-fit: contain; top: -3.6rem;">
+                            @if($disbursement_voucher->current_step_id >= 5000)
+                                <x-signature-block
+                                    :signature="$disbursement_voucher->signatory->signature?->content"
+                                    width="14rem"
+                                    maxHeight="7rem"
+                                    top="-3.6rem"
+                                />
                             @endif
                             <span class="font-extrabold uppercase underline print:text-10">
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
@@ -213,27 +216,27 @@
                     <div class="h-auto w-1/2 border-r-2 border-black text-center">
                         Account Title
                     </div>
-                    <div class="h-auto w-72 border-r-2 border-black text-center">
+                    <div class="h-auto w-64 border-r-2 border-black text-center">
                         UACS Code
                     </div>
-                    <div class="h-auto w-28 border-r-2 border-black text-center">
+                    <div class="h-auto w-36 border-r-2 border-black text-center">
                         Debit
                     </div>
-                    <div class="h-auto w-28 text-center">
+                    <div class="h-auto w-36 text-center">
                         Credit
                     </div>
                 </div>
                 <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="h-44 w-1/2 border-r-2 border-black text-center">
+                    <div class="h-40 w-1/2 border-r-2 border-black text-center">
                         &nbsp
                     </div>
-                    <div class="h-44 w-72 border-r-2 border-black text-center">
+                    <div class="h-40 w-64 border-r-2 border-black text-center">
                         &nbsp
                     </div>
-                    <div class="h-44 w-28 border-r-2 border-black text-center">
+                    <div class="h-40 w-36 border-r-2 border-black text-center">
                         &nbsp
                     </div>
-                    <div class="h-44 w-28 text-center">
+                    <div class="h-40 w-36 text-center">
                         &nbsp
                     </div>
                 </div>
@@ -278,20 +281,28 @@
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                             <span class="mx-auto my-auto flex print:text-12">Signature</span>
                         </div>
-                        @if($disbursement_voucher->current_step_id >= 14000 && $accountant?->user?->signature?->content)
-                            <img src="{{ $accountant->user->signature->content }}" alt="signature"
-                                class="absolute"
-                                style="width: 8rem; height: auto; max-height: 3rem; object-fit: contain; left: 5rem; top: -0.5rem;">
+                        @if($disbursement_voucher->current_step_id >= 14000)
+                            <x-signature-block
+                                :signature="$accountant?->user?->signature?->content"
+                                width="8rem"
+                                maxHeight="3rem"
+                                translateX="-30%"
+                                top="-1.2rem"
+                            />
                         @endif
                     </div>
                     <div class="w-1/2 space-y-1 print:text-8 relative">
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                             <span class="mx-auto my-auto flex print:text-12">Signature</span>
                         </div>
-                        @if($disbursement_voucher->current_step_id >= 16000 && $president?->user?->signature?->content)
-                            <img src="{{ $president->user->signature->content }}" alt="signature"
-                                class="absolute"
-                                style="width: 8rem; height: auto; max-height: 3rem; object-fit: contain; left: 5rem; top: -0.5rem;">
+                        @if($disbursement_voucher->current_step_id >= 16000)
+                            <x-signature-block
+                                :signature="$president?->user?->signature?->content"
+                                width="8rem"
+                                maxHeight="3rem"
+                                translateX="-30%"
+                                top="-1.2rem"
+                            />
                         @endif
                     </div>
                 </div>
@@ -440,9 +451,29 @@
         </div>
         <style>
             @page {
-                size: auto;
-                size: A4;
-                margin: 0mm;
+                size: A4 portrait;
+                margin: 2mm;
+            }
+            @media print {
+                body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                #dvPrint {
+                    width: 100% !important;
+                    max-width: 205mm !important;
+                    transform: scale(0.92);
+                    transform-origin: top center;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    page-break-inside: avoid;
+                }
+                #dvPrint img {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    image-rendering: -webkit-optimize-contrast;
+                    image-rendering: crisp-edges;
+                }
             }
         </style>
         @push('scripts')
