@@ -49,6 +49,11 @@ class EnsureUserHasSignature
             return $next($request);
         }
 
+        // Skip livewire and api routes (by path or name)
+        if (str_starts_with($currentPath, 'livewire/') || str_starts_with($currentPath, 'api/')) {
+            return $next($request);
+        }
+
         // Skip if route starts with 'api.' or 'livewire.'
         if ($currentRoute && (str_starts_with($currentRoute, 'api.') || str_starts_with($currentRoute, 'livewire.'))) {
             return $next($request);
