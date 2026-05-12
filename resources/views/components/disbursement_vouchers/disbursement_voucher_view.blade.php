@@ -183,10 +183,15 @@
                             <div class="border-b border-r border-black px-1 font-extrabold print:text-12">A.</div>
                             <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary, lawful and incurred under my direct supervision.</span>
                         </div>
-                        <div class="row-span-1 mx-auto block text-center">
+                        <div class="row-span-1 mx-auto block text-center relative">
                             @php
                                 $full_name = explode(',', $disbursement_voucher->signatory->employee_information->full_name)[0];
                             @endphp
+                            @if($disbursement_voucher->signatory->signature?->content)
+                                <img src="{{ $disbursement_voucher->signatory->signature->content }}" alt="signature"
+                                    class="absolute left-1/2 -translate-x-1/2"
+                                    style="width: 14rem; height: auto; max-height: 7rem; object-fit: contain; top: -3.6rem;">
+                            @endif
                             <span class="font-extrabold uppercase underline print:text-10">
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                                 {{ isset($full_name) ? $full_name : 'none' }}
@@ -264,22 +269,32 @@
                         </div>
                     </div>
                 </div>
+                @php
+                    $president = App\Models\EmployeeInformation::with('user.signature')->where('position_id', 34)->where('office_id', 51)->first();
+                    $accountant = App\Models\EmployeeInformation::with('user.signature')->where('position_id', 15)->where('office_id', 3)->first();
+                @endphp
                 <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="w-1/2 space-y-1 border-r-2 border-black print:text-8">
+                    <div class="w-1/2 space-y-1 border-r-2 border-black print:text-8 relative">
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                             <span class="mx-auto my-auto flex print:text-12">Signature</span>
                         </div>
+                        @if($accountant?->user?->signature?->content)
+                            <img src="{{ $accountant->user->signature->content }}" alt="signature"
+                                class="absolute"
+                                style="width: 8rem; height: auto; max-height: 3rem; object-fit: contain; left: 5rem; top: -0.5rem;">
+                        @endif
                     </div>
-                    <div class="w-1/2 space-y-1 print:text-8">
+                    <div class="w-1/2 space-y-1 print:text-8 relative">
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                             <span class="mx-auto my-auto flex print:text-12">Signature</span>
                         </div>
+                        @if($president?->user?->signature?->content)
+                            <img src="{{ $president->user->signature->content }}" alt="signature"
+                                class="absolute"
+                                style="width: 8rem; height: auto; max-height: 3rem; object-fit: contain; left: 5rem; top: -0.5rem;">
+                        @endif
                     </div>
                 </div>
-                @php
-                    $president = App\Models\EmployeeInformation::where('position_id', 34)->where('office_id', 51)->first();
-                    $accountant = App\Models\EmployeeInformation::where('position_id', 15)->where('office_id', 3)->first();
-                @endphp
                 <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
                     <div class="flex w-1/2 items-center space-y-1 border-r-2 border-black text-center print:text-8">
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
