@@ -26,4 +26,24 @@ class Vehicle extends Model
     {
         return $this->hasMany(RequestScheduleTimeAndDate::class);
     }
+
+    public function fuel_requisitions()
+    {
+        return $this->hasManyThrough(
+            FuelRequisition::class,
+            RequestSchedule::class,
+            'vehicle_id',
+            'request_schedule_id',
+            'id',
+            'id'
+        );
+    }
+
+    public function getLatestOdometerReadingAttribute(): ?int
+    {
+        return $this->fuel_requisitions()
+            ->whereNotNull('odometer_reading')
+            ->latest('fuel_requisitions.created_at')
+            ->value('odometer_reading');
+    }
 }
