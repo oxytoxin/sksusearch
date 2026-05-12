@@ -96,26 +96,29 @@
                             and
                             correction of records.</p>
 
-                        <p class="mt-4">For your guidance and immediate compliance.</p>
+                        <p class="mt-4 mb-12">For your guidance and immediate compliance.</p>
                     </div>
                 </div>
 
-                <div class="text-xs mt-4 text-gray-800">
+                @php
+                    $accountant = App\Models\EmployeeInformation::accountantUser();
+                @endphp
+                <div class="text-xs mt-16 text-gray-800">
                     <div class="grid grid-cols-3">
-                        <div class="col-span-1  relative">
-                            <x-signature-block :name="App\Models\EmployeeInformation::accountantUser()->full_name" :position="App\Models\EmployeeInformation::accountantUser()?->position->description .
-                                ' - ' .
-                                App\Models\EmployeeInformation::accountantUser()?->office->name" :signature="App\Models\EmployeeInformation::accountantUser()->user->signature?->content" />
-
-        {{-- @if($esign)
-        <x-esign-info
-            :name="$esign->sender_name"
-            :datetime="$esign->sent_at"
-            offsetX="7rem"
-            offsetY="-0.7rem"
-            textclass="text-[11px] leading-tight"
-        />
-    @endif --}}
+                        <div class="col-span-1 relative">
+                            <div class="relative inline-block">
+                                <x-signature-block
+                                    :signature="$accountant?->user?->signature?->content"
+                                    width="10rem"
+                                    maxHeight="4rem"
+                                    left="0"
+                                    translateX="0"
+                                    bottom="100%"
+                                    translateY="1rem"
+                                />
+                                <p class="font-bold uppercase">{{ $accountant?->full_name ?? '[ACCOUNTANT]' }}</p>
+                                <p>{{ $accountant?->position?->description ?? 'Accountant III' }}</p>
+                            </div>
                         </div>
 
                         <div class="col-span-2 flex justify-between ">

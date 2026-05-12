@@ -130,7 +130,25 @@
                             </tbody>
                         </table>
 
+                        @php
+                            $slipVehicle = $fuel_request->request_schedule?->vehicle;
+                            $slipVehicleLabel = $slipVehicle
+                                ? $slipVehicle->model . ($slipVehicle->plate_number ? ' (' . $slipVehicle->plate_number . ')' : '')
+                                : null;
+                        @endphp
                         <div class="flex-col mt-8">
+                            @if ($slipVehicleLabel)
+                                <div class="space-x-4">
+                                    <span class="text-sm font-semibold tracking-wide text-black">Vehicle:</span>
+                                    <span class="text-sm font-semibold tracking-wide text-black">{{ $slipVehicleLabel }}</span>
+                                </div>
+                            @endif
+                            @if ($fuel_request->odometer_reading !== null)
+                                <div class="space-x-4">
+                                    <span class="text-sm font-semibold tracking-wide text-black">Odometer Reading:</span>
+                                    <span class="text-sm font-semibold tracking-wide text-black">{{ number_format($fuel_request->odometer_reading) }} km</span>
+                                </div>
+                            @endif
                             <div class="space-x-4">
                                 <span class="text-sm font-semibold tracking-wide text-black">Purpose:</span>
                                 <span
@@ -140,7 +158,7 @@
                                 <span class="text-sm font-semibold tracking-wide text-black">Requested By : / Driver:
                                 </span>
                                 <span
-                                    class="text-sm font-semibold tracking-wide text-black">{{ $fuel_request->user->name }}</span>
+                                    class="text-sm font-semibold tracking-wide text-black">{{ $fuel_request->requested_by_employee?->full_name }}</span>
                             </div>
                         </div>
                     </div>

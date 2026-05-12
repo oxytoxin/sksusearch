@@ -38,6 +38,10 @@ class FuelRequisition extends Component implements HasForms
     {
         $this->request = RequestSchedule::find($request);
         $this->slip_number = now()->year . '-' . str_pad(ModelsFuelRequisition::max('id') + 1, 4, '0', STR_PAD_LEFT);
+
+        if ($this->request && $this->request->driver_id) {
+            $this->driver_id = $this->request->driver_id;
+        }
     }
 
 

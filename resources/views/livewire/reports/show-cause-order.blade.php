@@ -13,17 +13,34 @@
                 <h1 class="text-xl font-bold pt-1 mt-2 text-center">Office of the President</h1>
 
                 <div class="text-xs text-gray-800">
-                    <p class="mt-4 font-bold">Memorandum No. <span class="underline">
-                            {{ $record->cash_advance_reminder->memorandum_number ?? '' }}</p>
+                    <p class="mt-4 font-bold">
+                        Memorandum No.
+                        <span class="underline">{{ $record->cash_advance_reminder->memorandum_number ?? '_____' }}</span>,
+                        s. {{ $record?->cash_advance_reminder?->sco_date ? \Carbon\Carbon::parse($record->cash_advance_reminder->sco_date)->format('Y') : now()->format('Y') }}
+                    </p>
 
-                    <div class="mt-4">
+                    @php
+                        $president = App\Models\EmployeeInformation::presidentUser();
+                    @endphp
+                    <div class="mt-4 space-y-3">
                         <div class="flex font-bold">
                             <span class="min-w-12">To:</span>
                             <span>{{ $record?->user?->name }}</span>
                         </div>
                         <div class="flex font-bold">
                             <span class="min-w-12">From:</span>
-                            <span>{{ App\Models\EmployeeInformation::presidentUser()->full_name }}</span>
+                            <span class="relative inline-block">
+                                <x-signature-block
+                                    :signature="$president?->user?->signature?->content"
+                                    width="8rem"
+                                    maxHeight="3rem"
+                                    left="0"
+                                    translateX="0"
+                                    bottom="100%"
+                                    translateY="0.75rem"
+                                />
+                                {{ $president?->full_name ?? '[NAME]' }}
+                            </span>
                         </div>
                         <div class="flex font-bold">
                             <span class="min-w-12">Re:</span>
@@ -101,12 +118,13 @@
                                     Your separate and concurrent obligations to liquidate and to show cause are due
                                     within three (3)
                                     working days from receipt of this notice. Legal action shall ensue upon your failure
-                                    to comply.
+                                    to comply with both orders.
                                 </p>
                             </div>
 
                         </div>
                     </div>
+
                 </div>
             </div>
 

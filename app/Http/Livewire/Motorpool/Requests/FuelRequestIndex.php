@@ -24,7 +24,7 @@ class FuelRequestIndex extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
-            Tables\Columns\TextColumn::make('user.name')
+            Tables\Columns\TextColumn::make('requested_by_employee.full_name')
                 ->label('Requested By')
                 ->searchable()
                 ->wrap(),
@@ -32,6 +32,19 @@ class FuelRequestIndex extends Component implements HasTable
                 ->label('Slip Number')
                 ->sortable()
                 ->searchable(),
+            Tables\Columns\TextColumn::make('request_schedule.vehicle.model')
+                ->label('Vehicle')
+                ->wrap()
+                ->searchable()
+                ->formatStateUsing(function ($record) {
+                    $vehicle = $record->request_schedule?->vehicle;
+                    if (!$vehicle) {
+                        return '—';
+                    }
+                    return $vehicle->plate_number
+                        ? $vehicle->model . ' (' . $vehicle->plate_number . ')'
+                        : $vehicle->model;
+                }),
             Tables\Columns\TextColumn::make('article')
                 ->sortable()
                 ->searchable(),
@@ -41,6 +54,10 @@ class FuelRequestIndex extends Component implements HasTable
             Tables\Columns\TextColumn::make('unit')
                 ->sortable()
                 ->searchable(),
+            Tables\Columns\TextColumn::make('odometer_reading')
+                ->label('Odometer (km)')
+                ->sortable()
+                ->formatStateUsing(fn ($state) => $state !== null ? number_format($state) : '—'),
             Tables\Columns\TextColumn::make('purpose')
                 ->wrap()
                 ->sortable()
@@ -165,8 +182,28 @@ class FuelRequestIndex extends Component implements HasTable
                                     $unitPrice = $record->requested_unit_price ? '₱' . $formatMoney($record->requested_unit_price) : 'Not set';
                                     $totalAmount = $record->requested_total_amount ? '₱' . $formatMoney($record->requested_total_amount) : 'Not set';
 
+                                    $vehicle = $record->request_schedule?->vehicle;
+                                    $vehicleLabel = $vehicle
+                                        ? e($vehicle->model . ($vehicle->plate_number ? ' (' . $vehicle->plate_number . ')' : ''))
+                                        : '—';
+
+                                    $previousOdometer = null;
+                                    if ($vehicle) {
+                                        $previousOdometer = \App\Models\FuelRequisition::query()
+                                            ->whereHas('request_schedule', fn ($q) => $q->where('vehicle_id', $vehicle->id))
+                                            ->whereNotNull('odometer_reading')
+                                            ->where('id', '!=', $record->id)
+                                            ->latest('created_at')
+                                            ->value('odometer_reading');
+                                    }
+                                    $prevOdoLabel = $previousOdometer !== null
+                                        ? number_format($previousOdometer) . ' km'
+                                        : 'No prior reading';
+
                                     return new \Illuminate\Support\HtmlString("
                                         <div class='text-sm space-y-1 bg-gray-50 dark:bg-gray-800 p-3 rounded'>
+                                            <div><strong>Vehicle:</strong> {$vehicleLabel}</div>
+                                            <div><strong>Previous Odometer:</strong> {$prevOdoLabel}</div>
                                             <div><strong>Quantity:</strong> {$record->quantity} {$record->unit}</div>
                                             <div><strong>Article:</strong> {$record->article}</div>
                                             <div><strong>Unit Price:</strong> {$unitPrice}</div>
@@ -231,6 +268,27 @@ class FuelRequestIndex extends Component implements HasTable
                                         ->required()
                                         ->maxLength(255)
                                         ->columnSpan(2),
+                                    Forms\Components\TextInput::make('odometer_reading')
+                                        ->label('Current Odometer Reading (km)')
+                                        ->numeric()
+                                        ->minValue(0)
+                                        ->required()
+                                        ->columnSpan(2)
+                                        ->helperText(function ($record) {
+                                            $vehicle = $record->request_schedule?->vehicle;
+                                            if (!$vehicle) {
+                                                return null;
+                                            }
+                                            $prev = \App\Models\FuelRequisition::query()
+                                                ->whereHas('request_schedule', fn ($q) => $q->where('vehicle_id', $vehicle->id))
+                                                ->whereNotNull('odometer_reading')
+                                                ->where('id', '!=', $record->id)
+                                                ->latest('created_at')
+                                                ->value('odometer_reading');
+                                            return $prev !== null
+                                                ? 'Previous: ' . number_format($prev) . ' km — enter the current reading on the dashboard'
+                                                : 'No prior reading on record for this vehicle';
+                                        }),
                                 ]),
                         ]),
                 ])
@@ -238,6 +296,24 @@ class FuelRequestIndex extends Component implements HasTable
                     // Auto-calculate total amount
                     $data['actual_total_amount'] = round($data['actual_quantity'] * $data['actual_unit_price'], 2);
                     $data['is_liquidated'] = true;
+
+                    // Soft-warn if odometer went backwards
+                    $vehicle = $record->request_schedule?->vehicle;
+                    if ($vehicle && isset($data['odometer_reading'])) {
+                        $prev = \App\Models\FuelRequisition::query()
+                            ->whereHas('request_schedule', fn ($q) => $q->where('vehicle_id', $vehicle->id))
+                            ->whereNotNull('odometer_reading')
+                            ->where('id', '!=', $record->id)
+                            ->latest('created_at')
+                            ->value('odometer_reading');
+                        if ($prev !== null && (int) $data['odometer_reading'] < (int) $prev) {
+                            Notification::make()
+                                ->warning()
+                                ->title('Odometer reading is lower than the previous')
+                                ->body('Previous: ' . number_format($prev) . ' km, new: ' . number_format($data['odometer_reading']) . ' km. Saved anyway — please verify.')
+                                ->send();
+                        }
+                    }
 
                     $record->update($data);
 
@@ -275,8 +351,21 @@ class FuelRequestIndex extends Component implements HasTable
                     $actDate = \Carbon\Carbon::parse($record->actual_date)->format('F d, Y'); // November 27, 2025
                     $actTime = \Carbon\Carbon::parse($record->actual_time)->format('g:i A'); // 2:30 PM
 
+                    $vehicle = $record->request_schedule?->vehicle;
+                    $vehicleLabel = $vehicle
+                        ? e($vehicle->model . ($vehicle->plate_number ? ' (' . $vehicle->plate_number . ')' : ''))
+                        : '—';
+
+                    $odoLabel = $record->odometer_reading !== null
+                        ? number_format($record->odometer_reading) . ' km'
+                        : '—';
+
                     return new \Illuminate\Support\HtmlString("
                         <div class='p-6'>
+                            <div class='mb-4 bg-blue-50 border border-blue-200 p-3 rounded text-sm grid grid-cols-2 gap-2'>
+                                <div><strong>Vehicle:</strong> {$vehicleLabel}</div>
+                                <div><strong>Odometer at Fueling:</strong> {$odoLabel}</div>
+                            </div>
                             <div class='grid grid-cols-2 gap-6'>
                                 <div class='bg-gray-100 p-4 rounded'>
                                     <h3 class='font-bold mb-3'>REQUESTED</h3>
