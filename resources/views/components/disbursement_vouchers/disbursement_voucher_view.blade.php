@@ -192,9 +192,11 @@
                                     $disbursement_voucher->signatory->employee_information->full_name,
                                 )[0];
                             @endphp
+                            {{-- Temporarily hidden - signature not yet approved
                             @if ($disbursement_voucher->current_step_id >= 5000)
                                 <x-signature-block :signature="$disbursement_voucher->signatory->signature?->content" width="14rem" maxHeight="7rem" top="-3.6rem" />
                             @endif
+                            --}}
                             <span class="font-extrabold uppercase underline print:text-10">
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                                 {{ isset($full_name) ? $full_name : 'none' }}
@@ -287,19 +289,23 @@
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                             <span class="mx-auto my-auto flex print:text-12">Signature</span>
                         </div>
+                        {{-- Temporarily hidden - signature not yet approved
                         @if ($disbursement_voucher->current_step_id >= 14000)
                             <x-signature-block :signature="$accountant?->user?->signature?->content" width="8rem" maxHeight="3rem" translateX="-30%"
                                 top="-1.2rem" />
                         @endif
+                        --}}
                     </div>
                     <div class="w-1/2 space-y-1 print:text-8 relative">
                         <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                             <span class="mx-auto my-auto flex print:text-12">Signature</span>
                         </div>
+                        {{-- Temporarily hidden - signature not yet approved
                         @if ($disbursement_voucher->current_step_id >= 16000)
                             <x-signature-block :signature="$president?->user?->signature?->content" width="8rem" maxHeight="3rem" translateX="-30%"
                                 top="-1.2rem" />
                         @endif
+                        --}}
                     </div>
                 </div>
                 <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
