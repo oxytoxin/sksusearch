@@ -109,11 +109,21 @@
                 $is_auditor =
                     auth()->user()->employee_information->office_id == 61 &&
                     auth()->user()->employee_information->position_id == 31;
+                $is_finance_officer =
+                    auth()->user()->employee_information->office_id == 25 &&
+                    (auth()->user()->employee_information->position_id == 12 ||
+                        auth()->user()->employee_information->position_id == 38);
             @endphp
             @if ($is_president || $is_accountant || $is_auditor)
                 <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                     href="{{ route('requisitioner.ca-reminders') }}" href="#">
                     Notices
+                </a>
+            @endif
+            @if ($is_accountant || $is_finance_officer || $is_president)
+                <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                    href="{{ route('requisitioner.reports.cash-advance-aging') }}">
+                    Aging Report
                 </a>
             @endif
 
