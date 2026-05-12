@@ -39,7 +39,7 @@ class UpdateSignatureModal extends Component
 
     public function setActiveTab($tab)
     {
-        if (in_array($tab, ['draw', 'upload'])) {
+        if (in_array($tab, ['draw', 'upload', 'smart'])) {
             $this->activeTab = $tab;
             $this->resetErrorBag();
         }
