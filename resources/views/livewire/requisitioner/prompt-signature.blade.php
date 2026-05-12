@@ -4,7 +4,24 @@
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="flex-shrink-0 w-full max-w-lg" x-data="{ sig: null, activeTab: 'draw' }">
+                <div class="flex-shrink-0 w-full max-w-lg"
+                    x-data="{
+                        sig: null,
+                        activeTab: 'draw',
+                        initCanvas() {
+                            this.$nextTick(() => {
+                                const canvas = document.querySelector('#signature');
+                                if (canvas && typeof SignaturePad !== 'undefined') {
+                                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                                    canvas.width = canvas.offsetWidth * ratio;
+                                    canvas.height = canvas.offsetHeight * ratio;
+                                    canvas.getContext('2d').scale(ratio, ratio);
+                                    this.sig = new SignaturePad(canvas);
+                                }
+                            });
+                        }
+                    }"
+                    x-init="initCanvas()">
                     <div class="relative w-full flex-shrink-0 overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl">
 
                         {{-- Saving overlay --}}
@@ -40,7 +57,7 @@
 
                         {{-- Tabs --}}
                         <div class="flex gap-2 border-b border-gray-200 mb-4" role="tablist">
-                            <button type="button" @click="activeTab = 'draw'"
+                            <button type="button" @click="activeTab = 'draw'; initCanvas()"
                                 role="tab"
                                 :aria-selected="activeTab === 'draw' ? 'true' : 'false'"
                                 title="Sign using your mouse, finger, or stylus"
@@ -63,16 +80,7 @@
                         </div>
 
                         {{-- DRAW TAB --}}
-                        <div x-show="activeTab === 'draw'" x-init="$nextTick(() => {
-                            const canvas = document.querySelector('#signature');
-                            if (canvas) {
-                                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                                canvas.width = canvas.offsetWidth * ratio;
-                                canvas.height = canvas.offsetHeight * ratio;
-                                canvas.getContext('2d').scale(ratio, ratio);
-                                sig = new SignaturePad(canvas);
-                            }
-                        })">
+                        <div x-show="activeTab === 'draw'">
                             <p class="text-xs text-gray-600 mb-2">
                                 Sign in the box below using your <strong>mouse, finger, or stylus</strong>.
                             </p>
