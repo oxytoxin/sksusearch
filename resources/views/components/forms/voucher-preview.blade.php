@@ -1,6 +1,5 @@
-<x-forms::field-wrapper :id="$getId()" :label="$getLabel()" :label-sr-only="$isLabelHidden()"
-                        :helper-text="$getHelperText()" :hint="$getHint()" :hint-icon="$getHintIcon()"
-                        :required="$isRequired()" :state-path="$getStatePath()">
+<x-forms::field-wrapper :id="$getId()" :label="$getLabel()" :label-sr-only="$isLabelHidden()" :helper-text="$getHelperText()" :hint="$getHint()"
+    :hint-icon="$getHintIcon()" :required="$isRequired()" :state-path="$getStatePath()">
     @php
         $particulars = $evaluate(fn($get) => $get('disbursement_voucher_particulars'));
         $mop = $evaluate(fn($get) => $get('mop_id'));
@@ -14,7 +13,7 @@
 
     <div x-data="{ state: $wire.entangle('{{ $getStatePath() }}').defer }">
         <div id="dvPrint"
-             style="flex border-collapse  max-w-8xl print:block print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
+            style="flex border-collapse  max-w-8xl print:block print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
             <div class="grid grid-cols-8 border-4 border-collapse border-black">
 
                 <div class="col-span-6 border border-black">
@@ -23,16 +22,17 @@
                             <div class="flow-root my-auto">
                                 <div class="inline-block mr-2">
                                     <img class="object-scale-down h-full mx-auto w-14"
-                                         src="http://sksu.edu.ph/wp-content/uploads/2020/09/512x512-1.png"
-                                         alt="sksu logo">
-                                    <span
-                                            class="text-xs text-center text-black print:text-8">SKSU Works for Success!</span>
+                                        src="http://sksu.edu.ph/wp-content/uploads/2020/09/512x512-1.png"
+                                        alt="sksu logo">
+                                    <span class="text-xs text-center text-black print:text-8">SKSU Works for
+                                        Success!</span>
                                     {{-- <span class="text-xs font-bold text-center text-black"> ISO 9001:2015</span> --}}
                                 </div>
                             </div>
                             <div class="flex place-items-center">
                                 <div class="ext-left">
-                                    <span class="block text-sm font-bold text-black uppercase">Republic of the Philippines</span>
+                                    <span class="block text-sm font-bold text-black uppercase">Republic of the
+                                        Philippines</span>
                                     <span class="block text-sm font-bold text-green-600 uppercase">SULTAN KUDARAT STATE
                                         UNIVERSITY</span>
                                     <span class="block text-sm text-black">ACCESS, EJC Montilla, 9800 City of
@@ -45,10 +45,10 @@
                             <div class="m-3 text-center">
 
                                 <img class="w-12 h-auto mx-auto"
-                                     src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $evaluate(fn($get) => $get('tracking_number')) }}"
-                                     alt="N/A">
+                                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $evaluate(fn($get) => $get('tracking_number')) }}"
+                                    alt="N/A">
                                 <span
-                                        class="flex justify-center text-xs font-normal">{{ $evaluate(fn($get) => $get('tracking_number')) }}</span>
+                                    class="flex justify-center text-xs font-normal">{{ $evaluate(fn($get) => $get('tracking_number')) }}</span>
                             </div>
 
                         </div>
@@ -62,7 +62,7 @@
                 <div class="grid col-span-2 grid-rows-2 border border-black">
                     <div class="row-span-1 border-b border-l border-black">
                         <span
-                                class="mx-auto ml-1 font-serif text-xs font-extrabold text-black capitalize print:text-12">
+                            class="mx-auto ml-1 font-serif text-xs font-extrabold text-black capitalize print:text-12">
                             fund cluster:
                         </span>
                     </div>
@@ -85,12 +85,12 @@
                             <div class="flex items-center h-5">
                                 @if ($mop == '1')
                                     <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500"
-                                           id="comments" name="comments" type="checkbox"
-                                           aria-describedby="comments-description" readonly disabled checked>
+                                        id="comments" name="comments" type="checkbox"
+                                        aria-describedby="comments-description" readonly disabled checked>
                                 @else
                                     <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500"
-                                           id="comments" name="comments" type="checkbox"
-                                           aria-describedby="comments-description" readonly disabled>
+                                        id="comments" name="comments" type="checkbox"
+                                        aria-describedby="comments-description" readonly disabled>
                                 @endif
 
                             </div>
@@ -103,12 +103,12 @@
                             <div class="flex items-center h-5">
                                 @if ($mop == '2')
                                     <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500"
-                                           id="candidates" name="candidates" type="checkbox"
-                                           aria-describedby="candidates-description" readonly disabled checked>
+                                        id="candidates" name="candidates" type="checkbox"
+                                        aria-describedby="candidates-description" readonly disabled checked>
                                 @else
                                     <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500"
-                                           id="candidates" name="candidates" type="checkbox"
-                                           aria-describedby="candidates-description" readonly disabled>
+                                        id="candidates" name="candidates" type="checkbox"
+                                        aria-describedby="candidates-description" readonly disabled>
                                 @endif
 
                             </div>
@@ -121,12 +121,12 @@
                             <div class="flex items-center h-5">
                                 @if ($mop == '3')
                                     <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500"
-                                           id="offers" name="offers" type="checkbox"
-                                           aria-describedby="offers-description" readonly disabled checked>
+                                        id="offers" name="offers" type="checkbox"
+                                        aria-describedby="offers-description" readonly disabled checked>
                                 @else
                                     <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500"
-                                           id="offers" name="offers" type="checkbox"
-                                           aria-describedby="offers-description" readonly disabled>
+                                        id="offers" name="offers" type="checkbox"
+                                        aria-describedby="offers-description" readonly disabled>
                                 @endif
 
                             </div>
@@ -139,12 +139,12 @@
                             <div class="flex items-center h-5">
                                 @if ($mop == 4)
                                     <input class="w-4 h-4 text-indigo-500 border-black focus:ring-primary-500"
-                                           id="offers" name="offers" type="checkbox"
-                                           aria-describedby="offers-description" readonly disabled checked>
+                                        id="offers" name="offers" type="checkbox"
+                                        aria-describedby="offers-description" readonly disabled checked>
                                 @else
                                     <input class="w-4 h-4 border-black text-primary-500 focus:ring-primary-500"
-                                           id="offers" name="offers" type="checkbox"
-                                           aria-describedby="offers-description" readonly disabled>
+                                        id="offers" name="offers" type="checkbox"
+                                        aria-describedby="offers-description" readonly disabled>
                                 @endif
 
                             </div>
@@ -158,7 +158,7 @@
 
                                 <div class="ml-1 text-sm">
                                     <span
-                                            class="font-medium text-black">{{ $evaluate(fn($get) => $get('other_reason')) }}</span>
+                                        class="font-medium text-black">{{ $evaluate(fn($get) => $get('other_reason')) }}</span>
                                 </div>
                             </div>
                         @endif
@@ -250,7 +250,8 @@
                     <div class="w-full">
                         <div class="flex row-span-1">
                             <div class="px-1 font-extrabold border-b border-r border-black print:text-12">A.</div>
-                            <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary, lawful and incurred
+                            <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary,
+                                lawful and incurred
                                 under my direct supervision.</span>
                         </div>
                         <div class="block row-span-1 mx-auto text-center">
@@ -258,7 +259,10 @@
                                 $signatory_details;
                                 $full_name;
                                 if ($evaluate(fn($get) => $get('signatory_id')) != null) {
-                                    $signatory_details = \App\Models\EmployeeInformation::firstWhere('user_id', $evaluate(fn($get) => $get('signatory_id')));
+                                    $signatory_details = \App\Models\EmployeeInformation::firstWhere(
+                                        'user_id',
+                                        $evaluate(fn($get) => $get('signatory_id')),
+                                    );
                                     $temp;
                                     if (isset($signatory_details)) {
                                         $temp = explode(',', $signatory_details->full_name);
@@ -269,7 +273,8 @@
                                     $full_name = $temp[0];
                                 }
                             @endphp
-                            <span class="font-extrabold underline uppercase print:text-10">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                            <span
+                                class="font-extrabold underline uppercase print:text-10">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                                 {{ isset($full_name) ? $full_name : 'none' }}
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
                             <p class="font-extrabold capitalize print:text-10">
@@ -358,8 +363,12 @@
                     </div>
                 </div>
                 @php
-                    $president = App\Models\EmployeeInformation::where('position_id', 34)->where('office_id', 51)->first();
-                    $accountant = App\Models\EmployeeInformation::where('position_id', 15)->where('office_id', 3)->first();
+                    $president = App\Models\EmployeeInformation::where('position_id', 34)
+                        ->where('office_id', 51)
+                        ->first();
+                    $accountant = App\Models\EmployeeInformation::where('position_id', 15)
+                        ->where('office_id', 3)
+                        ->first();
                 @endphp
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-12">
                     <div class="flex items-center w-1/2 space-y-1 text-center border-r-2 border-black print:text-8">
@@ -367,14 +376,14 @@
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
                         <span
-                                class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
+                            class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
                     </div>
                     <div class="flex items-center w-1/2 space-y-1 text-center border-r-2 border-black print:text-8">
                         <div class="flex w-20 h-auto text-center border-r border-black print:h-8 print:w-16">
                             <span class="w-full break-words print:text-12">Printed Name</span>
                         </div>
                         <span
-                                class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
+                            class="flex mx-auto my-auto font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
                     </div>
                 </div>
                 <div class="flex items-start min-w-full col-span-8 font-serif border-t-2 border-black print:text-12">
@@ -386,10 +395,13 @@
 
                         <div class="w-full h-auto text-center print:h-8">
                             <div class="w-full h-4 border-b border-black">
-                                <span class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">University Accountant</span>
+                                <span
+                                    class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">University
+                                    Accountant</span>
                             </div>
                             <div class="w-full h-4">
-                                <span class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">Head, Accounting
+                                <span class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">Head,
+                                    Accounting
                                     Unit/Authorized Representative</span>
                             </div>
                         </div>
@@ -401,10 +413,14 @@
                         </div>
                         <div class="w-full h-auto text-center print:h-8">
                             <div class="w-full h-4 border-b border-black">
-                                <span class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">University President</span>
+                                <span
+                                    class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">University
+                                    President</span>
                             </div>
                             <div class="w-full h-4">
-                                <span class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">Agency Head/Authorized
+                                <span
+                                    class="block mx-auto my-auto text-xs font-extrabold uppercase print:text-8">Agency
+                                    Head/Authorized
                                     Representative</span>
                             </div>
                         </div>
@@ -433,7 +449,7 @@
                         </div>
                         <div class="flex flex-row w-full border-b-2 border-black">
                             <div
-                                    class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
+                                class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
                                 Check / ADA No.:
                             </div>
                             <div class="w-1/3 h-auto border-r border-black shrink-0">
@@ -457,7 +473,7 @@
                     <div class="flex-col w-full">
                         <div class="flex flex-row w-full border-b-2 border-black">
                             <div
-                                    class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
+                                class="w-20 h-auto px-1 text-xs font-extrabold border-r border-black print:text-10 shrink-0 print:w-20">
                                 Signature
                             </div>
                             <div class="w-1/3 h-auto border-r border-black shrink-0">
@@ -471,8 +487,8 @@
                             </div>
                         </div>
                         <div class="w-full">
-                            <span
-                                    class="pl-1 font-extrabold print:text-12">Official Receipt No. & Date/Other Documents</span>
+                            <span class="pl-1 font-extrabold print:text-12">Official Receipt No. & Date/Other
+                                Documents</span>
                         </div>
                     </div>
                     <div class="float-left w-1/6 h-full border-l border-black shrink-0">
@@ -482,7 +498,7 @@
                     </div>
                 </div>
                 <div class="border-t col-span-8 text-xs text-center italic border-black w-full">
-                    <p>The original copy of this document appears in electronic form.</p>
+                    <p>This is an electronic rendering; the original copy is in printed form.</p>
                 </div>
             </div>
         </div>

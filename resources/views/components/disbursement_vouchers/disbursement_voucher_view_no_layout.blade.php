@@ -1,6 +1,6 @@
 <div class="bg-primary-100 p-4">
     <div class="mx-auto flex max-w-[90%] border-collapse print:block print:h-[297mm] print:max-h-[297mm] print:w-[220mm] print:max-w-[220mm]"
-         id="dvPrint">
+        id="dvPrint">
         <div class="grid border-collapse grid-cols-8 border-4 border-black">
             <div class="col-span-6 border border-black">
                 <div class="flex min-w-full place-items-center justify-between">
@@ -8,16 +8,19 @@
                         <div class="my-auto flow-root">
                             <div class="mr-2 inline-block">
                                 <img class="mx-auto h-full w-14 object-scale-down"
-                                     src="{{ asset('images/sksulogo.png') }}" alt="sksu logo">
+                                    src="{{ asset('images/sksulogo.png') }}" alt="sksu logo">
                                 <span class="text-center text-xs text-black print:text-8">SKSU Works for Success!</span>
                                 {{-- <span class="text-xs font-bold text-center text-black"> ISO 9001:2015</span> --}}
                             </div>
                         </div>
                         <div class="flex place-items-center">
                             <div class="ext-left">
-                                <span class="block text-sm font-bold uppercase text-black">Republic of the Philippines</span>
-                                <span class="block text-sm font-bold uppercase text-green-600">SULTAN KUDARAT STATE UNIVERSITY</span>
-                                <span class="block text-sm text-black">ACCESS, EJC Montilla, 9800 City of Tacurong</span>
+                                <span class="block text-sm font-bold uppercase text-black">Republic of the
+                                    Philippines</span>
+                                <span class="block text-sm font-bold uppercase text-green-600">SULTAN KUDARAT STATE
+                                    UNIVERSITY</span>
+                                <span class="block text-sm text-black">ACCESS, EJC Montilla, 9800 City of
+                                    Tacurong</span>
                                 <span class="block text-sm text-black">Province of Sultan Kudarat</span>
                             </div>
                         </div>
@@ -26,24 +29,25 @@
                         <div class="m-3 text-center">
 
                             <img class="mx-auto h-auto w-12"
-                                 src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ route('disbursement-vouchers.show-from-trn', ['disbursement_voucher' => $disbursement_voucher->tracking_number]) }}"
-                                 alt="N/A">
-                            <span class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ route('disbursement-vouchers.show-from-trn', ['disbursement_voucher' => $disbursement_voucher->tracking_number]) }}"
+                                alt="N/A">
+                            <span
+                                class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>
                         </div>
 
                     </div>
                 </div>
                 <div class="min-w-full border-t-4 border-black text-center">
-                        <span class="text-md mx-auto font-serif font-extrabold uppercase text-black">
-                            Disbursement Voucher</span>
+                    <span class="text-md mx-auto font-serif font-extrabold uppercase text-black">
+                        Disbursement Voucher</span>
                 </div>
             </div>
 
             <div class="col-span-2 grid grid-rows-2 border border-black">
                 <div class="row-span-1 border-b border-l border-black">
-                        <span class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
-                            fund cluster:
-                        </span>
+                    <span class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
+                        fund cluster:
+                    </span>
                 </div>
                 <div class="row-span-1 border-l border-black pb-6">
                     <p class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
@@ -65,12 +69,12 @@
                             <div class="flex h-5 items-center">
                                 @if ($mop->id == $disbursement_voucher->mop_id)
                                     <input class="h-4 w-4 border-black text-indigo-500 focus:ring-primary-500"
-                                           id="comments" name="comments" type="checkbox"
-                                           aria-describedby="comments-description" readonly disabled checked>
+                                        id="comments" name="comments" type="checkbox"
+                                        aria-describedby="comments-description" readonly disabled checked>
                                 @else
                                     <input class="h-4 w-4 border-black text-primary-500 focus:ring-primary-500"
-                                           id="comments" name="comments" type="checkbox"
-                                           aria-describedby="comments-description" readonly disabled>
+                                        id="comments" name="comments" type="checkbox"
+                                        aria-describedby="comments-description" readonly disabled>
                                 @endif
                             </div>
                             <div class="ml-1 text-sm">
@@ -95,8 +99,8 @@
                     <span class="my-auto text-sm font-extrabold">Payee</span>
                 </div>
                 <div class="flex h-full w-1/2 border-r-2 border-black text-left">
-                        <span class="text-serif my-auto flex pl-2 font-extrabold uppercase print:text-10">
-                            {{ $disbursement_voucher->payee }} </span>
+                    <span class="text-serif my-auto flex pl-2 font-extrabold uppercase print:text-10">
+                        {{ $disbursement_voucher->payee }} </span>
                 </div>
                 <div class="flex h-full w-64 border-r-2 border-black px-2 py-1 text-left">
                     <span class="pb-3 text-xs font-extrabold">TIN/Employee No.:</span>
@@ -174,16 +178,20 @@
                 <div class="w-full">
                     <div class="row-span-1 flex">
                         <div class="border-b border-r border-black px-1 font-extrabold print:text-12">A.</div>
-                        <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary, lawful and incurred under my direct supervision.</span>
+                        <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary,
+                            lawful and incurred under my direct supervision.</span>
                     </div>
                     <div class="row-span-1 mx-auto block text-center">
                         @php
-                            $full_name = explode(',', $disbursement_voucher->signatory->employee_information->full_name)[0];
+                            $full_name = explode(
+                                ',',
+                                $disbursement_voucher->signatory->employee_information->full_name,
+                            )[0];
                         @endphp
                         <span class="font-extrabold uppercase underline print:text-10">
-                                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                                {{ isset($full_name) ? $full_name : 'none' }}
-                                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
+                            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                            {{ isset($full_name) ? $full_name : 'none' }}
+                            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
                         <p class="font-extrabold capitalize print:text-10">
                             {{ $disbursement_voucher->signatory->employee_information->position?->description }}
                             , {{ $disbursement_voucher->signatory->employee_information->office->name }}
@@ -278,13 +286,15 @@
                     <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                         <span class="w-full break-words print:text-12">Printed Name</span>
                     </div>
-                    <span class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
+                    <span
+                        class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
                 </div>
                 <div class="flex w-1/2 items-center space-y-1 border-r-2 border-black text-center print:text-8">
                     <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
                         <span class="w-full break-words print:text-12">Printed Name</span>
                     </div>
-                    <span class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
+                    <span
+                        class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
                 </div>
             </div>
             <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
@@ -296,13 +306,14 @@
 
                     <div class="h-auto w-full text-center print:h-8">
                         <div class="h-4 w-full border-b border-black">
-                                <span class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">University
-                                    Accountant</span>
+                            <span
+                                class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">University
+                                Accountant</span>
                         </div>
                         <div class="h-4 w-full">
-                                <span class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">Head,
-                                    Accounting
-                                    Unit/Authorized Representative</span>
+                            <span class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">Head,
+                                Accounting
+                                Unit/Authorized Representative</span>
                         </div>
                     </div>
                 </div>
@@ -313,13 +324,14 @@
                     </div>
                     <div class="h-auto w-full text-center print:h-8">
                         <div class="h-4 w-full border-b border-black">
-                                <span class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">University
-                                    President</span>
+                            <span
+                                class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">University
+                                President</span>
                         </div>
                         <div class="h-4 w-full">
-                                <span class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">Agency
-                                    Head/Authorized
-                                    Representative</span>
+                            <span class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">Agency
+                                Head/Authorized
+                                Representative</span>
                         </div>
                     </div>
                 </div>
@@ -346,7 +358,8 @@
                         <span class="pl-1 font-extrabold print:text-12">Receipt of Payment</span>
                     </div>
                     <div class="flex w-full flex-row border-b-2 border-black">
-                        <div class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
+                        <div
+                            class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
                             Check / ADA No.:
                         </div>
                         <div class="h-auto w-1/3 shrink-0 border-r border-black">
@@ -369,7 +382,8 @@
             <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
                 <div class="w-full flex-col">
                     <div class="flex w-full flex-row border-b-2 border-black">
-                        <div class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
+                        <div
+                            class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
                             Signature
                         </div>
                         <div class="h-auto w-1/3 shrink-0 border-r border-black">
@@ -383,8 +397,8 @@
                         </div>
                     </div>
                     <div class="w-full">
-                            <span class="pl-1 font-extrabold print:text-12">Official Receipt No. & Date/Other
-                                Documents</span>
+                        <span class="pl-1 font-extrabold print:text-12">Official Receipt No. & Date/Other
+                            Documents</span>
                     </div>
                 </div>
                 <div class="float-left h-full w-1/6 shrink-0 border-l border-black">
@@ -394,7 +408,7 @@
                 </div>
             </div>
             <div class="border-t col-span-8 text-xs text-center italic border-black w-full">
-                <p>The original copy of this document appears in electronic form.</p>
+                <p>This is an electronic rendering; the original copy is in printed form.</p>
             </div>
         </div>
     </div>
