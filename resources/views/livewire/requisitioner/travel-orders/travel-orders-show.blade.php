@@ -156,7 +156,16 @@
                 <div>
                     <div class="grid grid-cols-2 px-8 gap-16">
                         @forelse ($travel_order->immediate_supervisors as $supervisor)
-                            <div class="px-8">
+                            <div class="px-8 relative">
+                                @if($supervisor->pivot->is_approved == 1)
+                                    <x-signature-block
+                                        :signature="$supervisor->signature?->content"
+                                        width="12rem"
+                                        maxHeight="6rem"
+                                        bottom="100%"
+                                        translateY="1.5rem"
+                                    />
+                                @endif
                                 <p class="min-w-[4rem] text-sm text-center border-b border-black">{{ $supervisor->employee_information->full_name }}</p>
                                 <p class="text-center">Immediate Supervisor</p>
                             </div>
@@ -174,7 +183,16 @@
                     <div>
                         <p>Recommending Approval:</p>
                         @forelse ($travel_order->recommending_approval as $approver)
-                            <div class="px-16 mt-4">
+                            <div class="px-16 mt-4 relative">
+                                @if($approver->pivot->is_approved == 1)
+                                    <x-signature-block
+                                        :signature="$approver->signature?->content"
+                                        width="12rem"
+                                        maxHeight="6rem"
+                                        bottom="100%"
+                                        translateY="1.5rem"
+                                    />
+                                @endif
                                 <p class="min-w-[4rem] text-sm text-center border-b border-black">{{ $approver->employee_information->full_name }}</p>
                                 <p class="text-center">VPAA / VPRDEX / VPFARG</p>
                             </div>
@@ -189,7 +207,16 @@
                         <div>
                             <p>Approved:</p>
                             @forelse ($travel_order->university_president as $president)
-                                <div class="px-16 mt-4">
+                                <div class="px-16 mt-4 relative">
+                                    @if($president->pivot->is_approved == 1)
+                                        <x-signature-block
+                                            :signature="$president->signature?->content"
+                                            width="12rem"
+                                            maxHeight="6rem"
+                                            bottom="100%"
+                                            translateY="1.5rem"
+                                        />
+                                    @endif
                                     <p class="min-w-[4rem] text-sm text-center border-b border-black">{{ $president->employee_information->full_name }}</p>
                                     <p class="text-center">University President</p>
                                 </div>

@@ -19,6 +19,15 @@ class EnsureUserHasSignature
     ];
 
     /**
+     * URI paths that should be excluded from signature check
+     */
+    protected array $excludedPaths = [
+        'requisitioner/require-signature',
+        'requisitioner/require-contact-number',
+        'user/profile',
+    ];
+
+    /**
      * Handle an incoming request.
      */
     public function handle(Request $request, Closure $next)
@@ -31,6 +40,12 @@ class EnsureUserHasSignature
         // Skip if on excluded route
         $currentRoute = $request->route()?->getName();
         if (in_array($currentRoute, $this->excludedRoutes)) {
+            return $next($request);
+        }
+
+        // Skip if on excluded path
+        $currentPath = $request->path();
+        if (in_array($currentPath, $this->excludedPaths)) {
             return $next($request);
         }
 
