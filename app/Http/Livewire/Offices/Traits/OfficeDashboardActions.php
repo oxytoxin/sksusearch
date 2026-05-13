@@ -26,9 +26,7 @@
     use Filament\Notifications\Notification;
     use Filament\Tables\Actions\ActionGroup;
     use Filament\Forms\Components\RichEditor;
-    use Filament\Forms\Components\CheckboxList;
-    use Filament\Forms\Components\Radio;
-    use Filament\Forms\Components\Repeater;
+    use App\Forms\Components\RelatedDocumentsChecklist;
     use Carbon\Carbon;
     use App\Jobs\SendSmsJob;
 
@@ -160,38 +158,29 @@
                     ->form([
                         TextInput::make('log_number')
                             ->required(),
-                        Repeater::make('items')
+                        RelatedDocumentsChecklist::make('items')
                             ->label('Documentary Requirements')
-                            ->schema([
-                                Placeholder::make('document_label')
-                                    ->label('Document')
-                                    ->content(fn($get) => $get('document')),
-                                TextInput::make('document')
-                                    ->hidden()
-                                    ->dehydrated(),
-                                Radio::make('status')
-                                    ->label('Status')
-                                    ->options([
-                                        'required' => 'Required (verified present)',
-                                        'not_required' => 'Not Required',
-                                        'not_applicable' => 'Not Applicable',
-                                    ])
-                                    ->inline()
-                                    ->required()
-                                    ->reactive()
-                                    ->default('required'),
-                                Textarea::make('remarks')
-                                    ->label('Remarks')
-                                    ->rows(2)
-                                    ->required(fn($get) => in_array($get('status'), ['not_required', 'not_applicable']))
-                                    ->helperText(fn($get) => in_array($get('status'), ['not_required', 'not_applicable'])
-                                        ? 'Please justify why this document is marked as ' . str_replace('_', ' ', $get('status')) . '.'
-                                        : null),
-                            ])
-                            ->disableItemCreation()
-                            ->disableItemDeletion()
-                            ->disableItemMovement()
-                            ->columns(1),
+                            ->documents(fn($record) => $record?->voucher_subtype?->related_documents_list?->documents ?? [])
+                            ->required()
+                            ->rule(function () {
+                                return function (string $attribute, $value, \Closure $fail) {
+                                    if (!is_array($value)) {
+                                        $fail('Invalid checklist data.');
+                                        return;
+                                    }
+                                    foreach ($value as $i => $item) {
+                                        $status = $item['status'] ?? null;
+                                        if (!in_array($status, ['required', 'not_required', 'not_applicable'])) {
+                                            $fail('Each document must have a status set.');
+                                            return;
+                                        }
+                                        if (in_array($status, ['not_required', 'not_applicable']) && blank($item['remarks'] ?? null)) {
+                                            $fail('A note is required for "' . ($item['document'] ?? 'unknown') . '" since it is marked as ' . str_replace('_', ' ', $status) . '.');
+                                            return;
+                                        }
+                                    }
+                                };
+                            }),
                         RichEditor::make('remarks')
                             ->label('General Remarks (Optional)'),
                     ])->visible(function ($record) {
