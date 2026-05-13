@@ -25,7 +25,7 @@ class CashAdvanceAging extends Component
 
     public ?string $bucketFilter = null;
 
-    public ?int $fundClusterId = null;
+    public ?string $fundClusterId = null;
 
     public string $search = '';
 
