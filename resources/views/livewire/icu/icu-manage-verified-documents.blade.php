@@ -8,7 +8,30 @@
         </div>
     @endif
     <div id="dvPrint">
-        <div class="flex flex-col max-w-fit mx-auto divide-y-2 divide-black border-collapse border-4 border-black items-center print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
+        <style>
+            @page {
+                size: A4 portrait;
+                margin: 4mm;
+            }
+            @media print {
+                html, body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                #dvPrint {
+                    width: 100% !important;
+                    max-width: 202mm !important;
+                    transform: scale(0.95);
+                    transform-origin: top center;
+                    page-break-inside: avoid;
+                }
+                #dvPrint * {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+            }
+        </style>
+        <div class="flex flex-col max-w-fit mx-auto divide-y-2 divide-black border-collapse border-4 border-black items-center print:w-full print:max-w-[202mm]">
             <div class="grid grid-cols-8 border-collapse divide-x-2 divide-black w-full">
                 <div class="col-span-6">
                     <div class="flex justify-between min-w-full place-items-center">
@@ -111,16 +134,16 @@
                 @endif
             </div>
             <div class="flex-1"></div>
-            <div class="w-full p-4">
+            <div class="w-full px-4 pt-2 pb-4">
                 <div>
                     <p>Reviewed/Checked By:</p>
                 </div>
                 <div class="relative">
-                    <x-signature-block :signature="auth()->user()->signature?->content" width="10rem" maxHeight="3.5rem" bottom="2.5rem" />
-                    <span class="block mt-12 font-semibold tracking-wide text-center text-black underline text-md">
+                    <x-signature-block :signature="auth()->user()->signature?->content" width="10rem" maxHeight="3rem" bottom="2rem" />
+                    <span class="block mt-10 font-semibold tracking-wide text-center text-black underline text-md">
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ auth()->user()->employee_information->full_name }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </span>
-                    <span class="block mt-2 tracking-wide text-center text-black text-md">
+                    <span class="block mt-1 tracking-wide text-center text-black text-md">
                         {{ auth()->user()->employee_information->position?->description }}, {{ auth()->user()->employee_information->office->name }}
                     </span>
                 </div>
@@ -128,7 +151,7 @@
         </div>
     </div>
     <button class="inline-flex items-center px-4 py-2 mt-2 text-xs font-medium text-white border border-transparent rounded-md shadow-sm bg-primary-500 hover:bg-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-            type="button" onclick="printDiv('dvPrint')">
+            type="button" onclick="printOutData(document.getElementById('dvPrint').outerHTML, 'ICU Verification Report')">
         <svg class="w-5 h-5 mr-2 -ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
             <path fill-rule="evenodd"
                   d="M7.875 1.5C6.839 1.5 6 2.34 6 3.375v2.99c-.426.053-.851.11-1.274.174-1.454.218-2.476 1.483-2.476 2.917v6.294a3 3 0 003 3h.27l-.155 1.705A1.875 1.875 0 007.232 22.5h9.536a1.875 1.875 0 001.867-2.045l-.155-1.705h.27a3 3 0 003-3V9.456c0-1.434-1.022-2.7-2.476-2.917A48.716 48.716 0 0018 6.366V3.375c0-1.036-.84-1.875-1.875-1.875h-8.25zM16.5 6.205v-2.83A.375.375 0 0016.125 3h-8.25a.375.375 0 00-.375.375v2.83a49.353 49.353 0 019 0zm-.217 8.265c.178.018.317.16.333.337l.526 5.784a.375.375 0 01-.374.409H7.232a.375.375 0 01-.374-.409l.526-5.784a.373.373 0 01.333-.337 41.741 41.741 0 018.566 0zm.807-3.97a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H18a.75.75 0 01-.75-.75V10.5zM15 9.75a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V10.5a.75.75 0 00-.75-.75H15z"
@@ -136,23 +159,4 @@
         </svg>
         Print Report
     </button>
-    <style>
-        @page {
-            size: auto;
-            size: A4;
-            margin: 0mm;
-        }
-    </style>
-    @push('scripts')
-        <script>
-            function printDiv(divName) {
-                var originalContents = document.body.innerHTML;
-                var element = document.getElementById("toPrint");
-                var printContents = document.getElementById(divName).innerHTML;
-                document.body.innerHTML = printContents;
-                window.print();
-                document.body.innerHTML = originalContents;
-            }
-        </script>
-    @endpush
 </div>
