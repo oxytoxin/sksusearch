@@ -111,11 +111,11 @@
                             <template x-if="!isExpanded(index)">
                                 <button type="button"
                                     @click="openNote(index)"
-                                    :class="needsRemarks(index) ? 'border-amber-400 text-amber-700 bg-amber-50 hover:bg-amber-100' : 'border-gray-300 text-gray-600 bg-white hover:bg-gray-100'"
+                                    :class="needsRemarks(index) ? 'border-primary-400 text-primary-700 bg-primary-100 hover:bg-primary-200' : 'border-gray-300 text-gray-600 bg-white hover:bg-gray-100'"
                                     class="inline-flex items-center gap-1 px-3 py-1.5 text-xs border rounded-md transition-colors">
                                     <span>+</span>
                                     <span>Add note</span>
-                                    <span x-show="needsRemarks(index)" class="text-amber-600 font-bold ml-0.5" title="Note required for this status">*</span>
+                                    <span x-show="needsRemarks(index)" class="text-primary-600 font-bold ml-0.5" title="Note required for this status">*</span>
                                 </button>
                             </template>
                         </div>
@@ -130,7 +130,7 @@
                                 rows="2"
                                 placeholder="Note about this document..."
                                 :class="needsRemarks(index) && !item.remarks
-                                    ? 'border-amber-400 ring-1 ring-amber-200 bg-amber-50'
+                                    ? 'border-primary-400 ring-1 ring-primary-200 bg-primary-100'
                                     : 'border-gray-300'"
                                 class="block w-full text-xs rounded-md shadow-sm focus:border-primary-600 focus:ring-1 focus:ring-primary-600 resize-y pr-7"></textarea>
                             <button type="button"
@@ -154,7 +154,7 @@
         </div>
 
         <p class="text-xs text-gray-500 italic">
-            <span class="text-amber-600 font-bold">*</span> A note is required when a document is marked as <strong>Not Required</strong> or <strong>Not Applicable</strong>.
+            <span class="text-primary-600 font-bold">*</span> A note is required when a document is marked as <strong>Not Required</strong> or <strong>Not Applicable</strong>.
         </p>
     </div>
 </x-forms::field-wrapper>
