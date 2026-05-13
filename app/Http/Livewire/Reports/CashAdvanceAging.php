@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Reports;
 
 use App\Exports\CashAdvanceAgingExport;
 use App\Models\CaReminderStep;
+use App\Models\FundCluster;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -24,14 +25,17 @@ class CashAdvanceAging extends Component
 
     public ?string $bucketFilter = null;
 
+    public ?int $fundClusterId = null;
+
     public string $search = '';
 
     public int $totalMatchingCount = 0;
 
     protected $queryString = [
-        'asOfDate'     => ['except' => ''],
-        'bucketFilter' => ['except' => null],
-        'search'       => ['except' => ''],
+        'asOfDate'      => ['except' => ''],
+        'bucketFilter'  => ['except' => null],
+        'fundClusterId' => ['except' => null],
+        'search'        => ['except' => ''],
     ];
 
     public function mount(): void
@@ -58,6 +62,11 @@ class CashAdvanceAging extends Component
         // No-op; reactive.
     }
 
+    public function updatedFundClusterId(): void
+    {
+        // No-op; reactive.
+    }
+
     public function setBucket(?string $bucket): void
     {
         $this->bucketFilter = $bucket;
@@ -66,6 +75,7 @@ class CashAdvanceAging extends Component
     public function clearFilters(): void
     {
         $this->bucketFilter = null;
+        $this->fundClusterId = null;
         $this->search = '';
         $this->asOfDate = today()->format('Y-m-d');
     }
@@ -140,13 +150,18 @@ class CashAdvanceAging extends Component
     protected function baseQuery(): Builder
     {
         $asOf = $this->asOfDateCarbon();
+        $fundId = $this->fundClusterId;
 
         return CaReminderStep::query()
-            ->whereHas('disbursementVoucher', function ($q) {
+            ->whereHas('disbursementVoucher', function ($q) use ($fundId) {
                 $q->whereDoesntHave('liquidation_report', fn ($lr) => $lr->whereNull('cancelled_at'))
                     ->whereRelation('voucher_subtype', 'voucher_type_id', 1)
                     ->where('voucher_subtype_id', '!=', 69)
                     ->whereNotNull('cheque_number');
+
+                if (filled($fundId)) {
+                    $q->where('fund_cluster_id', $fundId);
+                }
             })
             ->whereNotNull('liquidation_period_end_date')
             ->whereDate('liquidation_period_end_date', '<', $asOf);
@@ -286,6 +301,11 @@ class CashAdvanceAging extends Component
         return '2y+';
     }
 
+    public function getFundClustersProperty()
+    {
+        return FundCluster::orderBy('name')->get(['id', 'name']);
+    }
+
     public function bucketLabel(string $key): string
     {
         return match ($key) {
@@ -310,6 +330,7 @@ class CashAdvanceAging extends Component
             'asOfDisplay'        => $this->asOfDateCarbon()->format('F j, Y'),
             'totalMatchingCount' => $this->totalMatchingCount,
             'rowLimit'           => self::ROW_RENDER_LIMIT,
+            'fundClusters'       => $this->fundClusters,
         ]);
     }
 }

@@ -36,13 +36,24 @@
 
         {{-- Filter row --}}
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4">
-            <div class="md:col-span-3">
+            <div class="md:col-span-2">
                 <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">As of date</label>
                 <input type="date" wire:model="asOfDate"
                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm" />
             </div>
 
-            <div class="md:col-span-6">
+            <div class="md:col-span-3">
+                <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Fund cluster</label>
+                <select wire:model="fundClusterId"
+                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm">
+                    <option value="">All funds</option>
+                    @foreach ($fundClusters as $fc)
+                        <option value="{{ $fc->id }}">{{ $fc->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="md:col-span-4">
                 <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Aging bucket</label>
                 <div class="inline-flex flex-wrap gap-1 rounded-md border border-gray-200 p-1 bg-white">
                     @php
