@@ -54,17 +54,41 @@
                 @if ($disbursement_voucher->related_documents && filled($disbursement_voucher->related_documents))
                     <h4 class="text-center capitalize">{{ str($disbursement_voucher->voucher_subtype->voucher_type->name)->singular() }} for {{ $disbursement_voucher->voucher_subtype->name }}</h4>
                     <h5 class="mt-4 text-sm italic">Checklist for Documentary Requirements</h5>
-                    <ul class="mt-4 space-y-1">
-                        @forelse ($disbursement_voucher->voucher_subtype->related_documents_list?->documents as $document)
-                            <li class="flex gap-2">
-                                <span class="w-6 flex-shrink-0">
-                                    @if (in_array($document, $disbursement_voucher->related_documents['verified_documents']))
-                                        <x-ri-checkbox-circle-fill class="text-primary-400" />
-                                    @else
-                                        <x-ri-close-circle-fill class="text-red-500" />
-                                    @endif
-                                </span>
-                                <span>{{ $document }}</span>
+                    <ul class="mt-4 space-y-2">
+                        @forelse ($disbursement_voucher->getRelatedDocumentItems() as $item)
+                            <li class="flex flex-col gap-1">
+                                <div class="flex gap-2">
+                                    <span class="w-6 flex-shrink-0">
+                                        @switch($item['status'])
+                                            @case('required')
+                                                <x-ri-checkbox-circle-fill class="text-primary-400" title="Required (verified)" />
+                                                @break
+                                            @case('not_required')
+                                                <x-ri-indeterminate-circle-fill class="text-gray-400" title="Not Required" />
+                                                @break
+                                            @case('not_applicable')
+                                                <x-ri-close-circle-fill class="text-amber-500" title="Not Applicable" />
+                                                @break
+                                            @default
+                                                <x-ri-question-fill class="text-gray-300" />
+                                        @endswitch
+                                    </span>
+                                    <span>
+                                        {{ $item['document'] }}
+                                        <span class="ml-2 text-xs italic text-gray-500">
+                                            @switch($item['status'])
+                                                @case('required') (Required) @break
+                                                @case('not_required') (Not Required) @break
+                                                @case('not_applicable') (Not Applicable) @break
+                                            @endswitch
+                                        </span>
+                                    </span>
+                                </div>
+                                @if (!empty($item['remarks']))
+                                    <div class="ml-8 text-xs italic text-gray-600">
+                                        Remark: {{ $item['remarks'] }}
+                                    </div>
+                                @endif
                             </li>
                         @empty
                             <li>
@@ -73,10 +97,10 @@
                         @endforelse
                     </ul>
                     <div class="mt-4 space-y-4">
-                        <h6>Remarks:</h6>
-                        @if ($disbursement_voucher->related_documents && filled($disbursement_voucher->related_documents['remarks']))
+                        <h6>General Remarks:</h6>
+                        @if (filled($disbursement_voucher->getRelatedDocumentsGeneralRemarks()))
                             <div>
-                                {!! $disbursement_voucher->related_documents['remarks'] !!}
+                                {!! $disbursement_voucher->getRelatedDocumentsGeneralRemarks() !!}
                             </div>
                         @else
                             <p>No remarks.</p>
@@ -91,7 +115,8 @@
                 <div>
                     <p>Reviewed/Checked By:</p>
                 </div>
-                <div>
+                <div class="relative">
+                    <x-signature-block :signature="auth()->user()->signature?->content" width="10rem" maxHeight="3.5rem" bottom="2.5rem" />
                     <span class="block mt-12 font-semibold tracking-wide text-center text-black underline text-md">
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ auth()->user()->employee_information->full_name }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </span>

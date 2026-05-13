@@ -27,6 +27,8 @@
     use Filament\Tables\Actions\ActionGroup;
     use Filament\Forms\Components\RichEditor;
     use Filament\Forms\Components\CheckboxList;
+    use Filament\Forms\Components\Radio;
+    use Filament\Forms\Components\Repeater;
     use Carbon\Carbon;
     use App\Jobs\SendSmsJob;
 
@@ -63,7 +65,7 @@
                 || ($record->current_step_id == 12000 && filled($record->journal_date) && filled($record->dv_number))
                 || ($record->current_step_id == 13000 && $record->certified_by_accountant)
                 || ($record->current_step_id == 18000 && filled($record->cheque_number))
-                || ($record->current_step_id == 6000 && (!$record->voucher_subtype->related_documents_list || filled($record->related_documents)));
+                || ($record->current_step_id == 6000 && (!$record->voucher_subtype->related_documents_list || $record->hasCompletedRelatedDocumentsVerification()));
         }
 
         private function viewActions()
@@ -118,6 +120,18 @@
                     ->icon('ri-file-copy-2-line')
                     ->label('Verify Related Documents')
                     ->modalHeading('Verify Related Documents')
+                    ->mountUsing(function ($form, $record) {
+                        $documents = $record?->voucher_subtype?->related_documents_list?->documents ?? [];
+                        $form->fill([
+                            'log_number' => $record->log_number,
+                            'items' => collect($documents)->map(fn($doc) => [
+                                'document' => $doc,
+                                'status' => 'required',
+                                'remarks' => null,
+                            ])->values()->all(),
+                            'remarks' => $record->related_documents['remarks'] ?? null,
+                        ]);
+                    })
                     ->action(function ($record, $data) {
                         $record->refresh();
                         DB::beginTransaction();
@@ -125,8 +139,11 @@
                             'log_number' => $data['log_number'],
                             'documents_verified_at' => now(),
                             'related_documents' => [
-                                'required_documents' => $record->voucher_subtype->related_documents_list?->documents ?? [],
-                                'verified_documents' => $data['verified_documents'],
+                                'items' => collect($data['items'] ?? [])->map(fn($item) => [
+                                    'document' => $item['document'] ?? '',
+                                    'status' => $item['status'] ?? 'required',
+                                    'remarks' => $item['remarks'] ?? null,
+                                ])->values()->all(),
                                 'remarks' => $data['remarks'] ?? '',
                             ]
                         ]);
@@ -143,11 +160,40 @@
                     ->form([
                         TextInput::make('log_number')
                             ->required(),
-                        CheckboxList::make('verified_documents')
-                            ->options(function ($record) {
-                                return collect($record?->voucher_subtype->related_documents_list?->documents)->flatMap(fn($d) => [$d => $d]) ?? [];
-                            }),
+                        Repeater::make('items')
+                            ->label('Documentary Requirements')
+                            ->schema([
+                                Placeholder::make('document_label')
+                                    ->label('Document')
+                                    ->content(fn($get) => $get('document')),
+                                TextInput::make('document')
+                                    ->hidden()
+                                    ->dehydrated(),
+                                Radio::make('status')
+                                    ->label('Status')
+                                    ->options([
+                                        'required' => 'Required (verified present)',
+                                        'not_required' => 'Not Required',
+                                        'not_applicable' => 'Not Applicable',
+                                    ])
+                                    ->inline()
+                                    ->required()
+                                    ->reactive()
+                                    ->default('required'),
+                                Textarea::make('remarks')
+                                    ->label('Remarks')
+                                    ->rows(2)
+                                    ->required(fn($get) => in_array($get('status'), ['not_required', 'not_applicable']))
+                                    ->helperText(fn($get) => in_array($get('status'), ['not_required', 'not_applicable'])
+                                        ? 'Please justify why this document is marked as ' . str_replace('_', ' ', $get('status')) . '.'
+                                        : null),
+                            ])
+                            ->disableItemCreation()
+                            ->disableItemDeletion()
+                            ->disableItemMovement()
+                            ->columns(1),
                         RichEditor::make('remarks')
+                            ->label('General Remarks (Optional)'),
                     ])->visible(function ($record) {
                         if (!$record) {
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
