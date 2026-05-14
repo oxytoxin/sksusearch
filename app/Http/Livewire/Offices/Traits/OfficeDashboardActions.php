@@ -51,7 +51,7 @@
                 $this->icuReturnCameFromVerify = false;
                 $record = $recordId ? DisbursementVoucher::find($recordId) : null;
                 if ($record) {
-                    $this->mountTableAction('edit', (string) $record->getKey());
+                    $this->swapMountedTableAction('edit', (string) $record->getKey());
                     return;
                 }
             }
@@ -62,6 +62,24 @@
             $this->dispatchBrowserEvent('close-modal', [
                 'id' => "{$this->id}-table-action",
             ]);
+        }
+
+        /**
+         * Swap the currently mounted table action to a different one, forcing
+         * Filament to rebuild the cached form so the new action's schema is used
+         * instead of the previous action's stale schema. Plain mountTableAction()
+         * does not invalidate the cached mountedTableActionForm, which causes the
+         * old form fields to render with the new action's heading.
+         */
+        protected function swapMountedTableAction(string $actionName, string $recordId)
+        {
+            // Drop the cached form so the next render rebuilds with the new schema.
+            if (property_exists($this, 'cachedForms') && is_array($this->cachedForms)) {
+                unset($this->cachedForms['mountedTableActionForm']);
+            }
+            $this->mountedTableActionData = [];
+
+            $this->mountTableAction($actionName, $recordId);
         }
 
         /**
@@ -116,29 +134,7 @@
             $this->icuReturnCameFromVerify = true;
 
             // Swap the same modal element from the verify action to the return action.
-            $this->mountTableAction('returnFromIcu', (string) $recordId);
-        }
-
-        /**
-         * Triggered by the "Back to Verify Documents" button at the top of the
-         * Return form. Swaps the same modal element back to the verify action so
-         * the verifier can adjust the checklist instead of returning.
-         */
-        public function backToVerifyFromReturn($recordId)
-        {
-            $record = DisbursementVoucher::find($recordId);
-            if (!$record) {
-                Notification::make()->title('Disbursement Voucher not found.')->danger()->send();
-                return;
-            }
-
-            // Reset the came-from-verify flag - the user is now back on verify; if
-            // they swap to return again it will be a fresh swap.
-            $this->icuReturnCameFromVerify = false;
-
-            // Re-mount the verify EditAction. Filament's EditAction is registered
-            // under the name 'edit' by default.
-            $this->mountTableAction('edit', (string) $recordId);
+            $this->swapMountedTableAction('returnFromIcu', (string) $recordId);
         }
 
         private function officeTableColumns()
@@ -318,11 +314,6 @@
                     })
                     ->form(function () {
                         return [
-                            Placeholder::make('back_to_verify_trigger')
-                                ->label('')
-                                ->content(fn ($record) => view('forms.components.icu-back-to-verify-trigger', [
-                                    'recordId' => $record?->getKey(),
-                                ])),
                             Select::make('return_step_id')
                                 ->label('Return to')
                                 ->options(fn($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
