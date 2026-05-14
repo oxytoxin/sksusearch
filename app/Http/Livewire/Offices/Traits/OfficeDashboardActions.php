@@ -89,6 +89,24 @@
             $this->mountTableAction('returnFromIcu', (string) $recordId);
         }
 
+        /**
+         * Triggered by the "Back to Verify Documents" button at the top of the
+         * Return form. Swaps the same modal element back to the verify action so
+         * the verifier can adjust the checklist instead of returning.
+         */
+        public function backToVerifyFromReturn($recordId)
+        {
+            $record = DisbursementVoucher::find($recordId);
+            if (!$record) {
+                Notification::make()->title('Disbursement Voucher not found.')->danger()->send();
+                return;
+            }
+
+            // Re-mount the verify EditAction. Filament's EditAction is registered
+            // under the name 'edit' by default.
+            $this->mountTableAction('edit', (string) $recordId);
+        }
+
         private function officeTableColumns()
         {
             return [
@@ -259,6 +277,11 @@
                     ->modalWidth('4xl')
                     ->form(function () {
                         return [
+                            Placeholder::make('back_to_verify_trigger')
+                                ->label('')
+                                ->content(fn ($record) => view('forms.components.icu-back-to-verify-trigger', [
+                                    'recordId' => $record?->getKey(),
+                                ])),
                             Select::make('return_step_id')
                                 ->label('Return to')
                                 ->options(fn($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
