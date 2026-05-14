@@ -8,6 +8,7 @@
     use App\Models\TravelOrderType;
     use Filament\Forms\Components\Grid;
     use Filament\Forms\Components\Placeholder;
+    use Filament\Forms\Components\Section;
     use Filament\Forms\Components\Textarea;
     use Illuminate\Support\Facades\DB;
     use App\Forms\Components\Flatpickr;
@@ -256,14 +257,20 @@
                             }),
                         RichEditor::make('remarks')
                             ->label('General Remarks (Optional)'),
-                        Select::make('return_step_id')
-                            ->label('Return to (only if returning)')
-                            ->helperText('Pick a previous office only when you intend to return the document. Required when clicking "Return Document".')
-                            ->options(fn($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id')),
-                        RichEditor::make('return_remarks')
-                            ->label('Return Reason (only if returning)')
-                            ->helperText('Explain why the document is being returned. Required when clicking "Return Document".')
-                            ->fileAttachmentsDisk('remarks'),
+                        Section::make('Return Document (instead of forwarding)')
+                            ->description('Fill these only if you intend to send this DV back to a previous office. After filling, click the red "Return Document" button at the bottom of this modal.')
+                            ->collapsible()
+                            ->collapsed()
+                            ->schema([
+                                Select::make('return_step_id')
+                                    ->label('Return to')
+                                    ->helperText('Required when clicking "Return Document".')
+                                    ->options(fn($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id')),
+                                RichEditor::make('return_remarks')
+                                    ->label('Return Reason')
+                                    ->helperText('Required when clicking "Return Document".')
+                                    ->fileAttachmentsDisk('remarks'),
+                            ]),
                     ])->visible(function ($record) {
                         if (!$record) {
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
