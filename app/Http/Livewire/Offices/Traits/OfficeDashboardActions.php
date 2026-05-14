@@ -84,9 +84,15 @@
 
         /**
          * Triggered by the in-modal "Return Document" button on the ICU verify pop-up.
-         * Saves the current checklist state (so verifier marks are not lost), then
-         * swaps the same Filament modal element from the verify form to the Return
+         * Swaps the same Filament modal element from the verify form to the Return
          * form by re-mounting the dedicated 'returnFromIcu' action.
+         *
+         * Intentionally does NOT persist anything to the DV. Clicking Return is
+         * the verifier saying "this DV is not acceptable, bounce it back" - we
+         * leave related_documents untouched so the DV stays in the un-verified
+         * state. The return reason captured in the next modal goes into the
+         * activity log, which is the audit trail. When the DV comes back to ICU
+         * later, the verify pop-up opens fresh.
          */
         public function openIcuReturnFromVerify($recordId)
         {
@@ -94,40 +100,6 @@
             if (!$record) {
                 Notification::make()->title('Disbursement Voucher not found.')->danger()->send();
                 return;
-            }
-
-            // Read the verify form's current state from Livewire-tracked data.
-            $data = $this->mountedTableActionData ?? [];
-
-            // Persist whatever the verifier has marked so far (best-effort save).
-            // Skip the strict checklist rule here so a half-filled checklist still
-            // saves before opening the return modal - the Return action is the
-            // verifier's signal that the DV is incomplete anyway.
-            try {
-                DB::beginTransaction();
-                $record->update([
-                    'log_number' => $data['log_number'] ?? $record->log_number,
-                    'documents_verified_at' => now(),
-                    'related_documents' => [
-                        'items' => collect($data['items'] ?? [])->map(fn ($item) => [
-                            'document' => $item['document'] ?? '',
-                            'status' => $item['status'] ?? 'required',
-                            'remarks' => $item['remarks'] ?? null,
-                        ])->values()->all(),
-                        'remarks' => $data['remarks'] ?? '',
-                    ],
-                ]);
-                $description = 'Related documents marked during return.';
-                if ($this->isOic()) {
-                    $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
-                }
-                $record->activity_logs()->create([
-                    'description' => $description,
-                ]);
-                DB::commit();
-            } catch (\Throwable $e) {
-                DB::rollBack();
-                // Non-fatal - still let them open the Return modal.
             }
 
             // Mark that we entered Return from the verify pop-up so Cancel can swap back.
