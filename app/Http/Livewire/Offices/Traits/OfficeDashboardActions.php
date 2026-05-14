@@ -131,17 +131,7 @@
                             'remarks' => $record->related_documents['remarks'] ?? null,
                         ]);
                     })
-                    ->extraModalActions(function ($action) {
-                        return [
-                            $action->makeExtraModalAction('returnDocument', ['action' => 'return'])
-                                ->label('Return Document')
-                                ->color('danger')
-                                ->icon('ri-arrow-go-back-line'),
-                        ];
-                    })
-                    ->action(function ($livewire, $record, $data, array $arguments = []) {
-                        $isReturn = ($arguments['action'] ?? null) === 'return';
-
+                    ->action(function ($record, $data) {
                         $record->refresh();
                         DB::beginTransaction();
                         $record->update([
@@ -164,13 +154,6 @@
                             'description' => $description,
                         ]);
                         DB::commit();
-
-                        if ($isReturn) {
-                            // Open the dedicated Return modal on top of the now-closing verify modal.
-                            $livewire->mountTableAction('returnFromIcu', $record->getKey());
-                            throw new \Filament\Support\Exceptions\Halt();
-                        }
-
                         Notification::make()->title('Related documents have been verified.')->success()->send();
                     })
                     ->form([
@@ -209,11 +192,9 @@
                         return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype->related_documents_list && blank($record->related_documents);
                     }),
 
-                // Second modal that opens AFTER the verifier clicks "Return Document"
-                // in the verify pop-up. Hidden from the row so it cannot be triggered
-                // directly — only via $livewire->mountTableAction('returnFromIcu', ...).
                 Action::make('returnFromIcu')
                     ->label('Return Document')
+                    ->button()
                     ->color('danger')
                     ->icon('ri-arrow-go-back-line')
                     ->modalHeading('Return Disbursement Voucher')
@@ -277,7 +258,12 @@
 
                         Notification::make()->title('Disbursement Voucher returned.')->success()->send();
                     })
-                    ->hidden(true),
+                    ->visible(function ($record) {
+                        if (!$record) {
+                            return false;
+                        }
+                        return $record->current_step_id == 6000 && $record->for_cancellation == false;
+                    }),
             ];
         }
 
