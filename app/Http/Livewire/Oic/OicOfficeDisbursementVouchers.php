@@ -133,7 +133,7 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
-                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false)
+                ->visible(fn ($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false && $record->current_step_id != 6000)
                 ->form(function () {
                     return [
                         Select::make('return_step_id')

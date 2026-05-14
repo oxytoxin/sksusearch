@@ -210,10 +210,25 @@
                 if (blank($item['status'])) {
                     return false;
                 }
+                // Not Applicable means the DV is incomplete — it must be returned, not forwarded.
+                if ($item['status'] === 'not_applicable') {
+                    return false;
+                }
                 if ($item['status'] !== 'required' && blank($item['remarks'])) {
                     return false;
                 }
             }
             return true;
+        }
+
+        public function hasNotApplicableRelatedDocuments(): bool
+        {
+            $items = $this->getRelatedDocumentItems();
+            foreach ($items as $item) {
+                if (($item['status'] ?? null) === 'not_applicable') {
+                    return true;
+                }
+            }
+            return false;
         }
     }
