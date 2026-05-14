@@ -37,6 +37,58 @@
             return false;
         }
 
+        /**
+         * Triggered by the in-modal "Return Document" button on the ICU verify pop-up.
+         * Saves the current checklist state (so verifier marks are not lost), then
+         * swaps the same Filament modal element from the verify form to the Return
+         * form by re-mounting the dedicated 'returnFromIcu' action.
+         */
+        public function openIcuReturnFromVerify($recordId)
+        {
+            $record = DisbursementVoucher::find($recordId);
+            if (!$record) {
+                Notification::make()->title('Disbursement Voucher not found.')->danger()->send();
+                return;
+            }
+
+            // Read the verify form's current state from Livewire-tracked data.
+            $data = $this->mountedTableActionData ?? [];
+
+            // Persist whatever the verifier has marked so far (best-effort save).
+            // Skip the strict checklist rule here so a half-filled checklist still
+            // saves before opening the return modal - the Return action is the
+            // verifier's signal that the DV is incomplete anyway.
+            try {
+                DB::beginTransaction();
+                $record->update([
+                    'log_number' => $data['log_number'] ?? $record->log_number,
+                    'documents_verified_at' => now(),
+                    'related_documents' => [
+                        'items' => collect($data['items'] ?? [])->map(fn ($item) => [
+                            'document' => $item['document'] ?? '',
+                            'status' => $item['status'] ?? 'required',
+                            'remarks' => $item['remarks'] ?? null,
+                        ])->values()->all(),
+                        'remarks' => $data['remarks'] ?? '',
+                    ],
+                ]);
+                $description = 'Related documents marked during return.';
+                if ($this->isOic()) {
+                    $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
+                }
+                $record->activity_logs()->create([
+                    'description' => $description,
+                ]);
+                DB::commit();
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                // Non-fatal - still let them open the Return modal.
+            }
+
+            // Swap the same modal element from the verify action to the return action.
+            $this->mountTableAction('returnFromIcu', (string) $recordId);
+        }
+
         private function officeTableColumns()
         {
             return [
@@ -184,6 +236,11 @@
                             }),
                         RichEditor::make('remarks')
                             ->label('General Remarks (Optional)'),
+                        Placeholder::make('return_trigger')
+                            ->label('')
+                            ->content(fn ($record) => view('forms.components.icu-return-trigger', [
+                                'recordId' => $record?->getKey(),
+                            ])),
                     ])->visible(function ($record) {
                         if (!$record) {
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
