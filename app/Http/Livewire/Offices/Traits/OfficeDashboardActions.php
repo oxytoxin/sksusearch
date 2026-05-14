@@ -8,7 +8,6 @@
     use App\Models\TravelOrderType;
     use Filament\Forms\Components\Grid;
     use Filament\Forms\Components\Placeholder;
-    use Filament\Forms\Components\Section;
     use Filament\Forms\Components\Textarea;
     use Illuminate\Support\Facades\DB;
     use App\Forms\Components\Flatpickr;
@@ -129,38 +128,9 @@
                                 'remarks' => null,
                             ])->values()->all(),
                             'remarks' => $record->related_documents['remarks'] ?? null,
-                            'return_step_id' => null,
-                            'return_remarks' => null,
                         ]);
                     })
-                    ->extraModalActions(function ($action) {
-                        return [
-                            $action->makeExtraModalAction('returnDocument', ['action' => 'return'])
-                                ->label('Return Document')
-                                ->color('danger')
-                                ->icon('ri-arrow-go-back-line'),
-                        ];
-                    })
-                    ->action(function ($record, $data, array $arguments = []) {
-                        $isReturn = ($arguments['action'] ?? null) === 'return';
-
-                        if ($isReturn) {
-                            if (blank($data['return_step_id'] ?? null)) {
-                                Notification::make()
-                                    ->title('Please select a "Return to" office before returning the document.')
-                                    ->danger()
-                                    ->send();
-                                return;
-                            }
-                            if (blank(strip_tags($data['return_remarks'] ?? ''))) {
-                                Notification::make()
-                                    ->title('Please provide a reason for returning the document.')
-                                    ->danger()
-                                    ->send();
-                                return;
-                            }
-                        }
-
+                    ->action(function ($record, $data) {
                         $record->refresh();
                         DB::beginTransaction();
                         $record->update([
@@ -182,50 +152,6 @@
                         $record->activity_logs()->create([
                             'description' => $description,
                         ]);
-
-                        if ($isReturn) {
-                            if ($record->current_step_id < $record->previous_step_id) {
-                                $previous_step_id = $record->previous_step_id;
-                            } else {
-                                $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('id', '<', $record->current_step->id)->latest('id')->first()->id;
-                            }
-                            $record->update([
-                                'current_step_id' => $data['return_step_id'],
-                                'previous_step_id' => $previous_step_id,
-                            ]);
-                            $record->refresh();
-                            $record->activity_logs()->create([
-                                'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient,
-                                'remarks' => $data['return_remarks'] ?? null,
-                            ]);
-                            DB::commit();
-
-                            // ========== SMS NOTIFICATION ==========
-                            $record->load(['user.employee_information']);
-                            $trackingNumber = $record->tracking_number;
-                            $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
-                            $remarks = strip_tags($data['return_remarks'] ?? '');
-                            $remarks = html_entity_decode($remarks, ENT_QUOTES, 'UTF-8');
-                            if (blank($remarks)) {
-                                $remarks = 'No remarks provided';
-                            }
-                            $message = "Your DV with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
-                            $requestedBy = $record->user;
-                            if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
-                                SendSmsJob::dispatch(
-                                    $requestedBy->employee_information->contact_number,
-                                    $message,
-                                    'disbursement_voucher_returned',
-                                    $requestedBy->id,
-                                    auth()->id()
-                                );
-                            }
-                            // ========== SMS NOTIFICATION END ==========
-
-                            Notification::make()->title('Disbursement Voucher returned.')->success()->send();
-                            return;
-                        }
-
                         DB::commit();
                         Notification::make()->title('Related documents have been verified.')->success()->send();
                     })
@@ -257,28 +183,87 @@
                             }),
                         RichEditor::make('remarks')
                             ->label('General Remarks (Optional)'),
-                        Section::make('Return Document (instead of forwarding)')
-                            ->description('Fill these only if you intend to send this DV back to a previous office. After filling, click the red "Return Document" button at the bottom of this modal.')
-                            ->collapsible()
-                            ->collapsed()
-                            ->schema([
-                                Select::make('return_step_id')
-                                    ->label('Return to')
-                                    ->helperText('Required when clicking "Return Document".')
-                                    ->options(fn($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id')),
-                                RichEditor::make('return_remarks')
-                                    ->label('Return Reason')
-                                    ->helperText('Required when clicking "Return Document".')
-                                    ->fileAttachmentsDisk('remarks'),
-                            ]),
                     ])->visible(function ($record) {
                         if (!$record) {
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
                             return false;
                         }
                         return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype->related_documents_list && blank($record->related_documents);
-                    })
+                    }),
 
+                Action::make('returnFromIcu')
+                    ->label('Return Document')
+                    ->button()
+                    ->color('danger')
+                    ->icon('ri-arrow-go-back-line')
+                    ->modalHeading('Return Disbursement Voucher')
+                    ->modalSubheading('Select which office to send this DV back to and explain why. The requisitioner will be notified by SMS.')
+                    ->modalWidth('4xl')
+                    ->form(function () {
+                        return [
+                            Select::make('return_step_id')
+                                ->label('Return to')
+                                ->options(fn($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
+                                ->required(),
+                            RichEditor::make('remarks')
+                                ->label('Return Reason')
+                                ->required()
+                                ->fileAttachmentsDisk('remarks'),
+                        ];
+                    })
+                    ->action(function ($record, $data) {
+                        DB::beginTransaction();
+                        if ($record->current_step_id < $record->previous_step_id) {
+                            $previous_step_id = $record->previous_step_id;
+                        } else {
+                            $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('id', '<', $record->current_step->id)->latest('id')->first()->id;
+                        }
+                        $record->update([
+                            'current_step_id' => $data['return_step_id'],
+                            'previous_step_id' => $previous_step_id,
+                        ]);
+                        $record->refresh();
+                        $description = 'Disbursement Voucher returned to ' . $record->current_step->recipient . ' by ICU.';
+                        if ($this->isOic()) {
+                            $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
+                        }
+                        $record->activity_logs()->create([
+                            'description' => $description,
+                            'remarks' => $data['remarks'] ?? null,
+                        ]);
+                        DB::commit();
+
+                        // ========== SMS NOTIFICATION ==========
+                        $record->load(['user.employee_information']);
+                        $trackingNumber = $record->tracking_number;
+                        $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                        $remarks = strip_tags($data['remarks'] ?? '');
+                        $remarks = html_entity_decode($remarks, ENT_QUOTES, 'UTF-8');
+                        if (blank($remarks)) {
+                            $remarks = 'No remarks provided';
+                        }
+                        $message = "Your DV with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
+                        $requestedBy = $record->user;
+                        if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                            SendSmsJob::dispatch(
+                                $requestedBy->employee_information->contact_number,
+                                $message,
+                                'disbursement_voucher_returned',
+                                $requestedBy->id,
+                                auth()->id()
+                            );
+                        }
+                        // ========== SMS NOTIFICATION END ==========
+
+                        Notification::make()->title('Disbursement Voucher returned.')->success()->send();
+                    })
+                    ->requiresConfirmation()
+                    ->visible(function ($record) {
+                        if (!$record) {
+                            return false;
+                        }
+                        return $record->current_step_id == 6000 && $record->for_cancellation == false;
+                    }),
             ];
         }
 
