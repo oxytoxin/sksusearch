@@ -137,10 +137,7 @@
                             $action->makeExtraModalAction('returnDocument', ['action' => 'return'])
                                 ->label('Return Document')
                                 ->color('danger')
-                                ->icon('ri-arrow-go-back-line')
-                                ->requiresConfirmation()
-                                ->modalHeading('Return Disbursement Voucher')
-                                ->modalSubheading('This will save the verification and send the document back to the selected office. Make sure you have selected a "Return to" target and provided a reason in the form before confirming.'),
+                                ->icon('ri-arrow-go-back-line'),
                         ];
                     })
                     ->action(function ($record, $data, array $arguments = []) {
