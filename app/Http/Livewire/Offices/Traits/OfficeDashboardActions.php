@@ -32,9 +32,36 @@
 
     trait OfficeDashboardActions
     {
+        public bool $icuReturnCameFromVerify = false;
+
         public function isOic()
         {
             return false;
+        }
+
+        /**
+         * Smart Cancel for the ICU Return modal.
+         * If the user got here via the in-modal Return Document swap, send them
+         * back to the verify modal so they can keep marking documents. If they
+         * got here via the row's red Return Document button, close the modal.
+         */
+        public function handleIcuReturnCancel($recordId = null)
+        {
+            if ($this->icuReturnCameFromVerify) {
+                $this->icuReturnCameFromVerify = false;
+                $record = $recordId ? DisbursementVoucher::find($recordId) : null;
+                if ($record) {
+                    $this->mountTableAction('edit', (string) $record->getKey());
+                    return;
+                }
+            }
+
+            $this->icuReturnCameFromVerify = false;
+            $this->mountedTableAction = null;
+            $this->mountedTableActionRecord = null;
+            $this->dispatchBrowserEvent('close-modal', [
+                'id' => "{$this->id}-table-action",
+            ]);
         }
 
         /**
@@ -85,6 +112,9 @@
                 // Non-fatal - still let them open the Return modal.
             }
 
+            // Mark that we entered Return from the verify pop-up so Cancel can swap back.
+            $this->icuReturnCameFromVerify = true;
+
             // Swap the same modal element from the verify action to the return action.
             $this->mountTableAction('returnFromIcu', (string) $recordId);
         }
@@ -101,6 +131,10 @@
                 Notification::make()->title('Disbursement Voucher not found.')->danger()->send();
                 return;
             }
+
+            // Reset the came-from-verify flag - the user is now back on verify; if
+            // they swap to return again it will be a fresh swap.
+            $this->icuReturnCameFromVerify = false;
 
             // Re-mount the verify EditAction. Filament's EditAction is registered
             // under the name 'edit' by default.
@@ -275,6 +309,13 @@
                     ->modalHeading('Return Disbursement Voucher')
                     ->modalSubheading('Select which previous office should receive this DV and explain what needs to be fixed. The requisitioner will be notified by SMS.')
                     ->modalWidth('4xl')
+                    ->modalCancelAction(function ($action) {
+                        $recordId = $action->getRecord()?->getKey();
+                        return $action->makeModalAction('cancel')
+                            ->label(__('filament-support::actions/modal.actions.cancel.label'))
+                            ->action('handleIcuReturnCancel', $recordId ? [(string) $recordId] : [])
+                            ->color('secondary');
+                    })
                     ->form(function () {
                         return [
                             Placeholder::make('back_to_verify_trigger')
