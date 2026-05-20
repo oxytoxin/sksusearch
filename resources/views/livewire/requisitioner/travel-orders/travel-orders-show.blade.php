@@ -113,7 +113,7 @@
                     <p class="flex-1">Purpose</p>
                     <p>:</p>
                 </div>
-                <p class="flex-1 border-b whitespace-pre border-black"> {{ $travel_order->purpose }}</p>
+                <p class="flex-1 border-b whitespace-pre-line break-words border-black"> {{ $travel_order->purpose }}</p>
             </div>
             @if (count($applicants))
                 <div class="mt-8">
@@ -150,7 +150,7 @@
                 </div>
                 <div class="flex gap-4 flex-1">
                     <p>Remarks:</p>
-                    <p class="text-justify flex-1 whitespace-pre underline"></p>
+                    <p class="text-justify flex-1 whitespace-pre-line break-words underline"></p>
                 </div>
             </div>
             <div class="mt-8">
