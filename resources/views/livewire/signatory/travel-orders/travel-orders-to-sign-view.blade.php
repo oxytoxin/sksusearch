@@ -30,7 +30,7 @@
                             </p>
 
                             <p>Purpose:</p>
-                            <p class="whitespace-pre px-8 py-4">{{ $travel_order->purpose }}</p>
+                            <p class="whitespace-pre-line px-8 py-4">{{ $travel_order->purpose }}</p>
                             <p>Registration Fee: <span>{{ $travel_order->registration_amount > 0 ? $travel_order->registration_amount : 'N/A' }}</span></p>
                             <hr>
                             <div>
