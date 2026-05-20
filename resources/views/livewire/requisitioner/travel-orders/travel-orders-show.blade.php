@@ -248,7 +248,7 @@
             </div>
             <br>
             <div class="text-xs text-center italic w-full my-8 print:hidden">
-                <p>This is an electronic rendering; the original copy is in printed form.</p>
+                <p>This is an electronic rendering of a document whose original copy exists in printed form.</p>
             </div>
         </div>
     </div>

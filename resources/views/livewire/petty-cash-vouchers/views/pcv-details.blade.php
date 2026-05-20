@@ -219,7 +219,7 @@
             </div>
         </div>
         <div class="border-t col-span-8 text-xs text-center italic border-black w-full print:hidden">
-            <p>This is an electronic rendering; the original copy is in printed form.</p>
+            <p>This is an electronic rendering of a document whose original copy exists in printed form.</p>
         </div>
     </div>
     <div class="flex justify-end mt-4">
