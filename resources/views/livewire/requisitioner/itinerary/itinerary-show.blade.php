@@ -26,7 +26,7 @@
                             <p>Destination: {{ $travel_order->destination }}</p>
                         @endif
                         <p>Purpose:</p>
-                        <p class="whitespace-pre p-4">{{ $travel_order->purpose }}</p>
+                        <p class="whitespace-pre-line p-4">{{ $travel_order->purpose }}</p>
                         <p>Registration Fee: <span>{{ number_format($travel_order->registration_amount, 2) > 0 ? number_format($travel_order->registration_amount, 2) : 'N/A' }}</span>
                         </p>
                         <p>Total Amount: <span>{{ number_format($total_amount, 2) }}</span>
