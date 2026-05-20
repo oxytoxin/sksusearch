@@ -138,13 +138,6 @@
                 <ul class="-my-5 divide-y divide-primary-200" role="list">
                     <div class="flex w-full justify-between">
                         <h3 class="text-lg font-semibold text-primary-600">Notes</h3>
-                        <button class="my-auto flex px-4 text-center" type="button" wire:click="$set('modal',true)">
-                            <span class="my-auto text-sm"> Add note</span>
-                            <svg class="my-auto h-3 w-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                        </button>
-
                     </div>
 
                     @forelse ($sidenotes as $sidenote)
@@ -155,7 +148,7 @@
                                     <span class="flex">{{ $sidenote->user->employee_information->full_name }}</span>
                                     <span class="flex">{{ $sidenote->created_at->format('M d, Y') }}</span>
                                 </h3>
-                                <p class="mt-1 line-clamp-2 text-sm text-primary-600">
+                                <p class="mt-1 whitespace-pre-line text-sm text-primary-600">
                                     {{ $sidenote->content }}</p>
                             </div>
                         </li>
