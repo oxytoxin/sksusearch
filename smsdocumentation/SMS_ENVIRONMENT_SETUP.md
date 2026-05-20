@@ -55,6 +55,7 @@ For SMS to work on any environment (staging, production, dev), **all** of these 
 
 | Pitfall | Symptom |
 |---|---|
+| **Supervisor `queue:work` driver ≠ `.env QUEUE_CONNECTION`** | **Direct API works, queued SMS silently never sent. Jobs vanish into Redis (or DB) with no error and no log row** |
 | Staging uses same Semaphore key as production | Production credits drain unexpectedly during testing |
 | Staging has no Semaphore key at all | Jobs silently fail or throw "API key not configured" |
 | `.env` updated but `config:cache` not cleared | Old config still in use, SMS not sent |
@@ -63,6 +64,39 @@ For SMS to work on any environment (staging, production, dev), **all** of these 
 | Staging shares Redis with prod | Jobs cross-pollinate between environments (dangerous) |
 | Supervisor stopped after server reboot | Jobs queue up indefinitely, nothing processes them |
 | Semaphore sender ID not yet approved on new account | All sends stuck at "Pending" indefinitely |
+
+### Critical: Supervisor / `.env` queue driver must match
+
+This was a real production issue (May 2026) that silently broke all queued SMS for an unknown period.
+
+**Symptom:** Direct `/api/sms/test-direct` works ✅. Queued `/api/sms/send` or DV/TO workflow SMS never arrive ❌. No errors in any log. `sms_logs` rows are never created.
+
+**Cause:** `.env` had `QUEUE_CONNECTION=redis` but Supervisor was running `queue:work database`. Dispatchers pushed jobs to Redis; workers watched the (empty) database `jobs` table. Jobs accumulated in Redis with no consumer.
+
+**Fix:** Edit `/etc/supervisor/conf.d/laravel-worker.conf` AND `/etc/supervisor/conf.d/laravel-proxy-worker.conf`:
+
+```ini
+# WRONG
+command=php /var/www/sksusearch/artisan queue:work database --sleep=3 --tries=3 --max-time=3600
+
+# CORRECT (must match .env QUEUE_CONNECTION)
+command=php /var/www/sksusearch/artisan queue:work redis --queue=default --sleep=3 --tries=3 --max-time=3600
+```
+
+Then:
+```bash
+sudo supervisorctl reread && sudo supervisorctl update
+sudo supervisorctl restart laravel-worker:* laravel-worker-proxy:*
+```
+
+**Verification command (run before/after any deploy or `.env` change):**
+```bash
+ENV_DRIVER=$(grep ^QUEUE_CONNECTION /var/www/sksusearch/.env | cut -d= -f2)
+SUP_DRIVER=$(grep -h "queue:work" /etc/supervisor/conf.d/*.conf | grep -v "^#" | head -1 | grep -oE "queue:work [a-z]+" | awk '{print $2}')
+echo ".env says:       $ENV_DRIVER"
+echo "Supervisor says: $SUP_DRIVER"
+[ "$ENV_DRIVER" = "$SUP_DRIVER" ] && echo "✅ MATCH" || echo "❌ MISMATCH — fix immediately"
+```
 
 ---
 
@@ -229,6 +263,7 @@ Expected: most recent row matches the test send, with `status = sent`.
 | Worked yesterday, fails today | Credits exhausted OR worker crashed | Check credit + restart workers |
 | `redis-cli ping` returns nothing | Redis not running | `sudo systemctl start redis-server` |
 | Queue pending count rising | Workers stuck or stopped | `sudo supervisorctl restart laravel-worker:*` |
+| **Direct API test sends OK but queued endpoint never produces `sms_logs` row** | **Supervisor `queue:work` driver ≠ `.env QUEUE_CONNECTION`** | **Edit both `laravel-worker.conf` and `laravel-proxy-worker.conf` to match `.env`; restart workers (see section 3)** |
 
 ---
 
