@@ -203,7 +203,7 @@
                                     <span class="flex">{{ $sidenote->user->employee_information->full_name }}</span>
                                     <span class="flex">{{ $sidenote->created_at->format('M d, Y') }}</span>
                                 </h3>
-                                <p class="mt-1 line-clamp-2 text-sm text-primary-600">
+                                <p class="mt-1 whitespace-pre-line text-sm text-primary-600">
                                     {{ $sidenote->content }}</p>
                             </div>
                         </li>
