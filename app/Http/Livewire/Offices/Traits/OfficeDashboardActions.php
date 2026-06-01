@@ -26,15 +26,87 @@
     use Filament\Notifications\Notification;
     use Filament\Tables\Actions\ActionGroup;
     use Filament\Forms\Components\RichEditor;
-    use Filament\Forms\Components\CheckboxList;
+    use App\Forms\Components\RelatedDocumentsChecklist;
     use Carbon\Carbon;
     use App\Jobs\SendSmsJob;
 
     trait OfficeDashboardActions
     {
+        public bool $icuReturnCameFromVerify = false;
+
         public function isOic()
         {
             return false;
+        }
+
+        /**
+         * Smart Cancel for the ICU Return modal.
+         * If the user got here via the in-modal Return Document swap, send them
+         * back to the verify modal so they can keep marking documents. If they
+         * got here via the row's red Return Document button, close the modal.
+         */
+        public function handleIcuReturnCancel($recordId = null)
+        {
+            if ($this->icuReturnCameFromVerify) {
+                $this->icuReturnCameFromVerify = false;
+                $record = $recordId ? DisbursementVoucher::find($recordId) : null;
+                if ($record) {
+                    $this->swapMountedTableAction('edit', (string) $record->getKey());
+                    return;
+                }
+            }
+
+            $this->icuReturnCameFromVerify = false;
+            $this->mountedTableAction = null;
+            $this->mountedTableActionRecord = null;
+            $this->dispatchBrowserEvent('close-modal', [
+                'id' => "{$this->id}-table-action",
+            ]);
+        }
+
+        /**
+         * Swap the currently mounted table action to a different one, forcing
+         * Filament to rebuild the cached form so the new action's schema is used
+         * instead of the previous action's stale schema. Plain mountTableAction()
+         * does not invalidate the cached mountedTableActionForm, which causes the
+         * old form fields to render with the new action's heading.
+         */
+        protected function swapMountedTableAction(string $actionName, string $recordId)
+        {
+            // Drop the cached form so the next render rebuilds with the new schema.
+            if (property_exists($this, 'cachedForms') && is_array($this->cachedForms)) {
+                unset($this->cachedForms['mountedTableActionForm']);
+            }
+            $this->mountedTableActionData = [];
+
+            $this->mountTableAction($actionName, $recordId);
+        }
+
+        /**
+         * Triggered by the in-modal "Return Document" button on the ICU verify pop-up.
+         * Swaps the same Filament modal element from the verify form to the Return
+         * form by re-mounting the dedicated 'returnFromIcu' action.
+         *
+         * Intentionally does NOT persist anything to the DV. Clicking Return is
+         * the verifier saying "this DV is not acceptable, bounce it back" - we
+         * leave related_documents untouched so the DV stays in the un-verified
+         * state. The return reason captured in the next modal goes into the
+         * activity log, which is the audit trail. When the DV comes back to ICU
+         * later, the verify pop-up opens fresh.
+         */
+        public function openIcuReturnFromVerify($recordId)
+        {
+            $record = DisbursementVoucher::find($recordId);
+            if (!$record) {
+                Notification::make()->title('Disbursement Voucher not found.')->danger()->send();
+                return;
+            }
+
+            // Mark that we entered Return from the verify pop-up so Cancel can swap back.
+            $this->icuReturnCameFromVerify = true;
+
+            // Swap the same modal element from the verify action to the return action.
+            $this->swapMountedTableAction('returnFromIcu', (string) $recordId);
         }
 
         private function officeTableColumns()
@@ -63,7 +135,7 @@
                 || ($record->current_step_id == 12000 && filled($record->journal_date) && filled($record->dv_number))
                 || ($record->current_step_id == 13000 && $record->certified_by_accountant)
                 || ($record->current_step_id == 18000 && filled($record->cheque_number))
-                || ($record->current_step_id == 6000 && (!$record->voucher_subtype->related_documents_list || filled($record->related_documents)));
+                || ($record->current_step_id == 6000 && (!$record->voucher_subtype->related_documents_list || $record->hasCompletedRelatedDocumentsVerification()));
         }
 
         private function viewActions()
@@ -118,6 +190,19 @@
                     ->icon('ri-file-copy-2-line')
                     ->label('Verify Related Documents')
                     ->modalHeading('Verify Related Documents')
+                    ->modalWidth('4xl')
+                    ->mountUsing(function ($form, $record) {
+                        $documents = $record?->voucher_subtype?->related_documents_list?->documents ?? [];
+                        $form->fill([
+                            'log_number' => $record->log_number,
+                            'items' => collect($documents)->map(fn($doc) => [
+                                'document' => $doc,
+                                'status' => 'required',
+                                'remarks' => null,
+                            ])->values()->all(),
+                            'remarks' => $record->related_documents['remarks'] ?? null,
+                        ]);
+                    })
                     ->action(function ($record, $data) {
                         $record->refresh();
                         DB::beginTransaction();
@@ -125,8 +210,11 @@
                             'log_number' => $data['log_number'],
                             'documents_verified_at' => now(),
                             'related_documents' => [
-                                'required_documents' => $record->voucher_subtype->related_documents_list?->documents ?? [],
-                                'verified_documents' => $data['verified_documents'],
+                                'items' => collect($data['items'] ?? [])->map(fn($item) => [
+                                    'document' => $item['document'] ?? '',
+                                    'status' => $item['status'] ?? 'required',
+                                    'remarks' => $item['remarks'] ?? null,
+                                ])->values()->all(),
                                 'remarks' => $data['remarks'] ?? '',
                             ]
                         ]);
@@ -143,19 +231,123 @@
                     ->form([
                         TextInput::make('log_number')
                             ->required(),
-                        CheckboxList::make('verified_documents')
-                            ->options(function ($record) {
-                                return collect($record?->voucher_subtype->related_documents_list?->documents)->flatMap(fn($d) => [$d => $d]) ?? [];
+                        RelatedDocumentsChecklist::make('items')
+                            ->label('Documentary Requirements')
+                            ->documents(fn($record) => $record?->voucher_subtype?->related_documents_list?->documents ?? [])
+                            ->required()
+                            ->rule(function () {
+                                return function (string $attribute, $value, \Closure $fail) {
+                                    if (!is_array($value)) {
+                                        $fail('Invalid checklist data.');
+                                        return;
+                                    }
+                                    foreach ($value as $i => $item) {
+                                        $status = $item['status'] ?? null;
+                                        if (!in_array($status, ['required', 'not_required', 'not_applicable'])) {
+                                            $fail('Each document must have a status set.');
+                                            return;
+                                        }
+                                        if (in_array($status, ['not_required', 'not_applicable']) && blank($item['remarks'] ?? null)) {
+                                            $fail('A note is required for "' . ($item['document'] ?? 'unknown') . '" since it is marked as ' . str_replace('_', ' ', $status) . '.');
+                                            return;
+                                        }
+                                    }
+                                };
                             }),
                         RichEditor::make('remarks')
+                            ->label('General Remarks (Optional)'),
+                        Placeholder::make('return_trigger')
+                            ->label('')
+                            ->content(fn ($record) => view('forms.components.icu-return-trigger', [
+                                'recordId' => $record?->getKey(),
+                            ])),
                     ])->visible(function ($record) {
                         if (!$record) {
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
                             return false;
                         }
                         return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype->related_documents_list && blank($record->related_documents);
-                    })
+                    }),
 
+                Action::make('returnFromIcu')
+                    ->label('Return Document')
+                    ->button()
+                    ->color('danger')
+                    ->icon('ri-arrow-go-back-line')
+                    ->modalHeading('Return Disbursement Voucher')
+                    ->modalSubheading('Select which previous office should receive this DV and explain what needs to be fixed. The requisitioner will be notified by SMS.')
+                    ->modalWidth('4xl')
+                    ->modalCancelAction(function ($action) {
+                        $recordId = $action->getRecord()?->getKey();
+                        return $action->makeModalAction('cancel')
+                            ->label(__('filament-support::actions/modal.actions.cancel.label'))
+                            ->action('handleIcuReturnCancel', $recordId ? [(string) $recordId] : [])
+                            ->color('secondary');
+                    })
+                    ->form(function () {
+                        return [
+                            Select::make('return_step_id')
+                                ->label('Return to')
+                                ->options(fn($record) => DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', '!=', $record->current_step->recipient)->where('id', '<', $record->current_step_id)->pluck('recipient', 'id'))
+                                ->required(),
+                            RichEditor::make('remarks')
+                                ->label('Return Reason')
+                                ->required()
+                                ->fileAttachmentsDisk('remarks'),
+                        ];
+                    })
+                    ->action(function ($record, $data) {
+                        DB::beginTransaction();
+                        if ($record->current_step_id < $record->previous_step_id) {
+                            $previous_step_id = $record->previous_step_id;
+                        } else {
+                            $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('id', '<', $record->current_step->id)->latest('id')->first()->id;
+                        }
+                        $record->update([
+                            'current_step_id' => $data['return_step_id'],
+                            'previous_step_id' => $previous_step_id,
+                        ]);
+                        $record->refresh();
+                        $description = 'Disbursement Voucher returned to ' . $record->current_step->recipient . ' by ICU.';
+                        if ($this->isOic()) {
+                            $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
+                        }
+                        $record->activity_logs()->create([
+                            'description' => $description,
+                            'remarks' => $data['remarks'] ?? null,
+                        ]);
+                        DB::commit();
+
+                        // ========== SMS NOTIFICATION ==========
+                        $record->load(['user.employee_information']);
+                        $trackingNumber = $record->tracking_number;
+                        $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                        $remarks = strip_tags($data['remarks'] ?? '');
+                        $remarks = html_entity_decode($remarks, ENT_QUOTES, 'UTF-8');
+                        if (blank($remarks)) {
+                            $remarks = 'No remarks provided';
+                        }
+                        $message = "Your DV with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
+                        $requestedBy = $record->user;
+                        if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                            SendSmsJob::dispatch(
+                                $requestedBy->employee_information->contact_number,
+                                $message,
+                                'disbursement_voucher_returned',
+                                $requestedBy->id,
+                                auth()->id()
+                            );
+                        }
+                        // ========== SMS NOTIFICATION END ==========
+
+                        Notification::make()->title('Disbursement Voucher returned.')->success()->send();
+                    })
+                    ->visible(function ($record) {
+                        if (!$record) {
+                            return false;
+                        }
+                        return $record->current_step_id == 6000 && $record->for_cancellation == false;
+                    }),
             ];
         }
 
@@ -459,6 +651,27 @@
                                 'remarks' => $data['remarks'] ?? null,
                             ]);
                         }
+
+                        // ========== SMS NOTIFICATION ==========
+                        // Notify the requisitioner that their DV was approved and forwarded
+                        $record->load(['user.employee_information', 'current_step']);
+                        $trackingNumber = $record->tracking_number;
+                        $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                        $nextRecipient = $record->current_step->recipient ?? 'the next office';
+                        $approverPrefix = $this->isOic() ? 'OIC ' : '';
+                        $message = "Your DV with ref. no. {$trackingNumber} has been approved by {$approverPrefix}{$officerName} and forwarded to {$nextRecipient}.";
+
+                        $requestedBy = $record->user;
+                        if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                            SendSmsJob::dispatch(
+                                $requestedBy->employee_information->contact_number,
+                                $message,
+                                'disbursement_voucher_forwarded',
+                                $requestedBy->id,
+                                auth()->id()
+                            );
+                        }
+                        // ========== SMS NOTIFICATION END ==========
 
                         DB::commit();
                         $this->emit('refresh');

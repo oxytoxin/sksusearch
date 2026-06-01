@@ -163,7 +163,7 @@ class TravelOrdersToSignView extends Component
 
     public function addNote()
     {
-        $this->validate(['note' => 'required|min:10']);
+        $this->validate(['note' => 'required']);
         $content = '';
         if ($this->from_oic) {
             $content .= "OIC's Note: ";
@@ -230,7 +230,7 @@ class TravelOrdersToSignView extends Component
 
     public function reject()
     {
-        $this->validate(['rejectionNote' => 'required|min:10']);
+        $this->validate(['rejectionNote' => 'required']);
         $this->modalRejection = false;
         $this->dialog()->id('custom')->confirm([
             'icon' => 'question',

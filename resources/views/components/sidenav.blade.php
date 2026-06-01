@@ -109,11 +109,21 @@
                 $is_auditor =
                     auth()->user()->employee_information->office_id == 61 &&
                     auth()->user()->employee_information->position_id == 31;
+                $is_finance_officer =
+                    auth()->user()->employee_information->office_id == 25 &&
+                    (auth()->user()->employee_information->position_id == 12 ||
+                        auth()->user()->employee_information->position_id == 38);
             @endphp
             @if ($is_president || $is_accountant || $is_auditor)
                 <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                     href="{{ route('requisitioner.ca-reminders') }}" href="#">
                     Notices
+                </a>
+            @endif
+            @if ($is_accountant || $is_finance_officer || $is_president || $is_auditor)
+                <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                    href="{{ route('requisitioner.reports.cash-advance-aging') }}">
+                    Aging Report
                 </a>
             @endif
 
@@ -329,6 +339,12 @@
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('motorpool.request.index') }}">
                         Vehicle Requests
+                        @if ($motorpool_chief_action > 0)
+                            <span
+                                class="mx-auto inline-flex h-2 w-2 items-center justify-center rounded-full bg-primary-100 p-3 text-xs font-medium text-primary-600">
+                                {{ $motorpool_chief_action }}
+                            </span>
+                        @endif
                     </a>
                 @endif
 
@@ -346,6 +362,12 @@
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('signatory.motorpool.for-signature') }}">
                         For Signature
+                        @if ($motorpool_president_approval > 0)
+                            <span
+                                class="mx-auto inline-flex h-2 w-2 items-center justify-center rounded-full bg-primary-100 p-3 text-xs font-medium text-primary-600">
+                                {{ $motorpool_president_approval }}
+                            </span>
+                        @endif
                     </a>
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('signatory.motorpool.signed') }}">

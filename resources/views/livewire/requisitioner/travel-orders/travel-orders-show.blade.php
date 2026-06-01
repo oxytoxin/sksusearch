@@ -16,7 +16,7 @@
                     </div>
                     <img class="h-20" src="{{ asset('images/headerlogo2.png') }}" alt="headerlogo2">
                 </div>
-                <img class="w-24" src="{{ new chillerlan\QRCode\QRCode()->render($travel_order->tracking_code) }}"
+                <img class="w-24" src="{{ (new chillerlan\QRCode\QRCode())->render($travel_order->tracking_code) }}"
                     alt="qr" />
 
             </div>
@@ -247,8 +247,8 @@
                 </div>
             </div>
             <br>
-            <div class="text-xs text-center italic w-full my-8">
-                <p>This is an electronic rendering; the original copy is in printed form.</p>
+            <div class="text-xs text-center italic w-full my-8 print:hidden">
+                <p>This is an electronic rendering of a document whose original copy exists in printed form.</p>
             </div>
         </div>
     </div>

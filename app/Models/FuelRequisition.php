@@ -15,9 +15,9 @@ class FuelRequisition extends Model
         return $this->belongsTo(Supplier::class);
     }
 
-    public function user()
+    public function requested_by_employee()
     {
-        return $this->belongsTo(User::class, 'requested_by');
+        return $this->belongsTo(EmployeeInformation::class, 'requested_by');
     }
 
     public function request_schedule()

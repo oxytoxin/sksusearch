@@ -141,4 +141,94 @@
             $endDate = $cashAdvanceReminder->voucher_end_date;
             return $endDate ? Carbon::now()->diffInDays(Carbon::parse($endDate)) : null;
         }
+
+        /**
+         * Normalize related_documents JSON into a unified item collection regardless of stored format.
+         *
+         * Returns a collection of: ['document' => string, 'status' => 'required'|'not_required'|'not_applicable', 'remarks' => ?string]
+         *
+         * Supports two storage formats:
+         *  - NEW (3-state): ['items' => [...], 'remarks' => '...']
+         *  - LEGACY (binary): ['required_documents' => [...], 'verified_documents' => [...], 'remarks' => '...']
+         */
+        public function getRelatedDocumentItems()
+        {
+            $data = $this->related_documents;
+            if (blank($data)) {
+                return collect();
+            }
+
+            // New format
+            if (isset($data['items']) && is_array($data['items'])) {
+                return collect($data['items'])->map(fn($item) => [
+                    'document' => $item['document'] ?? '',
+                    'status' => $item['status'] ?? 'required',
+                    'remarks' => $item['remarks'] ?? null,
+                ]);
+            }
+
+            // Legacy format — checked = required (verified), unchecked = not_required
+            $required = $data['required_documents'] ?? ($this->voucher_subtype?->related_documents_list?->documents ?? []);
+            $verified = $data['verified_documents'] ?? [];
+            return collect($required)->map(fn($doc) => [
+                'document' => $doc,
+                'status' => in_array($doc, $verified) ? 'required' : 'not_required',
+                'remarks' => null,
+            ]);
+        }
+
+        /**
+         * Returns the general remarks regardless of storage format.
+         */
+        public function getRelatedDocumentsGeneralRemarks(): ?string
+        {
+            return $this->related_documents['remarks'] ?? null;
+        }
+
+        /**
+         * Determines whether the related_documents verification is complete enough to allow forwarding.
+         * - All items must have a status set
+         * - Any non-'required' item must have remarks (justification)
+         */
+        public function hasCompletedRelatedDocumentsVerification(): bool
+        {
+            if (blank($this->related_documents)) {
+                return false;
+            }
+
+            // Legacy records are considered complete if they have any data saved
+            if (!isset($this->related_documents['items'])) {
+                return true;
+            }
+
+            $items = $this->getRelatedDocumentItems();
+            if ($items->isEmpty()) {
+                return false;
+            }
+
+            foreach ($items as $item) {
+                if (blank($item['status'])) {
+                    return false;
+                }
+                // Not Applicable means the DV is incomplete — it must be returned, not forwarded.
+                if ($item['status'] === 'not_applicable') {
+                    return false;
+                }
+                if ($item['status'] !== 'required' && blank($item['remarks'])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public function hasNotApplicableRelatedDocuments(): bool
+        {
+            $items = $this->getRelatedDocumentItems();
+            foreach ($items as $item) {
+                if (($item['status'] ?? null) === 'not_applicable') {
+                    return true;
+                }
+            }
+            return false;
+        }
     }

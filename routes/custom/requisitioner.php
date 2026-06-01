@@ -22,6 +22,7 @@ use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersIndex;
 use App\Http\Livewire\Requisitioner\TravelOrders\TravelOrdersCreate;
 use App\Http\Livewire\Requisitioner\Motorpool\VehicleRequestFormShow;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\LiquidationStatus;
+use App\Http\Livewire\Reports\CashAdvanceAging;
 use App\Http\Livewire\Requisitioner\DisbursementVouchers\CashAdvanceReminders;
 use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsIndex;
 use App\Http\Livewire\Requisitioner\LiquidationReports\LiquidationReportsCreate;
@@ -66,5 +67,6 @@ Route::middleware([
     Route::get('/motorpool/vehicle-request-form/{request}', VehicleRequestFormShow::class)->name('motorpool.show-request-form');
     Route::get('/motorpool/vehicle-request-details/{request}', RequestVehicleShow::class)->name('motorpool.show');
     Route::get('/ca-reminders', CashAdvanceReminders::class)->name('ca-reminders');
+    Route::get('/cash-advances/aging', CashAdvanceAging::class)->name('reports.cash-advance-aging');
     // Route::get('/ca-reminders', CashAdvanceReminders::class)->name('ca-reminders');
 });

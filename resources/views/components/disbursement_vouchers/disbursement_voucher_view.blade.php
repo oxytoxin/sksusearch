@@ -435,8 +435,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="border-t col-span-8 text-xs text-center italic border-black w-full">
-                    <p>This is an electronic rendering; the original copy is in printed form.</p>
+                <div class="border-t col-span-8 text-xs text-center italic border-black w-full print:hidden">
+                    <p>This is an electronic rendering of a document whose original copy exists in printed form.</p>
                 </div>
             </div>
 

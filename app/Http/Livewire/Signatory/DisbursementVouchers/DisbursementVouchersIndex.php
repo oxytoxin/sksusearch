@@ -114,6 +114,27 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
+
+                // ========== SMS NOTIFICATION ==========
+                // Notify the requisitioner that their DV was approved and forwarded
+                $record->load(['user.employee_information', 'current_step']);
+                $trackingNumber = $record->tracking_number;
+                $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                $nextRecipient = $record->current_step->recipient ?? 'the next office';
+                $message = "Your DV with ref. no. {$trackingNumber} has been approved by {$officerName} and forwarded to {$nextRecipient}.";
+
+                $requestedBy = $record->user;
+                if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        $requestedBy->employee_information->contact_number,
+                        $message,
+                        'disbursement_voucher_forwarded',
+                        $requestedBy->id,
+                        auth()->id()
+                    );
+                }
+                // ========== SMS NOTIFICATION END ==========
+
                 Notification::make()->title('Document Forwarded')->success()->send();
             })
                 ->form(function () {
