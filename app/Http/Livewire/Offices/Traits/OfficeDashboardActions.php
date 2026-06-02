@@ -247,10 +247,6 @@
                                             $fail('Each document must have a status set.');
                                             return;
                                         }
-                                        if (in_array($status, ['not_required', 'not_applicable']) && blank($item['remarks'] ?? null)) {
-                                            $fail('A note is required for "' . ($item['document'] ?? 'unknown') . '" since it is marked as ' . str_replace('_', ' ', $status) . '.');
-                                            return;
-                                        }
                                     }
                                 };
                             }),

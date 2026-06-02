@@ -87,7 +87,7 @@
                                                 <x-ri-checkbox-circle-fill class="text-primary-400" title="Required (verified)" />
                                                 @break
                                             @case('not_required')
-                                                <x-ri-indeterminate-circle-fill class="text-gray-400" title="Not Required" />
+                                                <x-ri-indeterminate-circle-fill class="text-red-500" title="For Compliance" />
                                                 @break
                                             @case('not_applicable')
                                                 <x-ri-close-circle-fill class="text-amber-500" title="Not Applicable" />
@@ -101,7 +101,7 @@
                                         <span class="ml-2 text-xs italic text-gray-500">
                                             @switch($item['status'])
                                                 @case('required') (Required) @break
-                                                @case('not_required') (Not Required) @break
+                                                @case('not_required') (For Compliance) @break
                                                 @case('not_applicable') (Not Applicable) @break
                                             @endswitch
                                         </span>

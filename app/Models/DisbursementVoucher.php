@@ -188,7 +188,7 @@
         /**
          * Determines whether the related_documents verification is complete enough to allow forwarding.
          * - All items must have a status set
-         * - Any non-'required' item must have remarks (justification)
+         * - No item may be marked 'not_applicable' (those must be returned, not forwarded)
          */
         public function hasCompletedRelatedDocumentsVerification(): bool
         {
@@ -212,9 +212,6 @@
                 }
                 // Not Applicable means the DV is incomplete — it must be returned, not forwarded.
                 if ($item['status'] === 'not_applicable') {
-                    return false;
-                }
-                if ($item['status'] !== 'required' && blank($item['remarks'])) {
                     return false;
                 }
             }
