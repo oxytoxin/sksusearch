@@ -47,11 +47,11 @@
                 Required (verified present)
             </span>
             <span class="flex items-center gap-1">
-                <span class="inline-block w-4 h-4 border-2 border-red-500 bg-red-500 rounded text-white text-center leading-none text-[10px] font-bold">−</span>
+                <span class="inline-block w-4 h-4 border-2 border-red-500 bg-red-500 rounded text-white text-center leading-none text-[10px] font-bold">✗</span>
                 For Compliance
             </span>
             <span class="flex items-center gap-1">
-                <span class="inline-block w-4 h-4 border-2 border-amber-500 bg-amber-500 rounded text-white text-center leading-none text-[10px] font-bold">✗</span>
+                <span class="inline-block w-4 h-4 border-2 border-gray-400 bg-gray-400 rounded text-white text-center leading-none text-[10px] font-bold">−</span>
                 Not Applicable
             </span>
         </div>
@@ -75,14 +75,14 @@
                                 :class="isChecked(index, 'not_required') ? 'bg-red-500 border-red-500 text-white' : 'bg-white border-gray-300 text-transparent hover:border-red-400'"
                                 class="w-6 h-6 border-2 rounded flex items-center justify-center text-xs font-bold transition-colors"
                                 title="For Compliance">
-                                −
+                                ✗
                             </button>
                             <button type="button"
                                 @click="setStatus(index, 'not_applicable')"
-                                :class="isChecked(index, 'not_applicable') ? 'bg-amber-500 border-amber-500 text-white' : 'bg-white border-gray-300 text-transparent hover:border-amber-400'"
+                                :class="isChecked(index, 'not_applicable') ? 'bg-gray-400 border-gray-400 text-white' : 'bg-white border-gray-300 text-transparent hover:border-gray-400'"
                                 class="w-6 h-6 border-2 rounded flex items-center justify-center text-xs font-bold transition-colors"
                                 title="Not Applicable">
-                                ✗
+                                −
                             </button>
                         </div>
 
