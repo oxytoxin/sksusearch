@@ -12,10 +12,10 @@
                                     <x-ri-checkbox-circle-fill class="text-primary-400" title="Required (verified)" />
                                     @break
                                 @case('not_required')
-                                    <x-ri-indeterminate-circle-fill class="text-red-500" title="For Compliance" />
+                                    <x-ri-close-circle-fill class="text-red-500" title="For Compliance" />
                                     @break
                                 @case('not_applicable')
-                                    <x-ri-close-circle-fill class="text-amber-500" title="Not Applicable" />
+                                    <x-ri-indeterminate-circle-fill class="text-gray-400" title="Not Applicable" />
                                     @break
                                 @default
                                     <x-ri-question-fill class="text-gray-300" />
