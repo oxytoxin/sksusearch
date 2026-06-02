@@ -15,12 +15,7 @@
                     };
                 });
                 this.items = seeded;
-                // Auto-expand notes that already have content
-                this.items.forEach((item, i) => {
-                    if (item.remarks) {
-                        this.expanded[i] = true;
-                    }
-                });
+                // Notes with existing content auto-open via isExpanded() (no need to seed `expanded`).
             },
             setStatus(index, status) {
                 this.items[index].status = status;
