@@ -15,29 +15,13 @@
                     };
                 });
                 this.items = seeded;
-                // Auto-expand notes that already have content or need justification
-                this.items.forEach((item, i) => {
-                    if (item.remarks || item.status === 'not_required' || item.status === 'not_applicable') {
-                        this.expanded[i] = true;
-                    }
-                });
+                // Notes with existing content auto-open via isExpanded() (no need to seed `expanded`).
             },
             setStatus(index, status) {
                 this.items[index].status = status;
-                if (status === 'not_required' || status === 'not_applicable') {
-                    this.expanded[index] = true;
-                    this.$nextTick(() => {
-                        const ta = document.getElementById('rdc-note-' + index);
-                        if (ta) ta.focus();
-                    });
-                }
             },
             isChecked(index, status) {
                 return this.items?.[index]?.status === status;
-            },
-            needsRemarks(index) {
-                const s = this.items?.[index]?.status;
-                return s === 'not_required' || s === 'not_applicable';
             },
             isExpanded(index) {
                 return this.expanded[index] || (this.items?.[index]?.remarks ?? '').length > 0;
@@ -50,7 +34,6 @@
                 });
             },
             closeNote(index) {
-                if (this.needsRemarks(index)) return; // can't collapse if remark required
                 this.expanded[index] = false;
             },
         }"
@@ -64,8 +47,8 @@
                 Required (verified present)
             </span>
             <span class="flex items-center gap-1">
-                <span class="inline-block w-4 h-4 border-2 border-gray-400 bg-gray-400 rounded text-white text-center leading-none text-[10px] font-bold">−</span>
-                Not Required
+                <span class="inline-block w-4 h-4 border-2 border-red-500 bg-red-500 rounded text-white text-center leading-none text-[10px] font-bold">−</span>
+                For Compliance
             </span>
             <span class="flex items-center gap-1">
                 <span class="inline-block w-4 h-4 border-2 border-amber-500 bg-amber-500 rounded text-white text-center leading-none text-[10px] font-bold">✗</span>
@@ -89,9 +72,9 @@
                             </button>
                             <button type="button"
                                 @click="setStatus(index, 'not_required')"
-                                :class="isChecked(index, 'not_required') ? 'bg-gray-400 border-gray-400 text-white' : 'bg-white border-gray-300 text-transparent hover:border-gray-400'"
+                                :class="isChecked(index, 'not_required') ? 'bg-red-500 border-red-500 text-white' : 'bg-white border-gray-300 text-transparent hover:border-red-400'"
                                 class="w-6 h-6 border-2 rounded flex items-center justify-center text-xs font-bold transition-colors"
-                                title="Not Required">
+                                title="For Compliance">
                                 −
                             </button>
                             <button type="button"
@@ -111,11 +94,9 @@
                             <template x-if="!isExpanded(index)">
                                 <button type="button"
                                     @click="openNote(index)"
-                                    :class="needsRemarks(index) ? 'border-primary-400 text-primary-700 bg-primary-100 hover:bg-primary-200' : 'border-gray-300 text-gray-600 bg-white hover:bg-gray-100'"
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs border rounded-md transition-colors">
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs border border-gray-300 text-gray-600 bg-white hover:bg-gray-100 rounded-md transition-colors">
                                     <span>+</span>
                                     <span>Add note</span>
-                                    <span x-show="needsRemarks(index)" class="text-primary-600 font-bold ml-0.5" title="Note required for this status">*</span>
                                 </button>
                             </template>
                         </div>
@@ -129,13 +110,10 @@
                                 x-model="item.remarks"
                                 rows="2"
                                 placeholder="Note about this document..."
-                                :class="needsRemarks(index) && !item.remarks
-                                    ? 'border-primary-400 ring-1 ring-primary-200 bg-primary-100'
-                                    : 'border-gray-300'"
-                                class="block w-full text-xs rounded-md shadow-sm focus:border-primary-600 focus:ring-1 focus:ring-primary-600 resize-y pr-7"></textarea>
+                                class="block w-full text-xs border-gray-300 rounded-md shadow-sm focus:border-primary-600 focus:ring-1 focus:ring-primary-600 resize-y pr-7"></textarea>
                             <button type="button"
                                 @click="closeNote(index)"
-                                x-show="!needsRemarks(index) && !item.remarks"
+                                x-show="!item.remarks"
                                 class="absolute top-1 right-1 w-5 h-5 text-gray-400 hover:text-gray-700"
                                 title="Close">
                                 ×
@@ -152,9 +130,5 @@
                 </div>
             </template>
         </div>
-
-        <p class="text-xs text-gray-500 italic">
-            <span class="text-primary-600 font-bold">*</span> A note is required when a document is marked as <strong>Not Required</strong> or <strong>Not Applicable</strong>.
-        </p>
     </div>
 </x-forms::field-wrapper>
