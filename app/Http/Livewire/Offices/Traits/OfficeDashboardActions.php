@@ -113,7 +113,7 @@
         {
             return [
                 TextColumn::make('tracking_number')->searchable(),
-                TextColumn::make('voucher_subtype.voucher_type.name')->limit(20)->tooltip(fn($record) => $record->voucher_subtype->voucher_type->name)->label('Voucher Type'),
+                TextColumn::make('voucher_subtype.voucher_type.name')->limit(20)->tooltip(fn($record) => $record->voucher_subtype?->voucher_type?->name)->label('Voucher Type'),
                 TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
                 TextColumn::make('payee')
                     ->limit(10)
@@ -135,7 +135,7 @@
                 || ($record->current_step_id == 12000 && filled($record->journal_date) && filled($record->dv_number))
                 || ($record->current_step_id == 13000 && $record->certified_by_accountant)
                 || ($record->current_step_id == 18000 && filled($record->cheque_number))
-                || ($record->current_step_id == 6000 && (!$record->voucher_subtype->related_documents_list || $record->hasCompletedRelatedDocumentsVerification()));
+                || ($record->current_step_id == 6000 && (!$record->voucher_subtype?->related_documents_list || $record->hasCompletedRelatedDocumentsVerification()));
         }
 
         private function viewActions()
@@ -262,7 +262,7 @@
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
                             return false;
                         }
-                        return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype->related_documents_list && blank($record->related_documents);
+                        return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype?->related_documents_list && blank($record->related_documents);
                     }),
 
                 Action::make('returnFromIcu')
