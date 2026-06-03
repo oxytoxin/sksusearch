@@ -1,13 +1,13 @@
 <x-app-layout>
     <div>
-        <div class="mx-auto max-w-[90%] print:w-[210mm] print:max-w-[210mm]">
-            <p class="text-right text-xs italic text-black" style="font-family: 'Times New Roman', Times, serif;">
-                Appendix 32</p>
-        </div>
         <div class="mx-auto flex max-w-[90%] border-collapse print:block print:w-[210mm] print:max-w-[210mm] print:overflow-hidden"
             id="dvPrint">
-            <div class="grid border-collapse grid-cols-8 border-4 border-black"
-                style="font-family: 'Times New Roman', Times, serif;">
+            <div class="flex flex-col">
+                <p class="text-right text-xs italic text-black"
+                    style="font-family: 'Times New Roman', Times, serif;">
+                    Appendix 32</p>
+                <div class="grid border-collapse grid-cols-8 border-4 border-black"
+                    style="font-family: 'Times New Roman', Times, serif;">
                 <div class="col-span-6 border border-black">
                     <div class="flex min-w-full place-items-center justify-between">
                         <div class="w-20 shrink-0"></div>
@@ -426,6 +426,7 @@
                 </div>
                 <div class="border-t col-span-8 text-xs text-center italic border-black w-full print:hidden">
                     <p>This is an electronic rendering of a document whose original copy exists in printed form.</p>
+                </div>
                 </div>
             </div>
 
