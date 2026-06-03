@@ -1,4 +1,8 @@
 <div class="bg-primary-100 p-4">
+    <div class="mx-auto max-w-[90%] print:w-[220mm] print:max-w-[220mm]">
+        <p class="text-right text-xs italic text-black" style="font-family: 'Times New Roman', Times, serif;">
+            Appendix 32</p>
+    </div>
     <div class="mx-auto flex max-w-[90%] border-collapse print:block print:h-[297mm] print:max-h-[297mm] print:w-[220mm] print:max-w-[220mm]"
         id="dvPrint">
         <div class="grid border-collapse grid-cols-8 border-4 border-black"

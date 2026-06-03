@@ -1,5 +1,9 @@
 <x-app-layout>
     <div>
+        <div class="mx-auto max-w-[90%] print:w-[210mm] print:max-w-[210mm]">
+            <p class="text-right text-xs italic text-black" style="font-family: 'Times New Roman', Times, serif;">
+                Appendix 32</p>
+        </div>
         <div class="mx-auto flex max-w-[90%] border-collapse print:block print:w-[210mm] print:max-w-[210mm] print:overflow-hidden"
             id="dvPrint">
             <div class="grid border-collapse grid-cols-8 border-4 border-black"
