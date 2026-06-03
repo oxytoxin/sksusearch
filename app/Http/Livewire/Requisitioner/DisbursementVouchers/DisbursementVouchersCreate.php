@@ -146,7 +146,6 @@
                                     ->searchable()
                                     ->preload()
                                     ->visible(fn() => $this->voucher_subtype->id == VoucherSubType::ACTIVITY_DESIGN)
-                                    ->required(fn() => $this->voucher_subtype->id == VoucherSubType::ACTIVITY_DESIGN)
                                     ->options(
                                         ActivityDesign::where('status', ActivityDesignStatus::APPROVED)
                                             ->whereDoesntHave('disbursement_vouchers',
@@ -156,6 +155,12 @@
                                     )
                                     ->reactive()
                                     ->afterStateUpdated(function ($set, $state) {
+                                        if (!$state) {
+                                            $set('disbursement_voucher_particulars', []);
+                                            $set('activity_date_from', null);
+                                            $set('activity_date_to', null);
+                                            return;
+                                        }
                                         $ad = ActivityDesign::find($state);
                                         $set('disbursement_voucher_particulars', [
                                             [
@@ -713,13 +718,13 @@
                                         Flatpickr::make('activity_date_from')
                                             ->label('From')
                                             ->disableTime()
-                                            ->required()
+                                            ->requiredWith('activity_design_id')
                                             ->disabled()
                                             ->columnSpan(1),
                                         Flatpickr::make('activity_date_to')
                                             ->label('To')
                                             ->disableTime()
-                                            ->required()
+                                            ->requiredWith('activity_design_id')
                                             ->disabled()
                                             ->columnSpan(1),
                                     ])->columns(2)
