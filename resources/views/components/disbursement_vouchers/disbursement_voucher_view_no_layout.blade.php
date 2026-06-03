@@ -1,29 +1,15 @@
 <div class="bg-primary-100 p-4">
     <div class="mx-auto flex max-w-[90%] border-collapse print:block print:h-[297mm] print:max-h-[297mm] print:w-[220mm] print:max-w-[220mm]"
         id="dvPrint">
-        <div class="grid border-collapse grid-cols-8 border-4 border-black">
+        <div class="grid border-collapse grid-cols-8 border-4 border-black"
+            style="font-family: 'Times New Roman', Times, serif;">
             <div class="col-span-6 border border-black">
                 <div class="flex min-w-full place-items-center justify-between">
-                    <div class="ml-1 mt-1 flex">
-                        <div class="my-auto flow-root">
-                            <div class="mr-2 inline-block">
-                                <img class="mx-auto h-full w-14 object-scale-down"
-                                    src="{{ asset('images/sksulogo.png') }}" alt="sksu logo">
-                                <span class="text-center text-xs text-black print:text-8">SKSU Works for Success!</span>
-                                {{-- <span class="text-xs font-bold text-center text-black"> ISO 9001:2015</span> --}}
-                            </div>
-                        </div>
-                        <div class="flex place-items-center">
-                            <div class="ext-left">
-                                <span class="block text-sm font-bold uppercase text-black">Republic of the
-                                    Philippines</span>
-                                <span class="block text-sm font-bold uppercase text-green-600">SULTAN KUDARAT STATE
-                                    UNIVERSITY</span>
-                                <span class="block text-sm text-black">ACCESS, EJC Montilla, 9800 City of
-                                    Tacurong</span>
-                                <span class="block text-sm text-black">Province of Sultan Kudarat</span>
-                            </div>
-                        </div>
+                    <div class="w-20 shrink-0"></div>
+                    <div class="mt-1 flex-1 text-center">
+                        <span class="block text-sm font-bold uppercase text-black">SULTAN KUDARAT STATE
+                            UNIVERSITY</span>
+                        <span class="block text-xs italic text-black">Entity Name</span>
                     </div>
                     <div class="flex">
                         <div class="m-3 text-center">
@@ -307,11 +293,11 @@
                     <div class="h-auto w-full text-center print:h-8">
                         <div class="h-4 w-full border-b border-black">
                             <span
-                                class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">University
+                                class="mx-auto my-auto block text-xs font-extrabold print:text-8">University
                                 Accountant</span>
                         </div>
                         <div class="h-4 w-full">
-                            <span class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">Head,
+                            <span class="mx-auto my-auto block text-xs font-extrabold print:text-8">Head,
                                 Accounting
                                 Unit/Authorized Representative</span>
                         </div>
@@ -325,11 +311,11 @@
                     <div class="h-auto w-full text-center print:h-8">
                         <div class="h-4 w-full border-b border-black">
                             <span
-                                class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">University
+                                class="mx-auto my-auto block text-xs font-extrabold print:text-8">University
                                 President</span>
                         </div>
                         <div class="h-4 w-full">
-                            <span class="mx-auto my-auto block text-xs font-extrabold uppercase print:text-8">Agency
+                            <span class="mx-auto my-auto block text-xs font-extrabold print:text-8">Agency
                                 Head/Authorized
                                 Representative</span>
                         </div>
