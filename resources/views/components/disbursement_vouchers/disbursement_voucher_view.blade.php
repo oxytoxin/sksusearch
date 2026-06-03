@@ -181,11 +181,9 @@
                                     $disbursement_voucher->signatory->employee_information->full_name,
                                 )[0];
                             @endphp
-                            {{-- Temporarily hidden - signature not yet approved
                             @if ($disbursement_voucher->current_step_id >= 5000)
-                                <x-signature-block :signature="$disbursement_voucher->signatory->signature?->content" width="14rem" maxHeight="7rem" top="-3.6rem" />
+                                <x-signature-block :signature="$disbursement_voucher->signatory->signature?->content" width="16rem" left="53%" maxHeight="8rem" top="-4.3rem" />
                             @endif
-                            --}}
                             <span class="font-extrabold uppercase underline print:text-10">
                                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                                 {{ isset($full_name) ? $full_name : 'none' }}
