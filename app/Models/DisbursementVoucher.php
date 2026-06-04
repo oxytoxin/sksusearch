@@ -188,7 +188,11 @@
         /**
          * Determines whether the related_documents verification is complete enough to allow forwarding.
          * - All items must have a status set
-         * - No item may be marked 'not_applicable' (those must be returned, not forwarded)
+         * - No item may be marked 'not_required' ("For Compliance" — the document is deficient
+         *   and must be complied with, so the DV is returned, not forwarded).
+         *
+         * Note: 'not_applicable' ("Not Applicable") is a valid verified state — it means the
+         * requirement genuinely does not apply to this DV — and does NOT block forwarding.
          */
         public function hasCompletedRelatedDocumentsVerification(): bool
         {
@@ -210,8 +214,9 @@
                 if (blank($item['status'])) {
                     return false;
                 }
-                // Not Applicable means the DV is incomplete — it must be returned, not forwarded.
-                if ($item['status'] === 'not_applicable') {
+                // "For Compliance" means a required document is deficient — the DV must be
+                // returned for compliance, not forwarded.
+                if ($item['status'] === 'not_required') {
                     return false;
                 }
             }
