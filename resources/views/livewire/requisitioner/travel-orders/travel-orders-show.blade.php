@@ -17,7 +17,7 @@
                     <img class="h-20" src="{{ asset('images/headerlogo2.png') }}" alt="headerlogo2">
                 </div>
                 <img class="w-24" src="{{ (new chillerlan\QRCode\QRCode())->render($travel_order->tracking_code) }}"
-                    alt="qr" />
+                     alt="qr"/>
 
             </div>
             <hr class="border my-2 border-black">
@@ -33,7 +33,7 @@
                         <div class="flex gap-2">
                             <p class="min-w-[4rem] relative text-center border-b border-black">
                                 @if ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_TIME)
-                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1" />
+                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1"/>
                                 @endif
                             </p>
                             <p>Official Time</p>
@@ -41,7 +41,7 @@
                         <div class="flex gap-2">
                             <p class="min-w-[4rem] relative text-center border-b border-black">
                                 @if ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
-                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1" />
+                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1"/>
                                 @endif
                             </p>
                             <p>Official Business</p>
@@ -133,7 +133,7 @@
                         <div class="flex gap-2">
                             <p class="min-w-[4rem] relative text-center border-b border-black">
                                 @if ($travel_order->needs_vehicle)
-                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1" />
+                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1"/>
                                 @endif
                             </p>
                             <p>Yes</p>
@@ -141,7 +141,7 @@
                         <div class="flex gap-2">
                             <p class="min-w-[4rem] relative text-center border-b border-black">
                                 @if (!$travel_order->needs_vehicle)
-                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1" />
+                                    <x-ri-check-line class="absolute inset-x-0 mx-auto -bottom-1"/>
                                 @endif
                             </p>
                             <p>Not Necessary</p>
@@ -154,73 +154,25 @@
                 </div>
             </div>
             <div class="mt-8">
-                <p>Noted:</p>
-                <div>
-                    <div class="grid grid-cols-2 px-8 gap-16">
-                        @forelse ($travel_order->immediate_supervisors as $supervisor)
-                            <div class="px-8 relative">
-                                @if ($supervisor->pivot->is_approved == 1)
-                                    <x-signature-block :signature="$supervisor->signature?->content" width="12rem" maxHeight="6rem" bottom="100%"
-                                        translateY="1.5rem" />
-                                @endif
-                                <p class="min-w-[4rem] text-sm text-center border-b border-black">
-                                    {{ $supervisor->employee_information->full_name }}</p>
-                                <p class="text-center">Immediate Supervisor</p>
-                            </div>
-                        @empty
-                            <div class="px-8">
-                                <p class="min-w-[4rem] text-center text-sm border-b border-black">&nbsp;</p>
-                                <p class="text-center">Immediate Supervisor</p>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
-            <div class="mt-8">
-                <div class="grid grid-cols-2">
-                    <div>
-                        <p>Recommending Approval:</p>
-                        @forelse ($travel_order->recommending_approval as $approver)
-                            <div class="px-16 mt-4 relative">
-                                @if ($approver->pivot->is_approved == 1)
-                                    <x-signature-block :signature="$approver->signature?->content" width="12rem" maxHeight="6rem" bottom="100%"
-                                        translateY="1.5rem" />
-                                @endif
-                                <p class="min-w-[4rem] text-sm text-center border-b border-black">
-                                    {{ $approver->employee_information->full_name }}</p>
-                                <p class="text-center">VPAA / VPRDEX / VPFARG</p>
-                            </div>
-                        @empty
-                            <div class="px-16 mt-4">
-                                <p class="min-w-[4rem] text-sm text-center border-b border-black">&nbsp;</p>
-                                <p class="text-center">VPAA / VPRDEX / VPFARG</p>
-                            </div>
-                        @endforelse
-                    </div>
-                    @if ($travel_order->philippine_region_id != 13)
+                <div class="grid grid-cols-2 gap-16">
+                    @foreach($travel_order->signatories as $signatory)
                         <div>
-                            <p>Approved:</p>
-                            @forelse ($travel_order->university_president as $president)
-                                <div class="px-16 mt-4 relative">
-                                    @if ($president->pivot->is_approved == 1)
-                                        <x-signature-block :signature="$president->signature?->content" width="12rem" maxHeight="6rem"
-                                            bottom="100%" translateY="1.5rem" />
-                                    @endif
-                                    <p class="min-w-[4rem] text-sm text-center border-b border-black">
-                                        {{ $president->employee_information->full_name }}</p>
-                                    <p class="text-center">University President</p>
-                                </div>
-                            @empty
-                                <div class="px-16 mt-4">
-                                    <p class="min-w-[4rem] text-sm text-center border-b border-black">&nbsp;</p>
-                                    <p class="text-center">University President</p>
-                                </div>
-                            @endforelse
+                            <p>{{ $signatory->pivot?->heading }}</p>
+                            <div class="px-16 relative">
+                                @if ($signatory->pivot->is_approved == 1)
+                                    <x-signature-block :signature="$signatory->signature?->content" width="12rem"
+                                                       maxHeight="6rem" bottom="100%"
+                                                       translateY="1.5rem"/>
+                                @endif
+                                <p class="min-w-[4rem] text-sm text-center border-b border-black">
+                                    {{ $signatory->employee_information->full_name }}</p>
+                                <p class="text-center">{{ $signatory->pivot?->designation }}</p>
+                            </div>
                         </div>
-                    @endif
+                    @endforeach
                 </div>
             </div>
-            <hr class="my-4 border-2 border-black border-dashed">
+            <hr class="my-8 border-2 border-black border-dashed">
             <div>
                 <h2 class="text-xl text-center font-semibold">CERTIFICATE OF APPEARANCE</h2>
                 <p class="mt-8 font-semibold">TO WHOM IT MAY CONCERN:</p>
@@ -228,10 +180,10 @@
                     <p class="indent-16 text-justify text-sm">This is to certify that the above-mentioned name actually
                         appeared in this office during
                         <span
-                            class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                         to
                         <span
-                            class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>.
+                                class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>.
                         This certification is issued his/her request as evidence.
                     </p>
                 </div>
@@ -254,9 +206,9 @@
     </div>
     <div class="flex justify-center">
         <button
-            class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white"
-            id="printto" type="button" value="click"
-            @click="printOutData($refs.travelOrder.innerHTML, 'Travel Order')">
+                class="max-w-sm px-4 py-2 font-semibold tracking-wider text-white rounded-full w-sm bg-primary-500 hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white"
+                id="printto" type="button" value="click"
+                @click="printOutData($refs.travelOrder.innerHTML, 'Travel Order')">
             Print Travel Order
         </button>
     </div>

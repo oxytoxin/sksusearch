@@ -59,7 +59,7 @@
 
         public function signatories()
         {
-            return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->withPivot(['id', 'is_approved', 'role'])->withTimestamps();
+            return $this->belongsToMany(User::class, 'travel_order_signatories', 'travel_order_id', 'user_id')->withPivot(['id', 'is_approved', 'role', 'heading', 'designation'])->withTimestamps();
         }
 
         public function immediate_supervisors()
