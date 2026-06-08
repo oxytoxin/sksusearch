@@ -3,7 +3,7 @@
     <div class="print:hidden">
         <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
-                <h1 class="text-2xl font-semibold text-gray-800">Aging Schedule of Unliquidated Cash Advances</h1>
+                <h1 class="text-2xl font-semibold text-gray-800">Aging of Cash Advances</h1>
                 <p class="text-sm text-gray-500">
                     COA-style report of cash advances past their liquidation deadline.
                 </p>
@@ -63,7 +63,8 @@
                             '31-90'   => '31–90',
                             '91-365'  => '91–365',
                             '1-2y'    => '>1y',
-                            '2y+'     => '>2y',
+                            '2-3y'    => '>2y',
+                            '3y+'     => '3y+',
                         ];
                     @endphp
                     @foreach ($buckets as $key => $label)
@@ -87,21 +88,23 @@
         </div>
 
         {{-- Summary cards --}}
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
             @php
                 $cardLabels = [
-                    '30'     => '30 days',
+                    '30'     => '30 days or less',
                     '31-90'  => '31 – 90 days',
                     '91-365' => '91 – 365 days',
                     '1-2y'   => 'Over 1 year',
-                    '2y+'    => 'Over 2 years',
+                    '2-3y'   => 'Over 2 years',
+                    '3y+'    => '3 years and above',
                 ];
                 $cardShades = [
                     '30'     => 'border-primary-300 bg-primary-50 text-primary-800',
                     '31-90'  => 'border-primary-400 bg-primary-100 text-primary-800',
                     '91-365' => 'border-primary-500 bg-primary-200 text-primary-900',
                     '1-2y'   => 'border-primary-600 bg-primary-300 text-primary-900',
-                    '2y+'    => 'border-primary-700 bg-primary-500 text-white',
+                    '2-3y'   => 'border-primary-700 bg-primary-400 text-white',
+                    '3y+'    => 'border-primary-800 bg-primary-600 text-white',
                 ];
             @endphp
             @foreach ($cardLabels as $key => $label)
@@ -175,7 +178,10 @@
         {{-- Title --}}
         <div class="text-center my-4">
             <p class="text-base font-bold uppercase tracking-wide" style="color:#0c6600;">
-                Aging Schedule of Unliquidated Cash Advances
+                Aging of Cash Advances
+            </p>
+            <p class="text-sm text-gray-700">
+                {{ $fundClusterId ? ('Fund '.optional($fundClusters->firstWhere('id', $fundClusterId))->name) : 'All Funds' }}
             </p>
             <p class="text-sm text-gray-700">As of {{ $asOfDisplay }}</p>
         </div>
@@ -184,23 +190,25 @@
         <table>
             <thead>
                 <tr>
-                    <th rowspan="2" style="width:3%;">#</th>
-                    <th rowspan="2" style="width:13%;">Name of Accountable Officer</th>
-                    <th rowspan="2" style="width:10%;">Position</th>
-                    <th rowspan="2" style="width:10%;">Office</th>
-                    <th rowspan="2" style="width:14%;">Purpose</th>
-                    <th rowspan="2" style="width:7%;">Date Granted</th>
-                    <th rowspan="2" style="width:7%;">Check No.</th>
-                    <th rowspan="2" style="width:8%;">Amount Granted</th>
-                    <th rowspan="2" style="width:5%;">Days Overdue</th>
-                    <th colspan="5">Past Due (Amount)</th>
+                    <th rowspan="2" style="width:3%;">Ref.</th>
+                    <th rowspan="2" style="width:12%;">Name</th>
+                    <th rowspan="2" style="width:6%;">Date</th>
+                    <th rowspan="2" style="width:7%;">Reference</th>
+                    <th rowspan="2" style="width:9%;">Account</th>
+                    <th rowspan="2" style="width:16%;">Particulars</th>
+                    <th rowspan="2" style="width:8%;">Amount</th>
+                    <th rowspan="2" style="width:4%;">Fund</th>
+                    <th rowspan="2" style="width:4%;">No. of Days</th>
+                    <th>Current</th>
+                    <th colspan="5">Past Due</th>
                 </tr>
                 <tr>
-                    <th style="width:5%;">30</th>
-                    <th style="width:5%;">31–90</th>
-                    <th style="width:6%;">91–365</th>
-                    <th style="width:6%;">&gt; 1 Yr</th>
-                    <th style="width:6%;">&gt; 2 Yrs</th>
+                    <th style="width:5%;">30 days or less</th>
+                    <th style="width:5%;">31–90 days</th>
+                    <th style="width:5%;">91–365 days</th>
+                    <th style="width:5%;">Over 1 year</th>
+                    <th style="width:5%;">Over 2 years</th>
+                    <th style="width:5%;">3 years and above</th>
                 </tr>
             </thead>
             <tbody>
@@ -209,35 +217,35 @@
                         $dv       = $step->disbursementVoucher;
                         $owner    = $dv?->user;
                         $info     = $owner?->employee_information;
-                        $position = $info?->position?->description ?? '';
-                        $office   = $info?->office?->name ?? '';
                         $first    = $dv?->disbursement_voucher_particulars?->first();
                         $purpose  = $first?->purpose ?? ($dv?->payee ?? '');
                         $amount   = (float) ($dv?->totalSum ?? 0);
                         $days     = (int) ($step->days_overdue ?? 0);
                         $bucket   = $this->bucketFor($days);
+                        $account  = $this->accountFor($step);
+                        $fund     = $this->fundFor($step);
+                        $granted  = $dv?->cheque_number_added_at ?? $dv?->created_at;
                     @endphp
                     <tr>
                         <td class="center">{{ $i + 1 }}</td>
-                        <td>{{ $owner?->name ?? '—' }}</td>
-                        <td>{{ $position }}</td>
-                        <td>{{ $office }}</td>
-                        <td>{{ $purpose }}</td>
-                        <td class="center">
-                            {{ $dv?->created_at ? \Carbon\Carbon::parse($dv->created_at)->format('M d, Y') : '' }}
-                        </td>
+                        <td>{{ $owner?->name ?? ($dv?->payee ?? '—') }}</td>
+                        <td class="center">{{ $granted ? \Carbon\Carbon::parse($granted)->format('M d, Y') : '' }}</td>
                         <td class="center">{{ $dv?->cheque_number ?? '' }}</td>
+                        <td>{{ $account['code'] }}<br><span class="muted">{{ $account['name'] }}</span></td>
+                        <td>{{ $purpose }}</td>
                         <td class="num">{{ number_format($amount, 2) }}</td>
+                        <td class="center">{{ $fund }}</td>
                         <td class="num">{{ $days }}</td>
                         <td class="num">{{ $bucket === '30'     ? number_format($amount, 2) : '' }}</td>
                         <td class="num">{{ $bucket === '31-90'  ? number_format($amount, 2) : '' }}</td>
                         <td class="num">{{ $bucket === '91-365' ? number_format($amount, 2) : '' }}</td>
                         <td class="num">{{ $bucket === '1-2y'   ? number_format($amount, 2) : '' }}</td>
-                        <td class="num">{{ $bucket === '2y+'    ? number_format($amount, 2) : '' }}</td>
+                        <td class="num">{{ $bucket === '2-3y'   ? number_format($amount, 2) : '' }}</td>
+                        <td class="num">{{ $bucket === '3y+'    ? number_format($amount, 2) : '' }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="14" class="center muted" style="padding:14px;">
+                        <td colspan="15" class="center muted" style="padding:14px;">
                             No unliquidated cash advances as of {{ $asOfDisplay }}.
                         </td>
                     </tr>
@@ -246,14 +254,16 @@
             @if ($rows->count())
                 <tfoot>
                     <tr>
-                        <td colspan="7" class="center">GRAND TOTAL</td>
+                        <td colspan="6" class="center">GRAND TOTAL</td>
                         <td class="num">{{ number_format($grandTotal, 2) }}</td>
+                        <td></td>
                         <td></td>
                         <td class="num">{{ number_format($bucketTotals['30']     ?? 0, 2) }}</td>
                         <td class="num">{{ number_format($bucketTotals['31-90']  ?? 0, 2) }}</td>
                         <td class="num">{{ number_format($bucketTotals['91-365'] ?? 0, 2) }}</td>
                         <td class="num">{{ number_format($bucketTotals['1-2y']   ?? 0, 2) }}</td>
-                        <td class="num">{{ number_format($bucketTotals['2y+']    ?? 0, 2) }}</td>
+                        <td class="num">{{ number_format($bucketTotals['2-3y']   ?? 0, 2) }}</td>
+                        <td class="num">{{ number_format($bucketTotals['3y+']    ?? 0, 2) }}</td>
                     </tr>
                 </tfoot>
             @endif
