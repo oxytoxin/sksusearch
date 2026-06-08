@@ -15,7 +15,11 @@ class FundClusterSeeder extends Seeder
      */
     public function run()
     {
-        FundCluster::create([
+        FundCluster::firstOrCreate([
+            'name' => '101',
+        ]);
+
+        FundCluster::firstOrCreate([
             'name' => '161',
         ]);
 
