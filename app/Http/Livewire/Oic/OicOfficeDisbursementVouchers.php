@@ -18,6 +18,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
+use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 
 class OicOfficeDisbursementVouchers extends Component implements HasTable
@@ -129,6 +130,22 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                     );
                 }
                 // ========== SMS NOTIFICATION END ==========
+
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    if ($requestedBy) {
+                        NotificationController::sendGeneralNotification(
+                            'disbursement_voucher_returned',
+                            'DV Returned',
+                            $message,
+                            $requestedBy,
+                            route('disbursement-vouchers.show', $record->id)
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
 
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })

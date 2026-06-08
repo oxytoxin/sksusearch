@@ -19,6 +19,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Livewire\Component;
+use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 
 class PettyCashVouchersCreate extends Component implements HasForms
@@ -141,6 +142,22 @@ class PettyCashVouchersCreate extends Component implements HasForms
         // ========== SMS NOTIFICATION END ==========
 
         DB::commit();
+
+        // ========== REALTIME NOTIFICATION ==========
+        try {
+            if ($requisitioner) {
+                NotificationController::sendGeneralNotification(
+                    'petty_cash_voucher_issued',
+                    'Petty Cash Issued',
+                    $message,
+                    $requisitioner
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::error('Realtime notification failed: ' . $e->getMessage());
+        }
+        // ========== REALTIME NOTIFICATION END ==========
+
         Notification::make()->title('Petty Cash Voucher request created.')->success()->send();
         redirect()->route('pcv.index');
     }
