@@ -22,6 +22,7 @@
     use App\Models\DisbursementVoucher;
     use App\Models\EmployeeInformation;
     use Filament\Forms\Components\Card;
+    use Filament\Forms\Components\FileUpload;
     use Filament\Forms\Components\Grid;
     use Filament\Forms\Components\Radio;
     use App\Models\InternetAccountNumber;
@@ -53,6 +54,8 @@
         use InteractsWithForms;
 
         #region Variables
+        public $attachment = [];
+
         public $other_expenses = [];
 
         public $total_expense;
@@ -785,6 +788,25 @@
                         ]),
                     #endregion
 
+                    #region Supporting Documents
+                    Step::make('Supporting Documents')
+                        ->description('Optionally attach supporting documents (not required).')
+                        ->schema([
+                            Card::make()
+                                ->schema([
+                                    FileUpload::make('attachment')
+                                        ->label('Attachments')
+                                        ->helperText('Optional. PDF, JPG, or PNG up to 10MB each.')
+                                        ->multiple()
+                                        ->enableOpen()
+                                        ->enableReordering()
+                                        ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                                        ->maxSize(10240) // KB = 10MB
+                                        ->columnSpan('full'),
+                                ]),
+                        ]),
+                    #endregion
+
                     #region Signatory
                     Step::make('DV Signatory')
                         ->description('Select the appropriate signatory for the disbursement voucher.')
@@ -910,6 +932,19 @@
                     'mfo_pap' => $particulars['mfo_pap'],
                     'amount' => $particulars['amount'],
                 ]);
+            }
+
+            // Optional supporting documents uploaded during DV creation
+            if (filled($this->attachment)) {
+                foreach ($this->attachment as $document) {
+                    $dv->scanned_documents()->create([
+                        'path' => $document->storeAs(
+                            'scanned_documents',
+                            now()->format('HismdY-').$document->getClientOriginalName()
+                        ),
+                        'document_name' => $document->getClientOriginalName(),
+                    ]);
+                }
             }
             if (in_array($this->voucher_subtype->id, [6, 7])) {
                 TravelCompletedCertificate::create([
