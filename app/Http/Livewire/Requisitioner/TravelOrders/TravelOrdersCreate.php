@@ -58,7 +58,8 @@
                             ->options(EmployeeInformation::whereNot('user_id', auth()->id())->pluck('full_name', 'user_id')),
                         TextInput::make('heading')->required(),
                         TextInput::make('designation')->required(),
-                    ]),
+                    ])
+                    ->minItems(1),
                 Textarea::make('purpose')
                     ->required(),
                 Grid::make(2)->schema([
