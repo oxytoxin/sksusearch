@@ -188,7 +188,10 @@ class CashAdvanceAging extends Component
                     ->orWhere('tracking_number', 'like', $needle)
                     ->orWhere('payee', 'like', $needle)
                     ->orWhere('cheque_number', 'like', $needle)
-                    ->orWhereHas('user', fn ($u) => $u->where('name', 'like', $needle))
+                    ->orWhereHas(
+                        'user.employee_information',
+                        fn ($e) => $e->where('full_name', 'like', $needle),
+                    )
                     ->orWhereHas(
                         'user.employee_information.office',
                         fn ($o) => $o->where('name', 'like', $needle),
