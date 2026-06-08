@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Signatory\TravelOrders;
 
+use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 use App\Models\Itinerary;
 use App\Models\TravelOrder;
@@ -75,6 +76,23 @@ class TravelOrdersToSignView extends Component
                 }
             }
             // ========== SMS NOTIFICATION END ==========
+
+            // ========== REALTIME NOTIFICATION ==========
+            try {
+                foreach ($applicants as $applicant) {
+                    NotificationController::sendGeneralNotification(
+                        'travel_order_type_converted',
+                        'Travel Order Type Converted',
+                        $message,
+                        $applicant,
+                        route('requisitioner.travel-orders.show', $this->travel_order),
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Realtime notification failed: ' . $e->getMessage());
+            }
+            // ========== REALTIME NOTIFICATION END ==========
         } else {
             // dd($this->travel_order->travel_order_type_id, TravelOrderType::OFFICIAL_BUSINESS, 'OFFICIAL_BUSINESS');
             $this->travel_order->update([
@@ -99,6 +117,23 @@ class TravelOrdersToSignView extends Component
                 }
             }
             // ========== SMS NOTIFICATION END ==========
+
+            // ========== REALTIME NOTIFICATION ==========
+            try {
+                foreach ($applicants as $applicant) {
+                    NotificationController::sendGeneralNotification(
+                        'travel_order_type_converted',
+                        'Travel Order Type Converted',
+                        $message,
+                        $applicant,
+                        route('requisitioner.travel-orders.show', $this->travel_order),
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Realtime notification failed: ' . $e->getMessage());
+            }
+            // ========== REALTIME NOTIFICATION END ==========
         }
 
         $this->travel_order->refresh();
@@ -126,6 +161,21 @@ class TravelOrdersToSignView extends Component
         $this->travel_order->refresh();
         DB::commit();
 
+        // ========== REALTIME NOTIFICATION ==========
+        try {
+            $officerName = auth()->user()->employee_information->full_name ?? auth()->user()->name;
+            NotificationController::sendGeneralNotification(
+                'travel_order_applicant_removed',
+                'Removed from Travel Order',
+                "You have been removed from travel order ref. no. {$this->travel_order->tracking_code} by {$officerName}.",
+                $user,
+                route('requisitioner.travel-orders.show', $this->travel_order)
+            );
+        } catch (\Exception $e) {
+            \Log::error('Realtime notification failed: ' . $e->getMessage());
+        }
+        // ========== REALTIME NOTIFICATION END ==========
+
         $this->dialog()->success(
             $title = 'Applicant removed',
             $description = 'The applicant has been removed from the travel order.',
@@ -140,6 +190,22 @@ class TravelOrdersToSignView extends Component
         $this->travel_order->sidenotes()->create(['content' => "Restored applicant {$user->employee_information->full_name} to travel order.", 'user_id' => auth()->id()]);
         $this->travel_order->refresh();
         DB::commit();
+
+        // ========== REALTIME NOTIFICATION ==========
+        try {
+            $officerName = auth()->user()->employee_information->full_name ?? auth()->user()->name;
+            NotificationController::sendGeneralNotification(
+                'travel_order_applicant_restored',
+                'Re-added to Travel Order',
+                "You have been re-added to travel order ref. no. {$this->travel_order->tracking_code} by {$officerName}.",
+                $user,
+                route('requisitioner.travel-orders.show', $this->travel_order)
+            );
+        } catch (\Exception $e) {
+            \Log::error('Realtime notification failed: ' . $e->getMessage());
+        }
+        // ========== REALTIME NOTIFICATION END ==========
+
         $this->dialog()->success(
             $title = 'Applicant restored',
             $description = 'The applicant has been restored from the travel order.',
@@ -219,6 +285,23 @@ class TravelOrdersToSignView extends Component
                 }
             }
             // ========== SMS NOTIFICATION END ==========
+
+            // ========== REALTIME NOTIFICATION ==========
+            try {
+                foreach ($applicants as $applicant) {
+                    NotificationController::sendGeneralNotification(
+                        'travel_order_approved',
+                        'Travel Order Approved',
+                        $message,
+                        $applicant,
+                        route('requisitioner.travel-orders.show', $this->travel_order),
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Realtime notification failed: ' . $e->getMessage());
+            }
+            // ========== REALTIME NOTIFICATION END ==========
         }
 
         $this->dialog()->success(
@@ -277,6 +360,23 @@ class TravelOrdersToSignView extends Component
             }
         }
         // ========== SMS NOTIFICATION END ==========
+
+        // ========== REALTIME NOTIFICATION ==========
+        try {
+            foreach ($applicants as $applicant) {
+                NotificationController::sendGeneralNotification(
+                    'travel_order_rejected',
+                    'Travel Order Rejected',
+                    $message,
+                    $applicant,
+                    route('requisitioner.travel-orders.show', $this->travel_order),
+                    $this->from_oic ? $this->oic_signatory : auth()->id()
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::error('Realtime notification failed: ' . $e->getMessage());
+        }
+        // ========== REALTIME NOTIFICATION END ==========
 
         if (! $rejectedDueToConversion) {
             $this->dialog()->success(

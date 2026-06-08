@@ -21,6 +21,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
+use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 
 class DisbursementVouchersIndex extends Component implements HasTable
@@ -135,6 +136,22 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 }
                 // ========== SMS NOTIFICATION END ==========
 
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    if ($requestedBy) {
+                        NotificationController::sendGeneralNotification(
+                            'disbursement_voucher_forwarded',
+                            'DV Forwarded',
+                            $message,
+                            $requestedBy,
+                            route('disbursement-vouchers.show', $record->id)
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
+
                 Notification::make()->title('Document Forwarded')->success()->send();
             })
                 ->form(function () {
@@ -206,6 +223,22 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 }
                 // ========== SMS NOTIFICATION END ==========
 
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    if ($requestedBy) {
+                        NotificationController::sendGeneralNotification(
+                            'disbursement_voucher_returned',
+                            'DV Returned',
+                            $message,
+                            $requestedBy,
+                            route('disbursement-vouchers.show', $record->id)
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
+
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
@@ -238,6 +271,24 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     'description' => 'Cancellation approved.',
                 ]);
                 DB::commit();
+
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    $requestedBy = $record->user;
+                    if ($requestedBy) {
+                        NotificationController::sendGeneralNotification(
+                            'disbursement_voucher_cancellation_approved',
+                            'DV Cancellation Approved',
+                            "Your request to cancel DV with ref. no. {$record->tracking_number} has been approved.",
+                            $requestedBy,
+                            route('disbursement-vouchers.show', $record->id)
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
+
                 Notification::make()->title('Disbursement voucher approved for cancellation.')->success()->send();
                 return;
             })

@@ -45,6 +45,7 @@
     use Filament\Forms\Components\Wizard\Step;
     use Filament\Forms\Components\Builder\Block;
     use Filament\Forms\Concerns\InteractsWithForms;
+    use App\Http\Controllers\NotificationController;
     use App\Jobs\SendSmsJob;
 
     class DisbursementVouchersCreate extends Component implements HasForms
@@ -943,6 +944,23 @@
             // ========== SMS NOTIFICATION END ==========
 
             DB::commit();
+
+            // ========== REALTIME NOTIFICATION ==========
+            try {
+                if ($signatory) {
+                    NotificationController::sendGeneralNotification(
+                        'disbursement_voucher_submitted',
+                        'DV for Approval',
+                        $message,
+                        $signatory,
+                        route('signatory.disbursement-vouchers.index')
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Realtime notification failed: ' . $e->getMessage());
+            }
+            // ========== REALTIME NOTIFICATION END ==========
+
             Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
 
             return redirect()->route('requisitioner.disbursement-vouchers.index');

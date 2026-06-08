@@ -632,6 +632,34 @@ class CashAdvanceReminders extends Component implements HasTable
                         // Don't throw - allow the main endorsement action to complete successfully
                     }
                     // ========== SMS NOTIFICATION END ==========
+
+                    // ========== REALTIME NOTIFICATION (PAYEE) ==========
+                    try {
+                        $payee = $record->disbursement_voucher->user ?? null;
+                        if ($payee) {
+                            $amount = $record->disbursement_voucher->total_sum ? number_format($record->disbursement_voucher->total_sum, 2) : '0.00';
+                            $checkNumber = $record->disbursement_voucher->cheque_number ?? 'N/A';
+                            $fmrNumber = $record->fmr_number ?? 'N/A';
+                            $fmdNumber = $record->fmd_number ?? 'N/A';
+                            $memorandumNumber = $record->memorandum_number ?? 'N/A';
+                            $payeeMessage = "Your unliquidated cash advance disbursed via check/ADA number {$checkNumber} amounting to ₱{$amount} has been endorsed to the Resident Auditor. The cash advance remains unliquidated despite service of notices in the form of FMR No. {$fmrNumber}, FMD No. {$fmdNumber}, and Memorandum No. {$memorandumNumber}.";
+
+                            NotificationController::sendCASystemReminder(
+                                'ENDORSEMENT',
+                                'Cash Advance Endorsed to Resident Auditor',
+                                $payeeMessage,
+                                $this->president,
+                                $payee->name,
+                                $this->president->id,
+                                $payee,
+                                route('print.endorsement-for-fd', $record->disbursement_voucher),
+                                $record->disbursement_voucher
+                            );
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Realtime notification failed for endorsement payee: '.$e->getMessage());
+                    }
+                    // ========== REALTIME NOTIFICATION END ==========
                 })->requiresConfirmation()->visible(fn ($record) => $record->step == 5 && $record->is_sent == 0),
             Action::make('uploadFD')
                 ->label('Upload FD')

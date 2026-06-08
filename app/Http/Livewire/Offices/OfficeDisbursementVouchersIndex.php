@@ -22,6 +22,7 @@ use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 
 class OfficeDisbursementVouchersIndex extends Component implements HasTable
@@ -206,6 +207,22 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 }
                 // ========== SMS NOTIFICATION END ==========
 
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    if ($requestedBy) {
+                        NotificationController::sendGeneralNotification(
+                            'disbursement_voucher_returned',
+                            'DV Returned',
+                            $message,
+                            $requestedBy,
+                            route('disbursement-vouchers.show', $record->id)
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
+
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
                 ->color('danger')
@@ -234,6 +251,24 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                     'description' => 'Cancellation approved by ' . auth()->user()->employee_information->full_name,
                 ]);
                 DB::commit();
+
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    $requestedBy = $record->user;
+                    if ($requestedBy) {
+                        NotificationController::sendGeneralNotification(
+                            'disbursement_voucher_cancellation_approved',
+                            'DV Cancellation Approved',
+                            "Your request to cancel DV with ref. no. {$record->tracking_number} has been approved.",
+                            $requestedBy,
+                            route('disbursement-vouchers.show', $record->id)
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
+
                 Notification::make()->title('Disbursement voucher approved for cancellation.')->success()->send();
                 return;
             })

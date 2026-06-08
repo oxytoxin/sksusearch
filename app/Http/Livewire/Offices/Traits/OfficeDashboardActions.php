@@ -336,6 +336,22 @@
                         }
                         // ========== SMS NOTIFICATION END ==========
 
+                        // ========== REALTIME NOTIFICATION ==========
+                        try {
+                            if ($requestedBy) {
+                                NotificationController::sendGeneralNotification(
+                                    'disbursement_voucher_returned',
+                                    'DV Returned',
+                                    $message,
+                                    $requestedBy,
+                                    route('disbursement-vouchers.show', $record->id)
+                                );
+                            }
+                        } catch (\Exception $e) {
+                            \Log::error('Realtime notification failed: ' . $e->getMessage());
+                        }
+                        // ========== REALTIME NOTIFICATION END ==========
+
                         Notification::make()->title('Disbursement Voucher returned.')->success()->send();
                     })
                     ->visible(function ($record) {
@@ -668,6 +684,22 @@
                             );
                         }
                         // ========== SMS NOTIFICATION END ==========
+
+                        // ========== REALTIME NOTIFICATION ==========
+                        try {
+                            if ($requestedBy) {
+                                NotificationController::sendGeneralNotification(
+                                    'disbursement_voucher_forwarded',
+                                    'DV Forwarded',
+                                    $message,
+                                    $requestedBy,
+                                    route('disbursement-vouchers.show', $record->id)
+                                );
+                            }
+                        } catch (\Exception $e) {
+                            \Log::error('Realtime notification failed: ' . $e->getMessage());
+                        }
+                        // ========== REALTIME NOTIFICATION END ==========
 
                         DB::commit();
                         $this->emit('refresh');
