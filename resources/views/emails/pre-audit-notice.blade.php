@@ -113,11 +113,13 @@
                                 {{ $isForCompliance ? 'For Compliance' : 'Verified / Compliant' }}
                             </p>
 
-                            {{-- General comments --}}
-                            <h2 style="font-size:14px; color:#111827; margin:24px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">General Comments</h2>
-                            <div style="font-size:14px; line-height:1.6; color:#374151;">
-                                {!! filled($generalRemarks) ? $generalRemarks : '<span style="color:#6b7280;">No remarks.</span>' !!}
-                            </div>
+                            {{-- General comments (hidden entirely when empty) --}}
+                            @if (filled($generalRemarks))
+                                <h2 style="font-size:14px; color:#111827; margin:24px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">General Comments</h2>
+                                <div style="font-size:14px; line-height:1.6; color:#374151;">
+                                    {!! $generalRemarks !!}
+                                </div>
+                            @endif
 
                             {{-- Important notice --}}
                             @if ($isForCompliance)
