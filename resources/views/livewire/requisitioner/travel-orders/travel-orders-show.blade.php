@@ -22,9 +22,8 @@
             </div>
             <hr class="border my-2 border-black">
             <div class="flex flex-col items-center gap-2">
-                <p class="text-3xl font-semibold" style="font-family: 'Script MT Bold';">Office of the President</p>
                 <div class="flex flex-col items-center gap-2">
-                    <p class="font-semibold text-xl">Travel Order</p>
+                    <p class="font-semibold mt-2 text-xl">Travel Order</p>
                     <div class="flex gap-2">
                         <p>No. </p>
                         <p class="min-w-[4rem] text-center border-b border-black">{{ $travel_order->tracking_code }}</p>
@@ -161,8 +160,7 @@
                             <div class="px-16 relative">
                                 @if ($signatory->pivot->is_approved == 1)
                                     <x-signature-block :signature="$signatory->signature?->content" width="12rem"
-                                                       maxHeight="6rem" bottom="100%"
-                                                       translateY="1.5rem"/>
+                                                       maxHeight="6rem" bottom="100%"/>
                                 @endif
                                 <p class="min-w-[4rem] text-sm text-center border-b border-black">
                                     {{ $signatory->employee_information->full_name }}</p>
