@@ -360,6 +360,47 @@
                         }
                         return $record->current_step_id == 6000 && $record->for_cancellation == false;
                     }),
+
+                Action::make('revertIcuVerification')
+                    ->label('Revert Verification')
+                    ->button()
+                    ->color('warning')
+                    ->icon('ri-refresh-line')
+                    ->modalHeading('Revert Document Verification')
+                    ->modalSubheading('This undoes the verification so the documents can be re-checked. The DV stays in ICU and is NOT sent back to another office.')
+                    ->requiresConfirmation()
+                    ->form(fn () => [
+                        RichEditor::make('remarks')
+                            ->label('Reason for reverting')
+                            ->required(),
+                    ])
+                    ->action(function ($record, $data) {
+                        $record->refresh();
+                        DB::beginTransaction();
+                        $record->update([
+                            'log_number' => null,
+                            'documents_verified_at' => null,
+                            'related_documents' => null,
+                        ]);
+                        $description = 'Document verification reverted by ICU.';
+                        if ($this->isOic()) {
+                            $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
+                        }
+                        $record->activity_logs()->create([
+                            'description' => $description,
+                            'remarks' => $data['remarks'] ?? null,
+                        ]);
+                        DB::commit();
+                        Notification::make()->title('Verification reverted. You can now re-verify the documents.')->success()->send();
+                    })
+                    ->visible(function ($record) {
+                        if (!$record) {
+                            return false;
+                        }
+                        return $record->current_step_id == 6000
+                            && $record->for_cancellation == false
+                            && filled($record->related_documents);
+                    }),
             ];
         }
 
