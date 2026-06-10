@@ -169,7 +169,7 @@
                             <br>
                             <span class="text-xs font-extrabold capitalize print:text-12">
                                 {{ $itinerary->user->employee_information->position?->description }},
-                                {{ $itinerary->user->employee_information->office->name }}
+                                {{ $itinerary->user->employee_information->office?->name }}
                             </span>
                         </div>
                     </div>
