@@ -21,11 +21,16 @@
 
         protected function getTableQuery()
         {
-            $office_final_step_id = auth()->user()->employee_information->office->office_group->disbursement_voucher_final_step->id;
-            if ($office_final_step_id == 20000) {
-                $office_final_step_id = 6000;
-            }
-            return DisbursementVoucher::whereForCancellation(false)->where('current_step_id', '>', $office_final_step_id)->latest('submitted_at');
+            $officeGroupId = auth()->user()->employee_information->office->office_group_id;
+            $officeStepIds = \App\Models\DisbursementVoucherStep::where('office_group_id', $officeGroupId)
+                ->whereEnabled(true)
+                ->pluck('id')
+                ->toArray();
+
+            return DisbursementVoucher::whereForCancellation(false)
+                ->whereNotIn('current_step_id', $officeStepIds)
+                ->where('current_step_id', '>', min($officeStepIds))
+                ->latest('submitted_at');
         }
 
 
@@ -55,12 +60,19 @@
         protected function getTableColumns()
         {
             return [
-                TextColumn::make('tracking_number'),
+                TextColumn::make('tracking_number')->searchable(),
                 TextColumn::make('user.employee_information.full_name')
+                    ->searchable()
+                    ->wrap()
                     ->label('Requisitioner'),
                 TextColumn::make('payee')
+                    ->searchable()
+                    ->wrap()
                     ->label('Payee'),
-                TextColumn::make('submitted_at')->label('Created by Requisitioner at')->dateTime('F d, Y'),
+                TextColumn::make('current_step.process')
+                    ->label('Status')
+                    ->formatStateUsing(fn ($record) => $record->current_step->process . ' ' . $record->current_step->recipient),
+                TextColumn::make('submitted_at')->label('Submitted at')->dateTime('F d, Y'),
                 TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php', true),
             ];
         }

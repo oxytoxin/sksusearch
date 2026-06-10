@@ -116,12 +116,10 @@
         {
             return [
                 TextColumn::make('tracking_number')->searchable(),
-                TextColumn::make('voucher_subtype.voucher_type.name')->limit(20)->tooltip(fn($record) => $record->voucher_subtype?->voucher_type?->name)->label('Voucher Type'),
-                TextColumn::make('user.employee_information.full_name')->label('Requisitioner'),
-                TextColumn::make('payee')
-                    ->limit(10)
-                    ->tooltip(fn($record) => $record->payee)
-                    ->label('Payee'),
+                TextColumn::make('voucher_subtype.voucher_type.name')->wrap()->label('Voucher Type'),
+                TextColumn::make('voucher_subtype.name')->wrap()->label('Voucher Sub Type'),
+                TextColumn::make('user.employee_information.full_name')->searchable()->wrap()->label('Requisitioner'),
+                TextColumn::make('payee')->searchable()->wrap()->label('Payee'),
                 TextColumn::make('submitted_at')->dateTime('F d, Y'),
                 TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php', true),
             ];
