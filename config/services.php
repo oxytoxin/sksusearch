@@ -64,4 +64,17 @@ return [
         'auth_token' => env('TWILIO_AUTH_TOKEN'),
         'from_number' => env('TWILIO_FROM_NUMBER'),
     ],
+
+    'email' => [
+        // Write every send attempt to the email_logs table
+        'log_enabled' => env('EMAIL_LOG_ENABLED', true),
+
+        // Optional per-recipient rate limiting (off by default)
+        'rate_limit_enabled' => env('EMAIL_RATE_LIMIT_ENABLED', false),
+        'rate_limit_per_hour' => env('EMAIL_RATE_LIMIT_PER_HOUR', 20),
+
+        // Max size (MB) for a single attachment; larger files are skipped + logged.
+        // (Send a download link instead for big files.)
+        'max_attachment_mb' => env('EMAIL_MAX_ATTACHMENT_MB', 10),
+    ],
 ];
