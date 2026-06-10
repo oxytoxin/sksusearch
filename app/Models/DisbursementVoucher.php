@@ -88,6 +88,11 @@
             return $this->belongsTo(DisbursementVoucherStep::class, 'previous_step_id');
         }
 
+        public function pending_return_step()
+        {
+            return $this->belongsTo(DisbursementVoucherStep::class, 'pending_return_step_id');
+        }
+
         public function disbursement_voucher_particulars()
         {
             return $this->hasMany(DisbursementVoucherParticular::class);
@@ -101,6 +106,11 @@
         public function activity_logs()
         {
             return $this->morphMany(ActivityLog::class, 'loggable');
+        }
+
+        public function dv_adjustments()
+        {
+            return $this->hasMany(DvAdjustment::class);
         }
 
         public function scanned_documents()

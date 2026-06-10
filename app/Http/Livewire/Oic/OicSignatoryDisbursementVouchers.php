@@ -130,18 +130,12 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
-                if ($record->current_step_id < $record->previous_step_id) {
-                    $previous_step_id = $record->previous_step_id;
-                } else {
-                    $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('recipient', $record->current_step->recipient)->first()->id;
-                }
+                $destinationStep = DisbursementVoucherStep::find($data['return_step_id']);
                 $record->update([
-                    'current_step_id' => $data['return_step_id'],
-                    'previous_step_id' => $previous_step_id,
+                    'pending_return_step_id' => $data['return_step_id'],
                 ]);
-                $record->refresh();
                 $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient . ' by OIC:' . auth()->user()->employee_information->full_name,
+                    'description' => 'DV marked for return to ' . ($destinationStep->recipient ?? 'Unknown') . ' by OIC:' . auth()->user()->employee_information->full_name . '. Awaiting physical release.',
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
@@ -151,14 +145,9 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 $trackingNumber = $record->tracking_number;
                 $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
                 $remarks = $data['remarks'] ?? 'No remarks provided';
-
-                // Strip HTML tags and decode HTML entities from remarks
                 $remarks = strip_tags($remarks);
                 $remarks = html_entity_decode($remarks, ENT_QUOTES, 'UTF-8');
-
                 $message = "Your DV with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
-
-                // Send to the user who requested the disbursement voucher
                 $requestedBy = $record->user;
                 if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
                     SendSmsJob::dispatch(
@@ -171,23 +160,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 }
                 // ========== SMS NOTIFICATION END ==========
 
-                // ========== REALTIME NOTIFICATION ==========
-                try {
-                    if ($requestedBy) {
-                        NotificationController::sendGeneralNotification(
-                            'disbursement_voucher_returned',
-                            'DV Returned',
-                            $message,
-                            $requestedBy,
-                            route('disbursement-vouchers.show', $record->id)
-                        );
-                    }
-                } catch (\Exception $e) {
-                    \Log::error('Realtime notification failed: ' . $e->getMessage());
-                }
-                // ========== REALTIME NOTIFICATION END ==========
-
-                Notification::make()->title('Disbursement Voucher returned.')->success()->send();
+                Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
             })
                 ->color('danger')
                 ->visible(function ($record) {
@@ -195,7 +168,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000 && $record->for_cancellation == false;
+                    return $record->current_step_id == 4000 && $record->for_cancellation == false && blank($record->pending_return_step_id);
                 })
                 ->form(function () {
                     return [
@@ -210,6 +183,7 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
+            ...$this->releaseAction(),
             Action::make('Cancel')->action(function ($record) {
                 DB::beginTransaction();
                 $record->update([
@@ -219,24 +193,6 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                     'description' => 'Cancellation approved by OIC:' . auth()->user()->employee_information->full_name,
                 ]);
                 DB::commit();
-
-                // ========== REALTIME NOTIFICATION ==========
-                try {
-                    $requestedBy = $record->user;
-                    if ($requestedBy) {
-                        NotificationController::sendGeneralNotification(
-                            'disbursement_voucher_cancellation_approved',
-                            'DV Cancellation Approved',
-                            "Your request to cancel DV with ref. no. {$record->tracking_number} has been approved.",
-                            $requestedBy,
-                            route('disbursement-vouchers.show', $record->id)
-                        );
-                    }
-                } catch (\Exception $e) {
-                    \Log::error('Realtime notification failed: ' . $e->getMessage());
-                }
-                // ========== REALTIME NOTIFICATION END ==========
-
                 Notification::make()->title('Disbursement voucher cancelled.')->success()->send();
             })
                 ->visible(function ($record) {

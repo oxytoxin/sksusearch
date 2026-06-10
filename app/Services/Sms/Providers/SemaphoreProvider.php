@@ -15,8 +15,8 @@ class SemaphoreProvider implements SmsProviderInterface
 
     public function __construct()
     {
-        $this->apiKey = config('services.semaphore.api_key', '');
-        $this->senderName = config('services.semaphore.sender_name', '');
+        $this->apiKey = (string) config('services.semaphore.api_key', '');
+        $this->senderName = (string) config('services.semaphore.sender_name', '');
     }
 
     public function send(string $number, string $message): array

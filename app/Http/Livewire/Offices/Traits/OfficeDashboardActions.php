@@ -27,7 +27,10 @@
     use Filament\Tables\Actions\ActionGroup;
     use Filament\Forms\Components\RichEditor;
     use App\Forms\Components\RelatedDocumentsChecklist;
+    use App\Models\DvAdjustment;
+    use Filament\Forms\Components\Repeater;
     use Carbon\Carbon;
+    use Illuminate\Support\Str;
     use App\Jobs\SendSmsJob;
 
     trait OfficeDashboardActions
@@ -130,6 +133,9 @@
                 Notification::make()->title('Selected document not found in office.')->warning()->send();
                 return;
             }
+            if (filled($record->pending_return_step_id)) {
+                return false;
+            }
             return ($record->current_step->process == 'Received in' && !in_array($record->current_step_id, [6000, 9000, 13000, 17000]))
                 || ($record->current_step_id == 9000 && filled($record->ors_burs) && filled($record->fund_cluster_id))
                 || ($record->current_step_id == 12000 && filled($record->journal_date) && filled($record->dv_number))
@@ -178,11 +184,20 @@
                         ->label('Preview')
                         ->openUrlInNewTab()
                         ->url(fn($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record]), true),
+                    ViewAction::make('adjustment_history')
+                        ->label('Adjustment History')
+                        ->icon('ri-history-line')
+                        ->modalHeading('DV Adjustment History')
+                        ->modalWidth('4xl')
+                        ->modalContent(fn($record) => view('components.disbursement_vouchers.dv-adjustment-history', [
+                            'adjustments' => $record->dv_adjustments()->with('adjusted_by_user.employee_information')->latest()->get(),
+                        ]))
+                        ->visible(fn($record) => $record->dv_adjustments()->exists()),
                 ])->icon('ri-eye-line'),
             ];
         }
 
-        private function icuActions()
+        private function icuVerifyAction()
         {
             return [
                 EditAction::make()
@@ -190,7 +205,8 @@
                     ->icon('ri-file-copy-2-line')
                     ->label('Verify Related Documents')
                     ->modalHeading('Verify Related Documents')
-                    ->modalWidth('4xl')
+                    ->modalButton('Verify Related Documents')
+                    ->modalWidth('7xl')
                     ->mountUsing(function ($form, $record) {
                         $documents = $record?->voucher_subtype?->related_documents_list?->documents ?? [];
                         $form->fill([
@@ -229,8 +245,12 @@
                         Notification::make()->title('Related documents have been verified.')->success()->send();
                     })
                     ->form([
-                        TextInput::make('log_number')
-                            ->required(),
+                        Placeholder::make('dv_details')
+                            ->label('')
+                            ->content(fn ($record) => view('components.disbursement_vouchers.dv-details-card', [
+                                'record' => $record,
+                            ])),
+                        TextInput::make('log_number'),
                         RelatedDocumentsChecklist::make('items')
                             ->label('Documentary Requirements')
                             ->documents(fn($record) => $record?->voucher_subtype?->related_documents_list?->documents ?? [])
@@ -262,9 +282,14 @@
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
                             return false;
                         }
-                        return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype?->related_documents_list && blank($record->related_documents);
+                        return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype?->related_documents_list && blank($record->related_documents) && blank($record->pending_return_step_id);
                     }),
+            ];
+        }
 
+        private function icuReturnAction()
+        {
+            return [
                 Action::make('returnFromIcu')
                     ->label('Return Document')
                     ->button()
@@ -294,17 +319,11 @@
                     })
                     ->action(function ($record, $data) {
                         DB::beginTransaction();
-                        if ($record->current_step_id < $record->previous_step_id) {
-                            $previous_step_id = $record->previous_step_id;
-                        } else {
-                            $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('id', '<', $record->current_step->id)->latest('id')->first()->id;
-                        }
+                        $destinationStep = DisbursementVoucherStep::find($data['return_step_id']);
                         $record->update([
-                            'current_step_id' => $data['return_step_id'],
-                            'previous_step_id' => $previous_step_id,
+                            'pending_return_step_id' => $data['return_step_id'],
                         ]);
-                        $record->refresh();
-                        $description = 'Disbursement Voucher returned to ' . $record->current_step->recipient . ' by ICU.';
+                        $description = 'DV marked for return to ' . ($destinationStep->recipient ?? 'Unknown') . ' by Accounting Office (Pre-Audit). Awaiting physical release.';
                         if ($this->isOic()) {
                             $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
                         }
@@ -336,30 +355,78 @@
                         }
                         // ========== SMS NOTIFICATION END ==========
 
-                        // ========== REALTIME NOTIFICATION ==========
-                        try {
-                            if ($requestedBy) {
-                                NotificationController::sendGeneralNotification(
-                                    'disbursement_voucher_returned',
-                                    'DV Returned',
-                                    $message,
-                                    $requestedBy,
-                                    route('disbursement-vouchers.show', $record->id)
-                                );
-                            }
-                        } catch (\Exception $e) {
-                            \Log::error('Realtime notification failed: ' . $e->getMessage());
-                        }
-                        // ========== REALTIME NOTIFICATION END ==========
-
-                        Notification::make()->title('Disbursement Voucher returned.')->success()->send();
+                        Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
                     })
                     ->visible(function ($record) {
                         if (!$record) {
                             return false;
                         }
-                        return $record->current_step_id == 6000 && $record->for_cancellation == false;
+                        return $record->current_step_id == 6000 && $record->for_cancellation == false && blank($record->pending_return_step_id);
                     }),
+            ];
+        }
+
+        private function releaseAction()
+        {
+            return [
+                Action::make('release')
+                    ->label('Release Document')
+                    ->button()
+                    ->color('success')
+                    ->icon('ri-hand-coin-line')
+                    ->modalHeading('Release Disbursement Voucher')
+                    ->modalButton('Confirm Release')
+                    ->requiresConfirmation()
+                    ->form([
+                        Placeholder::make('release_destination')
+                            ->label('Return Destination')
+                            ->content(fn ($record) => $record->pending_return_step?->recipient ?? 'Unknown'),
+                        TextInput::make('release_log_number')
+                            ->label('Log Number')
+                            ->required(),
+                        Textarea::make('release_note')
+                            ->label('Note (Optional)'),
+                    ])
+                    ->action(function ($record, $data) {
+                        DB::beginTransaction();
+
+                        $destinationStepId = $record->pending_return_step_id;
+
+                        if ($record->current_step_id < ($record->previous_step_id ?? 0)) {
+                            $previous_step_id = $record->previous_step_id;
+                        } else {
+                            $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')
+                                ->where('id', '<', $record->current_step_id)
+                                ->latest('id')
+                                ->first()
+                                ->id;
+                        }
+
+                        $record->update([
+                            'current_step_id' => $destinationStepId,
+                            'previous_step_id' => $previous_step_id,
+                            'pending_return_step_id' => null,
+                        ]);
+                        $record->refresh();
+
+                        $description = 'DV released to ' . $record->current_step->recipient . '. Log #: ' . $data['release_log_number'];
+                        if ($this->isOic()) {
+                            $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
+                        } else {
+                            $description .= ' by ' . auth()->user()->employee_information->full_name;
+                        }
+                        if (filled($data['release_note'])) {
+                            $description .= "\nNote: " . $data['release_note'];
+                        }
+
+                        $record->activity_logs()->create([
+                            'description' => $description,
+                        ]);
+
+                        DB::commit();
+                        Notification::make()->title('Document released successfully.')->success()->send();
+                    })
+                    ->visible(fn ($record) => $record && filled($record->pending_return_step_id)),
             ];
         }
 
@@ -456,7 +523,7 @@
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
                             return false;
                         }
-                        return $record->current_step_id == 17000 && blank($record->cheque_number) && $record->for_cancellation == false;
+                        return $record->current_step_id == 17000 && blank($record->cheque_number) && $record->for_cancellation == false && blank($record->pending_return_step_id);
                     })
                     ->form(function () {
                         return [
@@ -494,7 +561,7 @@
                     ])
                     ->button()
                     ->color('danger')
-                    ->visible(fn($record) => $record->cheque_number && $record->current_step_id == 18000 && !$record->for_cancellation),
+                    ->visible(fn($record) => $record->cheque_number && $record->current_step_id == 18000 && !$record->for_cancellation && blank($record->pending_return_step_id)),
             ];
         }
 
@@ -523,7 +590,7 @@
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
                             return false;
                         }
-                        return $record->current_step_id == 12000 && blank($record->journal_date) && blank($record->dv_number) && $record->for_cancellation == false;
+                        return $record->current_step_id == 12000 && blank($record->journal_date) && blank($record->dv_number) && $record->for_cancellation == false && blank($record->pending_return_step_id);
                     })
                     ->form(function () {
                         return [
@@ -565,7 +632,7 @@
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
                             return false;
                         }
-                        return $record->current_step_id == 9000 && (blank($record->ors_burs) || blank($record->fund_cluster_id)) && $record->for_cancellation == false;
+                        return $record->current_step_id == 9000 && (blank($record->ors_burs) || blank($record->fund_cluster_id)) && $record->for_cancellation == false && blank($record->pending_return_step_id);
                     })
                     ->form(function ($record) {
                         return [
@@ -630,7 +697,7 @@
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
                             return false;
                         }
-                        return $record->current_step->process == 'Forwarded to' && $record->for_cancellation == false;
+                        return $record->current_step->process == 'Forwarded to' && $record->for_cancellation == false && blank($record->pending_return_step_id);
                     })
                     ->requiresConfirmation(),
                 Action::make('Forward')->button()->action(function ($record, $data) {
@@ -685,22 +752,6 @@
                         }
                         // ========== SMS NOTIFICATION END ==========
 
-                        // ========== REALTIME NOTIFICATION ==========
-                        try {
-                            if ($requestedBy) {
-                                NotificationController::sendGeneralNotification(
-                                    'disbursement_voucher_forwarded',
-                                    'DV Forwarded',
-                                    $message,
-                                    $requestedBy,
-                                    route('disbursement-vouchers.show', $record->id)
-                                );
-                            }
-                        } catch (\Exception $e) {
-                            \Log::error('Realtime notification failed: ' . $e->getMessage());
-                        }
-                        // ========== REALTIME NOTIFICATION END ==========
-
                         DB::commit();
                         $this->emit('refresh');
                         Notification::make()->title('Document Forwarded')->success()->send();
@@ -718,6 +769,170 @@
                     ->modalWidth('4xl')
                     ->visible(fn($record) => $this->canBeForwarded($record) && $record->for_cancellation == false)
                     ->requiresConfirmation(),
+            ];
+        }
+
+        private function adjustmentActions()
+        {
+            $adjustableSteps = [6000, 8000, 9000, 11000, 12000, 13000, 20000];
+
+            return [
+                Action::make('amount_adjustment')
+                    ->label('Amount Adjustment')
+                    ->button()
+                    ->color('warning')
+                    ->icon('ri-edit-line')
+                    ->modalHeading('Amount Adjustment')
+                    ->modalButton('Save Adjustment')
+                    ->modalWidth('5xl')
+                    ->mountUsing(function ($form, $record) {
+                        $form->fill([
+                            'payee' => $record->payee,
+                            'particulars' => $record->disbursement_voucher_particulars->map(fn($p) => [
+                                'particular_id' => $p->id,
+                                'purpose' => $p->purpose,
+                                'amount' => $p->amount,
+                            ])->toArray(),
+                        ]);
+                    })
+                    ->action(function ($record, $data) {
+                        $record->refresh();
+                        DB::beginTransaction();
+
+                        $batchId = Str::uuid()->toString();
+                        $changes = [];
+
+                        // Check payee change
+                        if ($record->payee !== $data['payee']) {
+                            DvAdjustment::create([
+                                'disbursement_voucher_id' => $record->id,
+                                'field' => 'Payee',
+                                'old_value' => $record->payee,
+                                'new_value' => $data['payee'],
+                                'adjusted_by' => auth()->id(),
+                                'batch_id' => $batchId,
+                            ]);
+                            $record->update(['payee' => $data['payee']]);
+                            $changes[] = 'Payee';
+                        }
+
+                        // Process particulars
+                        $existingParticulars = $record->disbursement_voucher_particulars->keyBy('id');
+                        $submittedIds = collect($data['particulars'])->pluck('particular_id')->filter()->all();
+
+                        // Deleted particulars
+                        foreach ($existingParticulars as $id => $existing) {
+                            if (!in_array($id, $submittedIds)) {
+                                DvAdjustment::create([
+                                    'disbursement_voucher_id' => $record->id,
+                                    'field' => 'Particular removed',
+                                    'old_value' => $existing->purpose . ' — ₱' . number_format($existing->amount, 2),
+                                    'new_value' => null,
+                                    'adjusted_by' => auth()->id(),
+                                    'batch_id' => $batchId,
+                                ]);
+                                $existing->delete();
+                                $changes[] = 'Particular removed';
+                            }
+                        }
+
+                        foreach ($data['particulars'] as $item) {
+                            $particularId = $item['particular_id'] ?? null;
+
+                            if ($particularId && $existingParticulars->has($particularId)) {
+                                // Existing particular - check for changes
+                                $existing = $existingParticulars[$particularId];
+
+                                if ($existing->purpose !== $item['purpose']) {
+                                    DvAdjustment::create([
+                                        'disbursement_voucher_id' => $record->id,
+                                        'field' => 'Particular purpose',
+                                        'old_value' => $existing->purpose,
+                                        'new_value' => $item['purpose'],
+                                        'adjusted_by' => auth()->id(),
+                                        'batch_id' => $batchId,
+                                    ]);
+                                    $changes[] = 'Purpose';
+                                }
+
+                                if ((float) $existing->amount !== (float) $item['amount']) {
+                                    DvAdjustment::create([
+                                        'disbursement_voucher_id' => $record->id,
+                                        'field' => 'Particular amount',
+                                        'old_value' => '₱' . number_format($existing->amount, 2) . ' (' . $existing->purpose . ')',
+                                        'new_value' => '₱' . number_format($item['amount'], 2),
+                                        'adjusted_by' => auth()->id(),
+                                        'batch_id' => $batchId,
+                                    ]);
+                                    $changes[] = 'Amount';
+                                }
+
+                                $existing->update([
+                                    'purpose' => $item['purpose'],
+                                    'amount' => $item['amount'],
+                                ]);
+                            } else {
+                                // New particular
+                                $record->disbursement_voucher_particulars()->create([
+                                    'purpose' => $item['purpose'],
+                                    'amount' => $item['amount'],
+                                    'mfo_pap' => '',
+                                ]);
+                                DvAdjustment::create([
+                                    'disbursement_voucher_id' => $record->id,
+                                    'field' => 'Particular added',
+                                    'old_value' => null,
+                                    'new_value' => $item['purpose'] . ' — ₱' . number_format($item['amount'], 2),
+                                    'adjusted_by' => auth()->id(),
+                                    'batch_id' => $batchId,
+                                ]);
+                                $changes[] = 'Particular added';
+                            }
+                        }
+
+                        if (!empty($changes)) {
+                            $description = 'DV adjusted (' . implode(', ', array_unique($changes)) . ') by ';
+                            if ($this->isOic()) {
+                                $description .= 'OIC: ' . auth()->user()->employee_information->full_name . '.';
+                            } else {
+                                $description .= auth()->user()->employee_information->full_name;
+                            }
+                            $record->activity_logs()->create([
+                                'description' => $description,
+                            ]);
+                        }
+
+                        DB::commit();
+
+                        if (!empty($changes)) {
+                            Notification::make()->title('DV adjusted successfully.')->success()->send();
+                        } else {
+                            Notification::make()->title('No changes detected.')->warning()->send();
+                        }
+                    })
+                    ->form([
+                        TextInput::make('payee')
+                            ->label('Payee')
+                            ->required(),
+                        Repeater::make('particulars')
+                            ->label('Disbursement Voucher Particulars')
+                            ->schema([
+                                TextInput::make('particular_id')->hidden(),
+                                Textarea::make('purpose')
+                                    ->label('Purpose')
+                                    ->required(),
+                                TextInput::make('amount')
+                                    ->label('Amount')
+                                    ->numeric()
+                                    ->required(),
+                            ])
+                            ->minItems(1)
+                            ->defaultItems(1),
+                    ])
+                    ->visible(function ($record) use ($adjustableSteps) {
+                        if (!$record) return false;
+                        return in_array($record->current_step_id, $adjustableSteps) && !$record->for_cancellation && blank($record->pending_return_step_id);
+                    }),
             ];
         }
     }

@@ -45,7 +45,7 @@ class DisbursementVoucherStepSeeder extends Seeder
         DisbursementVoucherStep::create([
             'id' => 5000,
             'process' => 'Forwarded to',
-            'recipient' => 'ICU',
+            'recipient' => 'Accounting Office (Pre-Audit)',
             'sender' => 'by Signatory',
             'office_id' => 5,
             'return_step_id' => 5000,
@@ -54,8 +54,8 @@ class DisbursementVoucherStepSeeder extends Seeder
         DisbursementVoucherStep::create([
             'id' => 6000,
             'process' => 'Received in',
-            'recipient' => 'ICU',
-            'sender' => 'by ICU Staff (Pre-Audit)',
+            'recipient' => 'Accounting Office (Pre-Audit)',
+            'sender' => 'by Accounting Office Staff (Pre-Audit)',
             'office_id' => 5,
             'return_step_id' => 5000,
         ]);
@@ -64,7 +64,7 @@ class DisbursementVoucherStepSeeder extends Seeder
             'id' => 7000,
             'process' => 'Forwarded to',
             'recipient' => 'Budget Office',
-            'sender' => 'by ICU Staff',
+            'sender' => 'by Accounting Office Staff (Pre-Audit)',
             'office_id' => 2,
             'return_step_id' => 7000,
         ]);

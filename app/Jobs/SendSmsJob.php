@@ -90,6 +90,14 @@ class SendSmsJob implements ShouldQueue
         // Update attempt count
         $smsLog->increment('attempts');
 
+        if (!$smsService->isConfigured()) {
+            Log::info('SMS skipped: provider not configured', [
+                'number' => $this->number,
+            ]);
+            $smsLog->update(['status' => 'failed', 'error_message' => 'Provider not configured']);
+            return;
+        }
+
         $result = $smsService->sendSms(
             $this->number,
             $this->message
