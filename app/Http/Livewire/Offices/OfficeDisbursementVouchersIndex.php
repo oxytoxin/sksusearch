@@ -78,7 +78,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return DisbursementVoucher::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->latest();
+        return DisbursementVoucher::whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->oldest('current_step_id')->latest();
     }
 
     protected function getTableFilters(): array
@@ -88,6 +88,22 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 true => 'For Cancellation',
                 false => 'For Approval',
             ])->default(0)->label('Status'),
+            SelectFilter::make('phase')
+                ->options([
+                    'pre_audit' => 'For Pre-Audit',
+                    'verification' => 'For Verification',
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query->when($data['value'], function (Builder $query, string $value) {
+                        if ($value === 'pre_audit') {
+                            $query->whereIn('current_step_id', [5000, 6000]);
+                        } elseif ($value === 'verification') {
+                            $query->whereIn('current_step_id', [10000, 11000, 12000, 13000]);
+                        }
+                    });
+                })
+                ->label('Phase')
+                ->visible(fn () => auth()->user()->employee_information->office->office_group_id == 2),
             Filter::make('created_at')
                 ->form([
                     Grid::make(2)
@@ -149,7 +165,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             ...$this->budgetOfficeActions(),
             ...$this->accountingActions(),
             ...$this->cashierActions(),
-            ...$this->icuActions(),
+            ...$this->icuVerifyAction(),
             Action::make('certify')->button()->action(function ($record) {
                 DB::beginTransaction();
                 $record->update([
@@ -161,22 +177,19 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
-                ->visible(fn($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id)
+                ->visible(fn($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id && blank($record->pending_return_step_id))
                 ->requiresConfirmation(),
+            ...$this->adjustmentActions(),
+            ...$this->icuReturnAction(),
+            ...$this->releaseAction(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
-                if ($record->current_step_id < $record->previous_step_id) {
-                    $previous_step_id = $record->previous_step_id;
-                } else {
-                    $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('id', '<', $record->current_step->id)->latest('id')->first()->id;
-                }
+                $destinationStep = DisbursementVoucherStep::find($data['return_step_id']);
                 $record->update([
-                    'current_step_id' => $data['return_step_id'],
-                    'previous_step_id' => $previous_step_id,
+                    'pending_return_step_id' => $data['return_step_id'],
                 ]);
-                $record->refresh();
                 $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient,
+                    'description' => 'DV marked for return to ' . ($destinationStep->recipient ?? 'Unknown') . '. Awaiting physical release.',
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
@@ -206,10 +219,10 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 }
                 // ========== SMS NOTIFICATION END ==========
 
-                Notification::make()->title('Disbursement Voucher returned.')->success()->send();
+                Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
             })
                 ->color('danger')
-                ->visible(fn($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false && $record->current_step_id != 6000)
+                ->visible(fn($record) => $record->current_step->process != 'Forwarded to' && $record->for_cancellation == false && $record->current_step_id != 6000 && blank($record->pending_return_step_id))
                 ->form(function () {
                     return [
                         Select::make('return_step_id')
@@ -226,7 +239,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             Action::make('Cancel')->action(function ($record) {
                 DB::beginTransaction();
                 $process_ids = DisbursementVoucherStep::where('process', 'Received by')->orWhere('process', 'Received in')->pluck('id');
-                $next_step = $process_ids->last(fn($value) => $value < auth()->user()->employee_information->office->office_group->disbursement_voucher_starting_step->id);
+                $next_step = $process_ids->last(fn($value) => $value < $record->current_step->first_step_in_group->id);
                 $record->update([
                     'current_step_id' => $next_step,
                 ]);

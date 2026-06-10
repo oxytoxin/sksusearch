@@ -64,6 +64,14 @@ class SmsService
     }
 
     /**
+     * Check if the current provider is configured
+     */
+    public function isConfigured(): bool
+    {
+        return $this->provider->isConfigured();
+    }
+
+    /**
      * Send SMS via configured provider
      */
     public function sendSms(string $number, string $message): array
