@@ -800,6 +800,8 @@
                                         ->multiple()
                                         ->enableOpen()
                                         ->enableReordering()
+                                        ->disk(config('filesystems.default', 'local'))
+                                        ->directory('scanned_documents')
                                         ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                                         ->maxSize(10240) // KB = 10MB
                                         ->columnSpan('full'),
@@ -936,21 +938,11 @@
 
             // Optional supporting documents uploaded during DV creation
             if (filled($this->attachment)) {
-                foreach ($this->attachment as $document) {
-                    try {
-                        if (is_string($document)) {
-                            $document = new \Livewire\TemporaryUploadedFile($document, config('livewire.temporary_file_upload.disk', 'local'));
-                        }
+                foreach ($this->attachment as $storedPath) {
+                    if (filled($storedPath)) {
                         $dv->scanned_documents()->create([
-                            'path' => $document->storeAs(
-                                'scanned_documents',
-                                now()->format('HismdY-') . $document->getClientOriginalName()
-                            ),
-                            'document_name' => $document->getClientOriginalName(),
-                        ]);
-                    } catch (\Exception $e) {
-                        \Log::error('DV attachment upload failed: ' . $e->getMessage(), [
-                            'dv_id' => $dv->id,
+                            'path' => $storedPath,
+                            'document_name' => basename($storedPath),
                         ]);
                     }
                 }
