@@ -184,6 +184,14 @@
                         ->label('Preview')
                         ->openUrlInNewTab()
                         ->url(fn($record) => route('disbursement-vouchers.show', ['disbursement_voucher' => $record]), true),
+                    ViewAction::make('supporting_documents')
+                        ->label('Supporting Documents')
+                        ->icon('ri-attachment-line')
+                        ->modalHeading('Supporting Documents')
+                        ->modalContent(fn($record) => view('components.disbursement_vouchers.supporting-documents', [
+                            'documents' => $record->scanned_documents,
+                        ]))
+                        ->visible(fn($record) => $record->scanned_documents()->exists()),
                     ViewAction::make('adjustment_history')
                         ->label('Adjustment History')
                         ->icon('ri-history-line')
