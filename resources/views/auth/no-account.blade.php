@@ -11,9 +11,9 @@
                 </svg>
             </div>
 
-            <h2 class="text-xl font-bold text-gray-800">Account Not Found</h2>
+            <h2 class="text-xl font-bold text-white">Account Not Found</h2>
 
-            <p class="mt-3 text-sm text-gray-600">
+            <p class="mt-3 text-sm text-white">
                 The Google account you used is not registered in the SEARCH system.
                 Please contact your system administrator to have your account set up.
             </p>
