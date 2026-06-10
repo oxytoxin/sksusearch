@@ -15,6 +15,7 @@
     use App\Models\ItineraryEntry;
     use App\Models\TravelOrderType;
     use App\Models\LiquidationReport;
+    use App\Http\Controllers\NotificationController;
     use Illuminate\Support\HtmlString;
     use App\Forms\Components\Flatpickr;
     use App\Models\DisbursementVoucher;
@@ -441,6 +442,26 @@
             }
 
             DB::commit();
+
+            // ========== REALTIME NOTIFICATION ==========
+            // Notify the assigned signatory that a liquidation report awaits review.
+            try {
+                $signatory = $lr->signatory;
+                if ($signatory) {
+                    $makerName = auth()->user()->employee_information->full_name ?? 'A requisitioner';
+                    NotificationController::sendGeneralNotification(
+                        'liquidation_report_submitted',
+                        'Liquidation Report for Approval',
+                        "A liquidation report with ref. no. {$lr->tracking_number} has been submitted by {$makerName} for your approval.",
+                        $signatory,
+                        route('signatory.liquidation-reports.show', ['liquidation_report' => $lr])
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Realtime notification failed: ' . $e->getMessage());
+            }
+            // ========== REALTIME NOTIFICATION END ==========
+
             Notification::make()->title('Liquidation Report Submitted!')->success()->send();
             return redirect()->route('requisitioner.liquidation-reports.index');
         }

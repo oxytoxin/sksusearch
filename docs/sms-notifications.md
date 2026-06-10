@@ -3,7 +3,7 @@
 _Reference for the SEARCH system. Generated 2026-06-02._
 
 This document lists **every place the system sends an SMS**, what triggers it,
-who receives it, and the message sent. Use it as the basis for the SMS usage report.
+who receives it, and the message sent. Use it as the basis for the SMS usage report.    ` 
 
 ---
 

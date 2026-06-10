@@ -3,8 +3,10 @@
 namespace App\Http\Livewire\Oic;
 
 use App\Forms\Components\Flatpickr;
+use App\Http\Controllers\NotificationController;
 use App\Models\EmployeeInformation;
 use App\Models\OicUser;
+use App\Models\User;
 use Carbon\Carbon;
 use DB;
 use Filament\Forms\Components\Grid;
@@ -116,6 +118,27 @@ class OicAssign extends Component implements HasTable
             'valid_from' => $this->valid_from,
             'valid_to' => $this->valid_to,
         ]);
+
+        // ========== REALTIME NOTIFICATION ==========
+        // Notify the designated OIC that they now hold acting authority.
+        try {
+            $oic = User::find($this->oic_id);
+            if ($oic) {
+                $assignerName = auth()->user()->employee_information->full_name ?? auth()->user()->name;
+                $validFrom = \Carbon\Carbon::parse($this->valid_from)->format('F d, Y');
+                $validTo = $this->valid_to ? \Carbon\Carbon::parse($this->valid_to)->format('F d, Y') : 'further notice';
+                NotificationController::sendGeneralNotification(
+                    'oic_assigned',
+                    'You were assigned as OIC',
+                    "{$assignerName} has designated you as Officer-in-Charge from {$validFrom} until {$validTo}.",
+                    $oic,
+                    route('oic.dashboard')
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::error('Realtime notification failed: ' . $e->getMessage());
+        }
+        // ========== REALTIME NOTIFICATION END ==========
 
         Notification::make()->title('OIC Assigned')->body('OIC has been assigned successfully.')->success()->send();
     }

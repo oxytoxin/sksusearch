@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
+use App\Http\Controllers\NotificationController;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
@@ -114,6 +115,26 @@ class DisbursementVouchersIndex extends Component implements HasTable
                     return;
                 }
                 DB::commit();
+
+                // ========== REALTIME NOTIFICATION ==========
+                // Cancellation needs approval - notify the signatory who must act on it.
+                try {
+                    $signatory = $record->signatory;
+                    if ($signatory) {
+                        $requesterName = auth()->user()->employee_information->full_name ?? 'A requisitioner';
+                        NotificationController::sendGeneralNotification(
+                            'disbursement_voucher_cancellation_requested',
+                            'DV Cancellation Requested',
+                            "{$requesterName} has requested cancellation of DV with ref. no. {$record->tracking_number}. Please review.",
+                            $signatory,
+                            route('disbursement-vouchers.show', $record->id)
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
+
                 Notification::make()->title('Disbursement voucher requested for cancellation.')->success()->send();
             })
                 ->visible(fn ($record) => !$record->cheque_number && !$record->cancelled_at && !$record->for_cancellation)

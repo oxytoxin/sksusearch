@@ -176,6 +176,8 @@ class CashAdvanceAging extends Component
                 'disbursementVoucher.user.employee_information.office',
                 'disbursementVoucher.user.employee_information.position',
                 'disbursementVoucher.disbursement_voucher_particulars',
+                'disbursementVoucher.voucher_subtype',
+                'disbursementVoucher.fund_cluster',
             ])
             ->orderByRaw($this->daysOverdueExpression().' desc');
 
@@ -186,7 +188,10 @@ class CashAdvanceAging extends Component
                     ->orWhere('tracking_number', 'like', $needle)
                     ->orWhere('payee', 'like', $needle)
                     ->orWhere('cheque_number', 'like', $needle)
-                    ->orWhereHas('user', fn ($u) => $u->where('name', 'like', $needle))
+                    ->orWhereHas(
+                        'user.employee_information',
+                        fn ($e) => $e->where('full_name', 'like', $needle),
+                    )
                     ->orWhereHas(
                         'user.employee_information.office',
                         fn ($o) => $o->where('name', 'like', $needle),
@@ -201,7 +206,8 @@ class CashAdvanceAging extends Component
                 '31-90'   => "$expr BETWEEN 31 AND 90",
                 '91-365'  => "$expr BETWEEN 91 AND 365",
                 '1-2y'    => "$expr BETWEEN 366 AND 730",
-                '2y+'     => "$expr > 730",
+                '2-3y'    => "$expr BETWEEN 731 AND 1095",
+                '3y+'     => "$expr > 1095",
                 default   => '1=1',
             });
         }
@@ -234,11 +240,12 @@ class CashAdvanceAging extends Component
             })
             ->selectRaw("
                 CASE
-                    WHEN $expr <= 30  THEN '30'
-                    WHEN $expr <= 90  THEN '31-90'
-                    WHEN $expr <= 365 THEN '91-365'
-                    WHEN $expr <= 730 THEN '1-2y'
-                    ELSE '2y+'
+                    WHEN $expr <= 30   THEN '30'
+                    WHEN $expr <= 90   THEN '31-90'
+                    WHEN $expr <= 365  THEN '91-365'
+                    WHEN $expr <= 730  THEN '1-2y'
+                    WHEN $expr <= 1095 THEN '2-3y'
+                    ELSE '3y+'
                 END as bucket,
                 COUNT(*) as cnt,
                 COALESCE(SUM(dvp_sum.dv_total), 0) as total
@@ -251,7 +258,8 @@ class CashAdvanceAging extends Component
             '31-90'  => ['count' => 0, 'total' => 0.0],
             '91-365' => ['count' => 0, 'total' => 0.0],
             '1-2y'   => ['count' => 0, 'total' => 0.0],
-            '2y+'    => ['count' => 0, 'total' => 0.0],
+            '2-3y'   => ['count' => 0, 'total' => 0.0],
+            '3y+'    => ['count' => 0, 'total' => 0.0],
         ];
 
         foreach ($rows as $r) {
@@ -280,7 +288,8 @@ class CashAdvanceAging extends Component
             '31-90'  => 0.0,
             '91-365' => 0.0,
             '1-2y'   => 0.0,
-            '2y+'    => 0.0,
+            '2-3y'   => 0.0,
+            '3y+'    => 0.0,
         ];
 
         foreach ($this->rows as $row) {
@@ -293,12 +302,33 @@ class CashAdvanceAging extends Component
 
     public function bucketFor(int $days): string
     {
-        if ($days <= 30)  return '30';
-        if ($days <= 90)  return '31-90';
-        if ($days <= 365) return '91-365';
-        if ($days <= 730) return '1-2y';
+        if ($days <= 30)   return '30';
+        if ($days <= 90)   return '31-90';
+        if ($days <= 365)  return '91-365';
+        if ($days <= 730)  return '1-2y';
+        if ($days <= 1095) return '2-3y';
 
-        return '2y+';
+        return '3y+';
+    }
+
+    /**
+     * Derive the COA GL account (code + name) for a cash advance from its
+     * voucher subtype. Mapping is config-driven (config/coa_accounts.php).
+     */
+    public function accountFor($step): array
+    {
+        $subtypeId = $step->disbursementVoucher?->voucher_subtype_id;
+        $map = config('coa_accounts.subtype_accounts', []);
+
+        return $map[$subtypeId] ?? config('coa_accounts.default', ['code' => '', 'name' => '']);
+    }
+
+    /**
+     * Fund cluster name for a cash advance (e.g. 101 / 161 / 164).
+     */
+    public function fundFor($step): string
+    {
+        return (string) ($step->disbursementVoucher?->fund_cluster?->name ?? '');
     }
 
     public function getFundClustersProperty()
@@ -309,11 +339,12 @@ class CashAdvanceAging extends Component
     public function bucketLabel(string $key): string
     {
         return match ($key) {
-            '30'     => '30 days',
+            '30'     => '30 days or less',
             '31-90'  => '31 – 90 days',
             '91-365' => '91 – 365 days',
             '1-2y'   => 'Over 1 year',
-            '2y+'    => 'Over 2 years',
+            '2-3y'   => 'Over 2 years',
+            '3y+'    => '3 years and above',
             default  => $key,
         };
     }

@@ -44,6 +44,21 @@ class NotificationController extends Controller
 
         $receiver->notify( new SystemReminder($type, $title, $message,$senderName,$receiverName,$senderId,$receiver,$route, $disbursement_voucher));
     }
+
+    public static function sendGeneralNotification($type, $title, $message, $receiver, $route = null, $senderId = null)
+    {
+        $receiver->notify(new SystemReminder(
+            $type,
+            $title,
+            $message,
+            auth()->user()?->employee_information?->full_name ?? auth()->user()?->name,
+            $receiver->name,
+            $senderId ?? auth()->id(),
+            $receiver,
+            $route,
+            null
+        ));
+    }
     public static function cashAdvanceCreation($user, $receiver, $disbursement_voucher){
 
         $receiver->notify( new CashAdvanceCreation($user, $receiver, $disbursement_voucher));

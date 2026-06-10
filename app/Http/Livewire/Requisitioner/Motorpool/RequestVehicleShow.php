@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Requisitioner\Motorpool;
 
 use App\Forms\Components\Flatpickr;
+use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 use App\Models\EmployeeInformation;
 use App\Models\Position;
@@ -495,6 +496,22 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                 }
                 // ========== SMS NOTIFICATION END ==========
 
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    foreach ($applicants as $applicant) {
+                        NotificationController::sendGeneralNotification(
+                            'vehicle_changed',
+                            'Vehicle Changed',
+                            $message,
+                            $applicant,
+                            route('requisitioner.motorpool.show', ['request' => $this->request_schedule->id])
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
+
                 $this->dialog()->success(
                     $title = 'Success',
                     $description = 'Vehicle is updated'
@@ -630,6 +647,22 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                 }
                 // ========== SMS NOTIFICATION END ==========
 
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    foreach ($applicants as $applicant) {
+                        NotificationController::sendGeneralNotification(
+                            'driver_changed',
+                            'Driver Changed',
+                            $message,
+                            $applicant,
+                            route('requisitioner.motorpool.show', ['request' => $this->request_schedule->id])
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
+
                 $this->dialog()->success(
                     $title = 'Success',
                     $description = 'Driver is updated'
@@ -759,6 +792,22 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
             }
         }
         // ========== SMS NOTIFICATION END ==========
+
+        // ========== REALTIME NOTIFICATION ==========
+        try {
+            foreach ($applicants as $applicant) {
+                NotificationController::sendGeneralNotification(
+                    'vehicle_driver_confirmed',
+                    'Vehicle Request Approved',
+                    $message,
+                    $applicant,
+                    route('requisitioner.motorpool.show', ['request' => $this->request_schedule->id])
+                );
+            }
+        } catch (\Exception $e) {
+            \Log::error('Realtime notification failed: ' . $e->getMessage());
+        }
+        // ========== REALTIME NOTIFICATION END ==========
 
         $this->dialog()->success(
             $title = 'Success',

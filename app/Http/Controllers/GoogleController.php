@@ -11,7 +11,7 @@ class GoogleController extends Controller
 {
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->with(['prompt' => 'select_account'])->redirect();
     }
 
     /**
@@ -32,7 +32,7 @@ class GoogleController extends Controller
 
                 return redirect()->route('redirect');
             } else {
-                return redirect()->route('401-error');
+                return redirect('/no-account');
             }
         } catch (Exception $e) {
             dd($e);

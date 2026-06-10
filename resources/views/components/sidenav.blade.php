@@ -316,6 +316,12 @@
                     <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
                 </svg>
                 Motorpool
+                @if ($motorpool_chief_action + $motorpool_president_approval > 0)
+                    <span
+                        class="mx-auto inline-flex h-2 w-2 items-center justify-center rounded-full bg-primary-100 p-3 text-xs font-medium text-primary-600">
+                        {{ $motorpool_chief_action + $motorpool_president_approval }}
+                    </span>
+                @endif
             </button>
             @php
                 $is_motorpool_head =

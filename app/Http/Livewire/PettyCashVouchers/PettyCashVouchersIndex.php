@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 
 class PettyCashVouchersIndex extends Component implements HasTable
@@ -121,6 +122,22 @@ class PettyCashVouchersIndex extends Component implements HasTable
                     // ========== SMS NOTIFICATION END ==========
 
                     DB::commit();
+
+                    // ========== REALTIME NOTIFICATION ==========
+                    try {
+                        if ($requisitioner) {
+                            NotificationController::sendGeneralNotification(
+                                'petty_cash_voucher_liquidated',
+                                'Petty Cash Liquidated',
+                                $message,
+                                $requisitioner
+                            );
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Realtime notification failed: ' . $e->getMessage());
+                    }
+                    // ========== REALTIME NOTIFICATION END ==========
+
                     Notification::make()->title('Petty Cash Voucher liquidated.')->success()->send();
                 })
                 ->icon('heroicon-o-cash')

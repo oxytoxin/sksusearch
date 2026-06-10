@@ -2,15 +2,16 @@
 
     namespace App\Http\Livewire\Signatory\TravelOrders;
 
-    use App\Jobs\SendSmsJob;
-    use App\Models\Itinerary;
-    use App\Models\TravelOrder;
-    use App\Models\TravelOrderType;
-    use App\Models\User;
-    use DB;
-    use Filament\Notifications\Notification;
-    use Livewire\Component;
-    use WireUi\Traits\Actions;
+use App\Http\Controllers\NotificationController;
+use App\Jobs\SendSmsJob;
+use App\Models\Itinerary;
+use App\Models\TravelOrder;
+use App\Models\TravelOrderType;
+use App\Models\User;
+use DB;
+use Filament\Notifications\Notification;
+use Livewire\Component;
+use WireUi\Traits\Actions;
 
     class TravelOrdersToSignView extends Component
     {
@@ -62,25 +63,45 @@
                 $applicants = $this->travel_order->applicants()->with('employee_information')->get();
                 $message = "Your travel on official business has been converted by {$officerName} to one on official time. No travel allowances shall be granted.";
 
-                // ========== SMS NOTIFICATION ==========
-                foreach ($applicants as $applicant) {
-                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
-                        SendSmsJob::dispatch(
-                            $applicant->employee_information->contact_number,
-                            $message,
-                            'travel_order_type_converted',
-                            $applicant->id,
-                            $this->from_oic ? $this->oic_signatory : auth()->id()
-                        );
+            // ========== SMS NOTIFICATION ==========
+            foreach ($applicants as $applicant) {
+                if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+                    if (!config('services.semaphore.api_key')) {
+                        break;
                     }
+                    SendSmsJob::dispatch(
+                        $applicant->employee_information->contact_number,
+                        $message,
+                        'travel_order_type_converted',
+                        $applicant->id,
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
                 }
-                // ========== SMS NOTIFICATION END ==========
-            } else {
-                // dd($this->travel_order->travel_order_type_id, TravelOrderType::OFFICIAL_BUSINESS, 'OFFICIAL_BUSINESS');
-                $this->travel_order->update([
-                    'travel_order_type_id' => TravelOrderType::OFFICIAL_BUSINESS,
-                ]);
-                $this->travel_order->sidenotes()->create(['content' => 'Travel order type changed to Official Business.', 'user_id' => auth()->id()]);
+            }
+            // ========== SMS NOTIFICATION END ==========
+
+            // ========== REALTIME NOTIFICATION ==========
+            try {
+                foreach ($applicants as $applicant) {
+                    NotificationController::sendGeneralNotification(
+                        'travel_order_type_converted',
+                        'Travel Order Type Converted',
+                        $message,
+                        $applicant,
+                        route('requisitioner.travel-orders.show', $this->travel_order),
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Realtime notification failed: ' . $e->getMessage());
+            }
+            // ========== REALTIME NOTIFICATION END ==========
+        } else {
+            // dd($this->travel_order->travel_order_type_id, TravelOrderType::OFFICIAL_BUSINESS, 'OFFICIAL_BUSINESS');
+            $this->travel_order->update([
+                'travel_order_type_id' => TravelOrderType::OFFICIAL_BUSINESS,
+            ]);
+            $this->travel_order->sidenotes()->create(['content' => 'Travel order type changed to Official Business.', 'user_id' => auth()->id()]);
 
                 // Send SMS notifications to all applicants
                 $applicants = $this->travel_order->applicants()->with('employee_information')->get();
@@ -91,18 +112,35 @@
                     if (!config('services.semaphore.api_key')) {
                         break;
                     }
-                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
-                        SendSmsJob::dispatch(
-                            $applicant->employee_information->contact_number,
-                            $message,
-                            'travel_order_type_converted',
-                            $applicant->id,
-                            $this->from_oic ? $this->oic_signatory : auth()->id()
-                        );
-                    }
+                    if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        $applicant->employee_information->contact_number,
+                        $message,
+                        'travel_order_type_converted',
+                        $applicant->id,
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
                 }
-                // ========== SMS NOTIFICATION END ==========
             }
+            // ========== SMS NOTIFICATION END ==========
+
+            // ========== REALTIME NOTIFICATION ==========
+            try {
+                foreach ($applicants as $applicant) {
+                    NotificationController::sendGeneralNotification(
+                        'travel_order_type_converted',
+                        'Travel Order Type Converted',
+                        $message,
+                        $applicant,
+                        route('requisitioner.travel-orders.show', $this->travel_order),
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Realtime notification failed: ' . $e->getMessage());
+            }
+            // ========== REALTIME NOTIFICATION END ==========
+        }
 
             $this->travel_order->refresh();
 
@@ -129,26 +167,57 @@
             $this->travel_order->refresh();
             DB::commit();
 
-            $this->dialog()->success(
-                $title = 'Applicant removed',
-                $description = 'The applicant has been removed from the travel order.',
-                $icon = 'success',
+            // ========== REALTIME NOTIFICATION ==========
+        try {
+            $officerName = auth()->user()->employee_information->full_name ?? auth()->user()->name;
+            NotificationController::sendGeneralNotification(
+                'travel_order_applicant_removed',
+                'Removed from Travel Order',
+                "You have been removed from travel order ref. no. {$this->travel_order->tracking_code} by {$officerName}.",
+                $user,
+                route('requisitioner.travel-orders.show', $this->travel_order)
             );
+        } catch (\Exception $e) {
+            \Log::error('Realtime notification failed: ' . $e->getMessage());
         }
+        // ========== REALTIME NOTIFICATION END ==========
 
-        public function restoreApplicant(User $user)
-        {
-            DB::beginTransaction();
-            $this->travel_order->removed_applicants()->updateExistingPivot($user->id, ['deleted_at' => null]);
-            $this->travel_order->sidenotes()->create(['content' => "Restored applicant {$user->employee_information->full_name} to travel order.", 'user_id' => auth()->id()]);
-            $this->travel_order->refresh();
-            DB::commit();
-            $this->dialog()->success(
-                $title = 'Applicant restored',
-                $description = 'The applicant has been restored from the travel order.',
-                $icon = 'success',
+        $this->dialog()->success(
+            $title = 'Applicant removed',
+            $description = 'The applicant has been removed from the travel order.',
+            $icon = 'success',
+        );
+    }
+
+    public function restoreApplicant(User $user)
+    {
+        DB::beginTransaction();
+        $this->travel_order->removed_applicants()->updateExistingPivot($user->id, ['deleted_at' => null]);
+        $this->travel_order->sidenotes()->create(['content' => "Restored applicant {$user->employee_information->full_name} to travel order.", 'user_id' => auth()->id()]);
+        $this->travel_order->refresh();
+        DB::commit();
+
+        // ========== REALTIME NOTIFICATION ==========
+        try {
+            $officerName = auth()->user()->employee_information->full_name ?? auth()->user()->name;
+            NotificationController::sendGeneralNotification(
+                'travel_order_applicant_restored',
+                'Re-added to Travel Order',
+                "You have been re-added to travel order ref. no. {$this->travel_order->tracking_code} by {$officerName}.",
+                $user,
+                route('requisitioner.travel-orders.show', $this->travel_order)
             );
+        } catch (\Exception $e) {
+            \Log::error('Realtime notification failed: ' . $e->getMessage());
         }
+        // ========== REALTIME NOTIFICATION END ==========
+
+        $this->dialog()->success(
+            $title = 'Applicant restored',
+            $description = 'The applicant has been restored from the travel order.',
+            $icon = 'success',
+        );
+    }
 
         public function showDialog()
         {
@@ -216,18 +285,34 @@
                     if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
                         if (!config('services.semaphore.api_key')) {
                             break;
-                        }
-                        SendSmsJob::dispatch(
-                            $applicant->employee_information->contact_number,
-                            $message,
-                            'travel_order_approved',
-                            $applicant->id,
-                            $this->from_oic ? $this->oic_signatory : auth()->id()
-                        );
-                    }
+                        }SendSmsJob::dispatch(
+                        $applicant->employee_information->contact_number,
+                        $message,
+                        'travel_order_approved',
+                        $applicant->id,
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
                 }
-                // ========== SMS NOTIFICATION END ==========
             }
+            // ========== SMS NOTIFICATION END ==========
+
+            // ========== REALTIME NOTIFICATION ==========
+            try {
+                foreach ($applicants as $applicant) {
+                    NotificationController::sendGeneralNotification(
+                        'travel_order_approved',
+                        'Travel Order Approved',
+                        $message,
+                        $applicant,
+                        route('requisitioner.travel-orders.show', $this->travel_order),
+                        $this->from_oic ? $this->oic_signatory : auth()->id()
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error('Realtime notification failed: ' . $e->getMessage());
+            }
+            // ========== REALTIME NOTIFICATION END ==========
+        }
 
             $this->dialog()->success(
                 $title = 'Approved',
@@ -289,13 +374,30 @@
             }
             // ========== SMS NOTIFICATION END ==========
 
-            if (!$rejectedDueToConversion) {
-                $this->dialog()->success(
-                    $title = 'Operation Completed',
-                    $description = 'Travel order rejected!',
-                    $icon = 'success',
+            // ========== REALTIME NOTIFICATION ==========
+        try {
+            foreach ($applicants as $applicant) {
+                NotificationController::sendGeneralNotification(
+                    'travel_order_rejected',
+                    'Travel Order Rejected',
+                    $message,
+                    $applicant,
+                    route('requisitioner.travel-orders.show', $this->travel_order),
+                    $this->from_oic ? $this->oic_signatory : auth()->id()
                 );
             }
-            $this->travel_order->refresh();
+        } catch (\Exception $e) {
+            \Log::error('Realtime notification failed: ' . $e->getMessage());
         }
+        // ========== REALTIME NOTIFICATION END ==========
+
+        if (! $rejectedDueToConversion) {
+            $this->dialog()->success(
+                $title = 'Operation Completed',
+                $description = 'Travel order rejected!',
+                $icon = 'success',
+            );
+        }
+        $this->travel_order->refresh();
     }
+}

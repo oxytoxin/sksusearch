@@ -21,6 +21,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
+use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 
 class DisbursementVouchersIndex extends Component implements HasTable
@@ -165,18 +166,12 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
                 DB::beginTransaction();
-                if ($record->current_step_id < $record->previous_step_id) {
-                    $previous_step_id = $record->previous_step_id;
-                } else {
-                    $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')->where('id', '<', $record->current_step->id)->latest('id')->first()->id;
-                }
+                $destinationStep = DisbursementVoucherStep::find($data['return_step_id']);
                 $record->update([
-                    'current_step_id' => $data['return_step_id'],
-                    'previous_step_id' => $previous_step_id,
+                    'pending_return_step_id' => $data['return_step_id'],
                 ]);
-                $record->refresh();
                 $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient,
+                    'description' => 'DV marked for return to ' . ($destinationStep->recipient ?? 'Unknown') . '. Awaiting physical release.',
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
@@ -186,14 +181,9 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 $trackingNumber = $record->tracking_number;
                 $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
                 $remarks = $data['remarks'] ?? 'No remarks provided';
-
-                // Strip HTML tags and decode HTML entities from remarks
                 $remarks = strip_tags($remarks);
                 $remarks = html_entity_decode($remarks, ENT_QUOTES, 'UTF-8');
-
                 $message = "Your DV with ref. no. {$trackingNumber} has been returned by {$officerName} with the following remarks: \"{$remarks}\". Please retrieve your documents immediately.";
-
-                // Send to the user who requested the disbursement voucher
                 $requestedBy = $record->user;
                 if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
                     SendSmsJob::dispatch(
@@ -206,7 +196,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 }
                 // ========== SMS NOTIFICATION END ==========
 
-                Notification::make()->title('Disbursement Voucher returned.')->success()->send();
+                Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
             })
                 ->color('danger')
                 ->visible(function ($record) {
@@ -214,7 +204,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000 && $record->for_cancellation == false;
+                    return $record->current_step_id == 4000 && $record->for_cancellation == false && blank($record->pending_return_step_id);
                 })
                 ->form(function () {
                     return [
@@ -229,6 +219,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->requiresConfirmation(),
+            ...$this->releaseAction(),
             Action::make('Cancel')->action(function ($record) {
                 DB::beginTransaction();
                 $record->update([

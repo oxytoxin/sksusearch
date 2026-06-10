@@ -5,6 +5,7 @@
     use App\Models\User;
     use Livewire\Component;
     use App\Jobs\SendSmsJob;
+    use App\Http\Controllers\NotificationController;
     use App\Models\TravelOrder;
     use App\Models\PhilippineCity;
     use App\Models\TravelOrderType;
@@ -257,6 +258,22 @@
                     // ========== SMS NOTIFICATION END ==========
 
                     DB::commit();
+
+                    // ========== REALTIME NOTIFICATION ==========
+                    try {
+                        foreach ($signatoryUsers as $signatory) {
+                            NotificationController::sendGeneralNotification(
+                                'travel_order_signatory_notification',
+                                'Travel Order for Approval',
+                                $message,
+                                $signatory,
+                                route('signatory.travel-orders.view', $to)
+                            );
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Realtime notification failed: ' . $e->getMessage());
+                    }
+                    // ========== REALTIME NOTIFICATION END ==========
 
                     Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
 

@@ -14,6 +14,8 @@
 
             <option>Memos</option>
 
+            <option>Advisories</option>
+
             <option>Tutorials</option>
           </select>
         </div>
@@ -21,20 +23,24 @@
           <div class="border-b border-gray-200">
             <nav class="-mb-px flex" aria-label="Tabs">
               <!-- Current: "border-green-500 text-green-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" -->
-              <a href="#" class="border-green-500 text-green-600 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-bold text-sm"
+              <a href="#" class="border-green-500 text-green-600 hover:text-gray-700 hover:border-gray-300 w-1/5 py-4 px-1 text-center border-b-2 font-bold text-sm"
                 :class="{ 'border-green-500 text-green-600': activeTab === 'basic', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'basic' }"
                 @click.prevent="activeTab = 'basic'" aria-current="page">Basic Information</a>
 
-              <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-bold text-sm"
-                :class="{ 'border-green-500 text-green-600': activeTab === 'guide', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'history' }"
+              <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/5 py-4 px-1 text-center border-b-2 font-bold text-sm"
+                :class="{ 'border-green-500 text-green-600': activeTab === 'guide', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'guide' }"
                 @click.prevent="activeTab = 'guide'">User Guide</a>
 
-              <a href="#" class="border-transparent text-gray-500 w-1/4 py-4 px-1 text-center border-b-2 font-bold text-sm"
-                :class="{ 'border-green-500 text-green-600': activeTab === 'memos', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'guide' }"
+              <a href="#" class="border-transparent text-gray-500 w-1/5 py-4 px-1 text-center border-b-2 font-bold text-sm"
+                :class="{ 'border-green-500 text-green-600': activeTab === 'memos', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'memos' }"
                 @click.prevent="activeTab = 'memos'">Memos</a>
 
-              <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/4 py-4 px-1 text-center border-b-2 font-bold text-sm"
-                :class="{ 'border-green-500 text-green-600': activeTab === 'tutorials', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'memos' }"
+              <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/5 py-4 px-1 text-center border-b-2 font-bold text-sm"
+                :class="{ 'border-green-500 text-green-600': activeTab === 'advisories', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'advisories' }"
+                @click.prevent="activeTab = 'advisories'">Advisories</a>
+
+              <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1/5 py-4 px-1 text-center border-b-2 font-bold text-sm"
+                :class="{ 'border-green-500 text-green-600': activeTab === 'tutorials', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'tutorials' }"
                 @click.prevent="activeTab = 'tutorials'">Tutorials</a>
             </nav>
           </div>
@@ -73,6 +79,10 @@
                 <span class="mt-2 block text-2xl font-semibold text-gray-600">Content Coming Soon</span>
             </div>
         </div>
+      </div>
+
+      <div x-show="activeTab === 'advisories'">
+        <livewire:requisitioner.advisory-index />
       </div>
 
       <div x-show="activeTab === 'tutorials'">

@@ -20,6 +20,7 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Support\HtmlString;
+use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 
 class LiquidationReportsIndex extends Component implements HasTable
@@ -166,6 +167,22 @@ class LiquidationReportsIndex extends Component implements HasTable
                     );
                 }
                 // ========== SMS NOTIFICATION END ==========
+
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    if ($requestedBy) {
+                        NotificationController::sendGeneralNotification(
+                            'liquidation_report_returned',
+                            'Liquidation Report Returned',
+                            $message,
+                            $requestedBy,
+                            route('requisitioner.liquidation-reports.show', ['liquidation_report' => $record])
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
 
                 Notification::make()->title('Disbursement Voucher returned.')->success()->send();
             })
