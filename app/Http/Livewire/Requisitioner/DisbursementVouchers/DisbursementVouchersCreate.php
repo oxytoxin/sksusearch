@@ -936,14 +936,27 @@
 
             // Optional supporting documents uploaded during DV creation
             if (filled($this->attachment)) {
-                foreach ($this->attachment as $document) {
-                    $dv->scanned_documents()->create([
-                        'path' => $document->storeAs(
+                foreach ($this->attachment as $tmpPath) {
+                    try {
+                        $file = is_string($tmpPath)
+                            ? new \Livewire\TemporaryUploadedFile($tmpPath, config('livewire.temporary_file_upload.disk', 'local'))
+                            : $tmpPath;
+                        $storedPath = $file->storeAs(
                             'scanned_documents',
-                            now()->format('HismdY-').$document->getClientOriginalName()
-                        ),
-                        'document_name' => $document->getClientOriginalName(),
-                    ]);
+                            now()->format('HismdY-').$file->getClientOriginalName()
+                        );
+                        if ($storedPath) {
+                            $dv->scanned_documents()->create([
+                                'path' => $storedPath,
+                                'document_name' => $file->getClientOriginalName(),
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('DV attachment upload failed: ' . $e->getMessage(), [
+                            'dv_id' => $dv->id,
+                            'tmpPath' => is_string($tmpPath) ? $tmpPath : get_class($tmpPath),
+                        ]);
+                    }
                 }
             }
             if (in_array($this->voucher_subtype->id, [6, 7])) {
