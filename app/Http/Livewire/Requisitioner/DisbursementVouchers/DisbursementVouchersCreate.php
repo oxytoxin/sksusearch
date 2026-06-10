@@ -194,7 +194,7 @@
                                                 })->orWhere('travel_order_type_id', TravelOrderType::OFFICIAL_TIME);
                                             })
                                             ->whereDoesntHave('disbursement_vouchers',
-                                                fn($q) => $q->where('cancelled_at', null))
+                                                fn($q) => $q->where('user_id', auth()->id())->where('cancelled_at', null))
                                             ->approved()
                                             ->select(
                                                 DB::raw("CONCAT(purpose,' ( ',tracking_code,' )') AS tcAndP"),
