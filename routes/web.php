@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\DB;
     Route::get('/disbursement-voucher-view/tracking/{disbursement_voucher:tracking_number}', [HomeController::class, 'disbursement_voucher_view'])->name('disbursement-vouchers.show-from-trn');
     Route::get('auth/google', 'App\Http\Controllers\GoogleController@redirectToGoogle');
     Route::get('auth/google/callback', 'App\Http\Controllers\GoogleController@handleGoogleCallback');
+    Route::get('no-account', fn () => view('auth.no-account'))->name('401-error');
     Route::middleware(['auth:sanctum', 'verified'])->get('redirects', 'App\Http\Controllers\HomeController@index')->name('redirect');
 
     Route::get('/test', function () {
