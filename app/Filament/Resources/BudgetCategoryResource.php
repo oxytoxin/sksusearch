@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Table;
 use Filament\Tables;
@@ -34,6 +35,14 @@ class BudgetCategoryResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')->required(),
+                Select::make('type')
+                    ->label('Type')
+                    ->options([
+                        1 => 'PS (Salaries)',
+                        2 => 'MOOE (Maintenance & Other Operating Expenses)',
+                        3 => 'Capital Outlay',
+                    ])
+                    ->required(),
             ]);
     }
 
