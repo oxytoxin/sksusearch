@@ -51,7 +51,7 @@ class PromptSignature extends Component
 
         $file = $this->uploadedSignature;
         $base64 = 'data:' . $file->getMimeType() . ';base64,'
-            . base64_encode(file_get_contents($file->getRealPath()));
+            . base64_encode($file->get());
 
         Signature::query()->updateOrCreate([
             'user_id' => auth()->id(),
