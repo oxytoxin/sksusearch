@@ -800,6 +800,9 @@
                                         ->multiple()
                                         ->enableOpen()
                                         ->enableReordering()
+                                        ->disk('public')
+                                        ->directory('scanned_documents')
+                                        ->preserveFilenames()
                                         ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                                         ->maxSize(10240) // KB = 10MB
                                         ->columnSpan('full'),
@@ -936,25 +939,11 @@
 
             // Optional supporting documents uploaded during DV creation
             if (filled($this->attachment)) {
-                foreach ($this->attachment as $tmpPath) {
-                    try {
-                        $file = is_string($tmpPath)
-                            ? new \Livewire\TemporaryUploadedFile($tmpPath, config('livewire.temporary_file_upload.disk', 'local'))
-                            : $tmpPath;
-                        $storedPath = $file->storeAs(
-                            'scanned_documents',
-                            now()->format('HismdY-').$file->getClientOriginalName()
-                        );
-                        if ($storedPath) {
-                            $dv->scanned_documents()->create([
-                                'path' => $storedPath,
-                                'document_name' => $file->getClientOriginalName(),
-                            ]);
-                        }
-                    } catch (\Exception $e) {
-                        \Log::error('DV attachment upload failed: ' . $e->getMessage(), [
-                            'dv_id' => $dv->id,
-                            'tmpPath' => is_string($tmpPath) ? $tmpPath : get_class($tmpPath),
+                foreach ($this->attachment as $storedPath) {
+                    if (is_string($storedPath) && filled($storedPath)) {
+                        $dv->scanned_documents()->create([
+                            'path' => $storedPath,
+                            'document_name' => basename($storedPath),
                         ]);
                     }
                 }
