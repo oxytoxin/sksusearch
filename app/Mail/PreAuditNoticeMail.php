@@ -29,17 +29,20 @@ class PreAuditNoticeMail extends Mailable
     public ?string $recipientName;
     public ?string $reviewerName;
     public ?string $reviewerPosition;
+    public ?string $senderEmail;
 
     public function __construct(
         DisbursementVoucher $disbursementVoucher,
         ?string $recipientName = null,
         ?string $reviewerName = null,
-        ?string $reviewerPosition = null
+        ?string $reviewerPosition = null,
+        ?string $senderEmail = null
     ) {
         $this->disbursementVoucher = $disbursementVoucher;
         $this->recipientName = $recipientName;
         $this->reviewerName = $reviewerName;
         $this->reviewerPosition = $reviewerPosition;
+        $this->senderEmail = $senderEmail;
     }
 
     public function envelope()
@@ -64,12 +67,11 @@ class PreAuditNoticeMail extends Mailable
             with: [
                 'dv' => $dv,
                 'recipientName' => $this->recipientName ?? optional($dv->user)->name,
-                'reviewerName' => $this->reviewerName,
-                'reviewerPosition' => $this->reviewerPosition,
                 'items' => $dv->getRelatedDocumentItems(),
                 'generalRemarks' => $dv->getRelatedDocumentsGeneralRemarks(),
                 'isForCompliance' => $this->isForCompliance(),
                 'purposes' => $purposes,
+                'senderEmail' => $this->senderEmail ?? config('mail.from.address'),
             ],
         );
     }

@@ -46,6 +46,11 @@ use Illuminate\Support\Facades\DB;
         ]);
     });
 
+    // Preview the Pre-Audit Notice email in-browser (renders only, never sends).
+    Route::get('/preview/pre-audit-notice/{disbursementVoucher}', function (DisbursementVoucher $disbursementVoucher) {
+        return (new \App\Mail\PreAuditNoticeMail($disbursementVoucher))->render();
+    })->middleware('auth')->name('preview.pre-audit-notice');
+
     Route::get('/export/cost-center', App\Http\Controllers\TestController::class)->name('test.pre');
 
 
