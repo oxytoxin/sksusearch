@@ -51,6 +51,37 @@ use Illuminate\Support\Facades\DB;
         return (new \App\Mail\PreAuditNoticeMail($disbursementVoucher))->render();
     })->middleware('auth')->name('preview.pre-audit-notice');
 
+    // Email health-check: hit after deploy to confirm the mail provider works.
+    // Sends a real test email and returns the active config + send result as JSON.
+    // Recipient: ?to=someone@example.com, else the logged-in user's email.
+    Route::get('/email/test', function (\Illuminate\Http\Request $request) {
+        $to = $request->query('to', optional($request->user())->email);
+
+        if (! $to) {
+            return response()->json([
+                'ok' => false,
+                'error' => 'No recipient. Pass ?to=email@example.com or log in with an email on your account.',
+            ], 422);
+        }
+
+        $result = app(\App\Services\EmailService::class)->sendEmail(
+            $to,
+            'SEARCH email test',
+            'Email Test',
+            'If you received this, the SEARCH email channel is working. Sent at ' . now()->toDateTimeString() . '.'
+        );
+
+        return response()->json([
+            'ok'      => $result['success'],
+            'mailer'  => config('mail.default'),
+            'host'    => config('mail.mailers.smtp.host'),
+            'from'    => config('mail.from.address'),
+            'to'      => $to,
+            'error'   => $result['error'] ?? null,
+            'sent_at' => now()->toDateTimeString(),
+        ], $result['success'] ? 200 : 500);
+    })->middleware('auth')->name('email.test');
+
     Route::get('/export/cost-center', App\Http\Controllers\TestController::class)->name('test.pre');
 
 

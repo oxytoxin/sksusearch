@@ -18,22 +18,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pre-Audit Notice</title>
 </head>
-<body style="margin:0; padding:0; background-color:#f4f4f7; font-family: Arial, Helvetica, sans-serif; color:#333333;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7; padding:24px 0;">
+<body style="margin:0; padding:0; background-color:#ffffff; font-family: Arial, Helvetica, sans-serif; color:#333333;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff; padding:24px 0;">
         <tr>
             <td align="center">
-                <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px; width:100%; background-color:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb;">
-
-                    {{-- Header --}}
-                    <tr>
-                        <td style="background-color:#0f5132; padding:20px 32px;">
-                            <span style="color:#ffffff; font-size:18px; font-weight:bold; letter-spacing:0.5px;">S.E.A.R.C.H</span>
-                            <div style="color:#cfe3d8; font-size:12px; margin-top:2px;">Sultan Kudarat State University &middot; Office of the University Accountant</div>
-                        </td>
-                    </tr>
+                <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px; width:100%; background-color:#ffffff;">
 
                     <tr>
-                        <td style="padding:32px;">
+                        <td style="padding:8px 32px 32px;">
                             <h1 style="margin:0 0 4px; font-size:20px; color:#111827;">Pre-Audit Notice</h1>
                             <p style="margin:0 0 20px; font-size:13px; color:#6b7280;">
                                 Reference No. {{ $dv->tracking_number }}
@@ -145,7 +137,7 @@
 
                     {{-- Footer --}}
                     <tr>
-                        <td style="padding:20px 32px; background-color:#f9fafb; border-top:1px solid #e5e7eb;">
+                        <td style="padding:20px 32px; background-color:#ffffff; border-top:1px solid #e5e7eb;">
                             <p style="margin:0 0 4px; font-size:13px; color:#374151;">
                                 <strong>Office of the University Accountant</strong><br>
                                 Sultan Kudarat State University
