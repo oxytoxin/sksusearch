@@ -737,25 +737,27 @@
                             ]);
                         }
 
-                        // ========== SMS NOTIFICATION ==========
-                        // Notify the requisitioner that their DV was approved and forwarded
-                        $record->load(['user.employee_information', 'current_step']);
-                        $trackingNumber = $record->tracking_number;
-                        $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
-                        $nextRecipient = $record->current_step->recipient ?? 'the next office';
-                        $approverPrefix = $this->isOic() ? 'OIC ' : '';
-                        $message = "Your DV with ref. no. {$trackingNumber} has been approved by {$approverPrefix}{$officerName} and forwarded to {$nextRecipient}.";
-
-                        $requestedBy = $record->user;
-                        if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
-                            SendSmsJob::dispatch(
-                                $requestedBy->employee_information->contact_number,
-                                $message,
-                                'disbursement_voucher_forwarded',
-                                $requestedBy->id,
-                                auth()->id()
-                            );
-                        }
+                        // ========== SMS NOTIFICATION (DISABLED) ==========
+                        // Per Memo No. 75, s. 2025 (Annex A): NO SMS on DV movement/forward —
+                        // it floods the requisitioner on every hop. They track status via
+                        // their dashboard. DV SMS fires only on submit, return/disapproval,
+                        // and check/ADA issuance. Re-enable by uncommenting if policy changes.
+                        // $record->load(['user.employee_information', 'current_step']);
+                        // $trackingNumber = $record->tracking_number;
+                        // $officerName = auth()->user()->employee_information->full_name ?? 'Officer';
+                        // $nextRecipient = $record->current_step->recipient ?? 'the next office';
+                        // $approverPrefix = $this->isOic() ? 'OIC ' : '';
+                        // $message = "Your DV with ref. no. {$trackingNumber} has been approved by {$approverPrefix}{$officerName} and forwarded to {$nextRecipient}.";
+                        // $requestedBy = $record->user;
+                        // if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                        //     SendSmsJob::dispatch(
+                        //         $requestedBy->employee_information->contact_number,
+                        //         $message,
+                        //         'disbursement_voucher_forwarded',
+                        //         $requestedBy->id,
+                        //         auth()->id()
+                        //     );
+                        // }
                         // ========== SMS NOTIFICATION END ==========
 
                         DB::commit();
