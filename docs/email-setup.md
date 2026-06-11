@@ -20,6 +20,36 @@ Workspace admin.
 
 ---
 
+## How Resend works (plain English)
+
+**Resend** is an email-sending service — think of it as a post office for apps. Our
+app hands an email to Resend, and Resend delivers it to the recipient's inbox (Gmail,
+Outlook, etc.) with good deliverability (not flagged as spam).
+
+**How our app talks to Resend:** through Resend's **SMTP relay**. The app connects to
+`smtp.resend.com`, logs in with username `resend` and **the API key as the password**,
+and Resend sends the message. This uses Laravel's built-in mail — no extra package.
+(Resend also has an API + PHP package, but we don't use it; SMTP is simpler and avoids
+a dependency conflict in this project.)
+
+**Authentication = one API key.** A string like `re_xxxxxxxx` identifies our Resend
+account and authorizes sending. It is the *only* secret. It lives in `.env`
+(`MAIL_PASSWORD`) and is never committed.
+
+**Why a domain has to be "verified":** mail providers (Gmail, Outlook…) reject or
+spam-folder email from senders who can't *prove* they're allowed to send for a domain.
+To send **from `@sksu.edu.ph`**, Resend must be authorized on that domain via DNS
+records we add:
+- **SPF** — declares "Resend is allowed to send email for this domain."
+- **DKIM** — a cryptographic signature proving the email really came from us (anti-spoofing).
+- *(optionally a return-path/MX record Resend provides for bounce handling)*
+
+Until those records exist and Resend shows the domain **Verified**, the app can only
+send from Resend's shared **test** address `onboarding@resend.dev`, and **only to the
+Resend account's own email**. That's the test mode we're in now.
+
+---
+
 ## How it works (architecture)
 
 Email is the **third notification channel**, alongside **SMS** and **realtime
@@ -108,13 +138,31 @@ Set the keys in the table above (put the real `re_...` in `MAIL_PASSWORD`), then
 php artisan config:clear
 ```
 
-### 3. (Production only) Verify the domain
-To send from `sksusearch@sksu.edu.ph`:
-1. Resend → **Domains → Add Domain** → enter `sksu.edu.ph`.
-2. Resend shows DNS records (SPF + DKIM, and a return-path/MX). Add them to the
-   `sksu.edu.ph` DNS zone (requires SKSU DNS / Google Workspace admin access).
-3. Wait for Resend to show the domain **Verified**.
-4. Change `MAIL_FROM_ADDRESS="sksusearch@sksu.edu.ph"` and `php artisan config:clear`.
+### 3. (Production only) Verify the domain — step by step
+This is what unlocks sending **from `sksusearch@sksu.edu.ph` to real recipients**.
+
+1. In Resend, go to **Domains → Add Domain** and enter **`sksu.edu.ph`** (you may pick
+   a region; closest is fine). Click **Add**.
+2. Resend then shows a list of **DNS records** to add — typically:
+   - a **TXT** record for **SPF** (authorizes Resend to send for the domain),
+   - one or more **CNAME/TXT** records for **DKIM** (the signing keys),
+   - optionally a **MX/TXT** return-path record for bounce handling.
+3. Give these records to whoever manages **`sksu.edu.ph`'s DNS** (SKSU IT / Google
+   Workspace admin / the domain registrar). They add each record **exactly** as shown
+   (host/name + type + value) in the domain's DNS zone.
+4. Back in Resend, click **Verify**. DNS can take minutes to a few hours to propagate;
+   Resend will flip the domain to **Verified** once it sees the records.
+5. Once verified, update production `.env`:
+   ```ini
+   MAIL_FROM_ADDRESS="sksusearch@sksu.edu.ph"
+   MAIL_FROM_NAME="${APP_NAME}"
+   ```
+   then run `php artisan config:clear` (or `config:cache`).
+6. Confirm with `GET /email/test?to=<any real email>` — it should now deliver to
+   anyone, from `sksusearch@sksu.edu.ph`.
+
+> If nobody can edit `sksu.edu.ph` DNS, you cannot send from that address. The fallback
+> is to verify a domain you *do* control (even a subdomain) and send from that instead.
 
 ### 4. Deploy checklist
 - [ ] `.env` has the Resend keys (and the **production** `MAIL_FROM_ADDRESS`).
