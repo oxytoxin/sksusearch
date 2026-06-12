@@ -89,22 +89,50 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 true => 'For Cancellation',
                 false => 'For Approval',
             ])->default(0)->label('Status'),
+            // Accounting-internal phase (item 2.2 / 2.3). Pre-Audit and the
+            // verification queue split into "For JEV" (verification/recording,
+            // steps 10000-12000) and "For Certification" (Chief Accountant, 13000).
             SelectFilter::make('phase')
                 ->options([
                     'pre_audit' => 'For Pre-Audit',
-                    'verification' => 'For Verification',
+                    'for_jev' => 'For JEV',
+                    'for_certification' => 'For Certification',
                 ])
                 ->query(function (Builder $query, array $data): Builder {
                     return $query->when($data['value'], function (Builder $query, string $value) {
                         if ($value === 'pre_audit') {
                             $query->whereIn('current_step_id', [5000, 6000]);
-                        } elseif ($value === 'verification') {
-                            $query->whereIn('current_step_id', [10000, 11000, 12000, 13000]);
+                        } elseif ($value === 'for_jev') {
+                            $query->whereIn('current_step_id', [10000, 11000, 12000]);
+                        } elseif ($value === 'for_certification') {
+                            $query->where('current_step_id', 13000);
                         }
                     });
                 })
-                ->label('Phase')
+                ->label('Accounting Phase')
                 ->visible(fn () => auth()->user()->employee_information->office->office_group_id == 2),
+            // Incoming/Outgoing queue (item 2.1) — works for every office, keyed off
+            // the DV's current step process and the pending-return flag.
+            SelectFilter::make('queue')
+                ->options([
+                    'incoming' => 'Incoming — to receive',
+                    'in_office' => 'In office — received',
+                    'for_release' => 'For release / returned',
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query->when($data['value'], function (Builder $query, string $value) {
+                        if ($value === 'incoming') {
+                            $query->whereHas('current_step', fn ($q) => $q->where('process', 'Forwarded to'))
+                                ->whereNull('pending_return_step_id');
+                        } elseif ($value === 'in_office') {
+                            $query->whereHas('current_step', fn ($q) => $q->whereIn('process', ['Received in', 'Received by']))
+                                ->whereNull('pending_return_step_id');
+                        } elseif ($value === 'for_release') {
+                            $query->whereNotNull('pending_return_step_id');
+                        }
+                    });
+                })
+                ->label('Queue'),
             Filter::make('created_at')
                 ->form([
                     Grid::make(2)
@@ -220,8 +248,11 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
                 }
                 // ========== SMS NOTIFICATION END ==========
 
-                // ========== EMAIL NOTIFICATION ==========
-                $this->dispatchReturnEmail($record, $officerName, $remarks);
+                // ========== EMAIL NOTIFICATION (PREPARED, DISABLED) ==========
+                // No live email provider / verified domain yet. The full sender is
+                // built and ready in dispatchReturnEmail(); re-enable by uncommenting
+                // the line below once email is set up.
+                // $this->dispatchReturnEmail($record, $officerName, $remarks);
                 // ========== EMAIL NOTIFICATION END ==========
 
                 Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();

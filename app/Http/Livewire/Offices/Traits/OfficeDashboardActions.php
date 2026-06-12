@@ -412,8 +412,11 @@
                         }
                         // ========== SMS NOTIFICATION END ==========
 
-                        // ========== EMAIL NOTIFICATION ==========
-                        $this->dispatchReturnEmail($record, $officerName, $remarks);
+                        // ========== EMAIL NOTIFICATION (PREPARED, DISABLED) ==========
+                        // No live email provider / verified domain yet. The full sender
+                        // is built and ready in dispatchReturnEmail(); re-enable by
+                        // uncommenting the line below once email is set up.
+                        // $this->dispatchReturnEmail($record, $officerName, $remarks);
                         // ========== EMAIL NOTIFICATION END ==========
 
                         Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
