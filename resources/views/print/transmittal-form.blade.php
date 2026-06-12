@@ -62,7 +62,7 @@
     <div class="grid grid-cols-2 gap-8 mt-16 text-sm">
         <div>
             <p class="mb-10">Prepared by:</p>
-            <p class="font-semibold border-t border-gray-500 pt-1">{{ $transmittal->prepared_by_user->employee_information->full_name ?? '' }}</p>
+            <p class="font-semibold border-t border-gray-500 pt-1">{{ $transmittal->prepared_by_user?->employee_information?->full_name ?? '' }}</p>
             <p class="text-xs text-gray-500">Prepared By</p>
         </div>
         <div>

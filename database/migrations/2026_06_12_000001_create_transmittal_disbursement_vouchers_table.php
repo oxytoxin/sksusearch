@@ -10,9 +10,16 @@ return new class extends Migration
     {
         Schema::create('transmittal_disbursement_vouchers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transmittal_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('disbursement_voucher_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('transmittal_id');
+            $table->foreignId('disbursement_voucher_id');
             $table->timestamps();
+
+            // Explicit short constraint names — the auto-generated ones exceed
+            // MySQL's 64-char identifier limit for this long pivot table name.
+            $table->foreign('transmittal_id', 'tdv_transmittal_fk')
+                ->references('id')->on('transmittals')->cascadeOnDelete();
+            $table->foreign('disbursement_voucher_id', 'tdv_dv_fk')
+                ->references('id')->on('disbursement_vouchers')->cascadeOnDelete();
         });
     }
 
