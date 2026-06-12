@@ -54,6 +54,11 @@
                             {{ __('Office Dashboard') }}
                         </x-jet-nav-link>
                     @endif
+                    @if (auth()->user()->employee_information?->office?->office_group_id == 2)
+                        <x-jet-nav-link href="{{ route('office.sent-emails') }}" :active="request()->routeIs('office.sent-emails')">
+                            {{ __('Sent Emails') }}
+                        </x-jet-nav-link>
+                    @endif
                     <x-jet-nav-link href="{{ route('oic.dashboard') }}" :active="request()->routeIs('oic.dashboard')">
                         {{ __('OIC Dashboard') }}
                     </x-jet-nav-link>

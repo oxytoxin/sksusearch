@@ -118,6 +118,10 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
                 }
                 // ========== SMS NOTIFICATION END ==========
 
+                // ========== EMAIL NOTIFICATION ==========
+                $this->dispatchReturnEmail($record, $officerName, $remarks);
+                // ========== EMAIL NOTIFICATION END ==========
+
                 Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
             })
                 ->color('danger')

@@ -32,6 +32,7 @@
     use Carbon\Carbon;
     use Illuminate\Support\Str;
     use App\Jobs\SendSmsJob;
+    use App\Jobs\SendEmailJob;
 
     trait OfficeDashboardActions
     {
@@ -116,13 +117,63 @@
         {
             return [
                 TextColumn::make('tracking_number')->searchable(),
-                TextColumn::make('voucher_subtype.voucher_type.name')->wrap()->label('Voucher Type'),
-                TextColumn::make('voucher_subtype.name')->wrap()->label('Voucher Sub Type'),
+                // Per ICU/Accounting request: show the disbursement SUB-TYPE as the
+                // primary column (e.g. "Local Travel"); the broad type ("Cash Advances")
+                // is kept as a small description line for context, not its own column.
+                TextColumn::make('voucher_subtype.name')->wrap()->label('Disbursement Sub Type')
+                    ->description(fn ($record) => $record->voucher_subtype?->voucher_type?->name),
                 TextColumn::make('user.employee_information.full_name')->searchable()->wrap()->label('Requisitioner'),
                 TextColumn::make('payee')->searchable()->wrap()->label('Payee'),
                 TextColumn::make('submitted_at')->dateTime('F d, Y'),
                 TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php', true),
             ];
+        }
+
+        /**
+         * Dispatch the "DV returned to client" email (mirrors the SMS block).
+         *
+         * Independent and additive: guarded, queued via SendEmailJob, and recorded
+         * in email_logs (which Accounting can browse). A failure here never affects
+         * the SMS or realtime channels, nor the return action itself. Includes the
+         * DV sub-type in the body per the ICU request.
+         *
+         * $officerName and $remarks are already computed in each return handler's
+         * SMS block, so callers pass them straight through.
+         */
+        protected function dispatchReturnEmail(DisbursementVoucher $record, string $officerName, string $remarks): void
+        {
+            $requestedBy = $record->user;
+            if (! $requestedBy || blank($requestedBy->email)) {
+                return;
+            }
+
+            $record->loadMissing('voucher_subtype.voucher_type');
+            $type = $record->voucher_subtype?->voucher_type?->name;
+            $subType = $record->voucher_subtype?->name;
+            $voucherLabel = trim(implode(' - ', array_filter([$type, $subType]))) ?: 'Disbursement Voucher';
+            $trackingNumber = $record->tracking_number;
+
+            if (blank($remarks)) {
+                $remarks = 'No remarks provided';
+            }
+
+            $body = "Good day,\n\n"
+                . "Your Disbursement Voucher has been returned and is ready for you to retrieve.\n\n"
+                . "Reference No.: {$trackingNumber}\n"
+                . "Disbursement Sub Type: {$voucherLabel}\n"
+                . "Returned by: {$officerName}\n\n"
+                . "Remarks:\n{$remarks}\n\n"
+                . "Please retrieve and address your documents at your earliest convenience.";
+
+            SendEmailJob::dispatch(
+                $requestedBy->email,
+                "Disbursement Voucher Returned — {$trackingNumber}",
+                'Disbursement Voucher Returned',
+                $body,
+                'disbursement_voucher_returned',
+                $requestedBy->id,
+                auth()->id()
+            );
         }
 
         private function canBeForwarded($record)
@@ -360,6 +411,10 @@
                             );
                         }
                         // ========== SMS NOTIFICATION END ==========
+
+                        // ========== EMAIL NOTIFICATION ==========
+                        $this->dispatchReturnEmail($record, $officerName, $remarks);
+                        // ========== EMAIL NOTIFICATION END ==========
 
                         Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
                     })

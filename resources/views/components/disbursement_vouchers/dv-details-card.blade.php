@@ -1,4 +1,19 @@
 <div class="rounded-lg bg-green-50 border border-green-200 p-4">
+    <div class="flex items-center justify-between mb-3 pb-3 border-b border-green-200">
+        <div>
+            <span class="text-xs font-medium text-green-600 uppercase">Disbursement Sub Type</span>
+            <p class="text-sm font-bold text-gray-800">
+                {{ $record->voucher_subtype?->name ?? 'N/A' }}
+            </p>
+            @if ($record->voucher_subtype?->voucher_type?->name)
+                <p class="text-xs text-gray-500">{{ $record->voucher_subtype->voucher_type->name }}</p>
+            @endif
+        </div>
+        <div class="text-right">
+            <span class="text-xs font-medium text-green-600 uppercase">Tracking No.</span>
+            <p class="text-sm font-semibold text-gray-800">{{ $record->tracking_number }}</p>
+        </div>
+    </div>
     <div class="flex items-center justify-between mb-3">
         <div>
             <span class="text-xs font-medium text-green-600 uppercase">Payee</span>
