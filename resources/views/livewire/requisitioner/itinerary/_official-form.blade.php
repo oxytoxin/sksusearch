@@ -119,55 +119,64 @@
                 <td class="whitespace-nowrap border border-black border-t-2 px-1 py-0.5 text-right align-top font-bold">{{ $itineraryForm['totals']['grand'] }}</td>
             </tr>
             <tr>
-                <td class="h-[156px] border border-black px-1 py-0.5 text-center align-top" colspan="4" rowspan="2">
+                <td class="h-[156px] border border-black px-1 py-0.5 text-center align-top" colspan="4" rowspan="{{ $itineraryForm['signatures']['right_rowspan'] }}">
                     <p class="mt-7 text-justify [text-align-last:center]">
                         I certify that : (1) I have reviewed the foregoing itinerary, (2) the travel is necessary to the service, (3) the period covered is reasonable and (4) the expenses claimed are proper.
                     </p>
                     <div class="mt-[66px]">
-                        <span class="relative inline-block min-w-[62%] border-b border-black px-2 pb-px">
-                            @if ($itineraryForm['signatures']['immediate_supervisor']['signature'])
-                                <img src="{{ $itineraryForm['signatures']['immediate_supervisor']['signature'] }}"
+                        <span class="block text-left font-bold">{{ $itineraryForm['signatures']['certifying']['heading'] }}</span>
+                        <span class="block h-12 text-center">
+                            @if ($itineraryForm['signatures']['certifying']['signature'])
+                                <img src="{{ $itineraryForm['signatures']['certifying']['signature'] }}"
                                      alt="signature"
-                                     class="absolute bottom-full left-1/2 h-auto max-h-14 w-36 -translate-x-1/2 translate-y-5 object-contain print:!opacity-100 print:[-webkit-print-color-adjust:exact] print:[print-color-adjust:exact]">
+                                     class="mx-auto h-12 w-auto object-contain print:!opacity-100 print:[-webkit-print-color-adjust:exact] print:[print-color-adjust:exact]">
                             @endif
-                            {{ $itineraryForm['signatures']['immediate_supervisor']['name'] }}
+                        </span>
+                        <span class="inline-block min-w-[62%] border-b border-black px-2 pb-px">
+                            {{ $itineraryForm['signatures']['certifying']['name'] }}
                         </span>
                         <span class="block text-10">Signature over Printed Name</span>
-                        <span class="block text-10">Immediate Supervisor</span>
+                        <span class="block text-10">{{ $itineraryForm['signatures']['certifying']['designation'] }}</span>
                     </div>
                 </td>
                 <td class="border border-black px-1 py-0.5 align-top" colspan="5">
                     <span class="font-bold">Prepared by :</span>
-                    <div class="relative h-[72px] text-center align-bottom">
-                        <span class="relative inline-block min-w-[62%] border-b border-black px-2 pb-px">
+                    <div class="text-center">
+                        <span class="block h-12 text-center">
                             @if ($itineraryForm['traveler']['signature'])
                                 <img src="{{ $itineraryForm['traveler']['signature'] }}"
                                      alt="signature"
-                                     class="absolute bottom-full left-1/2 h-auto max-h-14 w-36 -translate-x-1/2 translate-y-5 object-contain print:!opacity-100 print:[-webkit-print-color-adjust:exact] print:[print-color-adjust:exact]">
+                                     class="mx-auto h-12 w-auto object-contain print:!opacity-100 print:[-webkit-print-color-adjust:exact] print:[print-color-adjust:exact]">
                             @endif
+                        </span>
+                        <span class="inline-block min-w-[62%] border-b border-black px-2 pb-px">
                             {{ $itineraryForm['traveler']['name'] }}
                         </span>
                         <span class="block text-10">Signature over Printed Name</span>
                     </div>
                 </td>
             </tr>
-            <tr>
-                <td class="border border-black px-1 py-0.5 align-top" colspan="5">
-                    <span class="font-bold">Approved by:</span>
-                    <div class="relative h-[72px] text-center align-bottom">
-                        <span class="relative inline-block min-w-[62%] border-b border-black px-2 pb-px">
-                            @if ($itineraryForm['signatures']['approved_by']['signature'])
-                                <img src="{{ $itineraryForm['signatures']['approved_by']['signature'] }}"
-                                     alt="signature"
-                                     class="absolute bottom-full left-1/2 h-auto max-h-14 w-36 -translate-x-1/2 translate-y-5 object-contain print:!opacity-100 print:[-webkit-print-color-adjust:exact] print:[print-color-adjust:exact]">
-                            @endif
-                            {{ $itineraryForm['signatures']['approved_by']['name'] }}
-                        </span>
-                        <span class="block text-10">Signature over Printed Name</span>
-                        <span class="block text-10">Agency Head/Authorized Representative</span>
-                    </div>
-                </td>
-            </tr>
+            @foreach ($itineraryForm['signatures']['approving'] as $signatory)
+                <tr>
+                    <td class="border border-black px-1 py-0.5 align-top" colspan="5">
+                        <span class="font-bold">{{ $signatory['heading'] }}</span>
+                        <div class="text-center">
+                            <span class="block h-12 text-center">
+                                @if ($signatory['signature'])
+                                    <img src="{{ $signatory['signature'] }}"
+                                         alt="signature"
+                                         class="mx-auto h-12 w-auto object-contain print:!opacity-100 print:[-webkit-print-color-adjust:exact] print:[print-color-adjust:exact]">
+                                @endif
+                            </span>
+                            <span class="inline-block min-w-[62%] border-b border-black px-2 pb-px">
+                                {{ $signatory['name'] }}
+                            </span>
+                            <span class="block text-10">Signature over Printed Name</span>
+                            <span class="block text-10">{{ $signatory['designation'] }}</span>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
 </div>

@@ -4,6 +4,7 @@
 
     use App\Enums\ActivityDesignStatus;
     use App\Forms\Components\ItineraryBuilder;
+    use App\Http\Livewire\Requisitioner\Itinerary\PreparesItineraryOfficialForm;
     use Str;
     use App\Models\Mop;
     use App\Models\Mot;
@@ -52,6 +53,7 @@
     class DisbursementVouchersCreate extends Component implements HasForms
     {
         use InteractsWithForms;
+        use PreparesItineraryOfficialForm;
 
         #region Variables
         public $attachment = [];
@@ -1098,6 +1100,7 @@
                                                         'itinerary' => $itinerary,
                                                         'itinerary_entries' => $itinerary_entries,
                                                         'travel_order' => $to,
+                                                        'itineraryForm' => $this->prepareItineraryOfficialForm($itinerary, $to, $itinerary_entries, $coverage),
                                                         'immediate_signatory' => $to?->signatories()->with('employee_information')->first(),
                                                     ]);
                                                 }

@@ -32,6 +32,7 @@
     use Carbon\Carbon;
     use Illuminate\Support\Str;
     use App\Jobs\SendSmsJob;
+    use Illuminate\Validation\ValidationException;
 
     trait OfficeDashboardActions
     {
@@ -135,7 +136,7 @@
                 return false;
             }
             return ($record->current_step->process == 'Received in' && !in_array($record->current_step_id, [6000, 9000, 13000, 17000]))
-                || ($record->current_step_id == 9000 && filled($record->ors_burs) && filled($record->fund_cluster_id))
+                || ($record->current_step_id == 9000 && filled($record->ors_burs) && filled($record->fund_cluster_id) && $record->hasValidUacsAllocations())
                 || ($record->current_step_id == 12000 && filled($record->journal_date) && filled($record->dv_number))
                 || ($record->current_step_id == 13000 && $record->certified_by_accountant)
                 || ($record->current_step_id == 18000 && filled($record->cheque_number))
@@ -616,14 +617,29 @@
         {
             return [
                 Action::make('ors_burs')->label('ORS/BURS')->button()->action(function ($record, $data) {
+                    $allocations = collect($data['uacs_allocations'] ?? [])
+                        ->map(fn ($allocation) => [
+                            'category_item_budget_id' => $allocation['category_item_budget_id'] ?? null,
+                            'amount' => $allocation['amount'] ?? null,
+                        ])
+                        ->filter(fn ($allocation) => filled($allocation['category_item_budget_id']) && filled($allocation['amount']))
+                        ->values();
+
+                    $this->validateUacsAllocations($record, $allocations);
+
                     DB::beginTransaction();
                     $record->update([
                         'ors_burs' => $data['ors_burs'],
-                        'category_item_budget_id' => $data['category_item_budget_id'],
                         'responsibility_center' => $data['responsibility_center'],
                         'fund_cluster_id' => $data['fund_cluster_id'],
                     ]);
-                    $description = 'ORS/BURS and Fund Cluster assigned to Disbursement Voucher.';
+                    $record->uacs_allocations()->delete();
+                    $record->uacs_allocations()->createMany($allocations->map(fn ($allocation) => [
+                        'category_item_budget_id' => $allocation['category_item_budget_id'],
+                        'amount' => $allocation['amount'],
+                    ])->all());
+
+                    $description = 'ORS/BURS, Fund Cluster, and UACS allocations assigned to Disbursement Voucher.';
                     if ($this->isOic()) {
                         $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
                     }
@@ -631,17 +647,30 @@
                         'description' => $description,
                     ]);
                     DB::commit();
-                    Notification::make()->title('ORS/BURS and Fund Cluster updated.')->success()->send();
+                    Notification::make()->title('ORS/BURS, Fund Cluster, and UACS allocations updated.')->success()->send();
                 })
                     ->visible(function ($record) {
                         if (!$record) {
                             Notification::make()->title('Selected document not found in office.')->warning()->send();
                             return false;
                         }
-                        return $record->current_step_id == 9000 && (blank($record->ors_burs) || blank($record->fund_cluster_id)) && $record->for_cancellation == false && blank($record->pending_return_step_id);
+                        return $record->current_step_id == 9000 && (blank($record->ors_burs) || blank($record->fund_cluster_id) || !$record->hasValidUacsAllocations()) && $record->for_cancellation == false && blank($record->pending_return_step_id);
                     })
                     ->form(function ($record) {
+                        $uacsAllocationDefaults = $record->uacs_allocations->isNotEmpty()
+                            ? $record->uacs_allocations->map(fn ($allocation) => [
+                                'category_item_budget_id' => $allocation->category_item_budget_id,
+                                'amount' => $allocation->amount,
+                            ])->values()->all()
+                            : [[
+                                'category_item_budget_id' => null,
+                                'amount' => $record->totalSumDisbursementVoucherParticular(),
+                            ]];
+
                         return [
+                            Placeholder::make('voucher_total')
+                                ->label('DV Amount')
+                                ->content(fn ($record) => 'PHP '.number_format($record->totalSumDisbursementVoucherParticular(), 2)),
                             Select::make('fund_cluster_id')
                                 ->label('Fund Cluster')
                                 ->options(FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id'))
@@ -654,16 +683,59 @@
                             TextInput::make('responsibility_center')
                                 ->default($record->responsibility_center)
                                 ->required(),
-                            Select::make('category_item_budget_id')
-                                ->label('UACS Code')
-                                ->options(CategoryItemBudget::selectRaw("id, concat(uacs_code, ' - ', name) as code")->pluck('code', 'id'))
-                                ->preload()
-                                ->searchable()
-                                ->required()
+                            Repeater::make('uacs_allocations')
+                                ->label('UACS Allocations')
+                                ->schema([
+                                    Select::make('category_item_budget_id')
+                                        ->label('UACS Code')
+                                        ->options(CategoryItemBudget::selectRaw("id, concat(uacs_code, ' - ', name) as code")->pluck('code', 'id'))
+                                        ->preload()
+                                        ->searchable()
+                                        ->required(),
+                                    TextInput::make('amount')
+                                        ->label('Amount')
+                                        ->numeric()
+                                        ->minValue(0.01)
+                                        ->required(),
+                                ])
+                                ->columns(2)
+                                ->default($uacsAllocationDefaults)
+                                ->defaultItems(1)
+                                ->minItems(1)
+                                ->required(),
                         ];
                     })
                     ->requiresConfirmation(),
             ];
+        }
+
+        private function validateUacsAllocations(DisbursementVoucher $record, $allocations): void
+        {
+            if ($allocations->isEmpty()) {
+                throw ValidationException::withMessages([
+                    'uacs_allocations' => 'At least one UACS allocation is required.',
+                ]);
+            }
+
+            if ($allocations->pluck('category_item_budget_id')->duplicates()->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'uacs_allocations' => 'Each UACS code can only be selected once.',
+                ]);
+            }
+
+            $allocationTotal = $allocations->sum(fn ($allocation) => (float) $allocation['amount']);
+            $voucherTotal = $record->totalSumDisbursementVoucherParticular();
+
+            if ($this->amountToCents($allocationTotal) !== $this->amountToCents($voucherTotal)) {
+                throw ValidationException::withMessages([
+                    'uacs_allocations' => 'The total UACS allocation must equal the DV amount of PHP '.number_format($voucherTotal, 2).'.',
+                ]);
+            }
+        }
+
+        private function amountToCents($amount): int
+        {
+            return (int) round((float) $amount * 100);
         }
 
         private function commonActions()

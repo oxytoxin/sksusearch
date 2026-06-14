@@ -215,17 +215,35 @@
                         Credit
                     </div>
                 </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="h-40 w-1/2 border-r-2 border-black text-center">
-                        &nbsp
+                <div class="col-span-8 flex min-w-full items-stretch border-t-2 border-black font-serif print:text-12">
+                    <div class="min-h-[10rem] w-1/2 border-r-2 border-black">
+                        @forelse ($disbursement_voucher->uacs_allocations as $allocation)
+                            <div class="border-b border-black px-1 py-0.5 text-left">
+                                {{ $allocation->category_item_budget?->name }}
+                            </div>
+                        @empty
+                            <div class="px-1 py-0.5 text-center">&nbsp;</div>
+                        @endforelse
                     </div>
-                    <div class="h-40 w-64 border-r-2 border-black text-center">
-                        &nbsp
+                    <div class="min-h-[10rem] w-64 border-r-2 border-black">
+                        @forelse ($disbursement_voucher->uacs_allocations as $allocation)
+                            <div class="border-b border-black px-1 py-0.5 text-center">
+                                {{ $allocation->category_item_budget?->uacs_code }}
+                            </div>
+                        @empty
+                            <div class="px-1 py-0.5 text-center">&nbsp;</div>
+                        @endforelse
                     </div>
-                    <div class="h-40 w-36 border-r-2 border-black text-center">
-                        &nbsp
+                    <div class="min-h-[10rem] w-36 border-r-2 border-black">
+                        @forelse ($disbursement_voucher->uacs_allocations as $allocation)
+                            <div class="border-b border-black px-1 py-0.5 text-right">
+                                {{ number_format($allocation->amount, 2) }}
+                            </div>
+                        @empty
+                            <div class="px-1 py-0.5 text-center">&nbsp;</div>
+                        @endforelse
                     </div>
-                    <div class="h-40 w-36 text-center">
+                    <div class="min-h-[10rem] w-36 text-center">
                         &nbsp
                     </div>
                 </div>

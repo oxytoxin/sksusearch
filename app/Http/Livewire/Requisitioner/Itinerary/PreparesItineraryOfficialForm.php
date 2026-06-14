@@ -2,20 +2,47 @@
 
 namespace App\Http\Livewire\Requisitioner\Itinerary;
 
+use App\Models\Itinerary;
+use App\Models\TravelOrder;
 use Carbon\Carbon;
 
 trait PreparesItineraryOfficialForm
 {
     protected function itineraryFormData(): array
     {
-        $itinerary = $this->itinerary;
-        $travelOrder = $this->travel_order ?? $itinerary->travel_order;
-        $coverageRows = collect($this->coverage ?? $itinerary->coverage ?? []);
-        $entriesByDate = $itinerary->itinerary_entries->groupBy(fn ($entry) => $entry->date?->format('Y-m-d'));
+        return $this->prepareItineraryOfficialForm(
+            $this->itinerary,
+            $this->travel_order ?? $this->itinerary->travel_order,
+            $this->itinerary->itinerary_entries,
+            $this->coverage ?? $this->itinerary->coverage ?? [],
+        );
+    }
+
+    protected function prepareItineraryOfficialForm(
+        Itinerary $itinerary,
+        ?TravelOrder $travelOrder = null,
+        $itineraryEntries = null,
+        $coverage = null,
+    ): array {
+        $travelOrder ??= $itinerary->travel_order;
+        $coverageRows = collect($coverage ?? $itinerary->coverage ?? []);
+        $entries = collect($itineraryEntries ?? $itinerary->itinerary_entries ?? []);
+        $entries->each->loadMissing('mot');
+        $entriesByDate = $entries->groupBy(fn ($entry) => $entry->date?->format('Y-m-d'));
         $signatories = $travelOrder->signatories ?? collect();
-        $preparedBy = $itinerary->user;
-        $immediateSupervisor = $signatories->firstWhere('pivot.role', 'immediate_supervisor') ?? $signatories->first();
-        $approvedBy = $signatories->firstWhere('pivot.role', 'university_president') ?? $signatories->last();
+        $preparedBy = $itinerary->user ?? $itinerary->user()->with([
+            'employee_information.position',
+            'employee_information.office',
+            'signature',
+        ])->first() ?? auth()->user();
+        $itinerarySignatories = $this->prepareItinerarySignatories($signatories);
+        $certifyingSignatory = $itinerarySignatories->first() ?? [
+            'heading' => 'Certified by:',
+            'designation' => '',
+            'name' => '',
+            'signature' => null,
+        ];
+        $approvingSignatories = $itinerarySignatories->skip(1)->values();
         $rows = [];
         $perDiemTotal = 0;
         $transportationTotal = 0;
@@ -88,14 +115,9 @@ trait PreparesItineraryOfficialForm
                 'signature' => $preparedBy->signature?->content,
             ],
             'signatures' => [
-                'immediate_supervisor' => [
-                    'name' => $immediateSupervisor?->employee_information?->full_name ?? $immediateSupervisor?->name,
-                    'signature' => $immediateSupervisor?->pivot?->is_approved ? $immediateSupervisor->signature?->content : null,
-                ],
-                'approved_by' => [
-                    'name' => $approvedBy?->employee_information?->full_name ?? $approvedBy?->name,
-                    'signature' => $approvedBy?->pivot?->is_approved ? $approvedBy->signature?->content : null,
-                ],
+                'certifying' => $certifyingSignatory,
+                'approving' => $approvingSignatories,
+                'right_rowspan' => $approvingSignatories->count() + 1,
             ],
             'rows' => $rows,
             'blank_rows' => max(0, 22 - count($rows)),
@@ -122,5 +144,20 @@ trait PreparesItineraryOfficialForm
     protected function formatItineraryAmount($amount): string
     {
         return $amount ? number_format($amount, 2) : '-';
+    }
+
+    protected function prepareItinerarySignatories($signatories)
+    {
+        return collect($signatories)
+            ->sortBy(fn ($signatory) => $signatory->pivot?->id ?? 0)
+            ->values()
+            ->map(function ($signatory, int $index) {
+                return [
+                    'heading' => $signatory->pivot?->heading ?: ($index === 0 ? 'Certified by:' : 'Approved by:'),
+                    'designation' => $signatory->pivot?->designation ?: ($index === 0 ? 'Immediate Supervisor' : 'Agency Head/Authorized Representative'),
+                    'name' => $signatory->employee_information?->full_name ?? $signatory->name,
+                    'signature' => $signatory->pivot?->is_approved ? $signatory->signature?->content : null,
+                ];
+            });
     }
 }

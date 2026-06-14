@@ -98,6 +98,11 @@
             return $this->hasMany(DisbursementVoucherParticular::class);
         }
 
+        public function uacs_allocations()
+        {
+            return $this->hasMany(DisbursementVoucherUacsAllocation::class);
+        }
+
         public function fund_cluster()
         {
             return $this->belongsTo(FundCluster::class);
@@ -140,6 +145,25 @@
         public function totalSumDisbursementVoucherParticular()
         {
             return $this->disbursement_voucher_particulars->sum('final_amount');
+        }
+
+        public function hasValidUacsAllocations(): bool
+        {
+            $this->loadMissing(['disbursement_voucher_particulars', 'uacs_allocations']);
+
+            if ($this->uacs_allocations->isEmpty()) {
+                return false;
+            }
+
+            $allocationTotal = $this->uacs_allocations->sum(fn ($allocation) => (float) $allocation->amount);
+            $voucherTotal = $this->totalSumDisbursementVoucherParticular();
+
+            return $this->amountToCents($allocationTotal) === $this->amountToCents($voucherTotal);
+        }
+
+        private function amountToCents($amount): int
+        {
+            return (int) round((float) $amount * 100);
         }
 
         public function daysOutstanding()
