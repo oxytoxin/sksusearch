@@ -20,6 +20,7 @@ use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use App\Models\OicUser;
 use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
+use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
 class OicSignatoryDisbursementVouchers extends Component implements HasTable
 {
@@ -60,18 +61,11 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
     {
         return [
             Action::make('Receive')->button()->action(function (DisbursementVoucher $record) {
-                if ($record->current_step->process == 'Forwarded to') {
-                    DB::beginTransaction();
-                    $record->update([
-                        'current_step_id' => $record->current_step->next_step->id,
-                    ]);
-                    $record->refresh();
-                    $record->activity_logs()->create([
-                        'description' => $record->current_step->process . ' OIC: ' . auth()->user()->employee_information->full_name,
-                    ]);
-                    DB::commit();
-                    Notification::make()->title('Document Received')->success()->send();
-                }
+                app(DisbursementVoucherWorkflowService::class)->receive($record, auth()->user(), [
+                    'is_oic' => true,
+                    'include_recipient' => false,
+                ]);
+                Notification::make()->title('Document Received')->success()->send();
             })
                 ->visible(function ($record) {
                     if (!$record) {
@@ -82,34 +76,10 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 })
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
-                    $record->update([
-                        'current_step_id' => $record->current_step->next_step->id,
-                    ]);
-                    if ($record->travel_order_id && in_array($record->voucher_subtype_id, [6, 7])) {
-                        $actual_itinerary = $record->travel_order?->itineraries()->whereIsActual(true)->first();
-                        if (!$actual_itinerary) {
-                            DB::rollBack();
-                            Notification::make()->title('Actual itinerary not found.')->warning()->send();
-                            return false;
-                        } else {
-                            $actual_itinerary->update([
-                                'approved_at' => now(),
-                            ]);
-                        }
-                    }
-                } else {
-                    $record->update([
-                        'current_step_id' => $record->previous_step_id,
-                    ]);
-                }
-                $record->refresh();
-                $record->activity_logs()->create([
-                    'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by OIC:' . auth()->user()->employee_information->full_name,
-                    'remarks' => $data['remarks'] ?? null,
+                app(DisbursementVoucherWorkflowService::class)->forward($record, auth()->user(), $data['remarks'] ?? null, [
+                    'is_oic' => true,
+                    'approve_actual_itinerary' => true,
                 ]);
-                DB::commit();
                 Notification::make()->title('Document Forwarded')->success()->send();
             })
                 ->form(function () {
@@ -129,16 +99,10 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                 })
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                $destinationStep = DisbursementVoucherStep::find($data['return_step_id']);
-                $record->update([
-                    'pending_return_step_id' => $data['return_step_id'],
+                app(DisbursementVoucherWorkflowService::class)->returnToStep($record, $data['return_step_id'], $data['remarks'] ?? null, [
+                    'is_oic' => true,
+                    'actor' => auth()->user(),
                 ]);
-                $record->activity_logs()->create([
-                    'description' => 'DV marked for return to ' . ($destinationStep->recipient ?? 'Unknown') . ' by OIC:' . auth()->user()->employee_information->full_name . '. Awaiting physical release.',
-                    'remarks' => $data['remarks'] ?? null,
-                ]);
-                DB::commit();
 
                 // ========== SMS NOTIFICATION ==========
                 $record->load(['user.employee_information']);

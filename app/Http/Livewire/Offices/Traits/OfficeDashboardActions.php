@@ -18,7 +18,6 @@
     use Illuminate\Support\Facades\Auth;
     use Filament\Forms\Components\Select;
     use App\Models\DisbursementVoucherStep;
-    use App\Notifications\SubmissionRequestNotification;
     use Filament\Tables\Actions\EditAction;
     use Filament\Tables\Actions\ViewAction;
     use Filament\Tables\Columns\TextColumn;
@@ -33,6 +32,7 @@
     use Illuminate\Support\Str;
     use App\Jobs\SendSmsJob;
     use Illuminate\Validation\ValidationException;
+    use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
     trait OfficeDashboardActions
     {
@@ -132,15 +132,7 @@
                 Notification::make()->title('Selected document not found in office.')->warning()->send();
                 return;
             }
-            if (filled($record->pending_return_step_id)) {
-                return false;
-            }
-            return ($record->current_step->process == 'Received in' && !in_array($record->current_step_id, [6000, 9000, 13000, 17000]))
-                || ($record->current_step_id == 9000 && filled($record->ors_burs) && filled($record->fund_cluster_id) && $record->hasValidUacsAllocations())
-                || ($record->current_step_id == 12000 && filled($record->journal_date) && filled($record->dv_number))
-                || ($record->current_step_id == 13000 && $record->certified_by_accountant)
-                || ($record->current_step_id == 18000 && filled($record->cheque_number))
-                || ($record->current_step_id == 6000 && (!$record->voucher_subtype?->related_documents_list || $record->hasCompletedRelatedDocumentsVerification()));
+            return app(DisbursementVoucherWorkflowService::class)->canBeForwarded($record);
         }
 
         private function viewActions()
@@ -228,27 +220,10 @@
                     })
                     ->action(function ($record, $data) {
                         $record->refresh();
-                        DB::beginTransaction();
-                        $record->update([
-                            'log_number' => $data['log_number'],
-                            'documents_verified_at' => now(),
-                            'related_documents' => [
-                                'items' => collect($data['items'] ?? [])->map(fn($item) => [
-                                    'document' => $item['document'] ?? '',
-                                    'status' => $item['status'] ?? 'required',
-                                    'remarks' => $item['remarks'] ?? null,
-                                ])->values()->all(),
-                                'remarks' => $data['remarks'] ?? '',
-                            ]
+                        app(DisbursementVoucherWorkflowService::class)->verifyRelatedDocuments($record, $data, [
+                            'is_oic' => $this->isOic(),
+                            'actor' => auth()->user(),
                         ]);
-                        $description = 'Related documents have been verified.';
-                        if ($this->isOic()) {
-                            $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
-                        }
-                        $record->activity_logs()->create([
-                            'description' => $description,
-                        ]);
-                        DB::commit();
                         Notification::make()->title('Related documents have been verified.')->success()->send();
                     })
                     ->form([
@@ -325,20 +300,10 @@
                         ];
                     })
                     ->action(function ($record, $data) {
-                        DB::beginTransaction();
-                        $destinationStep = DisbursementVoucherStep::find($data['return_step_id']);
-                        $record->update([
-                            'pending_return_step_id' => $data['return_step_id'],
+                        app(DisbursementVoucherWorkflowService::class)->returnToStep($record, $data['return_step_id'], $data['remarks'] ?? null, [
+                            'is_oic' => $this->isOic(),
+                            'actor' => auth()->user(),
                         ]);
-                        $description = 'DV marked for return to ' . ($destinationStep->recipient ?? 'Unknown') . ' by Accounting Office (Pre-Audit). Awaiting physical release.';
-                        if ($this->isOic()) {
-                            $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
-                        }
-                        $record->activity_logs()->create([
-                            'description' => $description,
-                            'remarks' => $data['remarks'] ?? null,
-                        ]);
-                        DB::commit();
 
                         // ========== SMS NOTIFICATION ==========
                         $record->load(['user.employee_information']);
@@ -395,42 +360,9 @@
                             ->label('Note (Optional)'),
                     ])
                     ->action(function ($record, $data) {
-                        DB::beginTransaction();
-
-                        $destinationStepId = $record->pending_return_step_id;
-
-                        if ($record->current_step_id < ($record->previous_step_id ?? 0)) {
-                            $previous_step_id = $record->previous_step_id;
-                        } else {
-                            $previous_step_id = DisbursementVoucherStep::where('process', 'Forwarded to')
-                                ->where('id', '<', $record->current_step_id)
-                                ->latest('id')
-                                ->first()
-                                ->id;
-                        }
-
-                        $record->update([
-                            'current_step_id' => $destinationStepId,
-                            'previous_step_id' => $previous_step_id,
-                            'pending_return_step_id' => null,
+                        app(DisbursementVoucherWorkflowService::class)->releaseReturn($record, auth()->user(), $data['release_log_number'], $data['release_note'] ?? null, [
+                            'is_oic' => $this->isOic(),
                         ]);
-                        $record->refresh();
-
-                        $description = 'DV released to ' . $record->current_step->recipient . '. Log #: ' . $data['release_log_number'];
-                        if ($this->isOic()) {
-                            $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
-                        } else {
-                            $description .= ' by ' . auth()->user()->employee_information->full_name;
-                        }
-                        if (filled($data['release_note'])) {
-                            $description .= "\nNote: " . $data['release_note'];
-                        }
-
-                        $record->activity_logs()->create([
-                            'description' => $description,
-                        ]);
-
-                        DB::commit();
                         Notification::make()->title('Document released successfully.')->success()->send();
                     })
                     ->visible(fn ($record) => $record && filled($record->pending_return_step_id)),
@@ -441,63 +373,11 @@
         {
             return [
                 Action::make('cheque_ada')->label('Cheque/ADA')->button()->action(function ($record, $data) {
-                    DB::beginTransaction();
-                    $record->update([
-                        'mop_id' => $data['mop_id'],
-                        'cheque_number' => $data['cheque_number'],
-                        'current_step_id' => $record->current_step_id + 1000,
-                        'cheque_number_added_at' => now(),
+                    app(DisbursementVoucherWorkflowService::class)->makeChequeAda($record, $data['mop_id'], $data['cheque_number'], [
+                        'is_oic' => $this->isOic(),
+                        'actor' => auth()->user(),
                     ]);
-                    $description = 'Cheque/ADA made for requisitioner.';
-                    if ($this->isOic()) {
-                        $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
-                    }
-                    $record->activity_logs()->create([
-                        'description' => $description,
-                    ]);
-                    $end_date = null;
-                    $liquidation_period_end_date = null;
-                    switch ($record->voucher_subtype_id) {
-                        case 1:
-                            //local travel
-                            $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
-                            $liquidation_period_end_date = Carbon::parse($end_date)->addDays(30)->format('Y-m-d');
-                            break;
-                        case 2:
-                            //foreign travel
-                            $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
-                            $liquidation_period_end_date = Carbon::parse($end_date)->addDays(60)->format('Y-m-d');
-                            break;
-                        case 3:
-                            //activities
-                            $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
-                            $liquidation_period_end_date = Carbon::parse($end_date)->addDays(20)->format('Y-m-d');
-                            break;
-                        case 4:
-                            //payroll
-                            $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
-                            $liquidation_period_end_date = Carbon::parse($end_date)->addDays(5)->format('Y-m-d');
-                            break;
-                        case 5:
-                            //special disbursing officer
-                            $end_date = $record->travel_order()->exists() ? $record->travel_order->date_to : $record->other_details['activity_date_to'] ?? null;
-                            $liquidation_period_end_date = Carbon::parse($end_date)->addDays(5)->format('Y-m-d');
-                            break;
-                        default:
-                            $end_date = null;
-                            $liquidation_period_end_date = null;
-                            break;
-                    }
-
-                    $record->cash_advance_reminder()->create([
-                        'status' => 'On-Going',
-                        'voucher_end_date' => $end_date,
-                        'liquidation_period_end_date' => $liquidation_period_end_date,
-                        'step' => 1,
-                        'is_sent' => false,
-                        'title' => 'Send FMR',
-                        'message' => 'Ongoing liquidation of cash advance.',
-                    ]);
+                    $record->refresh();
 
 
                     $receiver = $record->user;
@@ -522,7 +402,6 @@
                     }
                     // ========== SMS NOTIFICATION END ==========
 
-                    DB::commit();
                     Notification::make()->title('Cheque/ADA made for requisitioner.')->success()->send();
                 })
                     ->visible(function ($record) {
@@ -576,20 +455,10 @@
         {
             return [
                 Action::make('verify')->button()->action(function ($record, $data) {
-                    DB::beginTransaction();
-                    $record->update([
-                        'dv_number' => $data['dv_number'],
-                        'journal_date' => $data['journal_date'],
+                    app(DisbursementVoucherWorkflowService::class)->recordAccounting($record, $data['dv_number'], $data['journal_date'], [
+                        'is_oic' => $this->isOic(),
+                        'actor' => auth()->user(),
                     ]);
-                    $record->refresh();
-                    $description = 'Disbursement Voucher verified.';
-                    if ($this->isOic()) {
-                        $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
-                    }
-                    $record->activity_logs()->create([
-                        'description' => $description,
-                    ]);
-                    DB::commit();
                     Notification::make()->title('Disbursement Voucher verified.')->success()->send();
                 })
                     ->visible(function ($record) {
@@ -617,36 +486,10 @@
         {
             return [
                 Action::make('ors_burs')->label('ORS/BURS')->button()->action(function ($record, $data) {
-                    $allocations = collect($data['uacs_allocations'] ?? [])
-                        ->map(fn ($allocation) => [
-                            'category_item_budget_id' => $allocation['category_item_budget_id'] ?? null,
-                            'amount' => $allocation['amount'] ?? null,
-                        ])
-                        ->filter(fn ($allocation) => filled($allocation['category_item_budget_id']) && filled($allocation['amount']))
-                        ->values();
-
-                    $this->validateUacsAllocations($record, $allocations);
-
-                    DB::beginTransaction();
-                    $record->update([
-                        'ors_burs' => $data['ors_burs'],
-                        'responsibility_center' => $data['responsibility_center'],
-                        'fund_cluster_id' => $data['fund_cluster_id'],
+                    app(DisbursementVoucherWorkflowService::class)->assignOrsBurs($record, $data, [
+                        'is_oic' => $this->isOic(),
+                        'actor' => auth()->user(),
                     ]);
-                    $record->uacs_allocations()->delete();
-                    $record->uacs_allocations()->createMany($allocations->map(fn ($allocation) => [
-                        'category_item_budget_id' => $allocation['category_item_budget_id'],
-                        'amount' => $allocation['amount'],
-                    ])->all());
-
-                    $description = 'ORS/BURS, Fund Cluster, and UACS allocations assigned to Disbursement Voucher.';
-                    if ($this->isOic()) {
-                        $description .= "\nOIC: ".auth()->user()->employee_information->full_name.'.';
-                    }
-                    $record->activity_logs()->create([
-                        'description' => $description,
-                    ]);
-                    DB::commit();
                     Notification::make()->title('ORS/BURS, Fund Cluster, and UACS allocations updated.')->success()->send();
                 })
                     ->visible(function ($record) {
@@ -742,33 +585,10 @@
         {
             return [
                 Action::make('Receive')->button()->action(function (DisbursementVoucher $record) {
-                    if ($record->current_step->process == 'Forwarded to') {
-                        DB::beginTransaction();
-                        $record->update([
-                            'current_step_id' => $record->current_step->next_step->id,
-                        ]);
-                        $record->refresh();
-                        $description = $record->current_step->process.' '.$record->current_step->recipient.' by ';
-                        if ($this->isOic()) {
-                            $description .= "OIC: ".auth()->user()->employee_information->full_name.'.';
-                        } else {
-                            $description .= auth()->user()->employee_information->full_name;
-                        }
-                        $record->activity_logs()->create([
-                            'description' => $description,
-                        ]);
-                        if ($record->current_step_id == 8000 || $record->current_step_id == 11000) {
-                            $record->update([
-                                'current_step_id' => $record->current_step_id + 1000,
-                            ]);
-                            $record->refresh();
-                            $record->activity_logs()->create([
-                                'description' => $record->current_step->process,
-                            ]);
-                        }
-                        DB::commit();
-                        Notification::make()->title('Document Received')->success()->send();
-                    }
+                    app(DisbursementVoucherWorkflowService::class)->receive($record, auth()->user(), [
+                        'is_oic' => $this->isOic(),
+                    ]);
+                    Notification::make()->title('Document Received')->success()->send();
                 })
                     ->visible(function ($record) {
                         if (!$record) {
@@ -780,34 +600,10 @@
                     ->requiresConfirmation(),
                 Action::make('Forward')->button()->action(function ($record, $data) {
                     if ($this->canBeForwarded($record)) {
-                        DB::beginTransaction();
-                        if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
-                            $record->update([
-                                'current_step_id' => $record->current_step->next_step->id,
-                            ]);
-                        } else {
-                            $record->update([
-                                'current_step_id' => $record->previous_step_id,
-                            ]);
-                        }
+                        app(DisbursementVoucherWorkflowService::class)->forward($record, auth()->user(), $data['remarks'] ?? null, [
+                            'is_oic' => $this->isOic(),
+                        ]);
                         $record->refresh();
-                        if ($record->current_step_id == 13000) {
-                            $record->activity_logs()->create([
-                                'description' => $record->current_step->process.' '.$record->current_step->recipient,
-                                'remarks' => $data['remarks'] ?? null,
-                            ]);
-                        } else {
-                            $description = $record->current_step->process.' '.$record->current_step->recipient.' by ';
-                            if ($this->isOic()) {
-                                $description .= "OIC: ".auth()->user()->employee_information->full_name.'.';
-                            } else {
-                                $description .= auth()->user()->employee_information->full_name;
-                            }
-                            $record->activity_logs()->create([
-                                'description' => $description,
-                                'remarks' => $data['remarks'] ?? null,
-                            ]);
-                        }
 
                         // ========== SMS NOTIFICATION (DISABLED) ==========
                         // Per Memo No. 75, s. 2025 (Annex A): NO SMS on DV movement/forward —
@@ -832,7 +628,6 @@
                         // }
                         // ========== SMS NOTIFICATION END ==========
 
-                        DB::commit();
                         $this->emit('refresh');
                         Notification::make()->title('Document Forwarded')->success()->send();
                     } else {

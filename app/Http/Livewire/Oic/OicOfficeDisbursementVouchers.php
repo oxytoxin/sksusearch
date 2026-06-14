@@ -20,6 +20,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
+use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
 class OicOfficeDisbursementVouchers extends Component implements HasTable
 {
@@ -68,35 +69,19 @@ class OicOfficeDisbursementVouchers extends Component implements HasTable
             ...$this->cashierActions(),
             ...$this->icuActions(),
             Action::make('certify')->button()->action(function ($record) {
-                DB::beginTransaction();
-                $record->update([
-                    'certified_by_accountant' => true,
+                app(DisbursementVoucherWorkflowService::class)->certify($record, [
+                    'is_oic' => true,
+                    'actor' => auth()->user(),
                 ]);
-                $description = 'Disbursement voucher certified.';
-                if ($this->isOic()) {
-                    $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
-                }
-                $record->activity_logs()->create([
-                    'description' => $description,
-                ]);
-                DB::commit();
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
                 ->visible(fn ($record, $livewire) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && User::find($livewire->tableFilters['as']['value'])?->employee_information->position_id == User::find($livewire->tableFilters['as']['value'])?->employee_information->office->head_position_id)
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                $destinationStep = DisbursementVoucherStep::find($data['return_step_id']);
-                $record->update([
-                    'pending_return_step_id' => $data['return_step_id'],
+                app(DisbursementVoucherWorkflowService::class)->returnToStep($record, $data['return_step_id'], $data['remarks'] ?? null, [
+                    'is_oic' => true,
+                    'actor' => auth()->user(),
                 ]);
-                $description = 'DV marked for return to ' . ($destinationStep->recipient ?? 'Unknown') . '. Awaiting physical release.';
-                $description .= "\nOIC: " . auth()->user()->employee_information->full_name . '.';
-                $record->activity_logs()->create([
-                    'description' => $description,
-                    'remarks' => $data['remarks'] ?? null,
-                ]);
-                DB::commit();
 
                 // ========== SMS NOTIFICATION ==========
                 $record->load(['user.employee_information']);

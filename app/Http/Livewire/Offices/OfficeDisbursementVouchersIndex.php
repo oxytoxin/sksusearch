@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
+use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
 class OfficeDisbursementVouchersIndex extends Component implements HasTable
 {
@@ -43,31 +44,9 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             }
             $dv = DisbursementVoucher::where("tracking_number", '=', $value)->whereRelation('current_step', 'process', '=', "Forwarded to")->whereRelation('current_step', 'office_group_id', '=', auth()->user()->employee_information->office->office_group_id)->first();
             if ($dv != null) {
-                DB::beginTransaction();
-
-                $dv->update([
-                    'current_step_id' => $dv->current_step->next_step->id,
+                app(DisbursementVoucherWorkflowService::class)->receive($dv, auth()->user(), [
+                    'is_oic' => $this->isOic(),
                 ]);
-                $dv->refresh();
-                $description = $dv->current_step->process . ' ' . $dv->current_step->recipient . ' by ';
-                if ($this->isOic()) {
-                    $description .= "OIC: " . auth()->user()->employee_information->full_name . '.';
-                } else {
-                    $description .= auth()->user()->employee_information->full_name;
-                }
-                $dv->activity_logs()->create([
-                    'description' => $description,
-                ]);
-                if ($dv->current_step_id == 8000 || $dv->current_step_id == 11000) {
-                    $dv->update([
-                        'current_step_id' => $dv->current_step_id + 1000,
-                    ]);
-                    $dv->refresh();
-                    $dv->activity_logs()->create([
-                        'description' => $dv->current_step->process,
-                    ]);
-                }
-                DB::commit();
                 Notification::make()->title('Document Received')->success()->send();
                 redirect()->route('office.dashboard');
             } else {
@@ -168,14 +147,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             ...$this->cashierActions(),
             ...$this->icuVerifyAction(),
             Action::make('certify')->button()->action(function ($record) {
-                DB::beginTransaction();
-                $record->update([
-                    'certified_by_accountant' => true,
-                ]);
-                $record->activity_logs()->create([
-                    'description' => 'Disbursement voucher certified.',
-                ]);
-                DB::commit();
+                app(DisbursementVoucherWorkflowService::class)->certify($record);
                 Notification::make()->title('Disbursement voucher certified.')->success()->send();
             })
                 ->visible(fn($record) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id && blank($record->pending_return_step_id))
@@ -184,16 +156,7 @@ class OfficeDisbursementVouchersIndex extends Component implements HasTable
             ...$this->icuReturnAction(),
             ...$this->releaseAction(),
             Action::make('return')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                $destinationStep = DisbursementVoucherStep::find($data['return_step_id']);
-                $record->update([
-                    'pending_return_step_id' => $data['return_step_id'],
-                ]);
-                $record->activity_logs()->create([
-                    'description' => 'DV marked for return to ' . ($destinationStep->recipient ?? 'Unknown') . '. Awaiting physical release.',
-                    'remarks' => $data['remarks'] ?? null,
-                ]);
-                DB::commit();
+                app(DisbursementVoucherWorkflowService::class)->returnToStep($record, $data['return_step_id'], $data['remarks'] ?? null);
 
                 // ========== SMS NOTIFICATION ==========
                 $record->load(['user.employee_information']);
