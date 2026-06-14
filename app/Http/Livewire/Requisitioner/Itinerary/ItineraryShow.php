@@ -17,6 +17,17 @@ class ItineraryShow extends Component
 
     public function mount()
     {
+        $this->itinerary->load([
+            'itinerary_entries.mot',
+            'user.employee_information.position',
+            'user.employee_information.office',
+            'user.signature',
+            'travel_order.travel_order_type',
+            'travel_order.disbursement_vouchers.fund_cluster',
+            'travel_order.signatories.employee_information.position',
+            'travel_order.signatories.employee_information.office',
+            'travel_order.signatories.signature',
+        ]);
         $this->travel_order = $this->itinerary->travel_order;
         $this->coverage = $this->itinerary->coverage;
         $this->purpose = $this->itinerary->purpose != null ? $this->itinerary->purpose : '';
