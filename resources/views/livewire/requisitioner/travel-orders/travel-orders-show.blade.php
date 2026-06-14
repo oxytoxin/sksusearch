@@ -64,7 +64,7 @@
                             <p>:</p>
                         </div>
                         <p class="flex-1 border-b border-black">
-                            {{ auth()->user()->employee_information->position?->description }}
+                            {{ $requisitioner->employee_information->position?->description }}
                         </p>
                     </div>
                     <div class="flex gap-2">
@@ -73,7 +73,7 @@
                             <p>:</p>
                         </div>
                         <p class="flex-1 border-b border-black">
-                            {{ auth()->user()->employee_information->office?->name }}</p>
+                            {{ $requisitioner->employee_information->office?->name }}</p>
                     </div>
                 </div>
                 <div>

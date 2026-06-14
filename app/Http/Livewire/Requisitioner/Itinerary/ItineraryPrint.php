@@ -7,6 +7,8 @@ use Livewire\Component;
 
 class ItineraryPrint extends Component
 {
+    use PreparesItineraryOfficialForm;
+
     public Itinerary $itinerary;
     public $travel_order;
     public $coverage;
@@ -29,6 +31,8 @@ class ItineraryPrint extends Component
 
     public function render()
     {
-        return view('livewire.requisitioner.itinerary.itinerary-print');
+        return view('livewire.requisitioner.itinerary.itinerary-print', [
+            'itineraryForm' => $this->itineraryFormData(),
+        ]);
     }
 }

@@ -211,8 +211,8 @@
                                 return [
                                     'mot_id' => $entry->mot_id,
                                     'place' => $entry->place,
-                                    'departure_time' => $entry->departure_time->shiftTimezone('UTC'),
-                                    'arrival_time' => $entry->arrival_time->shiftTimezone('UTC'),
+                                    'departure_time' => $entry->departure_time,
+                                    'arrival_time' => $entry->arrival_time,
                                     'transportation_expenses' => $entry->transportation_expenses,
                                     'other_expenses' => $entry->other_expenses,
                                 ];

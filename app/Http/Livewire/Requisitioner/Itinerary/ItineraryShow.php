@@ -8,6 +8,8 @@ use Livewire\Component;
 
 class ItineraryShow extends Component
 {
+    use PreparesItineraryOfficialForm;
+
     public Itinerary $itinerary;
     public $travel_order;
     public $coverage;
@@ -36,7 +38,10 @@ class ItineraryShow extends Component
     }
     public function render()
     {
-        return view('livewire.requisitioner.itinerary.itinerary-show');
+        return view('livewire.requisitioner.itinerary.itinerary-show', [
+            'itineraryForm' => $this->itineraryFormData(),
+            'totalAmount' => $this->itineraryTotalAmount(),
+        ]);
     }
 
     public function save()

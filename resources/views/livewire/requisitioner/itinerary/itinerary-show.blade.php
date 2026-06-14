@@ -1,10 +1,4 @@
 <div>
-    @php
-        $total_amount = $travel_order->registration_amount;
-        foreach ($coverage as $value) {
-            $total_amount += $value['total_expenses'];
-        }
-    @endphp
     <div class="flex-col space-y-5 text-md" x-data>
         <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-lg">
             <div class="flex-wrap items-center justify-between w-full -mt-4 -ml-4 sm:flex-nowrap">
@@ -29,7 +23,7 @@
                         <p class="whitespace-pre-line p-4">{{ $travel_order->purpose }}</p>
                         <p>Registration Fee: <span>{{ number_format($travel_order->registration_amount, 2) > 0 ? number_format($travel_order->registration_amount, 2) : 'N/A' }}</span>
                         </p>
-                        <p>Total Amount: <span>{{ number_format($total_amount, 2) }}</span>
+                        <p>Total Amount: <span>{{ $totalAmount }}</span>
                         </p>
                         <p>Status: {{ $itinerary->approved_at ? 'Approved' : 'Pending' }}</p>
                     </div>
