@@ -6,6 +6,7 @@
     use App\Models\FundCluster;
     use App\Models\Mop;
     use App\Models\TravelOrderType;
+    use Awcodes\FilamentTableRepeater\Components\TableRepeater;
     use Filament\Forms\Components\Grid;
     use Filament\Forms\Components\Placeholder;
     use Filament\Forms\Components\Textarea;
@@ -229,7 +230,7 @@
                     ->form([
                         Placeholder::make('dv_details')
                             ->label('')
-                            ->content(fn ($record) => view('components.disbursement_vouchers.dv-details-card', [
+                            ->content(fn($record) => view('components.disbursement_vouchers.dv-details-card', [
                                 'record' => $record,
                             ])),
                         TextInput::make('log_number'),
@@ -256,7 +257,7 @@
                             ->label('General Remarks (Optional)'),
                         Placeholder::make('return_trigger')
                             ->label('')
-                            ->content(fn ($record) => view('forms.components.icu-return-trigger', [
+                            ->content(fn($record) => view('forms.components.icu-return-trigger', [
                                 'recordId' => $record?->getKey(),
                             ])),
                     ])->visible(function ($record) {
@@ -352,7 +353,7 @@
                     ->form([
                         Placeholder::make('release_destination')
                             ->label('Return Destination')
-                            ->content(fn ($record) => $record->pending_return_step?->recipient ?? 'Unknown'),
+                            ->content(fn($record) => $record->pending_return_step?->recipient ?? 'Unknown'),
                         TextInput::make('release_log_number')
                             ->label('Log Number')
                             ->required(),
@@ -365,7 +366,7 @@
                         ]);
                         Notification::make()->title('Document released successfully.')->success()->send();
                     })
-                    ->visible(fn ($record) => $record && filled($record->pending_return_step_id)),
+                    ->visible(fn($record) => $record && filled($record->pending_return_step_id)),
             ];
         }
 
@@ -486,11 +487,25 @@
         {
             return [
                 Action::make('ors_burs')->label('ORS/BURS')->button()->action(function ($record, $data) {
-                    app(DisbursementVoucherWorkflowService::class)->assignOrsBurs($record, $data, [
-                        'is_oic' => $this->isOic(),
-                        'actor' => auth()->user(),
-                    ]);
-                    Notification::make()->title('ORS/BURS, Fund Cluster, and UACS allocations updated.')->success()->send();
+                    try {
+                        app(DisbursementVoucherWorkflowService::class)->assignOrsBurs($record, $data, [
+                            'is_oic' => $this->isOic(),
+                            'actor' => auth()->user(),
+                        ]);
+                        Notification::make()->title('ORS/BURS, Fund Cluster, and UACS allocations updated.')->success()->send();
+                    } catch (ValidationException $exception) {
+                        foreach ($exception->errors() as $field => $messages) {
+                            foreach ($messages as $message) {
+                                Notification::make()->title($message)->danger()->send();
+                            }
+                        }
+                        Notification::make()->title('Please check the highlighted fields.')->danger()->send();
+                        throw $exception;
+                    } catch (\Throwable $exception) {
+                        report($exception);
+                        Notification::make()->title('Workflow action failed.')->body($exception->getMessage())->danger()->send();
+                    }
+
                 })
                     ->visible(function ($record) {
                         if (!$record) {
@@ -501,19 +516,21 @@
                     })
                     ->form(function ($record) {
                         $uacsAllocationDefaults = $record->uacs_allocations->isNotEmpty()
-                            ? $record->uacs_allocations->map(fn ($allocation) => [
+                            ? $record->uacs_allocations->map(fn($allocation) => [
                                 'category_item_budget_id' => $allocation->category_item_budget_id,
                                 'amount' => $allocation->amount,
                             ])->values()->all()
-                            : [[
-                                'category_item_budget_id' => null,
-                                'amount' => $record->totalSumDisbursementVoucherParticular(),
-                            ]];
+                            : [
+                                [
+                                    'category_item_budget_id' => null,
+                                    'amount' => $record->totalSumDisbursementVoucherParticular(),
+                                ]
+                            ];
 
                         return [
                             Placeholder::make('voucher_total')
                                 ->label('DV Amount')
-                                ->content(fn ($record) => 'PHP '.number_format($record->totalSumDisbursementVoucherParticular(), 2)),
+                                ->content(fn($record) => 'PHP '.number_format($record->totalSumDisbursementVoucherParticular(), 2)),
                             Select::make('fund_cluster_id')
                                 ->label('Fund Cluster')
                                 ->options(FundCluster::whereIn('id', [1, 2, 3, 8])->pluck('name', 'id'))
@@ -526,54 +543,36 @@
                             TextInput::make('responsibility_center')
                                 ->default($record->responsibility_center)
                                 ->required(),
-                            Repeater::make('uacs_allocations')
+                            TableRepeater::make('uacs_allocations')
                                 ->label('UACS Allocations')
+                                ->hideLabels()
+                                ->columnWidths([
+                                    0 => '70%',
+                                    1 => '30%',
+                                    'category_item_budget_id' => '70%',
+                                    'amount' => '30%',
+                                ])
                                 ->schema([
                                     Select::make('category_item_budget_id')
                                         ->label('UACS Code')
-                                        ->options(CategoryItemBudget::selectRaw("id, concat(uacs_code, ' - ', name) as code")->pluck('code', 'id'))
-                                        ->preload()
+                                        ->options(fn() => CategoryItemBudget::selectRaw("id, concat(uacs_code, ' - ', name) as code")->pluck('code', 'id'))
                                         ->searchable()
+                                        ->preload()
+                                        ->extraAttributes(['style' => 'min-width: 24rem; width: 100%;'])
+                                        ->extraInputAttributes(['style' => 'width: 100%;'])
                                         ->required(),
                                     TextInput::make('amount')
-                                        ->label('Amount')
+                                        ->extraAttributes(['style' => 'width: 100%;'])
                                         ->numeric()
                                         ->minValue(0.01)
                                         ->required(),
                                 ])
-                                ->columns(2)
-                                ->default($uacsAllocationDefaults)
-                                ->defaultItems(1)
                                 ->minItems(1)
                                 ->required(),
                         ];
-                    })
-                    ->requiresConfirmation(),
+                    }),
+
             ];
-        }
-
-        private function validateUacsAllocations(DisbursementVoucher $record, $allocations): void
-        {
-            if ($allocations->isEmpty()) {
-                throw ValidationException::withMessages([
-                    'uacs_allocations' => 'At least one UACS allocation is required.',
-                ]);
-            }
-
-            if ($allocations->pluck('category_item_budget_id')->duplicates()->isNotEmpty()) {
-                throw ValidationException::withMessages([
-                    'uacs_allocations' => 'Each UACS code can only be selected once.',
-                ]);
-            }
-
-            $allocationTotal = $allocations->sum(fn ($allocation) => (float) $allocation['amount']);
-            $voucherTotal = $record->totalSumDisbursementVoucherParticular();
-
-            if ($this->amountToCents($allocationTotal) !== $this->amountToCents($voucherTotal)) {
-                throw ValidationException::withMessages([
-                    'uacs_allocations' => 'The total UACS allocation must equal the DV amount of PHP '.number_format($voucherTotal, 2).'.',
-                ]);
-            }
         }
 
         private function amountToCents($amount): int
@@ -701,7 +700,7 @@
                                 DvAdjustment::create([
                                     'disbursement_voucher_id' => $record->id,
                                     'field' => 'Particular removed',
-                                    'old_value' => $existing->purpose . ' — ₱' . number_format($existing->amount, 2),
+                                    'old_value' => $existing->purpose.' — ₱'.number_format($existing->amount, 2),
                                     'new_value' => null,
                                     'adjusted_by' => auth()->id(),
                                     'batch_id' => $batchId,
@@ -734,8 +733,8 @@
                                     DvAdjustment::create([
                                         'disbursement_voucher_id' => $record->id,
                                         'field' => 'Particular amount',
-                                        'old_value' => '₱' . number_format($existing->amount, 2) . ' (' . $existing->purpose . ')',
-                                        'new_value' => '₱' . number_format($item['amount'], 2),
+                                        'old_value' => '₱'.number_format($existing->amount, 2).' ('.$existing->purpose.')',
+                                        'new_value' => '₱'.number_format($item['amount'], 2),
                                         'adjusted_by' => auth()->id(),
                                         'batch_id' => $batchId,
                                     ]);
@@ -757,7 +756,7 @@
                                     'disbursement_voucher_id' => $record->id,
                                     'field' => 'Particular added',
                                     'old_value' => null,
-                                    'new_value' => $item['purpose'] . ' — ₱' . number_format($item['amount'], 2),
+                                    'new_value' => $item['purpose'].' — ₱'.number_format($item['amount'], 2),
                                     'adjusted_by' => auth()->id(),
                                     'batch_id' => $batchId,
                                 ]);
@@ -766,9 +765,9 @@
                         }
 
                         if (!empty($changes)) {
-                            $description = 'DV adjusted (' . implode(', ', array_unique($changes)) . ') by ';
+                            $description = 'DV adjusted ('.implode(', ', array_unique($changes)).') by ';
                             if ($this->isOic()) {
-                                $description .= 'OIC: ' . auth()->user()->employee_information->full_name . '.';
+                                $description .= 'OIC: '.auth()->user()->employee_information->full_name.'.';
                             } else {
                                 $description .= auth()->user()->employee_information->full_name;
                             }
@@ -805,7 +804,9 @@
                             ->defaultItems(1),
                     ])
                     ->visible(function ($record) use ($adjustableSteps) {
-                        if (!$record) return false;
+                        if (!$record) {
+                            return false;
+                        }
                         return in_array($record->current_step_id, $adjustableSteps) && !$record->for_cancellation && blank($record->pending_return_step_id);
                     }),
             ];
