@@ -843,6 +843,30 @@
         public function save()
         {
             $this->validate();
+
+            // Validate travel order is selected for travel-related subtypes
+            if (in_array($this->voucher_subtype->id, VoucherSubType::TRAVELS) && blank($this->travel_order_id)) {
+                Notification::make()
+                    ->title('Travel Order Required')
+                    ->body('Please select a Travel Order for this voucher subtype.')
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            // Validate itinerary entries exist for official business travel reimbursements
+            if (in_array($this->voucher_subtype->id, [6, 7])
+                && TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS
+                && empty($this->itinerary_entries)) {
+                Notification::make()
+                    ->title('Itinerary Entries Required')
+                    ->body('Please fill in the itinerary entries for this Official Business travel order.')
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            try {
             DB::beginTransaction();
             if (in_array($this->voucher_subtype->id, [
                     6, 7
@@ -954,7 +978,7 @@
                     'user_id' => auth()->id(),
                     'signatory_id' => TravelOrder::find($this->travel_order_id)?->signatories()->first()?->id,
                     'travel_order_id' => $this->travel_order_id,
-                    'itinerary_id' => $itinerary->id,
+                    'itinerary_id' => isset($itinerary) ? $itinerary->id : null,
                     'disbursement_voucher_id' => $dv->id,
                     'condition' => $this->condition,
                     'explanation' => $this->explanation,
@@ -1002,6 +1026,17 @@
             Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
 
             return redirect()->route('requisitioner.disbursement-vouchers.index');
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                \Log::error('DV creation failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+                Notification::make()
+                    ->title('Submission Failed')
+                    ->body('Something went wrong while creating the disbursement voucher. Please check your inputs and try again.')
+                    ->danger()
+                    ->persistent()
+                    ->send();
+            }
         }
 
         private function ctcSection()
