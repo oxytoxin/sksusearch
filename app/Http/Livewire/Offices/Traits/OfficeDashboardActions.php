@@ -237,6 +237,7 @@
                         RelatedDocumentsChecklist::make('items')
                             ->label('Documentary Requirements')
                             ->documents(fn($record) => $record?->voucher_subtype?->related_documents_list?->documents ?? [])
+                            ->required(fn($record) => filled($record?->voucher_subtype?->related_documents_list?->documents ?? []))
                             ->rule(function () {
                                 return function (string $attribute, $value, \Closure $fail) {
                                     if (!is_array($value)) {

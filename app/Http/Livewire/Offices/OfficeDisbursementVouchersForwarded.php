@@ -26,7 +26,6 @@
                 ->whereEnabled(true)
                 ->pluck('id')
                 ->toArray();
-
             return DisbursementVoucher::whereForCancellation(false)
                 ->whereNotIn('current_step_id', $officeStepIds)
                 ->where('current_step_id', '>', min($officeStepIds))
@@ -71,7 +70,7 @@
                     ->label('Payee'),
                 TextColumn::make('current_step.process')
                     ->label('Status')
-                    ->formatStateUsing(fn ($record) => $record->current_step->process . ' ' . $record->current_step->recipient),
+                    ->formatStateUsing(fn($record) => $record->current_step->process.' '.$record->current_step->recipient),
                 TextColumn::make('submitted_at')->label('Submitted at')->dateTime('F d, Y'),
                 TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php', true),
             ];
