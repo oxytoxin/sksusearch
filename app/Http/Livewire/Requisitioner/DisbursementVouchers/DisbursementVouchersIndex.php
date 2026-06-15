@@ -5,17 +5,14 @@ namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 use App\Http\Controllers\NotificationController;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use App\Models\DisbursementVoucher;
-use App\Models\DisbursementVoucherStep;
 use Filament\Forms\Components\RichEditor;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
 class DisbursementVouchersIndex extends Component implements HasTable
 {
@@ -38,18 +35,10 @@ class DisbursementVouchersIndex extends Component implements HasTable
     {
         return [
             Action::make('Receive')->button()->action(function (DisbursementVoucher $record) {
-                if ($record->current_step->process == 'Forwarded to') {
-                    DB::beginTransaction();
-                    $record->update([
-                        'current_step_id' => $record->current_step->next_step->id,
-                    ]);
-                    $record->refresh();
-                    $record->activity_logs()->create([
-                        'description' => $record->current_step->process . ' ' . auth()->user()->employee_information->full_name,
-                    ]);
-                    DB::commit();
-                    Notification::make()->title('Document Received')->success()->send();
-                }
+                app(DisbursementVoucherWorkflowService::class)->receive($record, auth()->user(), [
+                    'include_recipient' => false,
+                ]);
+                Notification::make()->title('Document Received')->success()->send();
             })
                 ->visible(function ($record) {
                     if (!$record) {
@@ -60,22 +49,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 })
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
-                    $record->update([
-                        'current_step_id' => $record->current_step->next_step->id,
-                    ]);
-                } else {
-                    $record->update([
-                        'current_step_id' => $record->previous_step_id,
-                    ]);
-                }
-                $record->refresh();
-                $record->activity_logs()->create([
-                    'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
-                    'remarks' => $data['remarks'] ?? null,
-                ]);
-                DB::commit();
+                app(DisbursementVoucherWorkflowService::class)->forward($record, auth()->user(), $data['remarks'] ?? null);
                 Notification::make()->title('Document Forwarded')->success()->send();
             })
                 ->form(function () {

@@ -9,7 +9,17 @@
             <p class="text-sm font-semibold text-gray-800">₱{{ number_format($record->disbursement_voucher_particulars()->sum('amount'), 2) }}</p>
         </div>
     </div>
-    <div class="border-t border-green-200 pt-3">
+    <div class="border-t border-green-200 pt-3 flex items-center gap-6">
+        <div>
+            <span class="text-xs font-medium text-green-600 uppercase">DV Type</span>
+            <p class="text-sm font-semibold text-gray-800">{{ $record->voucher_subtype?->voucher_type?->name ?? 'N/A' }}</p>
+        </div>
+        <div>
+            <span class="text-xs font-medium text-green-600 uppercase">DV Subtype</span>
+            <p class="text-sm font-semibold text-gray-800">{{ $record->voucher_subtype?->name ?? 'N/A' }}</p>
+        </div>
+    </div>
+    <div class="border-t border-green-200 pt-3 mt-3">
         <span class="text-xs font-medium text-green-600 uppercase">Particulars</span>
         <div class="mt-1 space-y-1">
             @forelse($record->disbursement_voucher_particulars as $particular)

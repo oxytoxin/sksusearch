@@ -3,28 +3,36 @@
 namespace App\Http\Livewire\Requisitioner\Itinerary;
 
 use App\Models\Itinerary;
-use Carbon\Carbon;
 use Livewire\Component;
 
 class ItineraryPrint extends Component
 {
+    use PreparesItineraryOfficialForm;
+
     public Itinerary $itinerary;
-    public $itinerary_entries;
     public $travel_order;
     public $coverage;
-    public $immediate_signatory;
 
     public function mount()
     {
+        $this->itinerary->load([
+            'itinerary_entries.mot',
+            'user.employee_information.position',
+            'user.employee_information.office',
+            'user.signature',
+            'travel_order.disbursement_vouchers.fund_cluster',
+            'travel_order.signatories.employee_information.position',
+            'travel_order.signatories.employee_information.office',
+            'travel_order.signatories.signature',
+        ]);
         $this->travel_order = $this->itinerary->travel_order;
         $this->coverage = $this->itinerary->coverage;
-        $this->itinerary->load('user.employee_information', 'user.signature');
-        $this->itinerary_entries = $this->itinerary->itinerary_entries;
-        $this->immediate_signatory = $this->itinerary->travel_order->signatories()->with(['employee_information', 'signature'])->first();
     }
 
     public function render()
     {
-        return view('livewire.requisitioner.itinerary.itinerary-print');
+        return view('livewire.requisitioner.itinerary.itinerary-print', [
+            'itineraryForm' => $this->itineraryFormData(),
+        ]);
     }
 }

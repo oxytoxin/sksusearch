@@ -3,7 +3,6 @@
 namespace App\Http\Livewire\Signatory\DisbursementVouchers;
 
 use Livewire\Component;
-use App\Models\VoucherSubType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use App\Models\DisbursementVoucher;
@@ -11,18 +10,16 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Layout;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Placeholder;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
-use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
+use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
 class DisbursementVouchersIndex extends Component implements HasTable
 {
@@ -65,18 +62,10 @@ class DisbursementVouchersIndex extends Component implements HasTable
     {
         return [
             Action::make('Receive')->button()->action(function (DisbursementVoucher $record) {
-                if ($record->current_step->process == 'Forwarded to') {
-                    DB::beginTransaction();
-                    $record->update([
-                        'current_step_id' => $record->current_step->next_step->id,
-                    ]);
-                    $record->refresh();
-                    $record->activity_logs()->create([
-                        'description' => $record->current_step->process . ' ' . auth()->user()->employee_information->full_name,
-                    ]);
-                    DB::commit();
-                    Notification::make()->title('Document Received')->success()->send();
-                }
+                app(DisbursementVoucherWorkflowService::class)->receive($record, auth()->user(), [
+                    'include_recipient' => false,
+                ]);
+                Notification::make()->title('Document Received')->success()->send();
             })
                 ->visible(function ($record) {
                     if (!$record) {
@@ -87,34 +76,10 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 })
                 ->requiresConfirmation(),
             Action::make('Forward')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                if ($record->current_step_id >= ($record->previous_step_id ?? 0)) {
-                    $record->update([
-                        'current_step_id' => $record->current_step->next_step->id,
-                    ]);
-                    if ($record->travel_order_id && in_array($record->voucher_subtype_id, [6, 7])) {
-                        $actual_itinerary = $record->travel_order?->itineraries()->whereIsActual(true)->first();
-                        if (!$actual_itinerary) {
-                            DB::rollBack();
-                            Notification::make()->title('Actual itinerary not found.')->warning()->send();
-                            return false;
-                        } else {
-                            $actual_itinerary->update([
-                                'approved_at' => now(),
-                            ]);
-                        }
-                    }
-                } else {
-                    $record->update([
-                        'current_step_id' => $record->previous_step_id,
-                    ]);
-                }
-                $record->refresh();
-                $record->activity_logs()->create([
-                    'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
-                    'remarks' => $data['remarks'] ?? null,
+                app(DisbursementVoucherWorkflowService::class)->forward($record, auth()->user(), $data['remarks'] ?? null, [
+                    'approve_actual_itinerary' => true,
                 ]);
-                DB::commit();
+                $record->refresh();
 
                 // ========== SMS NOTIFICATION (DISABLED) ==========
                 // Per Memo No. 75, s. 2025 (Annex A): NO SMS on DV movement/forward — it
@@ -167,16 +132,7 @@ class DisbursementVouchersIndex extends Component implements HasTable
                 })
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
-                DB::beginTransaction();
-                $destinationStep = DisbursementVoucherStep::find($data['return_step_id']);
-                $record->update([
-                    'pending_return_step_id' => $data['return_step_id'],
-                ]);
-                $record->activity_logs()->create([
-                    'description' => 'DV marked for return to ' . ($destinationStep->recipient ?? 'Unknown') . '. Awaiting physical release.',
-                    'remarks' => $data['remarks'] ?? null,
-                ]);
-                DB::commit();
+                app(DisbursementVoucherWorkflowService::class)->returnToStep($record, $data['return_step_id'], $data['remarks'] ?? null);
 
                 // ========== SMS NOTIFICATION ==========
                 $record->load(['user.employee_information']);

@@ -29,4 +29,9 @@ class CategoryItemBudget extends Model
     {
         return $this->hasMany(WfpDetail::class);
     }
+
+    public function disbursement_voucher_uacs_allocations()
+    {
+        return $this->hasMany(DisbursementVoucherUacsAllocation::class);
+    }
 }

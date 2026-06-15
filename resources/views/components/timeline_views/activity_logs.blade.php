@@ -1,6 +1,17 @@
-<div class="p-8 bg-primary-100">
+@php
+    $safeColors = $safeColors ?? false;
+    $containerClass = $safeColors ? '' : 'bg-primary-100';
+    $lineClass = $safeColors ? '' : 'bg-primary-700';
+    $badgeClass = $safeColors ? '' : 'bg-primary-700';
+    $containerStyle = $safeColors ? 'background-color: #eef2ff;' : null;
+    $lineStyle = $safeColors ? 'background-color: #4338ca;' : null;
+    $badgeStyle = $safeColors ? 'background-color: #4338ca; color: #ffffff;' : null;
+@endphp
+
+<div class="p-8 {{ $containerClass }}" @if ($containerStyle) style="{{ $containerStyle }}" @endif>
     <ul class="relative space-y-8 isolate">
-        <div class="absolute w-1 h-full -z-10 left-8 bg-primary-700"></div>
+        <div class="absolute w-1 h-full -z-10 left-8 {{ $lineClass }}"
+             @if ($lineStyle) style="{{ $lineStyle }}" @endif></div>
         @foreach ($record->activity_logs as $log)
             <li>
                 <div class="flex gap-2">
@@ -12,7 +23,8 @@
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center">
-                            <h4 class="flex px-3 py-1 text-sm text-white whitespace-pre-line rounded md:rounded-full bg-primary-700">
+                            <h4 class="relative flex px-3 py-1 text-sm text-white whitespace-pre-line rounded md:rounded-full {{ $badgeClass }}"
+                                @if ($badgeStyle) style="{{ $badgeStyle }}" @endif>
                                 <p>{{ $log->description }}</p>
                             </h4>
                         </div>

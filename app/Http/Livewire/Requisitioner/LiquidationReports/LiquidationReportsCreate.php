@@ -3,6 +3,7 @@
     namespace App\Http\Livewire\Requisitioner\LiquidationReports;
 
     use App\Forms\Components\ItineraryBuilder;
+    use App\Http\Livewire\Requisitioner\Itinerary\PreparesItineraryOfficialForm;
     use DB;
     use Carbon\Carbon;
     use App\Models\Mot;
@@ -46,6 +47,7 @@
     class LiquidationReportsCreate extends Component implements HasForms
     {
         use InteractsWithForms;
+        use PreparesItineraryOfficialForm;
 
         public $data = [];
         public $disbursement_voucher;
@@ -514,6 +516,7 @@
                                                 'itinerary' => $itinerary,
                                                 'itinerary_entries' => $itinerary_entries,
                                                 'travel_order' => $this->disbursement_voucher?->travel_order,
+                                                'itineraryForm' => $this->prepareItineraryOfficialForm($itinerary, $this->disbursement_voucher?->travel_order, $itinerary_entries, $coverage),
                                                 'immediate_signatory' => $this->disbursement_voucher?->travel_order?->signatories()->with('employee_information')->first(),
                                             ]);
                                         }
