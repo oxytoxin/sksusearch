@@ -503,8 +503,8 @@
             }
 
             $days = match ((int) $voucher->voucher_subtype_id) {
-                1 => 30,
-                2 => 60,
+                1, 97 => 30, // Local Travel + Local Travel (Legacy)
+                2, 98 => 60, // Foreign Travel + Foreign Travel (Legacy)
                 3 => 20,
                 4, 5 => 5,
                 default => null,
