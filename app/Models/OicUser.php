@@ -1,35 +1,42 @@
 <?php
 
-namespace App\Models;
+    namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+    use App\Enums\OicType;
+    use Illuminate\Database\Eloquent\Factories\HasFactory;
+    use Illuminate\Database\Eloquent\Model;
 
-/**
- * @mixin IdeHelperOicUser
- */
-class OicUser extends Model
-{
-    use HasFactory;
-
-    public function oic()
+    /**
+     * @mixin IdeHelperOicUser
+     */
+    class OicUser extends Model
     {
-        return $this->belongsTo(User::class, 'oic_id');
-    }
+        use HasFactory;
 
-    public function signatory()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
+        protected $casts = [
+            'valid_from' => 'immutable_date',
+            'valid_to' => 'immutable_date',
+            'type' => OicType::class,
+        ];
 
-    protected function scopeValid($query)
-    {
-        return $query->where(function ($q) {
-            $q->where('oic_id', auth()->id())->where('valid_from', '<=', today())
-                ->where('valid_to', '>=', today());
-        })->orWhere(function ($q) {
-            $q->where('oic_id', auth()->id())->where('valid_from', '<=', today())
-                ->whereNull('valid_to');
-        });
+        public function oic()
+        {
+            return $this->belongsTo(User::class, 'oic_id');
+        }
+
+        public function signatory()
+        {
+            return $this->belongsTo(User::class, 'user_id');
+        }
+
+        protected function scopeValid($query)
+        {
+            return $query->where(function ($q) {
+                $q->where('oic_id', auth()->id())->where('valid_from', '<=', today())
+                    ->where('valid_to', '>=', today());
+            })->orWhere(function ($q) {
+                $q->where('oic_id', auth()->id())->where('valid_from', '<=', today())
+                    ->whereNull('valid_to');
+            });
+        }
     }
-}
