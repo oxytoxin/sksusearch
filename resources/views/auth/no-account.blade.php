@@ -14,14 +14,18 @@
             <h2 class="text-xl font-bold text-white">Account Not Found</h2>
 
             <p class="mt-3 text-sm text-white">
-                The Google account you used is not registered in the SEARCH system.
-                Please contact your system administrator to have your account set up.
+                The Google account you used is not yet registered in the S.E.A.R.C.H. system.
+                If you are an SKSU employee, you can self-register using your institutional email (<span class="font-semibold">@sksu.edu.ph</span>).
             </p>
 
-            <div class="mt-6">
+            <div class="mt-6 flex items-center justify-center space-x-3">
                 <a href="{{ route('login') }}"
                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                     Back to Login
+                </a>
+                <a href="{{ route('register') }}"
+                   class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    Register Now
                 </a>
             </div>
         </div>

@@ -89,6 +89,13 @@
                     </span>
                 </a>
             </div>
+
+            <div class="mt-3 text-center">
+                <span class="text-sm text-white/80">Not yet registered?</span>
+                <a href="{{ route('register') }}" class="text-sm underline text-primary-100 hover:text-primary-200">
+                    Self-Register here
+                </a>
+            </div>
         </form>
     </x-jet-authentication-card>
 </x-guest-layout>
