@@ -9,7 +9,9 @@
     use App\Models\TravelOrder;
     use App\Models\TravelOrderType;
     use Awcodes\FilamentTableRepeater\Components\TableRepeater;
+    use Carbon\Carbon;
     use Carbon\CarbonPeriod;
+    use Carbon\CarbonTimeZone;
     use Filament\Forms\Components\Builder;
     use Filament\Forms\Components\Builder\Block;
     use Filament\Forms\Components\Card;
@@ -110,8 +112,8 @@
                         'date' => $itinerary_entry['data']['date'],
                         'mot_id' => $entry['mot_id'],
                         'place' => $entry['place'],
-                        'departure_time' => $entry['departure_time'],
-                        'arrival_time' => $entry['arrival_time'],
+                        'departure_time' => Carbon::make($entry['departure_time'])->setTimezone('Asia/Manila'),
+                        'arrival_time' => Carbon::make($entry['arrival_time'])->setTimezone('Asia/Manila'),
                         'transportation_expenses' => $entry['transportation_expenses'],
                         'other_expenses' => $entry['other_expenses'],
                     ]);
