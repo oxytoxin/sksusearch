@@ -44,8 +44,8 @@
                         <div class="flex">
                             <div class="m-3 text-center">
 
-                                <img class="w-12 h-auto mx-auto"
-                                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $evaluate(fn($get) => $get('tracking_number')) }}"
+                                <img class="w-14 h-auto mx-auto"
+                                    src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ $evaluate(fn($get) => $get('tracking_number')) }}"
                                     alt="N/A">
                                 <span
                                     class="flex justify-center text-xs font-normal">{{ $evaluate(fn($get) => $get('tracking_number')) }}</span>

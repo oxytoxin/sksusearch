@@ -19,8 +19,8 @@
                         <div class="flex">
                             <div class="m-3 text-center">
 
-                                <img class="mx-auto h-auto w-12"
-                                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ route('disbursement-vouchers.show-from-trn', ['disbursement_voucher' => $disbursement_voucher->tracking_number]) }}"
+                                <img class="mx-auto h-auto w-14"
+                                    src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ route('disbursement-vouchers.show-from-trn', ['disbursement_voucher' => $disbursement_voucher->tracking_number]) }}"
                                     alt="N/A">
                                 <span
                                     class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>

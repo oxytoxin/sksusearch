@@ -4,6 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force text wrapping in Filament admin table columns */
+.filament-tables-text-column {
+    word-break: break-word;
+}
+
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
