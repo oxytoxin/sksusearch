@@ -17,6 +17,11 @@ class PromptContactNumber extends Component
     public function mount()
     {
         $this->contact_number = auth()->user()->employee_information->contact_number;
+
+        // Auto-show modal when user has no contact number (redirected by middleware)
+        if (blank($this->contact_number)) {
+            $this->showModal = true;
+        }
     }
 
     public function render()
@@ -53,6 +58,12 @@ class PromptContactNumber extends Component
         DB::commit();
         Notification::make()->title('Operation Success')->body('Contact Number was saved to your account.')->success()->send();
         $this->showModal = false;
+
+        // If user was redirected here by middleware, send them to the dashboard
+        if (request()->routeIs('requisitioner.contact-number')) {
+            return redirect()->route('requisitioner.dashboard');
+        }
+
         $this->dispatchBrowserEvent('contact-number-updated');
     }
 }
