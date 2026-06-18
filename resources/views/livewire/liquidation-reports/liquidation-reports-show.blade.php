@@ -132,8 +132,8 @@
                         <span class="text-sm">Certified: Correctness of the above data</span>
                     </div>
                     <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
-                        <x-signature-block :signature="$liquidation_report->requisitioner->signature?->content" width="10rem" maxHeight="3.5rem" bottom="100%"
-                            translateY="3.5rem" />
+                        <x-signature-block :signature="$liquidation_report->requisitioner->signature?->content" width="10rem" max-height="3.5rem" bottom="100%"
+                            translate-y="3.5rem" />
                         <p class="w-full text-center border-b border-black">
                             {{ $liquidation_report->requisitioner->employee_information->full_name }}
                         </p>
@@ -146,55 +146,82 @@
                         </p>
                     </div>
                 </div>
-                {{-- Section B: Signatory - Shows signature when forwarded past step 4000 --}}
-                <div class="flex flex-col w-1/3 h-48 pb-1">
-                    <div>
-                        <span class="p-1 border-b-2 border-r-2 border-black">B</span>
-                        <span class="text-sm">Certified: Purpose of travel / cash advance duly accomplished</span>
-                    </div>
-                    <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
-                        @if ($liquidation_report->current_step_id > 4000 || $liquidation_report->signatory_date)
-                            <x-signature-block :signature="$liquidation_report->signatory->signature?->content" width="10rem" maxHeight="3.5rem" bottom="100%"
-                                translateY="3.5rem" />
-                        @endif
-                        <p class="w-full text-center border-b border-black">
-                            {{ $liquidation_report->signatory->employee_information->full_name }}</p>
-                        <p>Signature over Printed Name</p>
-                        <p>Immediate Supervisor</p>
-                    </div>
-                    <div class="flex gap-2 px-4">
-                        <p>Date:</p>
-                        <p class="flex-1 text-center border-b border-black">
-                            @if ($liquidation_report->signatory_date)
-                                {{ $liquidation_report->signatory_date->format('m/d/Y') }}
-                            @endif
-                        </p>
-                    </div>
-                </div>
-                {{-- Section C: Accountant - Shows signature when certified_by_accountant is true --}}
-                <div class="flex flex-col w-1/3 h-48 pb-1">
-                    <div>
-                        <span class="p-1 border-b-2 border-r-2 border-black">C</span>
-                        <span class="text-sm">Certified: Supporting documents complete and proper</span>
-                    </div>
-                    <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
-                        @if ($liquidation_report->certified_by_accountant)
-                            <x-signature-block :signature="$accountant?->user?->signature?->content" width="10rem" maxHeight="3.5rem" bottom="100%"
-                                translateY="3.5rem" />
-                        @endif
-                        <p class="w-full text-center border-b border-black">{{ $accountant?->full_name }}</p>
-                        <p>Signature over Printed Name</p>
-                        <p>Head, Accounting Division Unit</p>
-                    </div>
-                    <div class="flex gap-2 px-4">
-                        <p>Date:</p>
-                        <p class="flex-1 text-center border-b border-black">
-                            @if ($liquidation_report->certified_by_accountant && $liquidation_report->journal_date)
-                                {{ $liquidation_report->journal_date->format('m/d/Y') }}
-                            @endif
-                        </p>
-                    </div>
-                </div>
+               {{-- Section B: Signatory - Shows signature when forwarded past step 4000 --}}
+               <div class="flex flex-col w-1/3 h-48 pb-1">
+                   <div>
+                       <span class="p-1 border-b-2 border-r-2 border-black">B</span>
+                       <span class="text-sm">Certified: Purpose of travel / cash advance duly accomplished</span>
+                   </div>
+                   @php
+                       $signatoryApproval = $liquidation_report->signatoryApproval;
+                       $sectionBSignature = $signatoryApproval?->signerSignature() ?? $liquidation_report->signatory?->signature?->content;
+                   @endphp
+                   <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
+                       @if ($liquidation_report->current_step_id > 4000 || $liquidation_report->signatory_date)
+                           <x-esignature-block
+                               :signature="$sectionBSignature"
+                               :signed-by="$signatoryApproval?->esign_name"
+                               :signed-at="$signatoryApproval?->approved_at"
+                               :show-info="$signatoryApproval?->wasSignedByOic() ?? false"
+                               width="10rem"
+                               max-height="3.5rem"
+                               bottom="100%"
+                               translate-y="3.5rem"
+                               info-offset-x="62%"
+                               info-offset-y="2.75rem"/>
+                       @endif
+                       <p class="w-full text-center border-b border-black">
+                           {{ $signatoryApproval?->signatory_name ?? $liquidation_report->signatory?->employee_information?->full_name }}</p>
+                       <p>Signature over Printed Name</p>
+                       <p>Immediate Supervisor</p>
+                   </div>
+                   <div class="flex gap-2 px-4">
+                       <p>Date:</p>
+                       <p class="flex-1 text-center border-b border-black">
+                           @if ($signatoryApproval?->approved_at)
+                               {{ $signatoryApproval->approved_at->timezone('Asia/Manila')->format('F d, Y g:i A') }}
+                           @endif
+                       </p>
+                   </div>
+               </div>
+               {{-- Section C: Accountant - Shows signature when certified_by_accountant is true --}}
+               <div class="flex flex-col w-1/3 h-48 pb-1">
+                   <div>
+                       <span class="p-1 border-b-2 border-r-2 border-black">C</span>
+                       <span class="text-sm">Certified: Supporting documents complete and proper</span>
+                   </div>
+                   @php
+                       $accountantApproval = $liquidation_report->accountantApproval;
+                       $sectionCName = $accountantApproval?->signatory_name ?? $accountant?->full_name;
+                       $sectionCSignature = $accountantApproval?->signerSignature() ?? $accountant?->user?->signature?->content;
+                   @endphp
+                   <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
+                       @if ($liquidation_report->certified_by_accountant)
+                           <x-esignature-block
+                               :signature="$sectionCSignature"
+                               :signed-by="$accountantApproval?->esign_name"
+                               :signed-at="$accountantApproval?->approved_at"
+                               :show-info="$accountantApproval?->wasSignedByOic() ?? false"
+                               width="10rem"
+                               max-height="3.5rem"
+                               bottom="100%"
+                               translate-y="3.5rem"
+                               info-offset-x="62%"
+                               info-offset-y="2.75rem"/>
+                       @endif
+                       <p class="w-full text-center border-b border-black">{{ $sectionCName }}</p>
+                       <p>Signature over Printed Name</p>
+                       <p>Head, Accounting Division Unit</p>
+                   </div>
+                   <div class="flex gap-2 px-4">
+                       <p>Date:</p>
+                       <p class="flex-1 text-center border-b border-black">
+                           @if ($accountantApproval?->approved_at)
+                               {{ $accountantApproval->approved_at->timezone('Asia/Manila')->format('F d, Y g:i A') }}
+                           @endif
+                       </p>
+                   </div>
+               </div>
             </div>
             <div class="border-t col-span-8 text-xs text-center italic border-black w-full print:hidden">
                 <p>This is an electronic rendering of a document whose original copy exists in printed form.</p>

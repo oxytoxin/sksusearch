@@ -75,13 +75,15 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                     return $record->current_step_id == 3000 && $record->for_cancellation == false;
                 })
                 ->requiresConfirmation(),
-            Action::make('Forward')->button()->action(function ($record, $data) {
-                app(DisbursementVoucherWorkflowService::class)->forward($record, auth()->user(), $data['remarks'] ?? null, [
-                    'is_oic' => true,
-                    'approve_actual_itinerary' => true,
-                ]);
-                Notification::make()->title('Document Forwarded')->success()->send();
-            })
+           Action::make('Forward')->button()->action(function ($record, $data) {
+               app(DisbursementVoucherWorkflowService::class)->forward($record, auth()->user(), $data['remarks'] ?? null, [
+                   'is_oic' => true,
+                   'approve_actual_itinerary' => true,
+                   'actor' => auth()->user(),
+                   'slot_owner_id' => $this->slotOwnerId(),
+               ]);
+               Notification::make()->title('Document Forwarded')->success()->send();
+           })
                 ->form(function () {
                     return [
                         RichEditor::make('remarks')

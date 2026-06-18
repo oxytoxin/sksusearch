@@ -1,11 +1,11 @@
 <div class="{{ $textclass }}"
-     style="position: absolute; left: {{ $offsetX }}; top: {{ $offsetY }};">
+     style="position: absolute; left: {{ $offsetX }}; top: {{ $offsetY }}; font-size: 10px; line-height: 1;">
     @if($name)
-        <p class="font-semibold">{{ $label }}</p>
         <p class="font-bold">{{ $name }}</p>
     @endif
 
     @if($datetime)
-        <p>{{ \Carbon\Carbon::parse($datetime)->format('Y-M-d | H:i:s') }} GMT+08:00</p>
+        <p>{{ $datetime }}</p>
     @endif
+    <p>OIC | Delegated Authority</p>
 </div>

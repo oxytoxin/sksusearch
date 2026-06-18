@@ -67,13 +67,14 @@
                 ...$this->budgetOfficeActions(),
                 ...$this->accountingActions(),
                 ...$this->cashierActions(),
-                Action::make('certify')->button()->action(function ($record) {
-                    app(DisbursementVoucherWorkflowService::class)->certify($record, [
-                        'is_oic' => true,
-                        'actor' => auth()->user(),
-                    ]);
-                    Notification::make()->title('Disbursement voucher certified.')->success()->send();
-                })
+               Action::make('certify')->button()->action(function ($record) {
+                   app(DisbursementVoucherWorkflowService::class)->certify($record, [
+                       'is_oic' => true,
+                       'actor' => auth()->user(),
+                       'slot_owner_id' => $this->slotOwnerId(),
+                   ]);
+                   Notification::make()->title('Disbursement voucher certified.')->success()->send();
+               })
                     ->visible(fn($record, $livewire) => $record->current_step_id == 13000 && $record->for_cancellation == false && !$record->certified_by_accountant && User::find($livewire->tableFilters['as']['value'])?->employee_information->position_id == User::find($livewire->tableFilters['as']['value'])?->employee_information->office->head_position_id)
                     ->requiresConfirmation(),
                 Action::make('return')->button()->action(function ($record, $data) {

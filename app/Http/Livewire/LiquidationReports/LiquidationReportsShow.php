@@ -17,6 +17,14 @@ class LiquidationReportsShow extends Component
             'requisitioner.employee_information',
             'signatory.signature',
             'signatory.employee_information',
+            'signatoryApproval.user.signature',
+            'signatoryApproval.user.employee_information',
+            'signatoryApproval.oic.signature',
+            'signatoryApproval.oic.employee_information',
+            'accountantApproval.user.signature',
+            'accountantApproval.user.employee_information',
+            'accountantApproval.oic.signature',
+            'accountantApproval.oic.employee_information',
         ]);
         $this->liquidation_report->disbursement_voucher->loadSum('disbursement_voucher_particulars as total_amount', 'final_amount');
     }

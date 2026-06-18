@@ -2,30 +2,28 @@
 
 namespace App\Http\Livewire\Signatory\LiquidationReports;
 
-use Livewire\Component;
-use App\Models\LiquidationReport;
-use Illuminate\Support\Facades\DB;
-use Filament\Tables\Actions\Action;
-use App\Models\LiquidationReportStep;
-use Filament\Forms\Components\Select;
-use App\Models\DisbursementVoucherStep;
-use App\Models\TravelOrderType;
-use App\Models\VoucherSubType;
-use Filament\Forms\Components\Placeholder;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Notifications\Notification;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Forms\Components\RichEditor;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Illuminate\Support\HtmlString;
 use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
+use App\Models\DisbursementVoucherStep;
+use App\Models\LiquidationReport;
+use App\Models\LiquidationReportStep;
+use App\Models\TravelOrderType;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
+use Livewire\Component;
 
 class LiquidationReportsIndex extends Component implements HasTable
 {
-
     use InteractsWithTable;
 
     protected function getTableQuery()
@@ -54,17 +52,19 @@ class LiquidationReportsIndex extends Component implements HasTable
                     ]);
                     $record->refresh();
                     $record->activity_logs()->create([
-                        'description' => $record->current_step->process . ' ' . auth()->user()->employee_information->full_name,
+                        'description' => $record->current_step->process.' '.auth()->user()->employee_information->full_name,
                     ]);
                     DB::commit();
                     Notification::make()->title('Document Received')->success()->send();
                 }
             })
                 ->visible(function ($record) {
-                    if (!$record) {
+                    if (! $record) {
                         Notification::make()->title('Selected document not found.')->warning()->send();
+
                         return false;
                     }
+
                     return $record->current_step_id == 3000;
                 })
                 ->requiresConfirmation(),
@@ -72,9 +72,10 @@ class LiquidationReportsIndex extends Component implements HasTable
                 DB::beginTransaction();
                 if ($record->disbursement_voucher->travel_order_id) {
                     $actual_itinerary = $record->disbursement_voucher->travel_order?->itineraries()->whereIsActual(true)->first();
-                    if (!$actual_itinerary) {
+                    if (! $actual_itinerary) {
                         DB::rollBack();
                         Notification::make()->title('Actual itinerary not found.')->warning()->send();
+
                         return false;
                     } else {
                         $actual_itinerary->update([
@@ -87,15 +88,17 @@ class LiquidationReportsIndex extends Component implements HasTable
                         'signatory_date' => now(),
                         'current_step_id' => $record->current_step->next_step->id,
                     ]);
+                    $record->recordSignatoryApproval();
                 } else {
                     $record->update([
                         'signatory_date' => now(),
                         'current_step_id' => $record->previous_step_id,
                     ]);
+                    $record->recordSignatoryApproval();
                 }
                 $record->refresh();
                 $record->activity_logs()->create([
-                    'description' => $record->current_step->process . ' ' . $record->current_step->recipient . ' by ' . auth()->user()->employee_information->full_name,
+                    'description' => $record->current_step->process.' '.$record->current_step->recipient.' by '.auth()->user()->employee_information->full_name,
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
@@ -107,9 +110,9 @@ class LiquidationReportsIndex extends Component implements HasTable
                             ->label('Important!')
                             ->content(
                                 fn ($record) => in_array($record->disbursement_voucher->voucher_subtype_id, [6, 7]) ?
-                                    new HtmlString("By forwarding this transaction, you are concurring in the contents of the Liquidation Report <br/>(including its supporting documents) and the related Actual Itinerary of Travel and are hereby approving the same.")
+                                    new HtmlString('By forwarding this transaction, you are concurring in the contents of the Liquidation Report <br/>(including its supporting documents) and the related Actual Itinerary of Travel and are hereby approving the same.')
                                     :
-                                    new HtmlString("By forwarding this transaction, you are concurring in the contents of the Liquidation Report <br/>(including its supporting documents) and are hereby approving the same.")
+                                    new HtmlString('By forwarding this transaction, you are concurring in the contents of the Liquidation Report <br/>(including its supporting documents) and are hereby approving the same.')
                             ),
                         RichEditor::make('remarks')
                             ->label('Remarks (Optional)')
@@ -118,11 +121,13 @@ class LiquidationReportsIndex extends Component implements HasTable
                 })
                 ->modalWidth('4xl')
                 ->visible(function ($record) {
-                    if (!$record) {
+                    if (! $record) {
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
+
                         return false;
                     }
-                    return $record->current_step_id == 4000 && !$record->for_cancellation;
+
+                    return $record->current_step_id == 4000 && ! $record->for_cancellation;
                 })
                 ->requiresConfirmation(),
             Action::make('return')->button()->action(function ($record, $data) {
@@ -138,7 +143,7 @@ class LiquidationReportsIndex extends Component implements HasTable
                 ]);
                 $record->refresh();
                 $record->activity_logs()->create([
-                    'description' => 'Disbursement Voucher returned to ' . $record->current_step->recipient,
+                    'description' => 'Disbursement Voucher returned to '.$record->current_step->recipient,
                     'remarks' => $data['remarks'] ?? null,
                 ]);
                 DB::commit();
@@ -157,7 +162,7 @@ class LiquidationReportsIndex extends Component implements HasTable
 
                 // Send to the user who requested the disbursement voucher
                 $requestedBy = $record->disbursement_voucher->user;
-                if ($requestedBy && $requestedBy->employee_information && !empty($requestedBy->employee_information->contact_number)) {
+                if ($requestedBy && $requestedBy->employee_information && ! empty($requestedBy->employee_information->contact_number)) {
                     SendSmsJob::dispatch(
                         $requestedBy->employee_information->contact_number,
                         $message,
@@ -180,7 +185,7 @@ class LiquidationReportsIndex extends Component implements HasTable
                         );
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                    \Log::error('Realtime notification failed: '.$e->getMessage());
                 }
                 // ========== REALTIME NOTIFICATION END ==========
 
@@ -188,10 +193,12 @@ class LiquidationReportsIndex extends Component implements HasTable
             })
                 ->color('danger')
                 ->visible(function ($record) {
-                    if (!$record) {
+                    if (! $record) {
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
+
                         return false;
                     }
+
                     return $record->current_step_id == 4000 && $record->for_cancellation == false;
                 })
                 ->form(function () {
@@ -217,14 +224,16 @@ class LiquidationReportsIndex extends Component implements HasTable
                 ]);
                 DB::commit();
                 Notification::make()->title('Liquidation Report approved for cancellation.')->success()->send();
-                return;
+
             })
                 ->visible(function ($record) {
-                    if (!$record) {
+                    if (! $record) {
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
+
                         return false;
                     }
-                    return $record->current_step_id == 4000 && $record->for_cancellation && !$record->cancelled_at && !$record->certified_by_accountant;
+
+                    return $record->current_step_id == 4000 && $record->for_cancellation && ! $record->cancelled_at && ! $record->certified_by_accountant;
                 })
                 ->requiresConfirmation()
                 ->button()

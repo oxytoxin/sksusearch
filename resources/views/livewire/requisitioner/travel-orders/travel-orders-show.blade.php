@@ -155,16 +155,33 @@
             <div class="mt-8">
                 <div class="grid grid-cols-2 gap-16">
                     @foreach($travel_order->signatories as $signatory)
+                        @php($signer = $signatory->pivot?->signer($signatory))
                         <div>
                             <p>{{ $signatory->pivot?->heading }}</p>
                             <div class="px-16 relative">
                                 @if ($signatory->pivot->is_approved == 1)
-                                    <x-signature-block :signature="$signatory->signature?->content" width="12rem"
-                                                       maxHeight="6rem" bottom="100%"/>
+                                    <x-esignature-block
+                                            :signature="$signer->signature?->content"
+                                            :signed-by="$signer?->employee_information?->full_name"
+                                            :signed-at="$signatory->pivot?->approved_at"
+                                            :show-info="$signatory->pivot?->wasSignedByOic() ?? false"
+                                            width="12rem"
+                                            max-height="6rem"
+                                            bottom="100%"
+                                            info-class="text-[10px] text-left leading-tight"
+                                            info-offset-x="60%"
+                                            info-offset-y="-3.5rem"/>
                                 @endif
                                 <p class="min-w-[4rem] text-sm text-center border-b border-black">
                                     {{ $signatory->employee_information->full_name }}</p>
-                                <p class="text-center">{{ $signatory->pivot?->designation }}</p>
+                                <p class="text-center">
+                                    {{ $signatory->pivot?->designation }}
+                                </p>
+                                @if ($signatory->pivot?->approved_at)
+                                    <p class="text-center text-xs">
+                                        {{ $signatory->pivot->approved_at->timezone('Asia/Manila')->format('F d, Y g:i A') }}
+                                    </p>
+                                @endif
                             </div>
                         </div>
                     @endforeach

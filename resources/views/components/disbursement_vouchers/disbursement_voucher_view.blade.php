@@ -1,462 +1,472 @@
 <x-app-layout>
     <div>
         <div class="mx-auto flex max-w-[90%] border-collapse print:block print:w-[210mm] print:max-w-[210mm] print:overflow-hidden"
-            id="dvPrint">
+             id="dvPrint">
             <div class="flex flex-col">
                 <p class="text-right text-xs italic text-black"
-                    style="font-family: 'Times New Roman', Times, serif;">
+                   style="font-family: 'Times New Roman', Times, serif;">
                     Appendix 32</p>
                 <div class="grid border-collapse grid-cols-8 border-4 border-black"
-                    style="font-family: 'Times New Roman', Times, serif;">
-                <div class="col-span-6 border border-black">
-                    <div class="flex min-w-full place-items-center justify-between">
-                        <div class="w-20 shrink-0"></div>
-                        <div class="mt-1 flex-1 text-center">
+                     style="font-family: 'Times New Roman', Times, serif;">
+                    <div class="col-span-6 border border-black">
+                        <div class="flex min-w-full place-items-center justify-between">
+                            <div class="w-20 shrink-0"></div>
+                            <div class="mt-1 flex-1 text-center">
                             <span class="block text-sm font-bold uppercase text-black">SULTAN KUDARAT STATE
                                 UNIVERSITY</span>
-                            <span class="block text-xs italic text-black">Entity Name</span>
-                        </div>
-                        <div class="flex">
-                            <div class="m-3 text-center">
-
-                                <img class="mx-auto h-auto w-14"
-                                    src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ route('disbursement-vouchers.show-from-trn', ['disbursement_voucher' => $disbursement_voucher->tracking_number]) }}"
-                                    alt="N/A">
-                                <span
-                                    class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>
+                                <span class="block text-xs italic text-black">Entity Name</span>
                             </div>
+                            <div class="flex">
+                                <div class="m-3 text-center">
 
+                                    <img class="mx-auto h-auto w-16"
+                                         src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ route('disbursement-vouchers.show-from-trn', ['disbursement_voucher' => $disbursement_voucher->tracking_number]) }}"
+                                         alt="N/A">
+                                    <span class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>
+                                </div>
+
+                            </div>
                         </div>
-                    </div>
-                    <div class="min-w-full border-t-4 border-black text-center">
+                        <div class="min-w-full border-t-4 border-black text-center">
                         <span class="text-md mx-auto font-serif font-extrabold uppercase text-black">
                             Disbursement Voucher</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="col-span-2 grid grid-rows-2 border border-black">
-                    <div class="row-span-1 border-b border-l border-black">
+                    <div class="col-span-2 grid grid-rows-2 border border-black">
+                        <div class="row-span-1 border-b border-l border-black">
                         <span
-                            class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
+                                class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
                             fund cluster:
                         </span>
+                        </div>
+                        <div class="row-span-1 border-l border-black pb-6">
+                            <p class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
+                                date <span
+                                        class="ml-2"> {{ $disbursement_voucher->submitted_at->format('m/d/Y') }}</span>
+                            </p>
+                            <p class="mx-auto ml-1 font-serif text-xs font-extrabold text-black print:text-12">
+                                DV No.
+                            </p>
+                        </div>
                     </div>
-                    <div class="row-span-1 border-l border-black pb-6">
-                        <p class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
-                            date <span class="ml-2"> {{ $disbursement_voucher->submitted_at->format('m/d/Y') }}</span>
-                        </p>
-                        <p class="mx-auto ml-1 font-serif text-xs font-extrabold text-black print:text-12">
-                            DV No.
-                        </p>
-                    </div>
-                </div>
 
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
-                    <div class="flex h-full border-r-2 border-black px-2 py-1 text-center">
-                        <span class="text-sm font-extrabold">Mode of Payment</span>
-                    </div>
-                    <div class="ml-10 flex space-x-2 py-1">
-                        @foreach ($mops as $mop)
-                            <div class="relative flex items-start">
-                                <div class="flex h-5 items-center">
-                                    @if ($mop->id == $disbursement_voucher->mop_id)
-                                        <input class="h-4 w-4 border-black text-indigo-500 focus:ring-primary-500"
-                                            id="comments" name="comments" type="checkbox"
-                                            aria-describedby="comments-description" readonly disabled checked>
-                                    @else
-                                        <input class="h-4 w-4 border-black text-primary-500 focus:ring-primary-500"
-                                            id="comments" name="comments" type="checkbox"
-                                            aria-describedby="comments-description" readonly disabled>
-                                    @endif
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
+                        <div class="flex h-full border-r-2 border-black px-2 py-1 text-center">
+                            <span class="text-sm font-extrabold">Mode of Payment</span>
+                        </div>
+                        <div class="ml-10 flex space-x-2 py-1">
+                            @foreach ($mops as $mop)
+                                <div class="relative flex items-start">
+                                    <div class="flex h-5 items-center">
+                                        @if ($mop->id == $disbursement_voucher->mop_id)
+                                            <input class="h-4 w-4 border-black text-indigo-500 focus:ring-primary-500"
+                                                   id="comments" name="comments" type="checkbox"
+                                                   aria-describedby="comments-description" readonly disabled checked>
+                                        @else
+                                            <input class="h-4 w-4 border-black text-primary-500 focus:ring-primary-500"
+                                                   id="comments" name="comments" type="checkbox"
+                                                   aria-describedby="comments-description" readonly disabled>
+                                        @endif
+                                    </div>
+                                    <div class="ml-1 text-sm">
+                                        <label class="font-medium text-black">{{ $mop->name }}</label>
+                                    </div>
                                 </div>
-                                <div class="ml-1 text-sm">
-                                    <label class="font-medium text-black">{{ $mop->name }}</label>
+                            @endforeach
+
+                            @if ($mop->id == 4)
+                                <div class="relative flex items-start">
+                                    <div class="ml-1 text-sm">
+                                        <span class="font-medium text-black"></span>
+                                    </div>
                                 </div>
-                            </div>
-                        @endforeach
-
-                        @if ($mop->id == 4)
-                            <div class="relative flex items-start">
-                                <div class="ml-1 text-sm">
-                                    <span class="font-medium text-black"></span>
-                                </div>
-                            </div>
-                        @endif
+                            @endif
+                        </div>
                     </div>
-                </div>
 
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
 
-                    <div class="flex h-full border-r-2 border-black px-2 py-1 text-center">
-                        <span class="my-auto text-sm font-extrabold">Payee</span>
-                    </div>
-                    <div class="flex h-full w-1/2 border-r-2 border-black text-left">
+                        <div class="flex h-full border-r-2 border-black px-2 py-1 text-center">
+                            <span class="my-auto text-sm font-extrabold">Payee</span>
+                        </div>
+                        <div class="flex h-full w-1/2 border-r-2 border-black text-left">
                         <span class="text-serif my-auto flex pl-2 font-extrabold uppercase print:text-10">
                             {{ $disbursement_voucher->payee }} </span>
-                    </div>
-                    <div class="flex h-full w-64 border-r-2 border-black px-2 py-1 text-left">
-                        <span class="pb-3 text-xs font-extrabold">TIN/Employee No.:</span>
-                    </div>
-                    <div class="flex h-full w-60 px-2 py-1 text-left">
+                        </div>
+                        <div class="flex h-full w-64 border-r-2 border-black px-2 py-1 text-left">
+                            <span class="pb-3 text-xs font-extrabold">TIN/Employee No.:</span>
+                        </div>
+                        <div class="flex h-full w-60 px-2 py-1 text-left">
                         <span class="pb-3 text-xs font-extrabold">ORS/BURS No.:
                             {{ $disbursement_voucher->ors_burs }}</span>
-                    </div>
+                        </div>
 
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
-                    <div class="flex h-full border-r-2 border-black px-2 py-1 text-center">
-                        <span class="my-auto text-sm font-extrabold">Address</span>
                     </div>
-                </div>
-                {{-- Particulars Heading --}}
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="h-auto w-1/2 border-r-2 border-black text-center">
-                        Particulars
-                    </div>
-                    <div class="h-auto w-64 border-r-2 border-black text-center">
-                        Responsibility Center
-                    </div>
-                    <div class="h-auto w-36 border-r-2 border-black text-center">
-                        MFO/PAP
-                    </div>
-                    <div class="h-auto w-36 text-center">
-                        Amount
-                    </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-10">
-                    <div class="h-40 w-1/2 border-r-2 border-black pl-2 text-left">
-                        <div class="flex flex-col">
-                            @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                                <span>{{ $particular->purpose }}</span>
-                            @endforeach
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
+                        <div class="flex h-full border-r-2 border-black px-2 py-1 text-center">
+                            <span class="my-auto text-sm font-extrabold">Address</span>
                         </div>
                     </div>
-                    <div class="h-40 w-64 border-r-2 border-black text-center">
-                        <div class="flex flex-col">
-                            @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                                <span>{{ $disbursement_voucher->responsibility_center }}</span>
-                            @endforeach
+                    {{-- Particulars Heading --}}
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
+                        <div class="h-auto w-1/2 border-r-2 border-black text-center">
+                            Particulars
+                        </div>
+                        <div class="h-auto w-64 border-r-2 border-black text-center">
+                            Responsibility Center
+                        </div>
+                        <div class="h-auto w-36 border-r-2 border-black text-center">
+                            MFO/PAP
+                        </div>
+                        <div class="h-auto w-36 text-center">
+                            Amount
                         </div>
                     </div>
-                    <div class="h-40 w-36 border-r-2 border-black text-center">
-                        <div class="flex flex-col">
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-10">
+                        <div class="h-40 w-1/2 border-r-2 border-black pl-2 text-left">
+                            <div class="flex flex-col">
+                                @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
+                                    <span>{{ $particular->purpose }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="h-40 w-64 border-r-2 border-black text-center">
+                            <div class="flex flex-col">
+                                @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
+                                    <span>{{ $disbursement_voucher->responsibility_center }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="h-40 w-36 border-r-2 border-black text-center">
+                            <div class="flex flex-col">
+                                @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
+                                    <span>{{ $particular->mfo_pap }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="h-40 w-36 text-right">
+                            <div class="flex flex-col">
+                                @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
+                                    <span>{{ number_format($particular->amount, 2) }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-8 flex min-w-full items-start border-black font-serif print:text-12">
+                        <div class="h-auto w-1/2 border-r-2 border-t-2 border-black text-center">
+                            Amount Due
+                        </div>
+                        <div class="flex h-auto w-64 border-r-2 border-black text-center">
+                            {{ $disbursement_voucher->responsibility_center }}
+                        </div>
+                        <div class="h-auto w-36 border-r-2 border-black text-center">
                             @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
                                 <span>{{ $particular->mfo_pap }}</span>
                             @endforeach
                         </div>
-                    </div>
-                    <div class="h-40 w-36 text-right">
-                        <div class="flex flex-col">
-                            @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                                <span>{{ number_format($particular->amount, 2) }}</span>
-                            @endforeach
+                        <div class="h-auto w-36 border-t-4 border-double border-black text-right print:text-10">
+                            {{ number_format($disbursement_voucher->disbursement_voucher_particulars->sum('final_amount'), 2) }}
                         </div>
                     </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-black font-serif print:text-12">
-                    <div class="h-auto w-1/2 border-r-2 border-t-2 border-black text-center">
-                        Amount Due
-                    </div>
-                    <div class="flex h-auto w-64 border-r-2 border-black text-center">
-                        &nbsp
-                    </div>
-                    <div class="h-auto w-36 border-r-2 border-black text-center">
-                        &nbsp
-                    </div>
-                    <div class="h-auto w-36 border-t-4 border-double border-black text-right print:text-10">
-                        {{ number_format($disbursement_voucher->disbursement_voucher_particulars->sum('final_amount'), 2) }}
-                    </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
-                    <div class="w-full">
-                        <div class="row-span-1 flex">
-                            <div class="border-b border-r border-black px-1 font-extrabold print:text-12">A.</div>
-                            <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary,
-                                lawful and incurred under my direct supervision.</span>
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
+                        <div class="w-full">
+                            <div class="row-span-1 flex">
+                                <div class="border-b border-r border-black px-1 font-extrabold print:text-12">A.</div>
+                                <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary,lawful and incurred under my direct supervision.</span>
+                            </div>
+                            <div class="row-span-1 mx-auto block text-center relative">
+                                @php
+                                    $signatoryApproval = $disbursement_voucher->signatoryApproval;
+                                    $sectionASignature = $signatoryApproval?->signerSignature() ?? $disbursement_voucher->signatory?->signature?->content;
+                                @endphp
+                                @if ($disbursement_voucher->current_step_id >= 5000)
+                                    <x-esignature-block
+                                            :signature="$sectionASignature"
+                                            :signed-by="$signatoryApproval?->esign_name"
+                                            :signed-at="$signatoryApproval?->approved_at"
+                                            :show-info="$signatoryApproval?->wasSignedByOic() ?? false"
+                                            width="16rem"
+                                            bottom="-3rem"
+                                            max-height="8rem"
+                                            info-class="text-[10px] text-left leading-tight"
+                                            info-offset-x="62%"
+                                            info-offset-y="-0.75rem"/>
+                                @endif
+                                <div class="flex flex-col items-center">
+                                    <p class="font-extrabold uppercase border-b border-black px-16 print:text-10">
+                                        {{ $disbursement_voucher->signatory->employee_information->full_name }}
+                                    </p>
+                                    <p class="font-extrabold capitalize print:text-10">
+                                        {{ $disbursement_voucher->signatory->employee_information->position?->description }}
+                                        , {{ $disbursement_voucher->signatory->employee_information->office?->name }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="row-span-1 mx-auto block text-center relative">
-                            @php
-                                $full_name = explode(
-                                    ',',
-                                    $disbursement_voucher->signatory->employee_information->full_name,
-                                )[0];
-                            @endphp
-                            @if ($disbursement_voucher->current_step_id >= 5000)
-                                <x-signature-block :signature="$disbursement_voucher->signatory->signature?->content" width="16rem" left="53%" maxHeight="8rem" top="-4.3rem" />
+                    </div>
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
+                        <div class="flex">
+                            <div class="border-b border-r border-black px-1 font-extrabold print:text-12">B.</div>
+                            <span class="pl-1 font-extrabold print:text-12">Accounting Entry:</span>
+                        </div>
+                    </div>
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
+                        <div class="h-auto w-1/2 border-r-2 border-black text-center">
+                            Account Title
+                        </div>
+                        <div class="h-auto w-64 border-r-2 border-black text-center">
+                            UACS Code
+                        </div>
+                        <div class="h-auto w-36 border-r-2 border-black text-center">
+                            Debit
+                        </div>
+                        <div class="h-auto w-36 text-center">
+                            Credit
+                        </div>
+                    </div>
+                    <div class="col-span-8 flex min-w-full items-stretch border-t-2 border-black font-serif print:text-12">
+                        <div class="min-h-[10rem] w-1/2 border-r-2 border-black">
+                            @forelse ($disbursement_voucher->uacs_allocations as $allocation)
+                                <div class="border-b border-black px-1 py-0.5 text-left">
+                                    {{ $allocation->category_item_budget?->name }}
+                                </div>
+                            @empty
+                                <div class="px-1 py-0.5 text-center">&nbsp;</div>
+                            @endforelse
+                        </div>
+                        <div class="min-h-[10rem] w-64 border-r-2 border-black">
+                            @forelse ($disbursement_voucher->uacs_allocations as $allocation)
+                                <div class="border-b border-black px-1 py-0.5 text-center">
+                                    {{ $allocation->category_item_budget?->uacs_code }}
+                                </div>
+                            @empty
+                                <div class="px-1 py-0.5 text-center">&nbsp;</div>
+                            @endforelse
+                        </div>
+                        <div class="min-h-[10rem] w-36 border-r-2 border-black">
+                            @forelse ($disbursement_voucher->uacs_allocations as $allocation)
+                                <div class="border-b border-black px-1 py-0.5 text-right">
+                                    {{ number_format($allocation->amount, 2) }}
+                                </div>
+                            @empty
+                                <div class="px-1 py-0.5 text-center">&nbsp;</div>
+                            @endforelse
+                        </div>
+                        <div class="min-h-[10rem] w-36 text-center">
+                            &nbsp
+                        </div>
+                    </div>
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
+                        <div class="w-1/2 border-r-2 border-black">
+                            <div class="flex">
+                                <div class="border-b border-r border-black px-1 font-extrabold print:text-12">C.</div>
+                                <span class="pl-1 font-extrabold print:text-12">Certified:</span>
+                            </div>
+                        </div>
+                        <div class="w-1/2 border-r-2 border-black">
+                            <div class="flex">
+                                <div class="border-b border-r border-black px-1 font-extrabold print:text-12">D.</div>
+                                <span class="pl-1 font-extrabold print:text-12">Approved for Payment:</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
+
+                        <div class="w-1/2 space-y-1 border-r-2 border-black print:text-8">
+                            <div class="mt-1 flex items-center">
+                                <div class="mx-2 h-3 w-8 border border-black"></div>
+                                <span>Cash available</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="mx-2 h-3 w-8 border border-black"></div>
+                                <span>Subject to Authority to Debit Account (when applicable)</span>
+                            </div>
+                            <div class="mb-1 flex items-center">
+                                <div class="mx-2 h-3 w-8 border border-black"></div>
+                                <span>Supporting documents complete and amount claimed proper</span>
+                            </div>
+                        </div>
+                    </div>
+                    @php
+                        $president = App\Models\EmployeeInformation::with('user.signature')
+                            ->where('position_id', 34)
+                            ->where('office_id', 51)
+                            ->first();
+                        $accountant = App\Models\EmployeeInformation::with('user.signature')
+                            ->where('position_id', 15)
+                            ->where('office_id', 3)
+                            ->first();
+                    @endphp
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
+                        <div class="w-1/2 space-y-1 border-r-2 border-black print:text-8 relative">
+                            <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
+                                <span class="mx-auto my-auto flex print:text-12">Signature</span>
+                            </div>
+                            {{-- Temporarily hidden - signature not yet approved
+                            @if ($disbursement_voucher->current_step_id >= 14000)
+                                <x-signature-block :signature="$accountant?->user?->signature?->content" width="8rem" max-height="3rem" translateX="-30%"
+                                    top="-1.2rem" />
                             @endif
-                            <span class="font-extrabold uppercase underline print:text-10">
-                                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                                {{ isset($full_name) ? $full_name : 'none' }}
-                                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
-                            <p class="font-extrabold capitalize print:text-10">
-                                {{ $disbursement_voucher->signatory->employee_information->position?->description }}
-                                , {{ $disbursement_voucher->signatory->employee_information->office?->name }}
-                            </p>
+                            --}}
                         </div>
-                    </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif">
-                    <div class="flex">
-                        <div class="border-b border-r border-black px-1 font-extrabold print:text-12">B.</div>
-                        <span class="pl-1 font-extrabold print:text-12">Accounting Entry:</span>
-                    </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="h-auto w-1/2 border-r-2 border-black text-center">
-                        Account Title
-                    </div>
-                    <div class="h-auto w-64 border-r-2 border-black text-center">
-                        UACS Code
-                    </div>
-                    <div class="h-auto w-36 border-r-2 border-black text-center">
-                        Debit
-                    </div>
-                    <div class="h-auto w-36 text-center">
-                        Credit
-                    </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-stretch border-t-2 border-black font-serif print:text-12">
-                    <div class="min-h-[10rem] w-1/2 border-r-2 border-black">
-                        @forelse ($disbursement_voucher->uacs_allocations as $allocation)
-                            <div class="border-b border-black px-1 py-0.5 text-left">
-                                {{ $allocation->category_item_budget?->name }}
+                        <div class="w-1/2 space-y-1 print:text-8 relative">
+                            <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
+                                <span class="mx-auto my-auto flex print:text-12">Signature</span>
                             </div>
-                        @empty
-                            <div class="px-1 py-0.5 text-center">&nbsp;</div>
-                        @endforelse
+                            {{-- Temporarily hidden - signature not yet approved
+                            @if ($disbursement_voucher->current_step_id >= 16000)
+                                <x-signature-block :signature="$president?->user?->signature?->content" width="8rem" max-height="3rem" translateX="-30%"
+                                    top="-1.2rem" />
+                            @endif
+                            --}}
+                        </div>
                     </div>
-                    <div class="min-h-[10rem] w-64 border-r-2 border-black">
-                        @forelse ($disbursement_voucher->uacs_allocations as $allocation)
-                            <div class="border-b border-black px-1 py-0.5 text-center">
-                                {{ $allocation->category_item_budget?->uacs_code }}
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
+                        <div class="flex w-1/2 items-center space-y-1 border-r-2 border-black text-center print:text-8">
+                            <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
+                                <span class="w-full break-words print:text-12">Printed Name</span>
                             </div>
-                        @empty
-                            <div class="px-1 py-0.5 text-center">&nbsp;</div>
-                        @endforelse
-                    </div>
-                    <div class="min-h-[10rem] w-36 border-r-2 border-black">
-                        @forelse ($disbursement_voucher->uacs_allocations as $allocation)
-                            <div class="border-b border-black px-1 py-0.5 text-right">
-                                {{ number_format($allocation->amount, 2) }}
+                            <span
+                                    class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
+                        </div>
+                        <div class="flex w-1/2 items-center space-y-1 border-r-2 border-black text-center print:text-8">
+                            <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
+                                <span class="w-full break-words print:text-12">Printed Name</span>
                             </div>
-                        @empty
-                            <div class="px-1 py-0.5 text-center">&nbsp;</div>
-                        @endforelse
-                    </div>
-                    <div class="min-h-[10rem] w-36 text-center">
-                        &nbsp
-                    </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="w-1/2 border-r-2 border-black">
-                        <div class="flex">
-                            <div class="border-b border-r border-black px-1 font-extrabold print:text-12">C.</div>
-                            <span class="pl-1 font-extrabold print:text-12">Certified:</span>
+                            <span
+                                    class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
                         </div>
                     </div>
-                    <div class="w-1/2 border-r-2 border-black">
-                        <div class="flex">
-                            <div class="border-b border-r border-black px-1 font-extrabold print:text-12">D.</div>
-                            <span class="pl-1 font-extrabold print:text-12">Approved for Payment:</span>
-                        </div>
-                    </div>
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
 
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
+                        <div class="flex w-1/2 space-y-1 border-r-2 border-black text-center print:text-8">
+                            <div class="flex h-auto w-20 shrink-0 border-r border-black text-center print:h-8 print:w-16">
+                                <span class="mx-auto my-auto flex print:text-12">Position</span>
+                            </div>
 
-                    <div class="w-1/2 space-y-1 border-r-2 border-black print:text-8">
-                        <div class="mt-1 flex items-center">
-                            <div class="mx-2 h-3 w-8 border border-black"></div>
-                            <span>Cash available</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="mx-2 h-3 w-8 border border-black"></div>
-                            <span>Subject to Authority to Debit Account (when applicable)</span>
-                        </div>
-                        <div class="mb-1 flex items-center">
-                            <div class="mx-2 h-3 w-8 border border-black"></div>
-                            <span>Supporting documents complete and amount claimed proper</span>
-                        </div>
-                    </div>
-                </div>
-                @php
-                    $president = App\Models\EmployeeInformation::with('user.signature')
-                        ->where('position_id', 34)
-                        ->where('office_id', 51)
-                        ->first();
-                    $accountant = App\Models\EmployeeInformation::with('user.signature')
-                        ->where('position_id', 15)
-                        ->where('office_id', 3)
-                        ->first();
-                @endphp
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="w-1/2 space-y-1 border-r-2 border-black print:text-8 relative">
-                        <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
-                            <span class="mx-auto my-auto flex print:text-12">Signature</span>
-                        </div>
-                        {{-- Temporarily hidden - signature not yet approved
-                        @if ($disbursement_voucher->current_step_id >= 14000)
-                            <x-signature-block :signature="$accountant?->user?->signature?->content" width="8rem" maxHeight="3rem" translateX="-30%"
-                                top="-1.2rem" />
-                        @endif
-                        --}}
-                    </div>
-                    <div class="w-1/2 space-y-1 print:text-8 relative">
-                        <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
-                            <span class="mx-auto my-auto flex print:text-12">Signature</span>
-                        </div>
-                        {{-- Temporarily hidden - signature not yet approved
-                        @if ($disbursement_voucher->current_step_id >= 16000)
-                            <x-signature-block :signature="$president?->user?->signature?->content" width="8rem" maxHeight="3rem" translateX="-30%"
-                                top="-1.2rem" />
-                        @endif
-                        --}}
-                    </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="flex w-1/2 items-center space-y-1 border-r-2 border-black text-center print:text-8">
-                        <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
-                            <span class="w-full break-words print:text-12">Printed Name</span>
-                        </div>
-                        <span
-                            class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $accountant->full_name }}</span>
-                    </div>
-                    <div class="flex w-1/2 items-center space-y-1 border-r-2 border-black text-center print:text-8">
-                        <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
-                            <span class="w-full break-words print:text-12">Printed Name</span>
-                        </div>
-                        <span
-                            class="mx-auto my-auto flex font-extrabold uppercase print:text-10">{{ $president->full_name }}</span>
-                    </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-
-                    <div class="flex w-1/2 space-y-1 border-r-2 border-black text-center print:text-8">
-                        <div class="flex h-auto w-20 shrink-0 border-r border-black text-center print:h-8 print:w-16">
-                            <span class="mx-auto my-auto flex print:text-12">Position</span>
-                        </div>
-
-                        <div class="h-auto w-full text-center print:h-8">
-                            <div class="h-4 w-full border-b border-black">
+                            <div class="h-auto w-full text-center print:h-8">
+                                <div class="h-4 w-full border-b border-black">
                                 <span
-                                    class="mx-auto my-auto block text-xs font-extrabold print:text-8">University
+                                        class="mx-auto my-auto block text-xs font-extrabold print:text-8">University
                                     Accountant</span>
-                            </div>
-                            <div class="h-4 w-full">
+                                </div>
+                                <div class="h-4 w-full">
                                 <span class="mx-auto my-auto block text-xs font-extrabold print:text-8">Head,
                                     Accounting
                                     Unit/Authorized Representative</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="flex w-1/2 space-y-1 border-r-2 border-black text-center print:text-8">
-                        <div class="flex h-auto w-20 shrink-0 border-r border-black text-center print:h-8 print:w-16">
-                            <span class="mx-auto my-auto flex print:text-12">Position</span>
-                        </div>
-                        <div class="h-auto w-full text-center print:h-8">
-                            <div class="h-4 w-full border-b border-black">
-                                <span
-                                    class="mx-auto my-auto block text-xs font-extrabold print:text-8">University
-                                    President</span>
+                        <div class="flex w-1/2 space-y-1 border-r-2 border-black text-center print:text-8">
+                            <div class="flex h-auto w-20 shrink-0 border-r border-black text-center print:h-8 print:w-16">
+                                <span class="mx-auto my-auto flex print:text-12">Position</span>
                             </div>
-                            <div class="h-4 w-full">
+                            <div class="h-auto w-full text-center print:h-8">
+                                <div class="h-4 w-full border-b border-black">
                                 <span
-                                    class="mx-auto my-auto block text-xs font-extrabold print:text-8">Agency
+                                        class="mx-auto my-auto block text-xs font-extrabold print:text-8">University
+                                    President</span>
+                                </div>
+                                <div class="h-4 w-full">
+                                <span
+                                        class="mx-auto my-auto block text-xs font-extrabold print:text-8">Agency
                                     Head/Authorized
                                     Representative</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
+                        <div class="w-1/2 space-y-1 border-r-2 border-black print:text-8">
+                            <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
+                                <span class="mx-auto my-auto flex print:text-12">Date</span>
+
+                            </div>
+                        </div>
+                        <div class="w-1/2 space-y-1 print:text-8">
+                            <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
+                                <span class="mx-auto my-auto flex print:text-12">Date</span>
                             </div>
                         </div>
                     </div>
 
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="w-1/2 space-y-1 border-r-2 border-black print:text-8">
-                        <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
-                            <span class="mx-auto my-auto flex print:text-12">Date</span>
-
-                        </div>
-                    </div>
-                    <div class="w-1/2 space-y-1 print:text-8">
-                        <div class="flex h-auto w-20 border-r border-black text-center print:h-8 print:w-16">
-                            <span class="mx-auto my-auto flex print:text-12">Date</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
-                    <div class="w-full flex-col">
-                        <div class="flex w-full border-b-2 border-r border-black">
-                            <div class="border-r border-black px-1 font-extrabold print:text-12">E.</div>
-                            <span class="pl-1 font-extrabold print:text-12">Receipt of Payment</span>
-                        </div>
-                        <div class="flex w-full flex-row border-b border-black">
-                            <div
-                                class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
-                                Check / ADA No.:
+                    <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-12">
+                        <div class="w-full flex-col">
+                            <div class="flex w-full border-b-2 border-r border-black">
+                                <div class="border-r border-black px-1 font-extrabold print:text-12">E.</div>
+                                <span class="pl-1 font-extrabold print:text-12">Receipt of Payment</span>
                             </div>
-                            <div class="h-auto w-1/3 shrink-0 border-r border-black">
-                                <div class="h-5"></div>
+                            <div class="flex w-full flex-row border-b border-black">
+                                <div
+                                        class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
+                                    Check / ADA No.:
+                                </div>
+                                <div class="h-auto w-1/3 shrink-0 border-r border-black">
+                                    <div class="h-5"></div>
+                                </div>
+                                <div class="h-auto w-full border-r border-black px-1 text-xs font-extrabold print:text-10">
+                                    Date:
+                                </div>
+                                <div class="h-auto w-full border-r border-black px-1 text-xs font-extrabold print:text-10">
+                                    Bank Name & Account Number
+                                </div>
                             </div>
-                            <div class="h-auto w-full border-r border-black px-1 text-xs font-extrabold print:text-10">
-                                Date:
-                            </div>
-                            <div class="h-auto w-full border-r border-black px-1 text-xs font-extrabold print:text-10">
-                                Bank Name & Account Number
+                        </div>
+                        <div class="float-left h-full w-1/6 shrink-0 border-l border-b border-black">
+                            <div class="flex text-left print:text-12">
+                                JEV No.
                             </div>
                         </div>
                     </div>
-                    <div class="float-left h-full w-1/6 shrink-0 border-l border-b border-black">
-                        <div class="flex text-left print:text-12">
-                            JEV No.
-                        </div>
-                    </div>
-                </div>
-                <div class="col-span-8 flex min-w-full items-start border-t border-black font-serif print:text-12">
-                    <div class="w-full flex-col border-r-2 border-black">
-                        <div class="flex w-full flex-row border-b-2 border-black">
-                            <div
-                                class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
-                                Signature
+                    <div class="col-span-8 flex min-w-full items-start border-t border-black font-serif print:text-12">
+                        <div class="w-full flex-col border-r-2 border-black">
+                            <div class="flex w-full flex-row border-b-2 border-black">
+                                <div
+                                        class="h-auto w-20 shrink-0 border-r border-black px-1 text-xs font-extrabold print:w-20 print:text-10">
+                                    Signature
+                                </div>
+                                <div class="h-auto w-1/3 shrink-0 border-r border-black">
+                                    <div class="h-5"></div>
+                                </div>
+                                <div class="h-auto w-full border-r border-black px-1 text-xs font-extrabold print:text-10">
+                                    Date:
+                                </div>
+                                <div class="h-auto w-full px-1 text-xs font-extrabold print:text-10">
+                                    Printed Name:
+                                </div>
                             </div>
-                            <div class="h-auto w-1/3 shrink-0 border-r border-black">
-                                <div class="h-5"></div>
-                            </div>
-                            <div class="h-auto w-full border-r border-black px-1 text-xs font-extrabold print:text-10">
-                                Date:
-                            </div>
-                            <div class="h-auto w-full px-1 text-xs font-extrabold print:text-10">
-                                Printed Name:
-                            </div>
-                        </div>
-                        <div class="w-full">
+                            <div class="w-full">
                             <span class="pl-1 font-extrabold print:text-12">Official Receipt No. &
                                 Date/OtherDocuments</span>
+                            </div>
+                        </div>
+                        <div class="h-full w-1/5">
+                            <div class="flex text-left print:text-12">
+                                Date
+                            </div>
                         </div>
                     </div>
-                    <div class="h-full w-1/5">
-                        <div class="flex text-left print:text-12">
-                            Date
-                        </div>
+                    <div class="border-t col-span-8 text-xs text-center italic border-black w-full print:hidden">
+                        <p>This is an electronic rendering of a document whose original copy exists in printed form.</p>
                     </div>
-                </div>
-                <div class="border-t col-span-8 text-xs text-center italic border-black w-full print:hidden">
-                    <p>This is an electronic rendering of a document whose original copy exists in printed form.</p>
-                </div>
                 </div>
             </div>
 
         </div>
         <div class="mx-auto mt-4 max-w-[90%]">
             <button
-                class="mt-2 inline-flex items-center rounded-md border border-transparent bg-primary-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                type="button" onclick="printDiv('dvPrint')">
+                    class="mt-2 inline-flex items-center rounded-md border border-transparent bg-primary-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                    type="button" onclick="printDiv('dvPrint')">
                 <!-- Heroicon name: mini/envelope -->
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                    fill="currentColor">
+                     fill="currentColor">
                     <path fill-rule="evenodd"
-                        d="M7.875 1.5C6.839 1.5 6 2.34 6 3.375v2.99c-.426.053-.851.11-1.274.174-1.454.218-2.476 1.483-2.476 2.917v6.294a3 3 0 003 3h.27l-.155 1.705A1.875 1.875 0 007.232 22.5h9.536a1.875 1.875 0 001.867-2.045l-.155-1.705h.27a3 3 0 003-3V9.456c0-1.434-1.022-2.7-2.476-2.917A48.716 48.716 0 0018 6.366V3.375c0-1.036-.84-1.875-1.875-1.875h-8.25zM16.5 6.205v-2.83A.375.375 0 0016.125 3h-8.25a.375.375 0 00-.375.375v2.83a49.353 49.353 0 019 0zm-.217 8.265c.178.018.317.16.333.337l.526 5.784a.375.375 0 01-.374.409H7.232a.375.375 0 01-.374-.409l.526-5.784a.373.373 0 01.333-.337 41.741 41.741 0 018.566 0zm.807-3.97a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H18a.75.75 0 01-.75-.75V10.5zM15 9.75a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V10.5a.75.75 0 00-.75-.75H15z"
-                        clip-rule="evenodd" />
+                          d="M7.875 1.5C6.839 1.5 6 2.34 6 3.375v2.99c-.426.053-.851.11-1.274.174-1.454.218-2.476 1.483-2.476 2.917v6.294a3 3 0 003 3h.27l-.155 1.705A1.875 1.875 0 007.232 22.5h9.536a1.875 1.875 0 001.867-2.045l-.155-1.705h.27a3 3 0 003-3V9.456c0-1.434-1.022-2.7-2.476-2.917A48.716 48.716 0 0018 6.366V3.375c0-1.036-.84-1.875-1.875-1.875h-8.25zM16.5 6.205v-2.83A.375.375 0 0016.125 3h-8.25a.375.375 0 00-.375.375v2.83a49.353 49.353 0 019 0zm-.217 8.265c.178.018.317.16.333.337l.526 5.784a.375.375 0 01-.374.409H7.232a.375.375 0 01-.374-.409l.526-5.784a.373.373 0 01.333-.337 41.741 41.741 0 018.566 0zm.807-3.97a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H18a.75.75 0 01-.75-.75V10.5zM15 9.75a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V10.5a.75.75 0 00-.75-.75H15z"
+                          clip-rule="evenodd"/>
                 </svg>
                 Print Voucher
             </button>

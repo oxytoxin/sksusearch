@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Requisitioner\Itinerary;
 
 use App\Models\Itinerary;
 use App\Models\TravelOrder;
+use App\Models\User;
 use Carbon\Carbon;
 
 trait PreparesItineraryOfficialForm
@@ -42,7 +43,9 @@ trait PreparesItineraryOfficialForm
             'name' => '',
             'signature' => null,
         ];
-        $approvingSignatories = $itinerarySignatories->skip(1)->values();
+        $approvingSignatories = $itinerarySignatories->count() > 1
+            ? collect([$itinerarySignatories->last()])
+            : collect();
         $rows = [];
         $perDiemTotal = 0;
         $transportationTotal = 0;
@@ -148,15 +151,32 @@ trait PreparesItineraryOfficialForm
 
     protected function prepareItinerarySignatories($signatories)
     {
+        $oicIds = collect($signatories)
+            ->map(fn ($signatory) => $signatory->pivot?->approved_by_oic_id)
+            ->filter()
+            ->unique()
+            ->all();
+        $oicUsers = $oicIds
+            ? User::with(['signature', 'employee_information.position', 'employee_information.office'])->findMany($oicIds)->keyBy('id')
+            : collect();
+
         return collect($signatories)
             ->sortBy(fn ($signatory) => $signatory->pivot?->id ?? 0)
             ->values()
-            ->map(function ($signatory, int $index) {
+            ->map(function ($signatory, int $index) use ($oicUsers) {
+                $oic = $signatory->pivot?->approved_by_oic_id ? $oicUsers->get($signatory->pivot->approved_by_oic_id) : null;
+                $signer = $oic ?? $signatory;
+                $approved = $signatory->pivot?->is_approved;
+                $officialDesignation = $signatory->pivot?->designation ?: ($index === 0 ? 'Immediate Supervisor' : 'Agency Head/Authorized Representative');
+
                 return [
                     'heading' => $signatory->pivot?->heading ?: ($index === 0 ? 'Certified by:' : 'Approved by:'),
-                    'designation' => $signatory->pivot?->designation ?: ($index === 0 ? 'Immediate Supervisor' : 'Agency Head/Authorized Representative'),
+                    'designation' => $officialDesignation,
                     'name' => $signatory->employee_information?->full_name ?? $signatory->name,
-                    'signature' => $signatory->pivot?->is_approved ? $signatory->signature?->content : null,
+                    'signature' => $approved ? $signer->signature?->content : null,
+                    'esign_name' => $approved ? ($signer->employee_information?->full_name ?? $signer->name) : null,
+                    'signed_by_oic' => filled($oic),
+                    'approved_at' => $signatory->pivot?->approved_at,
                 ];
             });
     }

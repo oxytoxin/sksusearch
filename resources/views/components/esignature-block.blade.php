@@ -1,0 +1,20 @@
+@if($signature)
+    <x-signature-block
+        :signature="$signature"
+        :width="$width"
+        :max-height="$maxHeight"
+        :top="$top"
+        :bottom="$bottom"
+        :left="$left"
+        :translate-x="$translateX"
+        :translate-y="$translateY"/>
+
+    @if($showInfo)
+        <x-esign-info
+            :name="$signedBy"
+            :datetime="$signedAt"
+            :textclass="$infoClass"
+            :offset-x="$infoOffsetX"
+            :offset-y="$infoOffsetY"/>
+    @endif
+@endif
