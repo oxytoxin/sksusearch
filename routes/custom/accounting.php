@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
+    'ensure.signature',
 ])->prefix('accounting')->name('accounting.')->group(function () {
     Route::get('/dashboard', AccountingDashboard::class)->name('dashboard');
 });

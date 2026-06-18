@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
+    'ensure.signature',
 ])->prefix('wfp')->name('wfp.')->group(function () {
     Route::get('/wfp-types', WFPTypes::class)->name('wfp-types');
     // Route::get('/fund-allocation/{filter?}', FundAllocation::class)->name('fund-allocation');

@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
+    'ensure.signature',
 ])->prefix('archiver')->name('archiver.')->group(function () {
     Route::get('/dashboard', ArchiverDashboard::class)->name('dashboard');
     Route::get('/view-archives', ViewArchives::class)->name('view-archives');

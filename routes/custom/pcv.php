@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
+    'ensure.signature',
 ])->prefix('pcv')->name('pcv.')->group(function () {
     Route::get('/petty-cash-vouchers', PettyCashVouchersIndex::class)->name('index');
     Route::get('/accountant-dashboard', AccountantPettyCashDashboard::class)->name('accountant.dashboard');
