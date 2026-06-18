@@ -7,11 +7,11 @@
             <span class="uppercase">SKSU<span class="capitalize"> electronic archiving, retrieval <span class="lowercase">and</span> content handling</span></span>
         </div>
 
-        <div class="w-full px-6 py-4 mt-6 overflow-hidden shadow-md sm:max-w-5xl sm:rounded-lg">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div class="w-full px-6 py-4 mt-6 overflow-hidden shadow-md sm:max-w-7xl sm:rounded-lg">
+            <div class="grid grid-cols-1 lg:grid-cols-7 gap-6">
 
-                {{-- Left: Instructions --}}
-                <div class="md:col-span-2 bg-primary-600 rounded-lg p-6 text-white">
+                {{-- Left: How to Register --}}
+                <div class="lg:col-span-2 bg-primary-600 rounded-lg p-6 text-white">
                     <h2 class="text-xl font-bold mb-4">Employee Registration</h2>
                     <p class="text-sm text-white/80 mb-6">
                         Register using your institutional email to get started with the S.E.A.R.C.H. system.
@@ -28,16 +28,6 @@
                         </ol>
                     </div>
 
-                    <div class="mt-6 space-y-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider">Important Notes</h3>
-                        <ul class="list-disc list-inside space-y-2 text-sm text-white/90">
-                            <li>Only <span class="font-semibold">@sksu.edu.ph</span> email addresses are accepted.</li>
-                            <li>All name fields will be automatically capitalized.</li>
-                            <li>Campus, office, and position are required fields.</li>
-                            <li>If you cannot find your office or position, please contact us using the link in the form.</li>
-                        </ul>
-                    </div>
-
                     <div class="mt-6 pt-4 border-t border-white/20">
                         <a href="{{ route('login') }}" class="text-sm underline text-white/80 hover:text-white">
                             &larr; Back to Login
@@ -45,8 +35,50 @@
                     </div>
                 </div>
 
+                {{-- Center: Important Notes --}}
+                <div class="lg:col-span-2 bg-primary-600 rounded-lg p-6 text-white">
+                    <h3 class="text-sm font-bold uppercase tracking-wider mb-4">Important Notes</h3>
+
+                    <div class="space-y-3 text-sm text-white/90">
+                        <div>
+                            <p class="font-semibold text-white mb-1">a. Office Assignment</p>
+                            <p>Office assignments must be selected based on organic function (as indicated by plantilla item). Designations (division/center directorship, project leadership, committee membership, etc.) will be handled by the HR module. For now, designations are not user-directed.</p>
+                        </div>
+
+                        <div>
+                            <p class="font-semibold text-white mb-1">b. Position Selection</p>
+                            <ol class="ml-6 space-y-1" style="list-style-type: lower-roman;">
+                                <li>Regular teaching and non-teaching personnel must select positions based on plantilla item.</li>
+                                <li>All COS teaching personnel must select <span class="font-semibold text-white">COS Faculty</span>.</li>
+                                <li>All office-based job order personnel must select <span class="font-semibold text-white">Job Order Staff</span> regardless of assignment or classification.</li>
+                                <li>All project-based (externally-funded/161) job order personnel must select <span class="font-semibold text-white">Project Staff</span> regardless of assignment, classification, or project staffing rank.</li>
+                            </ol>
+                            <div class="mt-2 p-2 bg-white/10 border border-white/20 rounded text-xs text-white/80">
+                                <span class="font-semibold text-white">Note:</span> Many of our office-based and project-based "job order" personnel should technically be classified as Contract of Service personnel under COA-CSC-DBM Joint Circular No. 1, s. 2025. However, as a matter of administrative convenience, we will give way to term familiarity and use the generic positions described above.
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="font-semibold text-white mb-1">c. Duplicate Registration</p>
+                            <p>The system will block new registration attempts from institutional emails that are already enrolled in the system.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-white/15 border border-white/30 rounded-lg">
+                        <p class="text-sm font-bold text-white mb-1">Can't find your office or position?</p>
+                        <p class="text-sm text-white/90">
+                            Download this
+                            <a href="{{ route('download.employee-template') }}" class="inline-flex items-center px-2 py-0.5 bg-white text-primary-600 font-semibold rounded hover:bg-white/90 text-xs">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Form
+                            </a>
+                            and email it to <span class="font-semibold text-white">sksusearch@sksu.edu.ph</span>
+                        </p>
+                    </div>
+                </div>
+
                 {{-- Right: Form --}}
-                <div class="md:col-span-3 bg-primary-400 rounded-lg p-6">
+                <div class="lg:col-span-3 bg-primary-400 rounded-lg p-6">
                     @if ($errors->any())
                         <div class="mb-4 p-3 bg-red-100 border border-red-400 rounded text-red-700 text-sm">
                             <ul class="list-disc list-inside">
@@ -78,7 +110,7 @@
 
                             <div>
                                 <x-jet-label class="font-bold text-white drop-shadow" for="full_name" value="Full Name (as it appears in documents) *" />
-                                <x-jet-input class="block w-full mt-1 uppercase" id="full_name" name="full_name" type="text" :value="old('full_name')" placeholder="e.g. DELA CRUZ, JUAN M." required style="text-transform: uppercase;" />
+                                <x-jet-input class="block w-full mt-1 uppercase" id="full_name" name="full_name" type="text" :value="old('full_name')" placeholder="JUAN M. DELA CRUZ" required style="text-transform: uppercase;" />
                                 @error('full_name') <span class="text-xs text-red-300">{{ $message }}</span> @enderror
                             </div>
 
@@ -94,8 +126,13 @@
                                     <x-jet-input class="block w-full mt-1" id="address" name="address" type="text" :value="old('address')" />
                                 </div>
                                 <div>
-                                    <x-jet-label class="font-bold text-white drop-shadow" for="contact_number" value="Contact Number" />
-                                    <x-jet-input class="block w-full mt-1" id="contact_number" name="contact_number" type="text" :value="old('contact_number')" />
+                                    <x-jet-label class="font-bold text-white drop-shadow" for="contact_number" value="Contact Number *" />
+                                    <div class="flex mt-1">
+                                        <span class="inline-flex items-center px-3 text-sm text-gray-700 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">09</span>
+                                        <input class="block w-full rounded-r-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" id="contact_number_suffix" type="text" value="{{ old('contact_number') ? substr(old('contact_number'), 2) : '' }}" maxlength="9" minlength="9" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+                                        <input type="hidden" id="contact_number" name="contact_number" value="{{ old('contact_number') }}" />
+                                    </div>
+                                    @error('contact_number') <span class="text-xs text-red-300">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
@@ -142,13 +179,6 @@
                                         @error('position_id') <span class="text-xs text-red-300">{{ $message }}</span> @enderror
                                     </div>
 
-                                    <div>
-                                        <a href="https://mail.google.com/mail/?view=cm&to=sksusearch@sksu.edu.ph&su=Employee%20Enrollment%20Concern"
-                                           target="_blank"
-                                           class="text-sm underline text-primary-100 hover:text-primary-200">
-                                            Can't find your office or position? Contact us
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
 
@@ -195,6 +225,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const campusId = document.getElementById('campus_id').value;
             if (campusId) loadOffices(campusId);
+
+            const suffix = document.getElementById('contact_number_suffix');
+            const hidden = document.getElementById('contact_number');
+            suffix.addEventListener('input', function() {
+                hidden.value = suffix.value ? '09' + suffix.value : '';
+            });
         });
     </script>
 </x-guest-layout>

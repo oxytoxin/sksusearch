@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\DB;
     Route::get('auth/google', 'App\Http\Controllers\GoogleController@redirectToGoogle');
     Route::get('auth/google/callback', 'App\Http\Controllers\GoogleController@handleGoogleCallback');
     Route::get('no-account', fn () => view('auth.no-account'))->name('401-error');
+    Route::get('download/employee-template', fn () => response()->download(storage_path('app/employee_template.xlsx')))->name('download.employee-template');
     Route::middleware(['auth:sanctum', 'verified'])->get('redirects', 'App\Http\Controllers\HomeController@index')->name('redirect');
 
     Route::get('/test', function () {

@@ -105,7 +105,7 @@
 									<span class="ml-2 w-0 flex-1 truncate">{{ $scanned_document->document_name }}</span>
 								</div>
 								<div class="ml-4 flex-shrink-0">
-									<a href="{{ asset('storage/'.$scanned_document->path) }}" target="_blank" class="font-medium text-indigo-600 hover:text-indigo-500">View Attachment</a>
+									<a href="{{ Storage::url($scanned_document->path) }}" target="_blank" class="font-medium text-indigo-600 hover:text-indigo-500">View Attachment</a>
 								</div>
 							</li>
 						@endforeach

@@ -328,6 +328,7 @@
                         }
                         // ========== SMS NOTIFICATION END ==========
 
+                        $this->emit('refresh');
                         Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
                     })
                     ->visible(function ($record) {
@@ -364,6 +365,7 @@
                         app(DisbursementVoucherWorkflowService::class)->releaseReturn($record, auth()->user(), $data['release_log_number'], $data['release_note'] ?? null, [
                             'is_oic' => $this->isOic(),
                         ]);
+                        $this->emit('refresh');
                         Notification::make()->title('Document released successfully.')->success()->send();
                     })
                     ->visible(fn($record) => $record && filled($record->pending_return_step_id)),
@@ -587,6 +589,7 @@
                     app(DisbursementVoucherWorkflowService::class)->receive($record, auth()->user(), [
                         'is_oic' => $this->isOic(),
                     ]);
+                    $this->emit('refresh');
                     Notification::make()->title('Document Received')->success()->send();
                 })
                     ->visible(function ($record) {

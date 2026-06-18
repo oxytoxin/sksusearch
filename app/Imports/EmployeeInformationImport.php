@@ -81,14 +81,20 @@ class EmployeeInformationImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
+            // Skip if email already exists
+            if (User::where('email', $email)->exists()) {
+                $this->errors[] = "Row {$rowNumber}: Email '{$email}' already exists in the system.";
+                $this->skipped++;
+                continue;
+            }
+
             DB::transaction(function () use ($firstName, $lastName, $fullName, $email, $campusId, $officeId, $positionId, $row) {
-                $user = User::firstOrCreate([
+                $user = User::create([
                     'email' => $email,
-                ], [
                     'password' => Hash::make(strtolower(str_replace(' ', '', $lastName . '123'))),
                 ]);
 
-                $data = [
+                $user->employee_information()->create([
                     'first_name' => strtoupper($firstName),
                     'last_name' => strtoupper($lastName),
                     'full_name' => strtoupper($fullName),
@@ -99,13 +105,7 @@ class EmployeeInformationImport implements ToCollection, WithHeadingRow
                     'position_id' => $positionId,
                     'office_id' => $officeId,
                     'campus_id' => $campusId,
-                ];
-
-                if ($user->employee_information()->exists()) {
-                    $user->employee_information->update($data);
-                } else {
-                    $user->employee_information()->create($data);
-                }
+                ]);
             });
 
             $this->imported++;

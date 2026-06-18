@@ -59,6 +59,11 @@ class EnsureUserHasSignature
             return $next($request);
         }
 
+        // Check if user has contact number
+        if (auth()->user()->employee_information->contact_number == null) {
+            return redirect()->route('requisitioner.contact-number');
+        }
+
         // Check if user has signature
         if (!auth()->user()->signature()->exists()) {
             return redirect()->route('requisitioner.signature');

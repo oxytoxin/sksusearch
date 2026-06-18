@@ -183,6 +183,7 @@
                     }
                     // ========== SMS NOTIFICATION END ==========
 
+                    $this->emit('refresh');
                     Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
                 })
                     ->color('danger')
