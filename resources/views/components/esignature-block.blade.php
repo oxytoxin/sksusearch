@@ -9,12 +9,13 @@
         :translate-x="$translateX"
         :translate-y="$translateY"/>
 
-    @if($showInfo)
+    @if($signedBy || $signedAt)
         <x-esign-info
             :name="$signedBy"
             :datetime="$signedAt"
             :textclass="$infoClass"
             :offset-x="$infoOffsetX"
-            :offset-y="$infoOffsetY"/>
+            :offset-y="$infoOffsetY"
+            :show-description="$showInfo"/>
     @endif
 @endif

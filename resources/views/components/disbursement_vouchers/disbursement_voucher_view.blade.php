@@ -187,11 +187,11 @@
                                             :signed-at="$signatoryApproval?->approved_at"
                                             :show-info="$signatoryApproval?->wasSignedByOic() ?? false"
                                             width="16rem"
-                                            bottom="-3rem"
+                                            bottom="0.5rem"
                                             max-height="8rem"
                                             info-class="text-[10px] text-left leading-tight"
-                                            info-offset-x="62%"
-                                            info-offset-y="-0.75rem"/>
+                                            info-offset-x="55%"
+                                            info-offset-y="-2.75rem"/>
                                 @endif
                                 <div class="flex flex-col items-center">
                                     <p class="font-extrabold uppercase border-b border-black px-16 print:text-10">

@@ -15,6 +15,7 @@
         public $offsetY;
         public $timezone;
         public $format;
+        public $showDescription;
 
         public function __construct(
             $name = null,
@@ -25,15 +26,17 @@
             $offsetY = '0rem',
             $timezone = 'Asia/Manila',
             $format = 'm/d/Y, g:i A',
+            $showDescription = false,
         ) {
             $this->name = $name;
-            $this->datetime = Carbon::parse($datetime)->timezone($timezone)->format($format);
+            $this->datetime = $datetime ? Carbon::parse($datetime)->timezone($timezone)->format($format) : null;
             $this->label = $label;
             $this->textclass = $textclass;
             $this->offsetX = $offsetX;
             $this->offsetY = $offsetY;
             $this->timezone = $timezone;
             $this->format = $format;
+            $this->showDescription = $showDescription;
         }
 
         public function render()

@@ -7,5 +7,7 @@
     @if($datetime)
         <p>{{ $datetime }}</p>
     @endif
-    <p>OIC | Delegated Authority</p>
+    @if($showDescription)
+        <p>OIC | Delegated Authority</p>
+    @endif
 </div>
