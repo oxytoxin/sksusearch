@@ -163,6 +163,11 @@ class DisbursementVoucher extends Model
         return $this->morphOne(Approval::class, 'approvable')->where('role', 'president');
     }
 
+    public function batch_transmittal_items()
+    {
+        return $this->hasMany(BatchTransmittalItem::class);
+    }
+
     public function totalSumDisbursementVoucherParticular()
     {
         return $this->disbursement_voucher_particulars->sum('final_amount');
