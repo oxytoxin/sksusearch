@@ -278,9 +278,6 @@
                     Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
 
                     if ($to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
-                        if ($to->needs_vehicle) {
-                            return redirect()->route('requisitioner.motorpool.create', ['travel_order' => $to]);
-                        }
                         return redirect()->route('requisitioner.itinerary.create', ['travel_order' => $to]);
                     }
 

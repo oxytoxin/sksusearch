@@ -122,6 +122,10 @@
             DB::commit();
             Notification::make()->title('Operation Success')->body('Itinerary has been created.')->success()->send();
 
+            $travel_order = TravelOrder::find($this->travel_order_id);
+            if ($travel_order && $travel_order->needs_vehicle) {
+                return redirect()->route('requisitioner.motorpool.create', ['travel_order' => $travel_order]);
+            }
             return redirect()->route('requisitioner.itinerary.show', ['itinerary' => $itinerary]);
         }
 

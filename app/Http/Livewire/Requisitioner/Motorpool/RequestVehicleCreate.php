@@ -400,9 +400,6 @@ class RequestVehicleCreate extends Component implements HasForms
                     }
                     DB::commit();
                      Notification::make()->title('Operation Success')->body('Request has been created.')->success()->send();
-                    if ($this->is_travel_order && $this->travel_order_id) {
-                        return redirect()->route('requisitioner.itinerary.create', ['travel_order' => $this->travel_order_id]);
-                    }
                     return redirect()->route('requisitioner.motorpool.index');
 
                 }
