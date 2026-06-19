@@ -24,7 +24,9 @@
           </div>
         </div>
         <div class="mt-5 sm:mt-6 flex gap-3">
-          <x-filament-support::button type="button" wire:click="closeModal" color="secondary" class="w-full justify-center">Cancel</x-filament-support::button>
+          @if(auth()->user()->employee_information->contact_number)
+            <x-filament-support::button type="button" wire:click="closeModal" color="secondary" class="w-full justify-center">Cancel</x-filament-support::button>
+          @endif
           <x-filament-support::button type="submit" wire:target='saveNumber' class="w-full justify-center">Save</x-filament-support::button>
         </div>
       </div>
