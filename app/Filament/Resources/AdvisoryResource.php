@@ -55,6 +55,7 @@ class AdvisoryResource extends Resource
                             ->maxLength(500),
                         FileUpload::make('file_path')
                             ->label('Advisory PDF')
+                            ->disk('public')
                             ->directory('advisories')
                             ->acceptedFileTypes(['application/pdf'])
                             ->preserveFilenames()

@@ -24,6 +24,10 @@ class RequestVehicleForSignature extends Component implements HasTable
     protected function getTableColumns()
     {
         return [
+            Tables\Columns\TextColumn::make('travel_order.tracking_code')
+                ->label('Tracking Code')
+                ->default('No T.O')
+                ->searchable(),
             ViewColumn::make('passengers')->view('tables.columns.passengers'),
             Tables\Columns\TextColumn::make('purpose')
                 ->wrap()
