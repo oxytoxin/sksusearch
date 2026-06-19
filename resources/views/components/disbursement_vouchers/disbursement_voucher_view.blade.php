@@ -37,7 +37,7 @@
                         <div class="row-span-1 border-b border-l border-black">
                         <span
                                 class="mx-auto ml-1 font-serif text-xs font-extrabold capitalize text-black print:text-12">
-                            fund cluster:
+                            fund cluster: {{ $disbursement_voucher->fund_cluster?->name }}
                         </span>
                         </div>
                         <div class="row-span-1 border-l border-black pb-6">

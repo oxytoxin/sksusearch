@@ -3,6 +3,7 @@
     @php
         $particulars = $evaluate(fn($get) => $get('disbursement_voucher_particulars'));
         $mop = $evaluate(fn($get) => $get('mop_id'));
+        $fund_cluster = \App\Models\FundCluster::find($evaluate(fn($get) => $get('fund_cluster_id')));
         $total_amount = 0;
 
         foreach ($particulars as $particular) {
@@ -63,7 +64,7 @@
                     <div class="row-span-1 border-b border-l border-black">
                         <span
                             class="mx-auto ml-1 font-serif text-xs font-extrabold text-black capitalize print:text-12">
-                            fund cluster:
+                            fund cluster: {{ $fund_cluster?->name }}
                         </span>
                     </div>
                     <div class="row-span-1 pb-6 border-l border-black">
