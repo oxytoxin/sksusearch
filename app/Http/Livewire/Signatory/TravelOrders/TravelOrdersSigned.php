@@ -7,7 +7,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Livewire\Component;
 
-class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
+class TravelOrdersSigned extends Component implements Tables\Contracts\HasTable
 {
     use Tables\Concerns\InteractsWithTable;
 
@@ -16,7 +16,7 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
         return TravelOrder::query()
             ->with('applicants')
             ->whereRelation('signatories', 'user_id', auth()->id())
-            ->whereHas('signatories', function ($query) {
+            ->whereDoesntHave('signatories', function ($query) {
                 $query->where('user_id', auth()->id())
                     ->where('is_approved', 0);
             })
@@ -49,8 +49,7 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
                     : ($record->signatories->contains('pivot.is_approved', 0) ? 'Pending'
                         : 'Approved')),
             Tables\Columns\TextColumn::make('signed')->label('Signed')
-                ->formatStateUsing(fn($record) => $record->signatories()->wherePivot('user_id', auth()->id())->value('is_approved') ? 'Signed' : 'Pending'),
-
+                ->formatStateUsing(fn($record) => $record->signatories()->wherePivot('user_id', auth()->id())->value('is_approved') == 2 ? 'Cancelled' : 'Signed'),
         ];
     }
 
@@ -68,6 +67,6 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
 
     public function render()
     {
-        return view('livewire.signatory.travel-orders.travel-orders-index');
+        return view('livewire.signatory.travel-orders.travel-orders-signed');
     }
 }
