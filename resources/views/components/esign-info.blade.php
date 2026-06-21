@@ -1,7 +1,7 @@
 <div class="{{ $textclass }}"
      style="position: absolute; left: {{ $offsetX }}; top: {{ $offsetY }}; font-size: 10px; line-height: 1;">
     @if($name)
-        <p class="font-bold">{{ $name }}</p>
+        <p class="font-bold whitespace-nowrap">{{ $name }}</p>
     @endif
 
     @if($datetime)

@@ -89,9 +89,9 @@ class DisbursementVoucherWorkflowService
     public function forward(DisbursementVoucher $voucher, User $actor, ?string $remarks = null, array $options = []): DisbursementVoucher
     {
         $voucher->refresh();
-        if (! $this->canBeForwarded($voucher)) {
+        if ($blocker = $this->forwardBlocker($voucher)) {
             throw ValidationException::withMessages([
-                'voucher' => 'This disbursement voucher cannot be forwarded yet.',
+                'voucher' => $blocker,
             ]);
         }
 
@@ -108,7 +108,7 @@ class DisbursementVoucherWorkflowService
                     $actualItinerary = $voucher->travel_order?->itineraries()->whereIsActual(true)->first();
                     if (! $actualItinerary) {
                         throw ValidationException::withMessages([
-                            'voucher' => 'Actual itinerary not found.',
+                            'voucher' => $this->missingActualItineraryMessage(),
                         ]);
                     }
 
@@ -408,19 +408,45 @@ class DisbursementVoucherWorkflowService
 
     public function canBeForwarded(DisbursementVoucher $voucher): bool
     {
+        return blank($this->forwardBlocker($voucher));
+    }
+
+    public function forwardBlocker(DisbursementVoucher $voucher): ?string
+    {
         $voucher->loadMissing(['current_step', 'voucher_subtype.related_documents_list']);
 
         if (filled($voucher->pending_return_step_id) || $voucher->for_cancellation) {
-            return false;
+            return 'This disbursement voucher cannot be forwarded yet.';
         }
 
-        return ($voucher->current_step->process == 'Received in' && ! in_array($voucher->current_step_id, [6000, 9000, 13000, 17000]))
+        if ($this->requiresActualItinerary($voucher) && ! $this->hasActualItinerary($voucher)) {
+            return $this->missingActualItineraryMessage();
+        }
+
+        $canBeForwarded = ($voucher->current_step->process == 'Received in' && ! in_array($voucher->current_step_id, [6000, 9000, 13000, 17000]))
             || in_array($voucher->current_step_id, [2000, 4000])
             || ($voucher->current_step_id == 9000 && filled($voucher->ors_burs) && filled($voucher->fund_cluster_id) && $voucher->hasValidUacsAllocations())
             || ($voucher->current_step_id == 12000 && filled($voucher->journal_date) && filled($voucher->dv_number))
             || ($voucher->current_step_id == 13000 && $voucher->certified_by_accountant)
             || ($voucher->current_step_id == 18000 && filled($voucher->cheque_number))
             || ($voucher->current_step_id == 6000 && (! $voucher->voucher_subtype?->related_documents_list || $voucher->hasCompletedRelatedDocumentsVerification()));
+
+        return $canBeForwarded ? null : 'This disbursement voucher cannot be forwarded yet.';
+    }
+
+    public function missingActualItineraryMessage(): string
+    {
+        return 'Actual itinerary not found. Please create the actual itinerary before forwarding this disbursement voucher.';
+    }
+
+    private function requiresActualItinerary(DisbursementVoucher $voucher): bool
+    {
+        return filled($voucher->travel_order_id) && in_array((int) $voucher->voucher_subtype_id, [6, 7], true);
+    }
+
+    private function hasActualItinerary(DisbursementVoucher $voucher): bool
+    {
+        return $voucher->travel_order?->itineraries()->whereIsActual(true)->exists() ?? false;
     }
 
     public function returnStepOptions(DisbursementVoucher $voucher): array

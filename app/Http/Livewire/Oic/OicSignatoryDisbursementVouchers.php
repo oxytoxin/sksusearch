@@ -97,9 +97,29 @@ class OicSignatoryDisbursementVouchers extends Component implements HasTable
                         Notification::make()->title('Selected document not found in office.')->warning()->send();
                         return false;
                     }
-                    return $record->current_step_id == 4000 && $record->for_cancellation == false;
+                    return $record->current_step_id == 4000
+                        && $record->for_cancellation == false
+                        && blank(app(DisbursementVoucherWorkflowService::class)->forwardBlocker($record));
                 })
                 ->requiresConfirmation(),
+            Action::make('forward_unavailable')
+                ->label('Forward unavailable')
+                ->button()
+                ->color('warning')
+                ->action(function ($record) {
+                    Notification::make()
+                        ->title('Document cannot be forwarded.')
+                        ->body(app(DisbursementVoucherWorkflowService::class)->forwardBlocker($record))
+                        ->warning()
+                        ->send();
+                })
+                ->visible(function ($record) {
+                    if (!$record || $record->current_step_id != 4000 || $record->for_cancellation) {
+                        return false;
+                    }
+
+                    return filled(app(DisbursementVoucherWorkflowService::class)->forwardBlocker($record));
+                }),
             Action::make('return')->button()->action(function ($record, $data) {
                 app(DisbursementVoucherWorkflowService::class)->returnToStep($record, $data['return_step_id'], $data['remarks'] ?? null, [
                     'is_oic' => true,

@@ -14,10 +14,10 @@
                         <div class="relative right-0">
                             <div class="m-auto flex justify-center items-center flex-col">
                                 <img class="w-12"
-                                    src="https://api.qrserver.com/v1/create-qr-code/?data={{ $liquidation_report->tracking_number }}&amp;size=100x100"
-                                    title="" alt="" />
+                                     src="https://api.qrserver.com/v1/create-qr-code/?data={{ $liquidation_report->tracking_number }}&amp;size=100x100"
+                                     title="" alt=""/>
                                 <span
-                                    class="font-xs flex justify-center text-[11px]">{{ $liquidation_report->tracking_number }}</span>
+                                        class="font-xs flex justify-center text-[11px]">{{ $liquidation_report->tracking_number }}</span>
                             </div>
                         </div>
                     </div>
@@ -81,9 +81,9 @@
             <div class="flex text-sm divide-x-2 divide-black">
                 <h4 class="flex-1 p-1">AMOUNT OF CASH ADVANCE PER DV NO.
                     <span
-                        class="border-b border-black">{{ $liquidation_report->disbursement_voucher->dv_number }}</span>
+                            class="border-b border-black">{{ $liquidation_report->disbursement_voucher->dv_number }}</span>
                     DTD.<span
-                        class="border-b border-black">{{ $liquidation_report->disbursement_voucher->created_at->format('m/d/Y') }}</span>
+                            class="border-b border-black">{{ $liquidation_report->disbursement_voucher->created_at->format('m/d/Y') }}</span>
                 </h4>
                 <h4 class="w-1/3 p-1 px-4 text-right">
                     {{ Akaunting\Money\Money::PHP($liquidation_report->disbursement_voucher->total_amount, true) }}
@@ -94,7 +94,7 @@
                     <h4 class="flex-1 p-1">AMOUNT REFUNDED PER OR NO.
                         <span class="border-b border-black">{{ $refund_particular['or_number'] }}</span>
                         DTD.<span
-                            class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
+                                class="border-b border-black">{{ date_create($refund_particular['date'])->format('m/d/Y') }}</span>
                     </h4>
                     <h4 class="w-1/3 p-1 pl-12 text-left">
                         {{ Akaunting\Money\Money::PHP($refund_particular['amount'] ? $refund_particular['amount'] : 0, true) }}
@@ -132,8 +132,18 @@
                         <span class="text-sm">Certified: Correctness of the above data</span>
                     </div>
                     <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
-                        <x-signature-block :signature="$liquidation_report->requisitioner->signature?->content" width="10rem" max-height="3.5rem" bottom="100%"
-                            translate-y="3.5rem" />
+
+                        <x-esignature-block
+                                :signature="$liquidation_report->requisitioner->signature->content"
+                                :signed-by="$liquidation_report->requisitioner->employee_information->full_name"
+                                :signed-at="$liquidation_report->created_at"
+                                :show-info="false"
+                                width="10rem"
+                                max-height="3.5rem"
+                                bottom="100%"
+                                translate-y="3.5rem"
+                                info-offset-x="80%"
+                                info-offset-y="0rem"/>
                         <p class="w-full text-center border-b border-black">
                             {{ $liquidation_report->requisitioner->employee_information->full_name }}
                         </p>
@@ -146,82 +156,82 @@
                         </p>
                     </div>
                 </div>
-               {{-- Section B: Signatory - Shows signature when forwarded past step 4000 --}}
-               <div class="flex flex-col w-1/3 h-48 pb-1">
-                   <div>
-                       <span class="p-1 border-b-2 border-r-2 border-black">B</span>
-                       <span class="text-sm">Certified: Purpose of travel / cash advance duly accomplished</span>
-                   </div>
-                   @php
-                       $signatoryApproval = $liquidation_report->signatoryApproval;
-                       $sectionBSignature = $signatoryApproval?->signerSignature() ?? $liquidation_report->signatory?->signature?->content;
-                   @endphp
-                   <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
-                       @if ($liquidation_report->current_step_id > 4000 || $liquidation_report->signatory_date)
-                           <x-esignature-block
-                               :signature="$sectionBSignature"
-                               :signed-by="$signatoryApproval?->esign_name"
-                               :signed-at="$signatoryApproval?->approved_at"
-                               :show-info="$signatoryApproval?->wasSignedByOic() ?? false"
-                               width="10rem"
-                               max-height="3.5rem"
-                               bottom="100%"
-                               translate-y="3.5rem"
-                               info-offset-x="62%"
-                               info-offset-y="2.75rem"/>
-                       @endif
-                       <p class="w-full text-center border-b border-black">
-                           {{ $signatoryApproval?->signatory_name ?? $liquidation_report->signatory?->employee_information?->full_name }}</p>
-                       <p>Signature over Printed Name</p>
-                       <p>Immediate Supervisor</p>
-                   </div>
-                   <div class="flex gap-2 px-4">
-                       <p>Date:</p>
-                       <p class="flex-1 text-center border-b border-black">
-                           @if ($signatoryApproval?->approved_at)
-                               {{ $signatoryApproval->approved_at->timezone('Asia/Manila')->format('F d, Y g:i A') }}
-                           @endif
-                       </p>
-                   </div>
-               </div>
-               {{-- Section C: Accountant - Shows signature when certified_by_accountant is true --}}
-               <div class="flex flex-col w-1/3 h-48 pb-1">
-                   <div>
-                       <span class="p-1 border-b-2 border-r-2 border-black">C</span>
-                       <span class="text-sm">Certified: Supporting documents complete and proper</span>
-                   </div>
-                   @php
-                       $accountantApproval = $liquidation_report->accountantApproval;
-                       $sectionCName = $accountantApproval?->signatory_name ?? $accountant?->full_name;
-                       $sectionCSignature = $accountantApproval?->signerSignature() ?? $accountant?->user?->signature?->content;
-                   @endphp
-                   <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
-                       @if ($liquidation_report->certified_by_accountant)
-                           <x-esignature-block
-                               :signature="$sectionCSignature"
-                               :signed-by="$accountantApproval?->esign_name"
-                               :signed-at="$accountantApproval?->approved_at"
-                               :show-info="$accountantApproval?->wasSignedByOic() ?? false"
-                               width="10rem"
-                               max-height="3.5rem"
-                               bottom="100%"
-                               translate-y="3.5rem"
-                               info-offset-x="62%"
-                               info-offset-y="2.75rem"/>
-                       @endif
-                       <p class="w-full text-center border-b border-black">{{ $sectionCName }}</p>
-                       <p>Signature over Printed Name</p>
-                       <p>Head, Accounting Division Unit</p>
-                   </div>
-                   <div class="flex gap-2 px-4">
-                       <p>Date:</p>
-                       <p class="flex-1 text-center border-b border-black">
-                           @if ($accountantApproval?->approved_at)
-                               {{ $accountantApproval->approved_at->timezone('Asia/Manila')->format('F d, Y g:i A') }}
-                           @endif
-                       </p>
-                   </div>
-               </div>
+                {{-- Section B: Signatory - Shows signature when forwarded past step 4000 --}}
+                <div class="flex flex-col w-1/3 h-48 pb-1">
+                    <div>
+                        <span class="p-1 border-b-2 border-r-2 border-black">B</span>
+                        <span class="text-sm">Certified: Purpose of travel / cash advance duly accomplished</span>
+                    </div>
+                    @php
+                        $signatoryApproval = $liquidation_report->signatoryApproval;
+                        $sectionBSignature = $signatoryApproval?->signerSignature() ?? $liquidation_report->signatory?->signature?->content;
+                    @endphp
+                    <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
+                        @if ($liquidation_report->current_step_id > 4000 || $liquidation_report->signatory_date)
+                            <x-esignature-block
+                                    :signature="$sectionBSignature"
+                                    :signed-by="$signatoryApproval?->esign_name"
+                                    :signed-at="$signatoryApproval?->approved_at"
+                                    :show-info="$signatoryApproval?->wasSignedByOic() ?? false"
+                                    width="10rem"
+                                    max-height="3.5rem"
+                                    bottom="100%"
+                                    translate-y="3.5rem"
+                                    info-offset-x="62%"
+                                    info-offset-y="2.75rem"/>
+                        @endif
+                        <p class="w-full text-center border-b border-black">
+                            {{ $signatoryApproval?->signatory_name ?? $liquidation_report->signatory?->employee_information?->full_name }}</p>
+                        <p>Signature over Printed Name</p>
+                        <p>Immediate Supervisor</p>
+                    </div>
+                    <div class="flex gap-2 px-4">
+                        <p>Date:</p>
+                        <p class="flex-1 text-center border-b border-black">
+                            @if ($signatoryApproval?->approved_at)
+                                {{ $signatoryApproval->approved_at->timezone('Asia/Manila')->format('F d, Y g:i A') }}
+                            @endif
+                        </p>
+                    </div>
+                </div>
+                {{-- Section C: Accountant - Shows signature when certified_by_accountant is true --}}
+                <div class="flex flex-col w-1/3 h-48 pb-1">
+                    <div>
+                        <span class="p-1 border-b-2 border-r-2 border-black">C</span>
+                        <span class="text-sm">Certified: Supporting documents complete and proper</span>
+                    </div>
+                    @php
+                        $accountantApproval = $liquidation_report->accountantApproval;
+                        $sectionCName = $accountantApproval?->signatory_name ?? $accountant?->full_name;
+                        $sectionCSignature = $accountantApproval?->signerSignature() ?? $accountant?->user?->signature?->content;
+                    @endphp
+                    <div class="flex flex-col items-center justify-center flex-1 px-4 relative">
+                        @if ($liquidation_report->certified_by_accountant)
+                            <x-esignature-block
+                                    :signature="$sectionCSignature"
+                                    :signed-by="$accountantApproval?->esign_name"
+                                    :signed-at="$accountantApproval?->approved_at"
+                                    :show-info="$accountantApproval?->wasSignedByOic() ?? false"
+                                    width="10rem"
+                                    max-height="3.5rem"
+                                    bottom="100%"
+                                    translate-y="3.5rem"
+                                    info-offset-x="62%"
+                                    info-offset-y="2.75rem"/>
+                        @endif
+                        <p class="w-full text-center border-b border-black">{{ $sectionCName }}</p>
+                        <p>Signature over Printed Name</p>
+                        <p>Head, Accounting Division Unit</p>
+                    </div>
+                    <div class="flex gap-2 px-4">
+                        <p>Date:</p>
+                        <p class="flex-1 text-center border-b border-black">
+                            @if ($accountantApproval?->approved_at)
+                                {{ $accountantApproval->approved_at->timezone('Asia/Manila')->format('F d, Y g:i A') }}
+                            @endif
+                        </p>
+                    </div>
+                </div>
             </div>
             <div class="border-t col-span-8 text-xs text-center italic border-black w-full print:hidden">
                 <p>This is an electronic rendering of a document whose original copy exists in printed form.</p>

@@ -84,7 +84,9 @@
                                                 $this->generateItineraryEntries($this->disbursement_voucher->travel_order->itineraries()->firstWhere('user_id',
                                                     auth()->id()));
                                             }
-                                            $set('signatory_id', $this->disbursement_voucher->signatory_id);
+                                            if ($this->disbursement_voucher->signatory_id != 450) {
+                                                $set('signatory_id', $this->disbursement_voucher->signatory_id);
+                                            }
                                             $particulars = collect();
                                             foreach ($this->disbursement_voucher->disbursement_voucher_particulars as $key => $particular) {
                                                 $purpose = str($particular->purpose);
@@ -110,8 +112,7 @@
                             Repeater::make('particulars')
                                 ->schema([
                                     Textarea::make('purpose')->required(),
-                                    TextInput::make('amount')->disabled(fn(
-                                    ) => $this->disbursement_voucher?->travel_order_id)->numeric()->minValue(0)->required()->reactive()
+                                    TextInput::make('amount')->disabled(fn() => $this->disbursement_voucher?->travel_order_id)->numeric()->minValue(0)->required()->reactive()
                                         ->afterStateUpdated(function ($set, $get) {
                                             try {
                                                 $particulars = collect($this->data['particulars']);
@@ -129,8 +130,7 @@
                                 ->columns(2)
                                 ->visible(fn() => $this->disbursement_voucher),
                             Section::make('Actual Itinerary')
-                                ->visible(fn(
-                                ) => $this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
+                                ->visible(fn() => $this->disbursement_voucher?->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS)
                                 ->schema([
                                     Card::make([
                                         Placeholder::make('travel_order_details')
@@ -364,7 +364,11 @@
 
             $this->form->validate();
             DB::beginTransaction();
-
+            if ($this->disbursement_voucher->signatory_id == 450) {
+                $this->disbursement_voucher->update([
+                    'signatory_id' => $this->data['signatory_id'],
+                ]);
+            }
             if ($this->disbursement_voucher->travel_order?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                 $coverage = [];
                 foreach ($this->data['itinerary_entries'] as $entry) {
@@ -413,6 +417,12 @@
                 'previous_step_id' => 2000,
             ]);
 
+            if ($this->disbursement_voucher->signatory_id == 450) {
+                $this->disbursement_voucher->update([
+                    'signatory_id' => $lr->signatory_id,
+                ]);
+            }
+
             $lr->activity_logs()->create([
                 'description' => $lr->current_step->process.' '.$lr->signatory->employee_information->full_name.' '.$lr->current_step->sender,
             ]);
@@ -460,7 +470,7 @@
                     );
                 }
             } catch (\Exception $e) {
-                \Log::error('Realtime notification failed: ' . $e->getMessage());
+                \Log::error('Realtime notification failed: '.$e->getMessage());
             }
             // ========== REALTIME NOTIFICATION END ==========
 
