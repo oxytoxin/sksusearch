@@ -35,7 +35,7 @@
 @endif
  --}}
 
-<nav class="sticky top-0 z-10 border-b border-gray-100 bg-primary-500" x-data="{ open: false }">
+<nav class="sticky top-0 z-20 border-b border-gray-100 bg-primary-500" x-data="{ open: false }">
     <!-- Primary Navigation Menu -->
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 justify-between">

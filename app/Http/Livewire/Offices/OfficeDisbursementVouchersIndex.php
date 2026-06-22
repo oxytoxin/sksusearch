@@ -230,6 +230,11 @@
             ];
         }
 
+        protected function getTableRecordClassesUsing(): ?\Closure
+        {
+            return fn (DisbursementVoucher $record): string => filled($record->pending_return_step_id) ? '!bg-rose-100' : '';
+        }
+
         public function render()
         {
             return view('livewire.offices.office-disbursement-vouchers-index');

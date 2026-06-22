@@ -7,6 +7,7 @@ module.exports = {
         require('./vendor/wireui/wireui/tailwind.config.js')
     ],
     content: [
+        './app/**/*.php',
         './resources/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
