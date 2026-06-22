@@ -19,6 +19,6 @@ class VoucherType extends Model
 
     public function voucher_subtypes()
     {
-        return $this->hasMany(VoucherSubType::class);
+        return $this->hasMany(VoucherSubType::class)->orderBy('order_column');
     }
 }
