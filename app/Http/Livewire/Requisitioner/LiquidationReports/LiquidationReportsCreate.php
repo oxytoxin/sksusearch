@@ -62,12 +62,7 @@
                                 Select::make('disbursement_voucher_id')
                                     ->options(
                                         DisbursementVoucher::query()
-                                            ->doesntHave('liquidation_report', 'and', function ($query) {
-                                                $query->whereNull('cancelled_at');
-                                            })
-                                            ->whereRelation('voucher_subtype', 'voucher_type_id', 1)
-                                            ->whereUserId(auth()->id())
-                                            ->whereNotNull('cheque_number')
+                                            ->forLiquidation()
                                             ->pluck('tracking_number', 'id')
                                     )
                                     ->placeholder('Select cash advance')

@@ -962,33 +962,33 @@
                     ]);
                 }
 
-            $dv->update(['gross_amount' => $dv->disbursement_voucher_particulars()->sum('amount')]);
+                $dv->update(['gross_amount' => $dv->disbursement_voucher_particulars()->sum('amount')]);
 
-            // Optional supporting documents uploaded during DV creation
-            if (filled($this->attachment)) {
-                foreach ($this->attachment as $storedPath) {
-                    if (filled($storedPath)) {
-                        $dv->scanned_documents()->create([
-                            'path' => $storedPath,
-                            'document_name' => basename($storedPath),
-                        ]);
+                // Optional supporting documents uploaded during DV creation
+                if (filled($this->attachment)) {
+                    foreach ($this->attachment as $storedPath) {
+                        if (filled($storedPath)) {
+                            $dv->scanned_documents()->create([
+                                'path' => $storedPath,
+                                'document_name' => basename($storedPath),
+                            ]);
+                        }
                     }
                 }
-            }
-            if (in_array($this->voucher_subtype->id, [6, 7])) {
-                TravelCompletedCertificate::create([
-                    'user_id' => auth()->id(),
-                    'signatory_id' => TravelOrder::find($this->travel_order_id)?->signatories()->first()?->id,
-                    'travel_order_id' => $this->travel_order_id,
-                    'itinerary_id' => isset($itinerary) ? $itinerary->id : null,
-                    'disbursement_voucher_id' => $dv->id,
-                    'condition' => $this->condition,
-                    'explanation' => $this->explanation,
+                if (in_array($this->voucher_subtype->id, [6, 7])) {
+                    TravelCompletedCertificate::create([
+                        'user_id' => auth()->id(),
+                        'signatory_id' => TravelOrder::find($this->travel_order_id)?->signatories()->first()?->id,
+                        'travel_order_id' => $this->travel_order_id,
+                        'itinerary_id' => isset($itinerary) ? $itinerary->id : null,
+                        'disbursement_voucher_id' => $dv->id,
+                        'condition' => $this->condition,
+                        'explanation' => $this->explanation,
+                    ]);
+                }
+                $dv->activity_logs()->create([
+                    'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
                 ]);
-            }
-            $dv->activity_logs()->create([
-                'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
-            ]);
                 // Optional supporting documents uploaded during DV creation
                 if (filled($this->attachment)) {
                     foreach ($this->attachment as $storedPath) {
@@ -1176,6 +1176,10 @@
 
         public function mount()
         {
+            if ($this->voucher_subtype->voucher_type_id == 1 && $this->voucher_subtype->id != 69 && DisbursementVoucher::forLiquidation()->count()) {
+                Notification::make()->title('Operation Failed')->body('Disbursement voucher cannot be created while there is pending Cash Advance for liquidation.')->danger()->persistent()->send();
+                $this->redirectRoute('requisitioner.liquidation-reports.create');
+            }
             $this->tracking_number = DisbursementVoucher::generateTrackingNumber();
             $this->form->fill();
         }

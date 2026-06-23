@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@alpinejs/collapse':
+        specifier: ^3.15.12
+        version: 3.15.12
       '@ryangjchandler/alpine-tooltip':
         specifier: ^1.2.0
         version: 1.2.0
@@ -66,6 +69,9 @@ packages:
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
+
+  '@alpinejs/collapse@3.15.12':
+    resolution: {integrity: sha512-BKNANLtNXuWYOSAnajSKLPjTsmHRNrv0ALFTbpmqt2/klHFooPhctSwkhFVPQb7rZ8BjEKHmNaBwnSbgtpk6xg==}
 
   '@alpinejs/focus@3.12.1':
     resolution: {integrity: sha512-8LXkzY9yHqTqsB+aqdY1SL4fv+IbMtn2vEwGPw3YFio0+vfS+hGnZS1E4aDkm+JIUUtQvqRbV3cnK2WRZkVGnA==}
@@ -755,6 +761,8 @@ packages:
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
+
+  '@alpinejs/collapse@3.15.12': {}
 
   '@alpinejs/focus@3.12.1':
     dependencies:
