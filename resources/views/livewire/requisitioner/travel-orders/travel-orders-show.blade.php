@@ -5,19 +5,44 @@
             $applicants = $travel_order->applicants->where('id', '!=', $requisitioner->id);
         @endphp
         <div class="text-xs">
-            <div class="flex">
-                <div class="flex flex-1 justify-center items-center gap-16">
-                    <img class="h-20" src="{{ asset('images/headerlogo1.png') }}" alt="sksulogo">
-                    <div class="text-sm flex flex-col items-center">
-                        <p>Republic of the Philippines</p>
-                        <p class="text-base text-green-600 font-semibold">SULTAN KUDARAT STATE UNIVERSITY</p>
-                        <p>ACCESS, EJC Montilla, 9800 City of Tacurong</p>
-                        <p>Province of Sultan Kudarat</p>
+            <div class="flex items-center">
+                <div class="flex-1 justify-start ml-16 items-center">
+                    <div class="flex gap-8">
+                        <div class="flex gap-4">
+                            <img class="h-20" src="{{ asset('images/bagong-pilipinas-logo.png') }}" alt="sksulogo">
+                            <img class="h-20" src="{{ asset('images/sksulogo.png') }}" alt="sksulogo">
+                        </div>
+                        <div class="text-sm leading-4 font-serif flex flex-col items-start">
+                            <p>Republic of the Philippines</p>
+                            <p class="text-lg text-green-600 font-semibold">SULTAN KUDARAT STATE UNIVERSITY</p>
+                            <em>EJC Montilla, City of Tacurong, 9800</em>
+                            <em>Province of Sultan Kudarat</em>
+                        </div>
                     </div>
-                    <img class="h-20" src="{{ asset('images/headerlogo2.png') }}" alt="headerlogo2">
+                    <div class="flex mt-4 ml-24 items-center gap-12">
+                        <div class="flex gap-1 font-semibold">
+                            <x-ri-global-line class="text-green-600 !w-4 !h-4"/>
+                            <p class="text-xs">https://sksu.edu.ph</p>
+                        </div>
+                        <div class="flex gap-1 font-semibold">
+                            <x-ri-mail-line class="text-green-600 !w-4 !h-4"/>
+                            <p class="text-xs">qa@sksu.edu.ph</p>
+                        </div>
+                        <div class="flex gap-1 font-semibold">
+                            <x-ri-phone-line class="text-green-600 !w-4 !h-4"/>
+                            <p class="text-xs">0917 174 9571</p>
+                        </div>
+                    </div>
                 </div>
-                <img class="w-24" src="{{ (new chillerlan\QRCode\QRCode())->render($travel_order->tracking_code) }}"
-                     alt="qr"/>
+                <div class="flex items-center gap-8">
+                    <div class="font-semibold leading-3">
+                        <p>SKSU-OUP-ATO-01</p>
+                        <p>Revision: 00</p>
+                        <p>Effective Date: July 07, 2025</p>
+                    </div>
+                    <img class="w-24" src="{{ (new chillerlan\QRCode\QRCode())->render($travel_order->tracking_code) }}"
+                         alt="qr"/>
+                </div>
 
             </div>
             <hr class="border my-2 border-black">

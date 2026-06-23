@@ -396,8 +396,8 @@
                             'date' => $itinerary_entry['data']['date'],
                             'mot_id' => $entry['mot_id'],
                             'place' => $entry['place'],
-                            'departure_time' => $entry['departure_time'],
-                            'arrival_time' => $entry['arrival_time'],
+                            'departure_time' => Carbon::make($entry['departure_time'])->setTimezone('Asia/Manila'),
+                            'arrival_time' => Carbon::make($entry['arrival_time'])->setTimezone('Asia/Manila'),
                             'transportation_expenses' => $entry['transportation_expenses'],
                             'other_expenses' => $entry['other_expenses'],
                         ]);
@@ -413,6 +413,7 @@
                 'report_date' => today(),
                 'particulars' => $this->data['particulars'],
                 'refund_particulars' => collect($this->data['refund_particulars'])->values()->toArray(),
+                'total_amount' => collect($this->data['particulars'])->sum('amount') ?? 0,
                 'current_step_id' => 3000,
                 'previous_step_id' => 2000,
             ]);

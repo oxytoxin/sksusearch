@@ -18,8 +18,7 @@
                             </div>
                             <div class="flex">
                                 <div class="m-3 text-center">
-
-                                    <img class="mx-auto h-auto w-20"
+                                    <img class="mx-auto h-28 w-28"
                                          src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ route('disbursement-vouchers.show-from-trn', ['disbursement_voucher' => $disbursement_voucher->tracking_number]) }}"
                                          alt="N/A">
                                 </div>
@@ -126,28 +125,28 @@
                         </div>
                     </div>
                     <div class="col-span-8 flex min-w-full items-start border-t-2 border-black font-serif print:text-10">
-                        <div class="h-40 w-1/2 border-r-2 border-black pl-2 text-left">
+                        <div class="min-h-[7rem] w-1/2 border-r-2 border-black pl-2 text-left">
                             <div class="flex flex-col">
                                 @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
                                     <span>{{ $particular->purpose }}</span>
                                 @endforeach
                             </div>
                         </div>
-                        <div class="h-40 w-64 border-r-2 border-black text-center">
+                        <div class="min-h-[7rem] w-64 border-r-2 border-black text-center">
                             <div class="flex flex-col">
                                 @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
                                     <span>{{ $disbursement_voucher->responsibility_center }}</span>
                                 @endforeach
                             </div>
                         </div>
-                        <div class="h-40 w-36 border-r-2 border-black text-center">
+                        <div class="min-h-[7rem] w-36 border-r-2 border-black text-center">
                             <div class="flex flex-col">
                                 @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
                                     <span>{{ $particular->mfo_pap }}</span>
                                 @endforeach
                             </div>
                         </div>
-                        <div class="h-40 w-36 text-right">
+                        <div class="min-h-[7rem] w-36 text-right">
                             <div class="flex flex-col">
                                 @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
                                     <span>{{ number_format($particular->amount, 2) }}</span>
@@ -159,15 +158,13 @@
                         <div class="h-auto w-1/2 border-r-2 border-t-2 border-black text-center">
                             Amount Due
                         </div>
-                        <div class="flex h-auto w-64 border-r-2 border-black text-center">
-                            {{ $disbursement_voucher->responsibility_center }}
+                        <div class="h-auto w-64 border-r-2 border-black text-center">
+                            &nbsp;
                         </div>
                         <div class="h-auto w-36 border-r-2 border-black text-center">
-                            @foreach ($disbursement_voucher->disbursement_voucher_particulars as $particular)
-                                <span>{{ $particular->mfo_pap }}</span>
-                            @endforeach
+                            &nbsp;
                         </div>
-                        <div class="h-auto w-36 border-t-4 border-double border-black text-right print:text-10">
+                        <div class="h-auto col-span-2 w-36 border-t-4 border-double border-black text-right print:text-10">
                             {{ number_format($disbursement_voucher->disbursement_voucher_particulars->sum('final_amount'), 2) }}
                         </div>
                     </div>
@@ -177,7 +174,7 @@
                                 <div class="border-b border-r border-black px-1 font-extrabold print:text-12">A.</div>
                                 <span class="pl-1 font-extrabold print:text-12">Certified: Expenses/Cash Advance necessary,lawful and incurred under my direct supervision.</span>
                             </div>
-                            <div class="row-span-1 mx-auto block text-center relative">
+                            <div class="row-span-1 mt-20 mx-auto block text-center relative">
                                 @php
                                     $signatoryApproval = $disbursement_voucher->signatoryApproval;
                                     $sectionASignature = $signatoryApproval?->signerSignature() ?? $disbursement_voucher->signatory?->signature?->content;
@@ -228,34 +225,13 @@
                         </div>
                     </div>
                     <div class="col-span-8 flex min-w-full items-stretch border-t-2 border-black font-serif print:text-12">
-                        <div class="min-h-[10rem] w-1/2 border-r-2 border-black">
-                            @forelse ($disbursement_voucher->uacs_allocations as $allocation)
-                                <div class="border-b border-black px-1 py-0.5 text-left">
-                                    {{ $allocation->category_item_budget?->name }}
-                                </div>
-                            @empty
-                                <div class="px-1 py-0.5 text-center">&nbsp;</div>
-                            @endforelse
+                        <div class="min-h-[3rem] w-1/2 border-r-2 border-black">
                         </div>
-                        <div class="min-h-[10rem] w-64 border-r-2 border-black">
-                            @forelse ($disbursement_voucher->uacs_allocations as $allocation)
-                                <div class="border-b border-black px-1 py-0.5 text-center">
-                                    {{ $allocation->category_item_budget?->uacs_code }}
-                                </div>
-                            @empty
-                                <div class="px-1 py-0.5 text-center">&nbsp;</div>
-                            @endforelse
+                        <div class="min-h-[3rem] w-64 border-r-2 border-black">
                         </div>
-                        <div class="min-h-[10rem] w-36 border-r-2 border-black">
-                            @forelse ($disbursement_voucher->uacs_allocations as $allocation)
-                                <div class="border-b border-black px-1 py-0.5 text-right">
-                                    {{ number_format($allocation->amount, 2) }}
-                                </div>
-                            @empty
-                                <div class="px-1 py-0.5 text-center">&nbsp;</div>
-                            @endforelse
+                        <div class="min-h-[3rem] w-36 border-r-2 border-black">
                         </div>
-                        <div class="min-h-[10rem] w-36 text-center">
+                        <div class="min-h-[3rem] w-36 text-center">
                             &nbsp
                         </div>
                     </div>

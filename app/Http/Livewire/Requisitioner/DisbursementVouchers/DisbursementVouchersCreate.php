@@ -867,100 +867,100 @@
             }
 
             try {
-            DB::beginTransaction();
-            if (in_array($this->voucher_subtype->id, [
-                    6, 7
-                ]) && TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
-                $coverage = [];
-                foreach ($this->itinerary_entries as $entry) {
-                    $coverage[] = [
-                        'date' => $entry['data']['date'],
-                        'per_diem' => $entry['data']['per_diem'],
-                        'total_expenses' => $entry['data']['total_expenses'],
-                        'breakfast' => $entry['data']['breakfast'],
-                        'lunch' => $entry['data']['lunch'],
-                        'dinner' => $entry['data']['dinner'],
-                        'lodging' => $entry['data']['lodging'],
-                    ];
-                }
-
-                $itinerary = Itinerary::create([
-                    'is_actual' => true,
-                    'user_id' => auth()->id(),
-                    'travel_order_id' => $this->travel_order_id,
-                    'coverage' => $coverage,
-                ]);
-
-                foreach ($this->itinerary_entries as $itinerary_entry) {
-                    foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
-                        $itinerary->itinerary_entries()->create([
-                            'date' => $itinerary_entry['data']['date'],
-                            'mot_id' => $entry['mot_id'],
-                            'place' => $entry['place'],
-                            'departure_time' => $entry['departure_time'],
-                            'arrival_time' => $entry['arrival_time'],
-                            'transportation_expenses' => $entry['transportation_expenses'],
-                            'other_expenses' => $entry['other_expenses'],
-                        ]);
-                    }
-                }
-            }
-
-            if ($this->voucher_subtype->id == 27) {
-                $other_details = [
-                    'type' => 'Electricity',
-                    'details' => collect($this->electricity_utility_particulars)->values()->toArray(),
-                    'other_expenses' => collect($this->other_expenses)->values()->toArray(),
-                ];
-            } else {
-                if ($this->voucher_subtype->id == 70) {
-                    $other_details = [
-                        'type' => 'Water',
-                        'details' => collect($this->water_utility_particulars)->values()->toArray(),
-                        'other_expenses' => collect($this->other_expenses)->values()->toArray(),
-                    ];
-                } else {
-                    if ($this->voucher_subtype->id == 71) {
-                        $other_details = [
-                            'type' => 'Fuel',
-                            'details' => collect($this->fuel_utility_particulars)->values()->toArray(),
-                            'other_expenses' => collect($this->other_expenses)->values()->toArray(),
+                DB::beginTransaction();
+                if (in_array($this->voucher_subtype->id, [
+                        6, 7
+                    ]) && TravelOrder::find($this->travel_order_id)?->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+                    $coverage = [];
+                    foreach ($this->itinerary_entries as $entry) {
+                        $coverage[] = [
+                            'date' => $entry['data']['date'],
+                            'per_diem' => $entry['data']['per_diem'],
+                            'total_expenses' => $entry['data']['total_expenses'],
+                            'breakfast' => $entry['data']['breakfast'],
+                            'lunch' => $entry['data']['lunch'],
+                            'dinner' => $entry['data']['dinner'],
+                            'lodging' => $entry['data']['lodging'],
                         ];
-                    } else {
-                        if ($this->voucher_subtype->id == 3 || $this->voucher_subtype->id == 4 || $this->voucher_subtype->id == 5) {
-                            $other_details = [
-                                'activity_date_from' => $this->activity_date_from,
-                                'activity_date_to' => $this->activity_date_to,
-                            ];
-                        } else {
-                            $other_details = [];
+                    }
+
+                    $itinerary = Itinerary::create([
+                        'is_actual' => true,
+                        'user_id' => auth()->id(),
+                        'travel_order_id' => $this->travel_order_id,
+                        'coverage' => $coverage,
+                    ]);
+
+                    foreach ($this->itinerary_entries as $itinerary_entry) {
+                        foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
+                            $itinerary->itinerary_entries()->create([
+                                'date' => $itinerary_entry['data']['date'],
+                                'mot_id' => $entry['mot_id'],
+                                'place' => $entry['place'],
+                                'departure_time' => Carbon::make($entry['departure_time'])->setTimezone('Asia/Manila'),
+                                'arrival_time' => Carbon::make($entry['arrival_time'])->setTimezone('Asia/Manila'),
+                                'transportation_expenses' => $entry['transportation_expenses'],
+                                'other_expenses' => $entry['other_expenses'],
+                            ]);
                         }
                     }
                 }
-            }
-            $dv = DisbursementVoucher::create([
-                'voucher_subtype_id' => $this->voucher_subtype->id,
-                'user_id' => auth()->id(),
-                'signatory_id' => $this->signatory_id,
-                'mop_id' => filled($this->mop_id) ? $this->mop_id : null,
-                'payee' => $this->payee,
-                'responsibility_center' => $this->responsibility_center ?? null,
-                'travel_order_id' => $this->travel_order_id,
-                'activity_design_id' => $this->activity_design_id,
-                'tracking_number' => $this->tracking_number,
-                'submitted_at' => now(),
-                'other_details' => $other_details,
-                'current_step_id' => 3000,
-                'previous_step_id' => 2000,
-            ]);
 
-            foreach ($this->disbursement_voucher_particulars as $key => $particulars) {
-                $dv->disbursement_voucher_particulars()->create([
-                    'purpose' => $particulars['purpose'],
-                    'mfo_pap' => $particulars['mfo_pap'],
-                    'amount' => $particulars['amount'],
+                if ($this->voucher_subtype->id == 27) {
+                    $other_details = [
+                        'type' => 'Electricity',
+                        'details' => collect($this->electricity_utility_particulars)->values()->toArray(),
+                        'other_expenses' => collect($this->other_expenses)->values()->toArray(),
+                    ];
+                } else {
+                    if ($this->voucher_subtype->id == 70) {
+                        $other_details = [
+                            'type' => 'Water',
+                            'details' => collect($this->water_utility_particulars)->values()->toArray(),
+                            'other_expenses' => collect($this->other_expenses)->values()->toArray(),
+                        ];
+                    } else {
+                        if ($this->voucher_subtype->id == 71) {
+                            $other_details = [
+                                'type' => 'Fuel',
+                                'details' => collect($this->fuel_utility_particulars)->values()->toArray(),
+                                'other_expenses' => collect($this->other_expenses)->values()->toArray(),
+                            ];
+                        } else {
+                            if ($this->voucher_subtype->id == 3 || $this->voucher_subtype->id == 4 || $this->voucher_subtype->id == 5) {
+                                $other_details = [
+                                    'activity_date_from' => $this->activity_date_from,
+                                    'activity_date_to' => $this->activity_date_to,
+                                ];
+                            } else {
+                                $other_details = [];
+                            }
+                        }
+                    }
+                }
+                $dv = DisbursementVoucher::create([
+                    'voucher_subtype_id' => $this->voucher_subtype->id,
+                    'user_id' => auth()->id(),
+                    'signatory_id' => $this->signatory_id,
+                    'mop_id' => filled($this->mop_id) ? $this->mop_id : null,
+                    'payee' => $this->payee,
+                    'responsibility_center' => $this->responsibility_center ?? null,
+                    'travel_order_id' => $this->travel_order_id,
+                    'activity_design_id' => $this->activity_design_id,
+                    'tracking_number' => $this->tracking_number,
+                    'submitted_at' => now(),
+                    'other_details' => $other_details,
+                    'current_step_id' => 3000,
+                    'previous_step_id' => 2000,
                 ]);
-            }
+
+                foreach ($this->disbursement_voucher_particulars as $key => $particulars) {
+                    $dv->disbursement_voucher_particulars()->create([
+                        'purpose' => $particulars['purpose'],
+                        'mfo_pap' => $particulars['mfo_pap'],
+                        'amount' => $particulars['amount'],
+                    ]);
+                }
 
             $dv->update(['gross_amount' => $dv->disbursement_voucher_particulars()->sum('amount')]);
 
@@ -989,49 +989,74 @@
             $dv->activity_logs()->create([
                 'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
             ]);
+                // Optional supporting documents uploaded during DV creation
+                if (filled($this->attachment)) {
+                    foreach ($this->attachment as $storedPath) {
+                        if (filled($storedPath)) {
+                            $dv->scanned_documents()->create([
+                                'path' => $storedPath,
+                                'document_name' => basename($storedPath),
+                            ]);
+                        }
+                    }
+                }
+                if (in_array($this->voucher_subtype->id, [6, 7])) {
+                    TravelCompletedCertificate::create([
+                        'user_id' => auth()->id(),
+                        'signatory_id' => TravelOrder::find($this->travel_order_id)?->signatories()->first()?->id,
+                        'travel_order_id' => $this->travel_order_id,
+                        'itinerary_id' => isset($itinerary) ? $itinerary->id : null,
+                        'disbursement_voucher_id' => $dv->id,
+                        'condition' => $this->condition,
+                        'explanation' => $this->explanation,
+                    ]);
+                }
+                $dv->activity_logs()->create([
+                    'description' => $dv->current_step->process.' '.$dv->signatory->employee_information->full_name.' '.$dv->current_step->sender,
+                ]);
 
-            // ========== SMS NOTIFICATION ==========
-            // Send SMS notification to signatory
-            $makerName = auth()->user()->employee_information->full_name ?? 'User';
-            $message = "A DV has been submitted to the SEARCH system by {$makerName} for your approval.";
+                // ========== SMS NOTIFICATION ==========
+                // Send SMS notification to signatory
+                $makerName = auth()->user()->employee_information->full_name ?? 'User';
+                $message = "A DV has been submitted to the SEARCH system by {$makerName} for your approval.";
 
-            $signatory = $dv->signatory;
-            if ($signatory && $signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
-                SendSmsJob::dispatch(
-                    $signatory->employee_information->contact_number,
-                    $message,
-                    'disbursement_voucher_submitted',
-                    $signatory->id,
-                    auth()->id()
-                );
-            }
-            // ========== SMS NOTIFICATION END ==========
-
-            DB::commit();
-
-            // ========== REALTIME NOTIFICATION ==========
-            try {
-                if ($signatory) {
-                    NotificationController::sendGeneralNotification(
-                        'disbursement_voucher_submitted',
-                        'DV for Approval',
+                $signatory = $dv->signatory;
+                if ($signatory && $signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
+                    SendSmsJob::dispatch(
+                        $signatory->employee_information->contact_number,
                         $message,
-                        $signatory,
-                        route('signatory.disbursement-vouchers.index')
+                        'disbursement_voucher_submitted',
+                        $signatory->id,
+                        auth()->id()
                     );
                 }
-            } catch (\Exception $e) {
-                \Log::error('Realtime notification failed: ' . $e->getMessage());
-            }
-            // ========== REALTIME NOTIFICATION END ==========
+                // ========== SMS NOTIFICATION END ==========
 
-            Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
+                DB::commit();
 
-            return redirect()->route('requisitioner.disbursement-vouchers.index');
+                // ========== REALTIME NOTIFICATION ==========
+                try {
+                    if ($signatory) {
+                        NotificationController::sendGeneralNotification(
+                            'disbursement_voucher_submitted',
+                            'DV for Approval',
+                            $message,
+                            $signatory,
+                            route('signatory.disbursement-vouchers.index')
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Realtime notification failed: '.$e->getMessage());
+                }
+                // ========== REALTIME NOTIFICATION END ==========
+
+                Notification::make()->title('Operation Success')->body('Disbursement voucher request has been submitted.')->success()->send();
+
+                return redirect()->route('requisitioner.disbursement-vouchers.index');
 
             } catch (\Exception $e) {
                 DB::rollBack();
-                \Log::error('DV creation failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+                \Log::error('DV creation failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
                 Notification::make()
                     ->title('Submission Failed')
                     ->body('Something went wrong while creating the disbursement voucher. Please check your inputs and try again.')
@@ -1138,7 +1163,6 @@
                                                         'itinerary_entries' => $itinerary_entries,
                                                         'travel_order' => $to,
                                                         'itineraryForm' => $this->prepareItineraryOfficialForm($itinerary, $to, $itinerary_entries, $coverage),
-                                                        'immediate_signatory' => $to?->signatories()->with('employee_information')->first(),
                                                     ]);
                                                 }
                                                 return new HtmlString('Itinerary not required by this disbursement voucher.');
@@ -1158,6 +1182,42 @@
 
         public function render()
         {
+            if ($this->shouldItineraryBeVisible()) {
+                $overall_itinerary_expenses = 0;
+                foreach ($this->itinerary_entries as $key => $entry) {
+                    $original_per_diem = $entry['data']['original_per_diem'];
+                    $per_diem = $original_per_diem;
+                    if (!$entry['data']['has_per_diem']) {
+                        $per_diem = 0;
+                    } else {
+                        if ($entry['data']['breakfast']) {
+                            $per_diem -= $original_per_diem * 0.1;
+                        }
+                        if ($entry['data']['lunch']) {
+                            $per_diem -= $original_per_diem * 0.1;
+                        }
+                        if ($entry['data']['dinner']) {
+                            $per_diem -= $original_per_diem * 0.1;
+                        }
+                        if ($entry['data']['lodging']) {
+                            $per_diem -= $original_per_diem * 0.5;
+                        }
+                    }
+
+                    $transportation_expenses = 0;
+                    $other_expenses = 0;
+                    foreach ($entry['data']['itinerary_entries'] as $expense) {
+                        $transportation_expenses += $expense['transportation_expenses'] == '' ? 0 : $expense['transportation_expenses'];
+                        $other_expenses += $expense['other_expenses'] == '' ? 0 : $expense['other_expenses'];
+                    }
+                    $this->itinerary_entries[$key]['data']['per_diem'] = $per_diem;
+                    $this->itinerary_entries[$key]['data']['total_expenses'] = $transportation_expenses + $other_expenses + $per_diem;
+                    $overall_itinerary_expenses += $this->itinerary_entries[$key]['data']['total_expenses'];
+                }
+                foreach ($this->disbursement_voucher_particulars as $key => $particulars) {
+                    $this->disbursement_voucher_particulars[$key]['amount'] = $overall_itinerary_expenses;
+                }
+            }
             return view('livewire.requisitioner.disbursement-vouchers.disbursement-vouchers-create');
         }
 
