@@ -37,9 +37,11 @@
                     <tr>
                         <th class="px-3 py-2">#</th>
                         <th class="px-3 py-2">Tracking No.</th>
+                        <th class="px-3 py-2">DV No.</th>
                         <th class="px-3 py-2">Payee</th>
                         <th class="px-3 py-2">Particulars</th>
-                        <th class="px-3 py-2">Amount</th>
+                        <th class="px-3 py-2">Gross Amount</th>
+                        <th class="px-3 py-2">Net Amount</th>
                         <th class="px-3 py-2">Current Step</th>
                         <th class="px-3 py-2">Remarks</th>
                     </tr>
@@ -49,8 +51,10 @@
                         <tr class="border-b">
                             <td class="px-3 py-2">{{ $index + 1 }}</td>
                             <td class="px-3 py-2 font-mono text-xs">{{ $item->disbursement_voucher->tracking_number }}</td>
+                            <td class="px-3 py-2 font-mono text-xs">{{ $item->disbursement_voucher->dv_number ?? '—' }}</td>
                             <td class="px-3 py-2">{{ $item->disbursement_voucher->payee }}</td>
                             <td class="px-3 py-2 max-w-xs truncate">{{ $item->disbursement_voucher->disbursement_voucher_particulars->pluck('purpose')->join('; ') }}</td>
+                            <td class="px-3 py-2 whitespace-nowrap">₱{{ number_format($item->disbursement_voucher->gross_amount ?? $item->disbursement_voucher->disbursement_voucher_particulars->sum('amount'), 2) }}</td>
                             <td class="px-3 py-2 whitespace-nowrap">₱{{ number_format($item->disbursement_voucher->disbursement_voucher_particulars->sum('amount'), 2) }}</td>
                             <td class="px-3 py-2 text-xs">{{ $item->disbursement_voucher->current_step?->process }} {{ $item->disbursement_voucher->current_step?->recipient }}</td>
                             <td class="px-3 py-2">{{ $item->remarks ?? '—' }}</td>

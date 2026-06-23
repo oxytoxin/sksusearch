@@ -38,8 +38,15 @@ class BatchTransmittal extends Model
         return $this->belongsTo(User::class, 'received_by');
     }
 
-    public static function generateSerialNumber(int $officeGroupId): int
+    public static function generateSerialNumber(int $officeGroupId): string
     {
-        return (static::where('office_group_id', $officeGroupId)->max('serial_number') ?? 0) + 1;
+        $year = now()->year;
+        $max = static::where('office_group_id', $officeGroupId)
+            ->where('serial_number', 'like', $year . '-%')
+            ->get()
+            ->map(fn ($bt) => (int) str($bt->serial_number)->afterLast('-'))
+            ->max() ?? 0;
+
+        return $year . '-' . ($max + 1);
     }
 }

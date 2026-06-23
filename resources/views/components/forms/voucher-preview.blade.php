@@ -45,11 +45,9 @@
                         <div class="flex">
                             <div class="m-3 text-center">
 
-                                <img class="w-14 h-auto mx-auto"
+                                <img class="w-20 h-auto mx-auto"
                                     src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ $evaluate(fn($get) => $get('tracking_number')) }}"
                                     alt="N/A">
-                                <span
-                                    class="flex justify-center text-xs font-normal">{{ $evaluate(fn($get) => $get('tracking_number')) }}</span>
                             </div>
 
                         </div>
@@ -73,6 +71,9 @@
                         </p>
                         <p class="mx-auto ml-1 font-serif text-xs font-extrabold text-black print:text-12">
                             DV No.
+                        </p>
+                        <p class="mx-auto ml-1 font-serif text-xs font-normal text-black print:text-12">
+                            <span class="font-extrabold">QR Code:</span> {{ $evaluate(fn($get) => $get('tracking_number')) }}
                         </p>
                     </div>
                 </div>

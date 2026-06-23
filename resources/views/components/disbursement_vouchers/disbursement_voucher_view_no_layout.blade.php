@@ -18,11 +18,9 @@
                     <div class="flex">
                         <div class="m-3 text-center">
 
-                            <img class="mx-auto h-auto w-14"
+                            <img class="mx-auto h-auto w-20"
                                 src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ route('disbursement-vouchers.show-from-trn', ['disbursement_voucher' => $disbursement_voucher->tracking_number]) }}"
                                 alt="N/A">
-                            <span
-                                class="flex justify-center text-xs font-normal">{{ $disbursement_voucher->tracking_number }}</span>
                         </div>
 
                     </div>
@@ -44,7 +42,10 @@
                         date <span class="ml-2"> {{ $disbursement_voucher->submitted_at->format('m/d/Y') }}</span>
                     </p>
                     <p class="mx-auto ml-1 font-serif text-xs font-extrabold text-black print:text-12">
-                        DV No.
+                        DV No. <span class="font-normal">{{ $disbursement_voucher->dv_number }}</span>
+                    </p>
+                    <p class="mx-auto ml-1 font-serif text-xs font-normal text-black print:text-12">
+                        <span class="font-extrabold">QR Code:</span> {{ $disbursement_voucher->tracking_number }}
                     </p>
                 </div>
             </div>
