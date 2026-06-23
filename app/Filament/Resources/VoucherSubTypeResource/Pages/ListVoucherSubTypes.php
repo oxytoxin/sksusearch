@@ -10,6 +10,11 @@ class ListVoucherSubTypes extends ListRecords
 {
     protected static string $resource = VoucherSubTypeResource::class;
 
+    protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getTableQuery()->orderBy('voucher_type_id')->orderBy('order_column');
+    }
+
     protected function getActions(): array
     {
         return [
@@ -17,6 +22,11 @@ class ListVoucherSubTypes extends ListRecords
                 ->label('New Voucher Sub Type')
                 ->color('success'),
         ];
+    }
+
+    protected function isTablePaginationEnabledWhileReordering(): bool
+    {
+        return true;
     }
 
     protected function getRedirectUrl(): string

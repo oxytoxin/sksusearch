@@ -61,4 +61,14 @@ class RequestSchedule extends Model
     {
         return $this->hasOne(FuelRequisition::class);
     }
+
+    public function vehicle_assigned_by_user()
+    {
+        return $this->belongsTo(User::class, 'vehicle_assigned_by');
+    }
+
+    public function driver_assigned_by_user()
+    {
+        return $this->belongsTo(User::class, 'driver_assigned_by');
+    }
 }

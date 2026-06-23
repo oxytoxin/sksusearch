@@ -28,6 +28,11 @@
                             <x-ri-close-circle-fill class="w-5 h-5 shrink-0 text-white" />
                             <span class="text-white capitalize">Document requested for cancellation.</span>
                         </li>
+                    @elseif (filled($record->pending_return_step_id))
+                        <li class="flex gap-1 -ml-8 bg-red-600 rounded-md">
+                            <x-ri-arrow-go-back-line class="w-5 h-5 shrink-0 text-white" />
+                            <span class="text-white capitalize">Returned to {{ $record->pending_return_step->recipient ?? 'Unknown' }} by {{ $step->recipient ?? $step->sender }}. Awaiting release.</span>
+                        </li>
                     @else
                         <li class="flex gap-1 -ml-8 rounded-md {{ $currentClass }}" @if ($currentStyle) style="{{ $currentStyle }}" @endif>
                             <x-ri-arrow-right-s-line class="w-5 h-5 shrink-0 text-white" />

@@ -324,9 +324,7 @@
                 @endif
             </button>
             @php
-                $is_motorpool_head =
-                    auth()->user()->employee_information->office_id == 32 &&
-                    auth()->user()->employee_information->position_id == 12;
+                $is_motorpool_staff = auth()->user()->employee_information->office_id == 32;
             @endphp
             <!-- Expandable link section, show/hide based on state. -->
             <div class="space-y-1" class="origin-top-left" id="sub-menu-1" x-show='open'
@@ -337,7 +335,7 @@
                     href="{{ route('requisitioner.motorpool.index') }}">
                     Request Vehicle
                 </a>
-                @if ($is_motorpool_head)
+                @if ($is_motorpool_staff)
                     {{-- <a class="flex items-center w-full py-2 pl-10 pr-2 text-sm font-medium rounded-md text-primary-600 group hover:bg-primary-100 hover:text-primary-900"
                    href="{{ route('motorpool.vehicle.index') }}">
                     Vehicles
@@ -358,7 +356,7 @@
                     href="{{ route('motorpool.view-schedule') }}">
                     Vehicle Schedules
                 </a>
-                @if ($is_motorpool_head)
+                @if ($is_motorpool_staff)
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('motorpool.request.fuel-requisition') }}">
                         Fuel Slips
@@ -397,9 +395,7 @@
                 Work & Financial Plan
             </button>
             @php
-                $is_motorpool_head =
-                    auth()->user()->employee_information->office_id == 32 &&
-                    auth()->user()->employee_information->position_id == 12;
+                $is_motorpool_staff = auth()->user()->employee_information->office_id == 32;
                 $isOfficeHead =
                     auth()->user()->employee_information->office?->head_employee?->id ==
                     auth()->user()->employee_information->id;

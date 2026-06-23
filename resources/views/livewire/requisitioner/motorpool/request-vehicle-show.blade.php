@@ -1,10 +1,8 @@
 <div class="">
     @php
-        $is_motorpool_head =
-            auth()->user()->employee_information->office_id == 32 &&
-            auth()->user()->employee_information->position_id == 12;
+        $is_motorpool_staff = auth()->user()->employee_information->office_id == 32;
         $is_president = auth()->user()->id == 64;
-        // $is_motorpool_head = auth()->user()->employee_information->office_id == 32 && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id;
+        // $is_motorpool_staff = auth()->user()->employee_information->office_id == 32 && auth()->user()->employee_information->position_id == auth()->user()->employee_information->office->head_position_id;
     @endphp
     <div class="grid grid-cols-1 lg:grid-cols-3">
         <div class="flex-row col-span-1 lg:col-span-2">
@@ -40,7 +38,7 @@
                                 {{ \Carbon\Carbon::parse($earliestDate)->format('F d, Y') }}
                                 to {{ \Carbon\Carbon::parse($latestDate)->format('F d, Y') }}
                         @endif
-                        @if ($is_motorpool_head)
+                        @if ($is_motorpool_staff)
                             <button class="italic underline ml-2" wire:click="$set('modifyDates',true)">(Click to
                                 modify)</button>
                         @endif
@@ -50,12 +48,15 @@
                         </p> --}}
                         <p class="mt-1 text-sm text-primary-500">Vehicle :
                             {{ $request->vehicle_id == null ? 'Not yet set' : $request->vehicle->campus->name . ' - ' . $request->vehicle->model . ' (' . $request->vehicle->plate_number . ')' }}
-                            @if (($is_president || $is_motorpool_head) && $request->vehicle_id == null)
+                            @if (($is_president || $is_motorpool_staff) && $request->vehicle_id == null)
                                 <button class="italic underline ml-2"
                                     wire:click="$set('assignVehicleModal',true)">(Assign Vehicle)</button>
-                            @elseif(($is_president || $is_motorpool_head) && $request->vehicle_id != null)
+                            @elseif(($is_president || $is_motorpool_staff) && $request->vehicle_id != null)
                                 <button class="italic underline ml-2"
                                     wire:click="$set('modifyVehicleModal',true)">(Click to Modify)</button>
+                            @endif
+                            @if ($request->vehicle_assigned_by)
+                                <span class="text-xs text-primary-400">(Assigned by: {{ $request->vehicle_assigned_by_user->employee_information->full_name ?? 'N/A' }})</span>
                             @endif
                         </p>
 
@@ -67,9 +68,12 @@
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Driver :
                             {{ $request->driver_id == null ? 'Not yet set' : $request->driver->full_name }}
-                            @if ($is_motorpool_head && $request->driver_id != null)
+                            @if ($is_motorpool_staff && $request->driver_id != null)
                                 <button class="italic underline ml-2" wire:click="$set('modifyDriverModal',true)">(Click
                                     to modify)</button>
+                            @endif
+                            @if ($request->driver_assigned_by)
+                                <span class="text-xs text-primary-400">(Assigned by: {{ $request->driver_assigned_by_user->employee_information->full_name ?? 'N/A' }})</span>
                             @endif
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Passengers :
@@ -111,7 +115,7 @@
                                 </div>
                             </div>
                         @endif
-                        @if ($is_motorpool_head)
+                        @if ($is_motorpool_staff)
                             @if ($request->driver_id == null && $request->vehicle_id != null)
                                 <a class="flex float-right mt-4 mx-2 px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
                                     wire:click="$set('assignDriverModal',true)" target="_blank">

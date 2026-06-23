@@ -343,6 +343,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
 
             if (! $conflict) {
                 $this->request_schedule->vehicle_id = $this->assign_vehicle;
+                $this->request_schedule->vehicle_assigned_by = auth()->id();
                 $this->request_schedule->save();
                 $item->vehicle_id = $this->assign_vehicle;
                 $item->save();
@@ -420,6 +421,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
 
             if (! $conflict) {
                 $this->request_schedule->vehicle_id = $this->change_vehicle;
+                $this->request_schedule->vehicle_assigned_by = auth()->id();
                 $this->request_schedule->save();
                 $item->vehicle_id = $this->change_vehicle;
                 $item->save();
@@ -573,6 +575,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
 
             if (! $conflict) {
                 $this->request_schedule->driver_id = $this->change_driver;
+                $this->request_schedule->driver_assigned_by = auth()->id();
                 $this->request_schedule->save();
                 $item->save();
 
@@ -698,6 +701,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
     public function confirmDriver()
     {
         $this->request_schedule->driver_id = $this->assigned_driver;
+        $this->request_schedule->driver_assigned_by = auth()->id();
         $this->request_schedule->save();
 
         // Load necessary relationships

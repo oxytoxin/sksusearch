@@ -97,6 +97,8 @@ class VoucherSubtypesRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->reorderable('order_column')
+            ->defaultSort('order_column');
     }
 }

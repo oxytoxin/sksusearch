@@ -20,6 +20,7 @@
         "vite": "^2.9.15"
     },
     "dependencies": {
+        "@alpinejs/collapse": "^3.15.12",
         "@ryangjchandler/alpine-tooltip": "^1.2.0",
         "flatpickr": "^4.6.13",
         "fullcalendar": "^6.1.8",

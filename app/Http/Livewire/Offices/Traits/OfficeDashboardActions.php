@@ -133,7 +133,8 @@ trait OfficeDashboardActions
             TextColumn::make('user.employee_information.full_name')->searchable()->wrap()->label('Requisitioner'),
             TextColumn::make('payee')->searchable()->wrap()->label('Payee'),
             TextColumn::make('submitted_at')->dateTime('F d, Y'),
-            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Amount')->money('php', true),
+            TextColumn::make('gross_amount')->label('Gross Amount')->money('php', true),
+            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Net Amount')->money('php', true),
         ];
     }
 

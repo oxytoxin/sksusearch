@@ -92,7 +92,8 @@ class VoucherSubTypeResource extends Resource
             ])
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->reorderable('order_column');
     }
 
     public static function getRelations(): array

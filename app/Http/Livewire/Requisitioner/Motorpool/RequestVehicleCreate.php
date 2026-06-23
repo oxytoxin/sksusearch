@@ -12,7 +12,6 @@ use App\Models\RequestSchedule;
 use App\Models\RequestScheduleTimeAndDate;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
-use App\Models\Vehicle;
 use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
@@ -24,7 +23,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Repeater;
 use Illuminate\Validation\ValidationException;
@@ -46,8 +44,6 @@ class RequestVehicleCreate extends Component implements HasForms
 
     public $driver_id;
 
-    public $vehicle_id;
-
     public $passengers = [];
 
     public $purpose;
@@ -63,8 +59,6 @@ class RequestVehicleCreate extends Component implements HasForms
     public $date_of_travel_from;
 
     public $date_of_travel_to;
-
-    public $is_vehicle_preferred;
 
     public $time_start;
 
@@ -207,28 +201,6 @@ class RequestVehicleCreate extends Component implements HasForms
             ])->visible(fn ($get) => $this->date_of_travel_from != null && $this->date_of_travel_to != null)
             ->reactive()->disableItemCreation(),
             // ->disableItemDeletion(),
-            Toggle::make('is_vehicle_preferred')
-                ->label('Select Vehicle')
-                ->onIcon('heroicon-s-check')
-                ->reactive()
-                ->afterStateUpdated(function ($get, $state, $set) {
-                    if ($state == false) {
-                        $set('vehicle_id', null);
-                        $set('time_start', null);
-                        $set('time_end', null);
-                    }
-
-                }),
-
-            Select::make('vehicle_id')
-                ->label('Vehicle')
-                ->options(Vehicle::select(DB::raw("CONCAT(campuses.name, ' - ', vehicles.model, ', ', vehicles.plate_number) AS value"), 'vehicles.id')
-                ->join('campuses', 'campuses.id', '=', 'vehicles.campus_id')
-                ->pluck('value', 'id'))
-                ->searchable()
-                ->reactive()
-                ->visible(fn ($get) => $get('is_vehicle_preferred') == true)
-                ->required(fn ($get) => $get('is_vehicle_preferred') == true),
         ];
     }
 
@@ -284,125 +256,39 @@ class RequestVehicleCreate extends Component implements HasForms
                 Notification::make()->title('Operation Failed')->body('Time must be filled. Please add time to each date.')->danger()->send();
             }
              else {
-                $dates_and_time = $this->mergeDateAndTime($this->date_and_time);
-                $hasConflictTime = false;
-                $hasConflictVehicle = false;
-                $vehicleId = $this->vehicle_id;
-                // $conflictTime;
-                // $conflictVehicle;
+                DB::beginTransaction();
+                $rq = RequestSchedule::create([
+                    'request_type' => $this->is_travel_order ? '1' : '0',
+                    'travel_order_id' => $this->travel_order_id == '' ? null : $this->travel_order_id,
+                    'driver_id' => $this->driver_id,
+                    'requested_by_id' => auth()->user()->id,
+                    'vehicle_id' => null,
+                    'purpose' => $this->purpose,
+                    'philippine_region_id' => PhilippineRegion::firstWhere('region_code', $this->region_code)?->id,
+                    'philippine_province_id' => PhilippineProvince::firstWhere('province_code', $this->province_code)?->id,
+                    'philippine_city_id' => PhilippineCity::firstWhere('city_municipality_code', $this->city_code)?->id,
+                    'other_details' => $this->other_details,
+                    'date_of_travel_from' => $this->date_of_travel_from,
+                    'date_of_travel_to' => $this->date_of_travel_to,
+                    'status' => 'Pending',
+                ]);
+                $rq->applicants()->sync($this->passengers);
 
                 foreach ($dates_and_time as $item) {
-                    if($this->vehicle_id == null )
-                    {
-                        $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) {
-                            $query->where('status', 'Approved');
-                        })
-                        ->where('travel_date', $item['date'])
-                        ->where(function ($query) use ($item) {
-                            $query->where(function ($query) use ($item) {
-                                $query->where('time_from', '<', $item['time_to'])
-                                      ->where('time_to', '>', $item['time_from']);
-                            })->orWhere(function ($query) use ($item) {
-                                $query->where('time_from', '>=', $item['time_from'])
-                                      ->where('time_to', '<=', $item['time_to']);
-                            });
-                        })
-                        ->first();
-
-                        if($conflict)
-                        {
-                            $hasConflictTime = true;
-                        }
-                    }else{
-                        $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId){
-                            $query->where('status', 'Approved')->where('vehicle_id', $vehicleId);
-                        })
-                        ->where('travel_date', $item['date'])
-                        ->where(function ($query) use ($item) {
-                            $query->where(function ($query) use ($item) {
-                                $query->where('time_from', '<', $item['time_to'])
-                                      ->where('time_to', '>', $item['time_from']);
-                            })->orWhere(function ($query) use ($item) {
-                                $query->where('time_from', '>=', $item['time_from'])
-                                      ->where('time_to', '<=', $item['time_to']);
-                            });
-                        })
-                        ->first();
-
-                        if($conflict)
-                        {
-                            $hasConflictVehicle = true;
-                        }
-                    }
-
-                    if($conflict && $this->is_vehicle_preferred)
-                    {
-                        if($hasConflictTime)
-                        {
-                            $date = Carbon::parse($item['date'])->format('F d, Y');
-                            $carbonDate = Carbon::createFromFormat('F d, Y', $date);
-                            $year = $carbonDate->year;
-                            $month = $carbonDate->month;
-                            Notification::make()->title('Operation Failed')->body("The date {$date} has a conflict in the approved schedules")
-                            ->actions([
-                                Action::make('view')
-                                    ->button()
-                                    ->url(route('motorpool.view-schedule',  ['year' => $year, 'month' => $month]), shouldOpenInNewTab: true),
-                            ])->persistent()
-                            ->danger()->send();
-                            return;
-                        }elseif($hasConflictVehicle)
-                        {
-                            $date = Carbon::parse($item['date'])->format('F d, Y');
-                            $carbonDate = Carbon::createFromFormat('F d, Y', $date);
-                            $year = $carbonDate->year;
-                            $month = $carbonDate->month;
-                            Notification::make()->title('Operation Failed')->body("The vehicle you chose has a conflict in the approved schedules. Date : {$date}")
-                            ->actions([
-                                Action::make('view')
-                                    ->button()
-                                    ->url(route('motorpool.view-schedule', ['year' => $year, 'month' => $month, 'vehicle' => $vehicleId]), shouldOpenInNewTab: true),
-                            ])->persistent()
-                            ->danger()->send();
-                            return;
-                        }
-                    }
-                }
-
-                if (!$conflict) {
-
-                    DB::beginTransaction();
-                    $rq = RequestSchedule::create([
-                        'request_type' => $this->is_travel_order ? '1' : '0',
-                        'travel_order_id' => $this->travel_order_id == '' ? null : $this->travel_order_id,
-                        'driver_id' => $this->driver_id,
-                        'requested_by_id' => auth()->user()->id,
-                        'vehicle_id' => $this->vehicle_id ?? null,
-                        'purpose' => $this->purpose,
-                        'philippine_region_id' => PhilippineRegion::firstWhere('region_code', $this->region_code)?->id,
-                        'philippine_province_id' => PhilippineProvince::firstWhere('province_code', $this->province_code)?->id,
-                        'philippine_city_id' => PhilippineCity::firstWhere('city_municipality_code', $this->city_code)?->id,
-                        'other_details' => $this->other_details,
-                        'date_of_travel_from' => $this->date_of_travel_from,
-                        'date_of_travel_to' => $this->date_of_travel_to,
-                        'status' => 'Pending',
+                    RequestScheduleTimeAndDate::create([
+                        'request_schedule_id' => $rq->id,
+                        'vehicle_id' => null,
+                        'travel_date' => $item['date'],
+                        'time_from' => $item['time_from'],
+                        'time_to' => $item['time_to'],
                     ]);
-                    $rq->applicants()->sync($this->passengers);
-
-                    foreach ($dates_and_time as $item) {
-                        RequestScheduleTimeAndDate::create([
-                            'request_schedule_id' => $rq->id,
-                            'vehicle_id' => $this->vehicle_id ?? null,
-                            'travel_date' => $item['date'],
-                            'time_from' => $item['time_from'],
-                            'time_to' => $item['time_to'],
-                        ]);
-                    }
-                    DB::commit();
-                     Notification::make()->title('Operation Success')->body('Request has been created.')->success()->send();
-                    return redirect()->route('requisitioner.motorpool.index');
-
                 }
+                DB::commit();
+                Notification::make()->title('Operation Success')->body('Request has been created.')->success()->send();
+                if ($this->is_travel_order && $this->travel_order_id) {
+                    return redirect()->route('requisitioner.itinerary.create', ['travel_order' => $this->travel_order_id]);
+                }
+                return redirect()->route('requisitioner.motorpool.index');
             }
         } else {
             Notification::make()->title('Operation Failed')->body('Passengers must include you.')->danger()->send();
@@ -445,7 +331,6 @@ class RequestVehicleCreate extends Component implements HasForms
                 $this->date_of_travel_to = $travel_order->date_to;
                 $this->date_and_time =  $dates;
                 $this->passengers = $this->passengers;
-                $this->is_vehicle_preferred = true;
             }
         }
     }

@@ -54,7 +54,7 @@ class Sidenav extends Component
 
         $motorpool_chief_action = 0;
         $employee_information = auth()->user()->employee_information;
-        if ($employee_information && $employee_information->office_id == 32 && $employee_information->position_id == 12) {
+        if ($employee_information && $employee_information->office_id == 32) {
             $motorpool_chief_action = RequestSchedule::where('status', 'Approved')
                 ->whereNull('driver_id')
                 ->count();
