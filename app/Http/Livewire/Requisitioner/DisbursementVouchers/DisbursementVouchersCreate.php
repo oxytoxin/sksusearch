@@ -962,6 +962,8 @@
                 ]);
             }
 
+            $dv->update(['gross_amount' => $dv->disbursement_voucher_particulars()->sum('amount')]);
+
             // Optional supporting documents uploaded during DV creation
             if (filled($this->attachment)) {
                 foreach ($this->attachment as $storedPath) {

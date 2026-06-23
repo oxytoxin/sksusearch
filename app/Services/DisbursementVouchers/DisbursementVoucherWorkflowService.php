@@ -41,6 +41,8 @@ class DisbursementVoucherWorkflowService
                 ]);
             }
 
+            $voucher->update(['gross_amount' => $voucher->disbursement_voucher_particulars()->sum('amount')]);
+
             $voucher->refresh();
             $voucher->activity_logs()->create([
                 'description' => $voucher->current_step->process.' '.$voucher->signatory->employee_information->full_name.' '.$voucher->current_step->sender,
