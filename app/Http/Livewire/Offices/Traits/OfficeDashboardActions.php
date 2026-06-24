@@ -127,14 +127,27 @@ trait OfficeDashboardActions
     private function officeTableColumns()
     {
         return [
-            TextColumn::make('tracking_number')->searchable(),
-            TextColumn::make('voucher_subtype.voucher_type.name')->wrap()->label('Voucher Type'),
-            TextColumn::make('voucher_subtype.name')->wrap()->label('Voucher Sub Type'),
-            TextColumn::make('user.employee_information.full_name')->searchable()->wrap()->label('Requisitioner'),
-            TextColumn::make('payee')->searchable()->wrap()->label('Payee'),
-            TextColumn::make('submitted_at')->dateTime('F d, Y'),
-            TextColumn::make('gross_amount')->label('Gross Amount')->money('php', true),
-            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Net Amount')->money('php', true),
+            TextColumn::make('tracking_number')->searchable()->toggleable()
+                ->extraAttributes(['style' => 'min-width:140px']),
+            TextColumn::make('particulars')
+                ->label('Particulars')
+                ->getStateUsing(fn ($record) => Str::limit(strip_tags($record->disbursement_voucher_particulars->first()?->purpose ?? ''), 50))
+                ->tooltip(fn ($record) => strip_tags($record->disbursement_voucher_particulars->first()?->purpose ?? ''))
+                ->wrap()
+                ->toggleable()
+                ->extraAttributes(['style' => 'min-width:200px']),
+            TextColumn::make('voucher_subtype.voucher_type.name')->label('Voucher Type')->wrap()->toggleable(isToggledHiddenByDefault: true)
+                ->extraAttributes(['style' => 'min-width:120px']),
+            TextColumn::make('voucher_subtype.name')->label('Voucher Sub Type')->wrap()->toggleable()
+                ->extraAttributes(['style' => 'min-width:150px']),
+            TextColumn::make('user.employee_information.full_name')->searchable()->wrap()->label('Requisitioner')->toggleable()
+                ->extraAttributes(['style' => 'min-width:140px']),
+            TextColumn::make('payee')->searchable()->wrap()->label('Payee')->toggleable()
+                ->extraAttributes(['style' => 'min-width:140px']),
+            TextColumn::make('submitted_at')->dateTime('F d, Y')->toggleable()
+                ->extraAttributes(['style' => 'min-width:120px']),
+            TextColumn::make('gross_amount')->label('Gross Amount')->money('php', true)->toggleable(),
+            TextColumn::make('disbursement_voucher_particulars_sum_amount')->sum('disbursement_voucher_particulars', 'amount')->label('Net Amount')->money('php', true)->toggleable(),
         ];
     }
 
@@ -222,13 +235,19 @@ trait OfficeDashboardActions
                 ->modalWidth('7xl')
                 ->mountUsing(function ($form, $record) {
                     $documents = $record?->voucher_subtype?->related_documents_list?->documents ?? [];
+                    $existingItems = $record->related_documents['items'] ?? [];
+                    $existingByDoc = collect($existingItems)->keyBy('document');
+
                     $form->fill([
                         'log_number' => $record->log_number,
-                        'items' => collect($documents)->map(fn ($doc) => [
-                            'document' => $doc,
-                            'status' => 'required',
-                            'remarks' => null,
-                        ])->values()->all(),
+                        'items' => collect($documents)->map(function ($doc) use ($existingByDoc) {
+                            $existing = $existingByDoc->get($doc);
+                            return [
+                                'document' => $doc,
+                                'status' => $existing['status'] ?? 'required',
+                                'remarks' => $existing['remarks'] ?? null,
+                            ];
+                        })->values()->all(),
                         'remarks' => $record->related_documents['remarks'] ?? null,
                     ]);
                 })
@@ -265,6 +284,11 @@ trait OfficeDashboardActions
 
                                         return;
                                     }
+                                    if ($status === 'not_required') {
+                                        $fail('Cannot verify while there are documents marked "For Compliance". Please return the document instead.');
+
+                                        return;
+                                    }
                                 }
                             };
                         }),
@@ -282,7 +306,7 @@ trait OfficeDashboardActions
                         return false;
                     }
 
-                    return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype?->related_documents_list && blank($record->related_documents) && blank($record->pending_return_step_id);
+                    return $record->current_step_id == 6000 && $record->for_cancellation == false && $record->voucher_subtype?->related_documents_list && ! $record->hasCompletedRelatedDocumentsVerification() && blank($record->pending_return_step_id);
                 }),
         ];
     }
@@ -384,6 +408,32 @@ trait OfficeDashboardActions
                         'is_oic' => $this->isOic(),
                     ]);
                     $this->emit('refresh');Notification::make()->title('Document released successfully.')->success()->send();
+                })
+                ->visible(fn ($record) => $record && filled($record->pending_return_step_id)),
+        ];
+    }
+
+    private function resolveReturnAction()
+    {
+        return [
+            Action::make('resolve_return')
+                ->label('Resolve Return')
+                ->button()
+                ->color('warning')
+                ->icon('ri-arrow-go-back-line')
+                ->modalHeading('Resolve Return')
+                ->modalButton('Confirm Resolve')
+                ->requiresConfirmation()
+                ->form([
+                    Textarea::make('resolve_note')
+                        ->label('Remarks (Optional)'),
+                ])
+                ->action(function ($record, $data) {
+                    app(DisbursementVoucherWorkflowService::class)->resolveReturn($record, auth()->user(), $data['resolve_note'] ?? null, [
+                        'is_oic' => $this->isOic(),
+                    ]);
+                    $this->emit('refresh');
+                    Notification::make()->title('Return resolved successfully.')->success()->send();
                 })
                 ->visible(fn ($record) => $record && filled($record->pending_return_step_id)),
         ];

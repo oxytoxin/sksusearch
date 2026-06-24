@@ -7,6 +7,8 @@ use App\Models\DisbursementVoucher;
 use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
 use Livewire\Component;
 
 class BatchTransmittalCreate extends Component
@@ -117,6 +119,14 @@ class BatchTransmittalCreate extends Component
     {
         if (empty($value)) return;
 
+        // QR codes contain a URL — extract the tracking number from it
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            $route = Route::getRoutes()->match(Request::create($value));
+            if ($route->getName() == 'disbursement-vouchers.show-from-trn') {
+                $value = $route->parameters['disbursement_voucher'];
+            }
+        }
+
         $dv = DisbursementVoucher::with(['current_step', 'voucher_subtype.related_documents_list'])
             ->where('tracking_number', $value)
             ->whereRelation('current_step', 'office_group_id', $this->officeGroupId)
@@ -189,7 +199,9 @@ class BatchTransmittalCreate extends Component
                 ]);
 
                 if ($workflowService->canBeForwarded($dv)) {
-                    $workflowService->forward($dv, auth()->user());
+                    $workflowService->forward($dv, auth()->user(), null, [
+                        'batch_transmittal_number' => $serial,
+                    ]);
                 }
             }
 
