@@ -20,8 +20,31 @@
                 padding: 0 !important;
                 margin: 0 !important;
                 max-width: 100% !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
             }
         }
+
+        /* Screen-only styling */
+        @media screen {
+            .print-page-wrapper {
+                min-height: 100vh;
+                background: #f1f5f9;
+                padding: 2rem 1rem;
+            }
+            .print-container {
+                background: white;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 4px 20px rgba(0,0,0,0.06);
+                border-radius: 8px;
+            }
+            .print-table th {
+                background: #f8fafc;
+            }
+            .print-table tr:hover {
+                background: #f8fafc;
+            }
+        }
+
         .print-container {
             max-width: 8.5in;
             margin: 0 auto;
@@ -43,14 +66,15 @@
         }
     </style>
 
-    <div class="no-print mb-4 flex justify-center gap-2 pt-4">
-        <button onclick="window.print()" class="rounded-md bg-primary-600 px-6 py-2 text-sm font-semibold text-white hover:bg-primary-700">
-            Print
-        </button>
-        <a href="{{ route('office.batch-transmittal.show', $batch) }}" class="rounded-md border border-gray-300 bg-white px-6 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
-            Back
-        </a>
-    </div>
+    <div class="print-page-wrapper">
+        <div class="no-print" style="max-width: 8.5in; margin: 0 auto 1.5rem; display: flex; justify-content: center; gap: 0.5rem;">
+            <button onclick="window.print()" class="rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 transition-colors">
+                Print
+            </button>
+            <a href="{{ route('office.batch-transmittal.show', $batch) }}" class="rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+                Back
+            </a>
+        </div>
 
     <div class="print-container">
         {{-- Header --}}
@@ -118,5 +142,6 @@
                 <p style="margin: 10px 0 0;">Date: _______________________________</p>
             </div>
         </div>
+    </div>
     </div>
 </div>

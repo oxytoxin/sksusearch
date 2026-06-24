@@ -24,6 +24,8 @@
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\NotificationController;
     use App\Jobs\SendSmsJob;
+    use App\Models\VoucherType;
+    use App\Models\VoucherSubType;
     use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
     class OfficeDisbursementVouchersIndex extends Component implements HasTable
@@ -68,6 +70,13 @@
                     true => 'For Cancellation',
                     false => 'For Approval',
                 ])->default(0)->label('Status'),
+                SelectFilter::make('voucher_type')
+                    ->label('Voucher Type')
+                    ->options(fn () => VoucherType::pluck('name', 'id'))
+                    ->query(fn (Builder $query, array $data): Builder => $query->when($data['value'], fn (Builder $query, $value) => $query->whereHas('voucher_subtype', fn (Builder $q) => $q->where('voucher_type_id', $value)))),
+                SelectFilter::make('voucher_subtype_id')
+                    ->label('Voucher Sub Type')
+                    ->options(fn () => VoucherSubType::pluck('name', 'id')),
                 SelectFilter::make('phase')
                     ->options([
                         'pre_audit' => 'For Pre-Audit',
@@ -123,7 +132,7 @@
 
         protected function getTableFiltersFormColumns(): int
         {
-            return 2;
+            return 3;
         }
 
         protected function getTableFiltersLayout(): ?string
@@ -155,6 +164,7 @@
                 ...$this->adjustmentActions(),
                 ...$this->icuReturnAction(),
                 ...$this->releaseAction(),
+                ...$this->resolveReturnAction(),
                 Action::make('return')->button()->action(function ($record, $data) {
                     app(DisbursementVoucherWorkflowService::class)->returnToStep($record, $data['return_step_id'], $data['remarks'] ?? null);
 

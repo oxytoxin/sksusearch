@@ -129,6 +129,10 @@ class DisbursementVoucherWorkflowService
                 ? $voucher->current_step->process.' '.$voucher->current_step->recipient
                 : $voucher->current_step->process.' '.$voucher->current_step->recipient.' by '.$this->actorName($actor, $options);
 
+            if ($options['batch_transmittal_number'] ?? null) {
+                $description .= ' (Transmittal No. '.$options['batch_transmittal_number'].')';
+            }
+
             $voucher->activity_logs()->create([
                 'description' => $description,
                 'remarks' => $remarks,
@@ -208,6 +212,33 @@ class DisbursementVoucherWorkflowService
             $description = 'DV released to '.$voucher->current_step->recipient.'. Log #: '.$logNumber.' by '.$this->actorName($actor, $options);
             if (filled($note)) {
                 $description .= "\nNote: ".$note;
+            }
+
+            $voucher->activity_logs()->create([
+                'description' => $description,
+            ]);
+
+            return $voucher->refresh();
+        });
+    }
+
+    public function resolveReturn(DisbursementVoucher $voucher, User $actor, ?string $note = null, array $options = []): DisbursementVoucher
+    {
+        $voucher->refresh();
+        if (blank($voucher->pending_return_step_id)) {
+            throw ValidationException::withMessages([
+                'voucher' => 'This disbursement voucher has no pending return to resolve.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($voucher, $actor, $note, $options) {
+            $voucher->update([
+                'pending_return_step_id' => null,
+            ]);
+
+            $description = 'Return resolved by '.$this->actorName($actor, $options).'.';
+            if (filled($note)) {
+                $description .= "\nRemarks: ".$note;
             }
 
             $voucher->activity_logs()->create([
