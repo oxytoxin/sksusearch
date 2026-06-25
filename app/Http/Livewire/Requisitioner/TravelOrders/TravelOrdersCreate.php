@@ -92,22 +92,19 @@
                         Select::make('region_code')
                             ->reactive()
                             ->label('Region')
-                            ->required(fn($get) => $get('travel_order_type_id') == TravelOrderType::OFFICIAL_BUSINESS)
                             ->options(PhilippineRegion::pluck('region_description', 'region_code')),
                         Select::make('province_code')
                             ->reactive()
                             ->label('Province')
                             ->visible(fn($get) => $get('region_code'))
-                            ->required(fn($get) => $get('travel_order_type_id') == TravelOrderType::OFFICIAL_BUSINESS)
                             ->options(fn($get) => PhilippineProvince::where('region_code', $get('region_code'))->pluck('province_description', 'province_code')),
                         Select::make('city_code')
                             ->label('City')
                             ->visible(fn($get) => $get('province_code'))
-                            ->required(fn($get) => $get('travel_order_type_id') == TravelOrderType::OFFICIAL_BUSINESS)
                             ->options(fn($get) => PhilippineCity::where('province_code', $get('province_code'))->pluck('city_municipality_description', 'city_municipality_code')),
                         TextInput::make('other_details')->nullable(),
                     ]),
-                ])->visible(fn($get) => $get('travel_order_type_id') == TravelOrderType::OFFICIAL_BUSINESS),
+                ]),
                 TableRepeater::make('attachments')
                     ->hideLabels()
                     ->schema([
@@ -134,9 +131,9 @@
                 'has_registration' => $this->data['has_registration'] ?? false,
                 'needs_vehicle' => ($this->data['travel_order_type_id'] == TravelOrderType::OFFICIAL_BUSINESS && isset($this->data['needs_vehicle'])) ? $this->data['needs_vehicle'] : false,
                 'registration_amount' => $this->data['registration_amount'] ?? 0,
-                'philippine_region_id' => ($this->data['travel_order_type_id'] == TravelOrderType::OFFICIAL_BUSINESS && isset($this->data['region_code'])) ? PhilippineRegion::firstWhere('region_code', $this->data['region_code'])?->id : null,
-                'philippine_province_id' => ($this->data['travel_order_type_id'] == TravelOrderType::OFFICIAL_BUSINESS && isset($this->data['province_code'])) ? PhilippineProvince::firstWhere('province_code', $this->data['province_code'])?->id : null,
-                'philippine_city_id' => ($this->data['travel_order_type_id'] == TravelOrderType::OFFICIAL_BUSINESS && isset($this->data['city_code'])) ? PhilippineCity::firstWhere('city_municipality_code', $this->data['city_code'])?->id : null,
+                'philippine_region_id' => isset($this->data['region_code']) ? PhilippineRegion::firstWhere('region_code', $this->data['region_code'])?->id : null,
+                'philippine_province_id' => isset($this->data['province_code']) ? PhilippineProvince::firstWhere('province_code', $this->data['province_code'])?->id : null,
+                'philippine_city_id' => isset($this->data['city_code']) ? PhilippineCity::firstWhere('city_municipality_code', $this->data['city_code'])?->id : null,
                 'other_details' => $this->data['other_details'] ?? null,
             ]);
 
@@ -271,7 +268,7 @@
                             );
                         }
                     } catch (\Exception $e) {
-                        \Log::error('Realtime notification failed: ' . $e->getMessage());
+                        \Log::error('Realtime notification failed: '.$e->getMessage());
                     }
                     // ========== REALTIME NOTIFICATION END ==========
 

@@ -72,11 +72,11 @@
                 ])->default(0)->label('Status'),
                 SelectFilter::make('voucher_type')
                     ->label('Voucher Type')
-                    ->options(fn () => VoucherType::pluck('name', 'id'))
-                    ->query(fn (Builder $query, array $data): Builder => $query->when($data['value'], fn (Builder $query, $value) => $query->whereHas('voucher_subtype', fn (Builder $q) => $q->where('voucher_type_id', $value)))),
+                    ->options(fn() => VoucherType::pluck('name', 'id'))
+                    ->query(fn(Builder $query, array $data): Builder => $query->when($data['value'], fn(Builder $query, $value) => $query->whereHas('voucher_subtype', fn(Builder $q) => $q->where('voucher_type_id', $value)))),
                 SelectFilter::make('voucher_subtype_id')
                     ->label('Voucher Sub Type')
-                    ->options(fn () => VoucherSubType::pluck('name', 'id')),
+                    ->options(fn() => VoucherSubType::pluck('name', 'id')),
                 SelectFilter::make('phase')
                     ->options([
                         'pre_audit' => 'For Pre-Audit',
@@ -93,6 +93,25 @@
                     })
                     ->label('Phase')
                     ->visible(fn() => auth()->user()->employee_information->office->office_group_id == 2),
+                SelectFilter::make('phase')
+                    ->options([
+                        'cheque' => 'For Cheque/ADA',
+                        'receive' => 'For Receiving',
+                        'forward' => 'For Forwarding'
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when($data['value'], function (Builder $query, string $value) {
+                            if ($value === 'cheque') {
+                                $query->whereIn('current_step_id', [17000]);
+                            } elseif ($value === 'receive') {
+                                $query->whereIn('current_step_id', [16000]);
+                            } elseif ($value === 'forward') {
+                                $query->whereIn('current_step_id', [18000])->whereNotNull('cheque_number');
+                            }
+                        });
+                    })
+                    ->label('Phase')
+                    ->visible(fn() => auth()->user()->employee_information->office->office_group_id == 4),
                 Filter::make('created_at')
                     ->form([
                         Grid::make(2)
@@ -242,7 +261,7 @@
 
         protected function getTableRecordClassesUsing(): ?\Closure
         {
-            return fn (DisbursementVoucher $record): string => filled($record->pending_return_step_id) ? '!bg-rose-100' : '';
+            return fn(DisbursementVoucher $record): string => filled($record->pending_return_step_id) ? '!bg-rose-100' : '';
         }
 
         public function render()

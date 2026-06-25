@@ -193,7 +193,7 @@
                             $refund_particulars = collect($this->data['refund_particulars']);
                             $cheque_amount = $this->disbursement_voucher->total_amount;
                             if ($cheque_amount > $particulars->sum('amount')) {
-                                if (($refund_particulars->sum('amount') ?? 0) != ($cheque_amount - $particulars->sum('amount') ?? 0)) {
+                                if (round($refund_particulars->sum('amount') ?? 0, 2) != round($cheque_amount - $particulars->sum('amount') ?? 0, 2)) {
                                     Notification::make()->title('Refund Error')->body('Refunded amount must be equal to the amount to be refunded.')->danger()->send();
                                     throw ValidationException::withMessages([
                                         'refund_amount' => 'Refunded amount must be equal to the amount to be refunded.'

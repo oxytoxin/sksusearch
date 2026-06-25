@@ -195,6 +195,9 @@
                                                         });
                                                 })->orWhere('travel_order_type_id', TravelOrderType::OFFICIAL_TIME);
                                             })
+                                            ->whereHas('applicants', function ($query) {
+                                                $query->where('user_id', auth()->id());
+                                            })
                                             ->whereDoesntHave('disbursement_vouchers',
                                                 fn($q) => $q->where('user_id', auth()->id())->where('cancelled_at', null))
                                             ->approved()
