@@ -24,7 +24,7 @@
 
     class DisbursementVoucherFlowSimulator extends Page
     {
-        protected static ?string $navigationGroup = 'Testing Tools';
+        protected static ?string $navigationGroup = 'Testing Tools and Settings';
 
         protected static ?string $navigationIcon = 'heroicon-o-switch-horizontal';
 

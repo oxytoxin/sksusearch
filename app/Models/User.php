@@ -85,6 +85,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(EmployeeInformation::class);
     }
 
+    public function smsDetailAccess()
+    {
+        return $this->hasOne(SmsDetailAccess::class);
+    }
+
     public function bond()
     {
         return $this->hasOne(Bond::class);

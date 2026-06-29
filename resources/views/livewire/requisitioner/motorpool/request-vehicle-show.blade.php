@@ -31,8 +31,10 @@
                         @if ($earliestDate === $latestDate)
                             <p class="mt-1 text-sm text-primary-500">Date :
                                 {{ \Carbon\Carbon::parse($earliestDate)->format('F d, Y') }}
-                                ({{ \Carbon\Carbon::parse($requestScheduleTime->time_from)->format('h:i A') }} to
-                                {{ \Carbon\Carbon::parse($requestScheduleTime->time_to)->format('h:i A') }})
+                                @if ($requestScheduleTime)
+                                    ({{ \Carbon\Carbon::parse($requestScheduleTime->time_from)->format('h:i A') }} to
+                                    {{ \Carbon\Carbon::parse($requestScheduleTime->time_to)->format('h:i A') }})
+                                @endif
                             @else
                             <p class="mt-1 text-sm text-primary-500">Date :
                                 {{ \Carbon\Carbon::parse($earliestDate)->format('F d, Y') }}
@@ -47,7 +49,7 @@
                             {{ $request->time_start == null || $request->time_end == null ? 'Not yet set' : \Carbon\Carbon::parse($request->time_start)->format('h: i A') . ' to ' . \Carbon\Carbon::parse($request->time_end)->format('h: i A') }}
                         </p> --}}
                         <p class="mt-1 text-sm text-primary-500">Vehicle :
-                            {{ $request->vehicle_id == null ? 'Not yet set' : $request->vehicle->campus->name . ' - ' . $request->vehicle->model . ' (' . $request->vehicle->plate_number . ')' }}
+                            {{ $request->vehicle_id == null ? 'Not yet set' : ($request->vehicle ? $request->vehicle->campus->name . ' - ' . $request->vehicle->model . ' (' . $request->vehicle->plate_number . ')' : 'Vehicle not found') }}
                             @if (($is_president || $is_motorpool_staff) && $request->vehicle_id == null)
                                 <button class="italic underline ml-2"
                                     wire:click="$set('assignVehicleModal',true)">(Assign Vehicle)</button>
@@ -113,6 +115,13 @@
                                         <span class="">Reject Vehicle Request</span>
                                     </button>
                                 </div>
+                            </div>
+                        @elseif ($is_president && $request->status == 'Pending' && $request->travel_order && !$request->travel_order->is_fully_approved)
+                            <div class="mt-10 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                                <p class="text-sm text-yellow-700">
+                                    This vehicle request cannot be approved yet because the linked Travel Order
+                                    ({{ $request->travel_order->tracking_code }}) is still pending signatory approval.
+                                </p>
                             </div>
                         @endif
                         @if ($is_motorpool_staff)

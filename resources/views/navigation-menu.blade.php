@@ -165,6 +165,12 @@
                                 {{ __('Profile') }}
                             </x-jet-dropdown-link>
 
+                            @if (\App\Models\SmsDetailAccess::where('user_id', auth()->id())->exists())
+                                <x-jet-dropdown-link href="{{ route('sms-details') }}">
+                                    {{ __('SMS Details') }}
+                                </x-jet-dropdown-link>
+                            @endif
+
                             @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                                 <x-jet-dropdown-link href="{{ route('api-tokens.index') }}">
                                     {{ __('API Tokens') }}

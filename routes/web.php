@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\DB;
         Route::get('/disbursement-voucher-view/{disbursement_voucher}', [HomeController::class, 'disbursement_voucher_view'])->name('disbursement-vouchers.show');
         Route::get('/disbursement-voucher-view-no-layout/{disbursement_voucher}', [HomeController::class, 'disbursement_voucher_view_no_layout'])->name('disbursement-vouchers-no-layout.show');
         Route::get('/certification-of-travel-completion/{ctc}', TravelCompletedCertificatePrint::class)->name('ctc.show');
+        Route::get('/sms-details', App\Http\Livewire\SmsDetails::class)->name('sms-details');
     });
     Route::get('/disbursement-voucher-view/tracking/{disbursement_voucher:tracking_number}', [HomeController::class, 'disbursement_voucher_view'])->name('disbursement-vouchers.show-from-trn');
     Route::get('auth/google', 'App\Http\Controllers\GoogleController@redirectToGoogle');
