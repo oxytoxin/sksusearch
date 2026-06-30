@@ -55,6 +55,11 @@ class LiquidationReport extends Model
         return $this->belongsTo(LiquidationReportStep::class, 'previous_step_id');
     }
 
+    public function pending_return_step()
+    {
+        return $this->belongsTo(LiquidationReportStep::class, 'pending_return_step_id');
+    }
+
     public function disbursement_voucher()
     {
         return $this->belongsTo(DisbursementVoucher::class);
@@ -100,5 +105,49 @@ class LiquidationReport extends Model
                 'approved_by_oic_id' => $approvedByOicId,
             ],
         );
+    }
+
+    /**
+     * Normalize related_documents JSON into a unified item collection regardless of stored format.
+     *
+     * Returns a collection of: ['document' => string, 'status' => 'required'|'not_required'|'not_applicable', 'remarks' => ?string]
+     *
+     * Supports two storage formats:
+     *  - NEW (3-state): ['items' => [...], 'remarks' => '...']
+     *  - LEGACY (binary): ['required_documents' => [...], 'verified_documents' => [...], 'remarks' => '...']
+     */
+    public function getRelatedDocumentItems()
+    {
+        $data = $this->related_documents;
+        if (blank($data)) {
+            return collect();
+        }
+
+        // New 3-state format
+        if (isset($data['items']) && is_array($data['items'])) {
+            return collect($data['items'])->map(fn ($item) => [
+                'document' => $item['document'] ?? '',
+                'status' => $item['status'] ?? 'required',
+                'remarks' => $item['remarks'] ?? null,
+            ]);
+        }
+
+        // Legacy format — checked = required (verified), unchecked = not_required
+        $required = $data['required_documents'] ?? ($this->disbursement_voucher?->voucher_subtype?->related_documents_list?->liquidation_report_documents ?? []);
+        $verified = $data['verified_documents'] ?? [];
+
+        return collect($required)->map(fn ($doc) => [
+            'document' => $doc,
+            'status' => in_array($doc, $verified) ? 'required' : 'not_required',
+            'remarks' => null,
+        ]);
+    }
+
+    /**
+     * General remarks captured during verification, regardless of storage format.
+     */
+    public function getRelatedDocumentsGeneralRemarks(): ?string
+    {
+        return $this->related_documents['remarks'] ?? null;
     }
 }

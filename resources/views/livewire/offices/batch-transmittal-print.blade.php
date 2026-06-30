@@ -95,44 +95,82 @@
         </div>
 
         {{-- Table --}}
-        <table class="print-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">No.</th>
-                    <th style="width: 10%;">DV No.</th>
-                    <th>Payee</th>
-                    <th>Particulars</th>
-                    <th style="width: 12%;">Gross Amount</th>
-                    <th style="width: 12%;">Net Amount</th>
-                    <th style="width: 12%;">Remarks</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($batch->items as $index => $item)
+        @if ($batch->document_type === 'liquidation_report')
+            <table class="print-table">
+                <thead>
                     <tr>
-                        <td style="text-align: center;">{{ $index + 1 }}</td>
-                        <td style="text-align: center;">{{ $item->disbursement_voucher->dv_number ?? '' }}</td>
-                        <td>{{ $item->disbursement_voucher->payee }}</td>
-                        <td>{{ $item->disbursement_voucher->disbursement_voucher_particulars->pluck('purpose')->join('; ') }}</td>
-                        <td style="text-align: right;">{{ number_format($item->disbursement_voucher->gross_amount ?? $item->disbursement_voucher->disbursement_voucher_particulars->sum('amount'), 2) }}</td>
-                        <td style="text-align: right;">{{ number_format($item->disbursement_voucher->disbursement_voucher_particulars->sum('amount'), 2) }}</td>
-                        <td>{{ $item->remarks ?? '' }}</td>
+                        <th style="width: 5%;">No.</th>
+                        <th style="width: 14%;">LR No.</th>
+                        <th>Requisitioner</th>
+                        <th style="width: 16%;">DV No.</th>
+                        <th style="width: 14%;">Amount</th>
+                        <th style="width: 14%;">Remarks</th>
                     </tr>
-                @endforeach
-                {{-- Empty rows to fill the page --}}
-                @for ($i = $batch->items->count(); $i < max($batch->items->count(), 10); $i++)
+                </thead>
+                <tbody>
+                    @foreach ($batch->items as $index => $item)
+                        <tr>
+                            <td style="text-align: center;">{{ $index + 1 }}</td>
+                            <td style="text-align: center;">{{ $item->liquidation_report?->lr_number ?? '' }}</td>
+                            <td>{{ $item->liquidation_report?->requisitioner?->employee_information?->full_name ?? '' }}</td>
+                            <td style="text-align: center;">{{ $item->liquidation_report?->disbursement_voucher?->tracking_number ?? '' }}</td>
+                            <td style="text-align: right;">{{ number_format($item->liquidation_report?->total_amount ?? 0, 2) }}</td>
+                            <td>{{ $item->remarks ?? '' }}</td>
+                        </tr>
+                    @endforeach
+                    {{-- Empty rows to fill the page --}}
+                    @for ($i = $batch->items->count(); $i < max($batch->items->count(), 10); $i++)
+                        <tr>
+                            <td style="height: 24px;">&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    @endfor
+                </tbody>
+            </table>
+        @else
+            <table class="print-table">
+                <thead>
                     <tr>
-                        <td style="height: 24px;">&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
+                        <th style="width: 5%;">No.</th>
+                        <th style="width: 10%;">DV No.</th>
+                        <th>Payee</th>
+                        <th>Particulars</th>
+                        <th style="width: 12%;">Gross Amount</th>
+                        <th style="width: 12%;">Net Amount</th>
+                        <th style="width: 12%;">Remarks</th>
                     </tr>
-                @endfor
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($batch->items as $index => $item)
+                        <tr>
+                            <td style="text-align: center;">{{ $index + 1 }}</td>
+                            <td style="text-align: center;">{{ $item->disbursement_voucher->dv_number ?? '' }}</td>
+                            <td>{{ $item->disbursement_voucher->payee }}</td>
+                            <td>{{ $item->disbursement_voucher->disbursement_voucher_particulars->pluck('purpose')->join('; ') }}</td>
+                            <td style="text-align: right;">{{ number_format($item->disbursement_voucher->gross_amount ?? $item->disbursement_voucher->disbursement_voucher_particulars->sum('amount'), 2) }}</td>
+                            <td style="text-align: right;">{{ number_format($item->disbursement_voucher->disbursement_voucher_particulars->sum('amount'), 2) }}</td>
+                            <td>{{ $item->remarks ?? '' }}</td>
+                        </tr>
+                    @endforeach
+                    {{-- Empty rows to fill the page --}}
+                    @for ($i = $batch->items->count(); $i < max($batch->items->count(), 10); $i++)
+                        <tr>
+                            <td style="height: 24px;">&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    @endfor
+                </tbody>
+            </table>
+        @endif
 
         {{-- Footer signatures - aligned right --}}
         <div style="display: flex; justify-content: flex-end; margin-top: 40px; font-size: 12px;">

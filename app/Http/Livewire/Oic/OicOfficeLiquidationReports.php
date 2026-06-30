@@ -3,14 +3,14 @@
     namespace App\Http\Livewire\Oic;
 
     use App\Forms\Components\Flatpickr;
+    use App\Forms\Components\RelatedDocumentsChecklist;
     use App\Models\DisbursementVoucherStep;
     use App\Models\EmployeeInformation;
     use App\Models\LiquidationReport;
     use App\Models\LiquidationReportStep;
     use App\Models\OicUser;
     use App\Models\User;
-    use Filament\Forms\Components\CheckboxList;
-    use Filament\Forms\Components\Fieldset;
+    use Filament\Forms\Components\Placeholder;
     use Filament\Forms\Components\RichEditor;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
@@ -140,7 +140,7 @@
                         'journal_date' => $data['journal_date'],
                         'related_documents' => [
                             'required_documents' => $record?->disbursement_voucher->voucher_subtype->related_documents_list?->liquidation_report_documents ?? [],
-                            'verified_documents' => $data['verified_documents'],
+                            'items' => $data['items'] ?? [],
                             'remarks' => $data['remarks'] ?? '',
                         ],
                         'current_step_id' => $record->current_step->next_step->id,
@@ -152,24 +152,58 @@
                     DB::commit();
                     Notification::make()->title('Liquidation Report verified.')->success()->send();
                 })
+                    ->mountUsing(function ($form, $record) {
+                        $documents = $record?->disbursement_voucher?->voucher_subtype?->related_documents_list?->liquidation_report_documents ?? [];
+                        $existingByDoc = $record->getRelatedDocumentItems()->keyBy('document');
+
+                        $form->fill([
+                            'lr_number' => $record->lr_number,
+                            'journal_date' => $record->journal_date,
+                            'items' => collect($documents)->map(function ($doc) use ($existingByDoc) {
+                                $existing = $existingByDoc->get($doc);
+
+                                return [
+                                    'document' => $doc,
+                                    'status' => $existing['status'] ?? 'required',
+                                    'remarks' => $existing['remarks'] ?? null,
+                                ];
+                            })->values()->all(),
+                            'remarks' => $record->getRelatedDocumentsGeneralRemarks(),
+                        ]);
+                    })
                     ->visible(fn($record) => filled($record) && $record->current_step_id == 7000 && blank($record->journal_date) && blank($record->lr_number) && !$record->for_cancellation)
                     ->form(function () {
                         return [
+                            Placeholder::make('lr_details')
+                                ->label('')
+                                ->content(fn ($record) => view('components.liquidation_reports.lr-details-card', [
+                                    'record' => $record,
+                                ])),
                             TextInput::make('lr_number')->label('LR Number')->required(),
                             Flatpickr::make('journal_date')->disableTime()->required(),
-                            Fieldset::make('Related Documents')
-                                ->columns(1)
-                                ->schema([
-                                    CheckboxList::make('verified_documents')
-                                        ->options(function ($record) {
-                                            return collect($record?->disbursement_voucher->voucher_subtype->related_documents_list?->liquidation_report_documents)->flatMap(fn($d) => [$d => $d]) ?? [];
-                                        }),
-                                    RichEditor::make('remarks'),
-                                ]),
+                            RelatedDocumentsChecklist::make('items')
+                                ->label('Documentary Requirements')
+                                ->documents(fn ($record) => $record?->disbursement_voucher?->voucher_subtype?->related_documents_list?->liquidation_report_documents ?? [])
+                                ->rule(function () {
+                                    return function (string $attribute, $value, \Closure $fail) {
+                                        if (! is_array($value)) {
+                                            return;
+                                        }
+                                        foreach ($value as $item) {
+                                            if (($item['status'] ?? null) === 'not_required') {
+                                                $fail('Cannot verify while there are documents marked "For Compliance". Please return the document instead.');
+
+                                                return;
+                                            }
+                                        }
+                                    };
+                                }),
+                            RichEditor::make('remarks')->label('General Remarks (Optional)'),
                         ];
                     })
-                    ->modalWidth('3xl')
-                    ->requiresConfirmation(),
+                    ->modalHeading('Verify Liquidation Report')
+                    ->modalButton('Verify')
+                    ->modalWidth('7xl'),
                 Action::make('certify')->button()->action(function ($record) {
                     DB::beginTransaction();
                     $record->update([

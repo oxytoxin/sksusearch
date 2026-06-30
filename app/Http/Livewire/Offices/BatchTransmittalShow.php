@@ -14,6 +14,9 @@ class BatchTransmittalShow extends Component
         $this->batch = $batch->load([
             'items.disbursement_voucher.disbursement_voucher_particulars',
             'items.disbursement_voucher.current_step',
+            'items.liquidation_report.disbursement_voucher',
+            'items.liquidation_report.requisitioner.employee_information',
+            'items.liquidation_report.current_step',
             'created_by_user.employee_information',
             'forwarded_by_user.employee_information',
             'received_by_user.employee_information',

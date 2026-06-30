@@ -17,4 +17,9 @@ class BatchTransmittalItem extends Model
     {
         return $this->belongsTo(DisbursementVoucher::class);
     }
+
+    public function liquidation_report()
+    {
+        return $this->belongsTo(LiquidationReport::class);
+    }
 }
