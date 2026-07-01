@@ -239,9 +239,13 @@ class RequestVehicleCreate extends Component implements HasForms
     {
         $dates_and_time = $this->mergeDateAndTime($this->date_and_time);
         $has_no_time = false;
+        $has_invalid_time = false;
         foreach ($dates_and_time as $item) {
             if (!isset($item['time_from']) || !isset($item['time_to'])) {
                 $has_no_time = true;
+            } elseif ($item['time_to'] <= $item['time_from']) {
+                // End must come after start; an inverted/zero-length slot silently breaks overlap checks.
+                $has_invalid_time = true;
             }
         }
 
@@ -254,6 +258,9 @@ class RequestVehicleCreate extends Component implements HasForms
             }elseif($has_no_time)
             {
                 Notification::make()->title('Operation Failed')->body('Time must be filled. Please add time to each date.')->danger()->send();
+            }elseif($has_invalid_time)
+            {
+                Notification::make()->title('Operation Failed')->body('Each time slot must end after it starts. Please check the times.')->danger()->send();
             }
              else {
                 DB::beginTransaction();

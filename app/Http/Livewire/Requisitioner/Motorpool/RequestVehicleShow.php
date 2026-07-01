@@ -252,17 +252,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
     })
     ->where('id', '!=', $item->id)
     ->first();
-            if (! $conflict) {
-                $this->request_schedule->status = 'Approved';
-                $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
-                $this->request_schedule->save();
-                $this->dialog()->success(
-                    $title = 'Success',
-                    $description = 'Request for vehicle has been approved'
-                );
-
-                return redirect()->route('signatory.motorpool.signed');
-            } else {
+            if ($conflict) {
                 $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
                 $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
                 $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
@@ -274,6 +264,18 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                 return;
             }
         }
+
+        // Every day is conflict-free — approve the whole request (do NOT short-circuit
+        // on the first clear day; the loop above already validated all of them).
+        $this->request_schedule->status = 'Approved';
+        $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
+        $this->request_schedule->save();
+        $this->dialog()->success(
+            $title = 'Success',
+            $description = 'Request for vehicle has been approved'
+        );
+
+        return redirect()->route('signatory.motorpool.signed');
     }
 
     public function rejectRequest($id)
@@ -321,13 +323,22 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
 
     public function confirmVehicle()
     {
-        DB::beginTransaction();
-
         $vehicleId = $this->assign_vehicle;
+        $driverId = $this->request_schedule->driver_id;
 
+        // Validate EVERY day BEFORE writing anything. Previously this saved inside the loop
+        // and did not return on a conflict, so a clash on a later day left a partial (already
+        // committed) assignment. It also ignored the driver entirely. Now: any conflict on
+        // the vehicle OR (if already set) the driver aborts the whole assignment.
         foreach ($this->request_schedule_date_and_time as $item) {
-            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId) {
-                $query->where('status', 'Approved')->where('vehicle_id', $vehicleId);
+            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId, $driverId) {
+                $query->where('status', 'Approved')
+                    ->where(function ($q) use ($vehicleId, $driverId) {
+                        $q->where('vehicle_id', $vehicleId);
+                        if (! is_null($driverId)) {
+                            $q->orWhere('driver_id', $driverId);
+                        }
+                    });
             })
                 ->where('travel_date', $item->travel_date)
                 ->where(function ($query) use ($item) {
@@ -339,22 +350,10 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                             ->where('time_to', '<=', $item->time_to);
                     });
                 })
+                ->where('request_schedule_id', '!=', $this->request_schedule->id)
                 ->first();
 
-            if (! $conflict) {
-                $this->request_schedule->vehicle_id = $this->assign_vehicle;
-                $this->request_schedule->vehicle_assigned_by = auth()->id();
-                $this->request_schedule->save();
-                $item->vehicle_id = $this->assign_vehicle;
-                $item->save();
-
-                $this->dialog()->success(
-                    $title = 'Success',
-                    $description = 'Vehicle is assigned'
-                );
-                $this->assignVehicleModal = false;
-                $this->emit('refreshComponent');
-            } else {
+            if ($conflict) {
                 $vehicle = Vehicle::find($vehicleId);
                 $date = Carbon::parse($conflict->travel_date)->format('F d, Y');
                 $carbonDate = Carbon::createFromFormat('F d, Y', $date);
@@ -367,13 +366,28 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                             ->url(route('motorpool.view-schedule', ['year' => $year, 'month' => $month, 'vehicle' => $vehicleId]), shouldOpenInNewTab: true),
                     ])->persistent()
                     ->danger()->send();
-                // $this->dialog()->error(
-                //     $title = 'Vehicle Unavailable',
-                //     $description = 'Vehicle has an existing schedule with this records date and time.'
-                // );
+
+                return;
             }
         }
+
+        // All days are clear — assign the vehicle to the request and every day row atomically.
+        DB::beginTransaction();
+        $this->request_schedule->vehicle_id = $this->assign_vehicle;
+        $this->request_schedule->vehicle_assigned_by = auth()->id();
+        $this->request_schedule->save();
+        foreach ($this->request_schedule_date_and_time as $item) {
+            $item->vehicle_id = $this->assign_vehicle;
+            $item->save();
+        }
         DB::commit();
+
+        $this->dialog()->success(
+            $title = 'Success',
+            $description = 'Vehicle is assigned'
+        );
+        $this->assignVehicleModal = false;
+        $this->emit('refreshComponent');
     }
 
     public function changeVehicle($id)
@@ -700,6 +714,43 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
 
     public function confirmDriver()
     {
+        $driverId = $this->assigned_driver;
+
+        // Prevent driver double-booking: reject if this driver already has an approved
+        // trip overlapping any day/time of this request. (confirmDriver previously had
+        // no conflict check at all — the primary path to double-booking a driver.)
+        $dateAndTimes = RequestScheduleTimeAndDate::where('request_schedule_id', $this->request_schedule->id)->get();
+
+        foreach ($dateAndTimes as $item) {
+            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($driverId) {
+                $query->where('status', 'Approved')->where('driver_id', $driverId);
+            })
+                ->where('travel_date', $item->travel_date)
+                ->where(function ($query) use ($item) {
+                    $query->where(function ($query) use ($item) {
+                        $query->where('time_from', '<', $item->time_to)
+                            ->where('time_to', '>', $item->time_from);
+                    })->orWhere(function ($query) use ($item) {
+                        $query->where('time_from', '>=', $item->time_from)
+                            ->where('time_to', '<=', $item->time_to);
+                    });
+                })
+                ->where('request_schedule_id', '!=', $this->request_schedule->id)
+                ->first();
+
+            if ($conflict) {
+                $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
+                $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
+                $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
+                $this->dialog()->error(
+                    $title = 'Driver Unavailable',
+                    $description = "The driver is unavailable on {$date} between {$time_from} and {$time_to} due to a conflict in the approved schedules."
+                );
+
+                return;
+            }
+        }
+
         $this->request_schedule->driver_id = $this->assigned_driver;
         $this->request_schedule->driver_assigned_by = auth()->id();
         $this->request_schedule->save();

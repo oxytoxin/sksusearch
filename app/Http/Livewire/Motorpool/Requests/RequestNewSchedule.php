@@ -9,6 +9,7 @@ use App\Models\PhilippineProvince;
 use App\Models\PhilippineRegion;
 use App\Models\Position;
 use App\Models\RequestSchedule;
+use App\Models\RequestScheduleTimeAndDate;
 use App\Models\TravelOrder;
 use App\Models\TravelOrderType;
 use App\Models\Vehicle;
@@ -160,6 +161,41 @@ class RequestNewSchedule extends Component implements HasForms
     public function save()
     {
         $this->validate();
+
+        // Guard against an inverted/zero-length slot (end must come after start). Without this
+        // an overnight or reversed range silently breaks every time-overlap comparison.
+        if ($this->time_end <= $this->time_start) {
+            Notification::make()->title('Operation Failed')->body('End time must be after start time.')->danger()->send();
+            return;
+        }
+
+        // Conflict check: the chosen vehicle OR driver must be free on this date/time. This GSO
+        // path previously created records with no status and no day rows, so it neither checked
+        // for conflicts nor was visible to other conflict checks.
+        $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) {
+            $query->where('status', 'Approved')
+                ->where(function ($q) {
+                    $q->where('vehicle_id', $this->vehicle_id)
+                        ->orWhere('driver_id', $this->driver_id);
+                });
+        })
+            ->where('travel_date', $this->date_of_travel)
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('time_from', '<', $this->time_end)
+                        ->where('time_to', '>', $this->time_start);
+                })->orWhere(function ($q) {
+                    $q->where('time_from', '>=', $this->time_start)
+                        ->where('time_to', '<=', $this->time_end);
+                });
+            })
+            ->first();
+
+        if ($conflict) {
+            Notification::make()->title('Operation Failed')->body('The selected vehicle or driver already has an approved schedule that overlaps this date and time.')->danger()->send();
+            return;
+        }
+
         DB::beginTransaction();
         $rq = RequestSchedule::create([
             'request_type' => $this->request_type,
@@ -174,8 +210,19 @@ class RequestNewSchedule extends Component implements HasForms
             'date_of_travel' => $this->date_of_travel,
             'time_start' => $this->time_start,
             'time_end' => $this->time_end,
+            'status' => 'Approved',
         ]);
         $rq->applicants()->sync($this->passengers);
+
+        // Record the day/time as a child row so the trip ticket can print it and so this booking
+        // participates in future conflict checks (which all query request_schedule_time_and_dates).
+        RequestScheduleTimeAndDate::create([
+            'request_schedule_id' => $rq->id,
+            'vehicle_id' => $this->vehicle_id,
+            'travel_date' => $this->date_of_travel,
+            'time_from' => $this->time_start,
+            'time_to' => $this->time_end,
+        ]);
         DB::commit();
 
         Notification::make()->title('Operation Success')->body('Request has been created.')->success()->send();
