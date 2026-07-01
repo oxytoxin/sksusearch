@@ -293,7 +293,10 @@ class RequestVehicleCreate extends Component implements HasForms
                 DB::commit();
                 Notification::make()->title('Operation Success')->body('Request has been created.')->success()->send();
                 if ($this->is_travel_order && $this->travel_order_id) {
-                    return redirect()->route('requisitioner.itinerary.create', ['travel_order' => $this->travel_order_id]);
+                    // TO -> itinerary -> vehicle flow: the itinerary already exists, so send the
+                    // user to their Travel Orders list. Redirecting back to itinerary/create would
+                    // hit the duplicate-itinerary guard in ItineraryCreate::mount() and 403.
+                    return redirect()->route('requisitioner.travel-orders.index');
                 }
                 return redirect()->route('requisitioner.motorpool.index');
             }
