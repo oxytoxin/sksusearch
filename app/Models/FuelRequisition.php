@@ -15,6 +15,11 @@ class FuelRequisition extends Model
         return $this->belongsTo(Supplier::class);
     }
 
+    public function actual_supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'actual_supplier_id');
+    }
+
     public function requested_by_employee()
     {
         return $this->belongsTo(EmployeeInformation::class, 'requested_by');

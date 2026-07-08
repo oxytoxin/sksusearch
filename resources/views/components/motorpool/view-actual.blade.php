@@ -68,8 +68,8 @@
                 </dd>
             </div>
             <div class="col-span-2">
-                <dt class="text-gray-600 dark:text-gray-400">Supplier/Attendant:</dt>
-                <dd class="font-semibold">{{ $record->actual_supplier_attendant }}</dd>
+                <dt class="text-gray-600 dark:text-gray-400">Supplier:</dt>
+                <dd class="font-semibold">{{ $record->actual_supplier->name ?? $record->actual_supplier_attendant }}</dd>
             </div>
         </dl>
     </div>

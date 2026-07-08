@@ -263,10 +263,12 @@ class FuelRequestIndex extends Component implements HasTable
                                         ->label('Time of Fueling')
                                         ->required()
                                         ->default(now()),
-                                    Forms\Components\TextInput::make('actual_supplier_attendant')
-                                        ->label('Supplier/Attendant')
+                                    Forms\Components\Select::make('actual_supplier_id')
+                                        ->label('Supplier')
+                                        ->options(\App\Models\Supplier::pluck('name', 'id'))
+                                        ->searchable()
                                         ->required()
-                                        ->maxLength(255)
+                                        ->default(fn ($record) => $record->supplier_id)
                                         ->columnSpan(2),
                                     Forms\Components\TextInput::make('odometer_reading')
                                         ->label('Current Odometer Reading (km)')
@@ -360,6 +362,8 @@ class FuelRequestIndex extends Component implements HasTable
                         ? number_format($record->odometer_reading) . ' km'
                         : '—';
 
+                    $supplierLabel = e($record->actual_supplier->name ?? $record->actual_supplier_attendant ?? '—');
+
                     return new \Illuminate\Support\HtmlString("
                         <div class='p-6'>
                             <div class='mb-4 bg-blue-50 border border-blue-200 p-3 rounded text-sm grid grid-cols-2 gap-2'>
@@ -382,7 +386,7 @@ class FuelRequestIndex extends Component implements HasTable
                                     <div><strong>OR Number:</strong> {$record->actual_or_number}</div>
                                     <div><strong>Date:</strong> {$actDate}</div>
                                     <div><strong>Time:</strong> {$actTime}</div>
-                                    <div><strong>Attendant:</strong> {$record->actual_supplier_attendant}</div>
+                                    <div><strong>Supplier:</strong> {$supplierLabel}</div>
                                 </div>
                             </div>
                         </div>
