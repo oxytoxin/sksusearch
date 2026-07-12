@@ -99,15 +99,16 @@
             DB::beginTransaction();
             $coverage = [];
             foreach ($this->itinerary_entries as $entry) {
+                $data = $entry['data'];
                 $coverage[] = [
-                    'date' => $entry['data']['date'],
-                    'per_diem' => $entry['data']['per_diem'],
-                    'original_per_diem' => $entry['data']['original_per_diem'],
-                    'total_expenses' => $entry['data']['total_expenses'],
-                    'breakfast' => $entry['data']['breakfast'],
-                    'lunch' => $entry['data']['lunch'],
-                    'dinner' => $entry['data']['dinner'],
-                    'lodging' => $entry['data']['lodging'],
+                    'date' => $data['date'],
+                    'per_diem' => $data['per_diem'] ?? 0,
+                    'original_per_diem' => $data['original_per_diem'] ?? 0,
+                    'total_expenses' => $data['total_expenses'] ?? 0,
+                    'breakfast' => $data['breakfast'] ?? false,
+                    'lunch' => $data['lunch'] ?? false,
+                    'dinner' => $data['dinner'] ?? false,
+                    'lodging' => $data['lodging'] ?? false,
                 ];
             }
 
@@ -129,7 +130,7 @@
             }
 
             foreach ($this->itinerary_entries as $itinerary_entry) {
-                foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
+                foreach ($itinerary_entry['data']['itinerary_entries'] ?? [] as $entry) {
                     $itinerary->itinerary_entries()->create([
                         'date' => $itinerary_entry['data']['date'],
                         'mot_id' => $entry['mot_id'],
@@ -205,31 +206,33 @@
         public function render()
         {
             foreach ($this->itinerary_entries as $key => $entry) {
-                $original_per_diem = $entry['data']['original_per_diem'];
+                $data = $entry['data'] ?? [];
+                $original_per_diem = $data['original_per_diem'] ?? $this->getPerDiemForDate($data['date'] ?? null);
                 $per_diem = $original_per_diem;
-                if (!$entry['data']['has_per_diem']) {
+                if (!($data['has_per_diem'] ?? true)) {
                     $per_diem = 0;
                 } else {
-                    if ($entry['data']['breakfast']) {
+                    if ($data['breakfast'] ?? false) {
                         $per_diem -= $original_per_diem * 0.1;
                     }
-                    if ($entry['data']['lunch']) {
+                    if ($data['lunch'] ?? false) {
                         $per_diem -= $original_per_diem * 0.1;
                     }
-                    if ($entry['data']['dinner']) {
+                    if ($data['dinner'] ?? false) {
                         $per_diem -= $original_per_diem * 0.1;
                     }
-                    if ($entry['data']['lodging']) {
+                    if ($data['lodging'] ?? false) {
                         $per_diem -= $original_per_diem * 0.5;
                     }
                 }
 
                 $transportation_expenses = 0;
                 $other_expenses = 0;
-                foreach ($entry['data']['itinerary_entries'] as $expense) {
-                    $transportation_expenses += $expense['transportation_expenses'] == '' ? 0 : $expense['transportation_expenses'];
-                    $other_expenses += $expense['other_expenses'] == '' ? 0 : $expense['other_expenses'];
+                foreach ($data['itinerary_entries'] ?? [] as $expense) {
+                    $transportation_expenses += ($expense['transportation_expenses'] ?? '') == '' ? 0 : $expense['transportation_expenses'];
+                    $other_expenses += ($expense['other_expenses'] ?? '') == '' ? 0 : $expense['other_expenses'];
                 }
+                $this->itinerary_entries[$key]['data']['original_per_diem'] = $original_per_diem;
                 $this->itinerary_entries[$key]['data']['per_diem'] = $per_diem;
                 $this->itinerary_entries[$key]['data']['total_expenses'] = $transportation_expenses + $other_expenses + $per_diem;
             }
@@ -237,6 +240,70 @@
             return view('livewire.requisitioner.itinerary.itinerary-create');
         }
 
+        public function getTravelOrderCoverageDaysCount(): int
+        {
+            return $this->travelOrderCoverageDates()->count();
+        }
+
+        public function getTravelOrderDateFrom(): ?string
+        {
+            return $this->travel_order?->date_from?->toDateString();
+        }
+
+        public function getTravelOrderDateTo(): ?string
+        {
+            return $this->travel_order?->date_to?->toDateString();
+        }
+
+        public function getPerDiemForDate($date)
+        {
+            if (!$this->travel_order || !$date || $this->travel_order->travel_order_type_id != TravelOrderType::OFFICIAL_BUSINESS) {
+                return 0;
+            }
+
+            try {
+                $date = Carbon::make($date)?->toDateString();
+            } catch (\Throwable) {
+                return 0;
+            }
+
+            if (!$date) {
+                return 0;
+            }
+
+            $perDiem = data_get($this->travel_order, 'philippine_region.dte.amount', 0);
+
+            return $date === $this->travel_order->date_to->toDateString()
+                ? $perDiem / 2
+                : $perDiem;
+        }
+
+        public function missingTravelOrderCoverageDates($entries)
+        {
+            $entryDates = collect($entries)
+                ->filter(fn($entry) => filled(data_get($entry, 'data.itinerary_entries')))
+                ->map(function ($entry) {
+                    $date = data_get($entry, 'data.date');
+
+                    if (blank($date)) {
+                        return null;
+                    }
+
+                    try {
+                        return Carbon::make($date)?->toDateString();
+                    } catch (\Throwable) {
+                        return null;
+                    }
+                })
+                ->filter()
+                ->unique()
+                ->values();
+
+            return $this->travelOrderCoverageDates()
+                ->diff($entryDates)
+                ->map(fn(string $date) => Carbon::make($date)->format('M d, Y'))
+                ->values();
+        }
 
         private function generateItineraryEntries($itinerary = null)
         {
@@ -310,5 +377,16 @@
                 }
             }
             $this->itinerary_entries = $entries;
+        }
+
+        private function travelOrderCoverageDates()
+        {
+            if (!$this->travel_order?->date_from || !$this->travel_order?->date_to) {
+                return collect();
+            }
+
+            return collect(CarbonPeriod::between($this->travel_order->date_from, $this->travel_order->date_to))
+                ->map(fn($date) => $date->toDateString())
+                ->values();
         }
     }

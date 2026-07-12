@@ -8,6 +8,7 @@
     use Filament\Forms\Components\Builder\Block;
     use Filament\Forms\Components\Fieldset;
     use Filament\Forms\Components\Grid;
+    use Filament\Forms\Components\Hidden;
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
     use Filament\Forms\Components\Toggle;
@@ -25,7 +26,15 @@
                                 Flatpickr::make('date')
                                     ->disableTime()
                                     ->required()
-                                    ->disabled()
+                                    ->reactive()
+                                    ->afterOrEqual(fn($livewire) => $livewire->getTravelOrderDateFrom())
+                                    ->beforeOrEqual(fn($livewire) => $livewire->getTravelOrderDateTo())
+                                    ->afterStateUpdated(function ($state, $set, $livewire) {
+                                        $perDiem = $livewire->getPerDiemForDate($state);
+
+                                        $set('original_per_diem', $perDiem);
+                                        $set('per_diem', $perDiem);
+                                    })
                                     ->columnSpan(1),
                                 Grid::make([
                                     'sm' => 4,
@@ -47,8 +56,10 @@
                                     ])->columnSpan(1),
                             ])->columnSpan(1),
                             Fieldset::make('Total Amount')->schema([
+                                Hidden::make('original_per_diem')->default(0),
                                 Toggle::make('has_per_diem')
                                     ->label('Has Per Diem')
+                                    ->default(true)
                                     ->reactive(),
                                 TextInput::make('per_diem')->disabled(),
                                 TextInput::make('total_expenses')->disabled()->default(0),
@@ -56,6 +67,9 @@
                         ]),
                         TableRepeater::make('itinerary_entries')
                             ->hideLabels()
+                            ->defaultItems(1)
+                            ->minItems(1)
+                            ->createItemButtonLabel('Add itinerary row')
                             ->schema([
                                 Select::make('mot_id')
                                     ->options(Mot::pluck('name', 'id'))
@@ -85,8 +99,16 @@
                             ])
                     ]),
                 ])
-                ->disableItemCreation()
-                ->disableItemDeletion()
+                ->createItemButtonLabel('Add itinerary entry')
+                ->createItemBetweenButtonLabel('Add itinerary entry')
+                ->minItems(fn($livewire) => $livewire->getTravelOrderCoverageDaysCount())
+                ->rule(fn($livewire) => function (string $attribute, $value, $fail) use ($livewire) {
+                    $missingDates = $livewire->missingTravelOrderCoverageDates($value ?? []);
+
+                    if ($missingDates->isNotEmpty()) {
+                        $fail('Please add itinerary entries for every travel order coverage date. Missing: '.$missingDates->join(', '));
+                    }
+                })
                 ->visible(fn($get) => $get('travel_order_id'));
 
         }

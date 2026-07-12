@@ -1,4 +1,4 @@
-<div x-data x-cloak>
+<div x-data>
     <h4 class="mb-4 text-lg font-semibold">{{ $is_editing ? 'Edit Itinerary' : 'Create Itinerary' }}</h4>
     <form wire:submit.prevent='save' class="flex flex-col gap-4">
         <div>
