@@ -383,6 +383,7 @@
                     'user_id' => auth()->id(),
                     'travel_order_id' => $this->disbursement_voucher->travel_order_id,
                     'coverage' => $coverage,
+                    'submitted_at' => now(),
                 ]);
 
                 foreach ($this->data['itinerary_entries'] as $itinerary_entry) {

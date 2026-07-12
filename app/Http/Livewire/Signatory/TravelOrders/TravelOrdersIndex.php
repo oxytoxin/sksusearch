@@ -15,6 +15,7 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
     {
         return TravelOrder::query()
             ->with('applicants')
+            ->whereNotNull('submitted_at')
             ->whereRelation('signatories', 'user_id', auth()->id())
             ->whereHas('signatories', function ($query) {
                 $query->where('user_id', auth()->id())

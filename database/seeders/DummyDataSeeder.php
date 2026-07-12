@@ -23,6 +23,7 @@ class DummyDataSeeder extends Seeder
         $faker = \Faker\Factory::create();
         $to = TravelOrder::create([
             'tracking_code' => TravelOrder::generateTrackingCode(),
+            'submitted_at' => now(),
             'travel_order_type_id' => 1,
             'date_from' => today()->addDays(2),
             'date_to' => today()->addDays(4),
@@ -66,6 +67,7 @@ class DummyDataSeeder extends Seeder
             'user_id' => 1,
             'travel_order_id' => $to->id,
             'coverage' => $entries,
+            'submitted_at' => now(),
         ]);
 
         $dv = DisbursementVoucher::create([

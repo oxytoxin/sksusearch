@@ -4,8 +4,19 @@
             <div class="rounded-md border-b border-primary-200 bg-white px-4 py-5 sm:px-6 lg:rounded-none lg:rounded-tl-lg">
                 <div class="-ml-4 -mt-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
                     <div class="ml-4 mt-4 w-full">
-                        <h3 class="text-lg font-medium leading-6 text-primary-900">Travel Order Details</h3>
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <h3 class="text-lg font-medium leading-6 text-primary-900">Travel Order Details</h3>
+                            @if (blank($travel_order->submitted_at))
+                                <a class="flex w-fit rounded-full bg-primary-600 px-4 py-2 text-sm text-primary-100 hover:bg-primary-900 hover:text-primary-100 active:ring-2 active:ring-primary-700 active:ring-offset-2" href="{{ route('requisitioner.travel-orders.edit', $travel_order) }}">
+                                    <svg class="h-auto w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                                    </svg>
+                                    <span class="pl-2">Edit TO</span>
+                                </a>
+                            @endif
+                        </div>
                         <p class="mt-4 text-sm text-primary-500">Tracking Code: {{ $travel_order->tracking_code }}</p>
+                        <p class="mt-1 text-sm text-primary-500">Submission Status: {{ blank($travel_order->submitted_at) ? 'Draft / Returned for editing' : 'Submitted' }}</p>
                         <p class="mt-1 text-sm text-primary-500">Travel Order Type:
                             {{ $travel_order->travel_order_type->name }}</p>
                         <p class="mt-1 text-sm text-primary-500">Date Range:
@@ -60,15 +71,24 @@
                         @if ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
                             <div class="flex justify-end gap-2">
                                 @if ($proposed_itinerary)
-                                    <a class="flex w-fit rounded-full bg-primary-600 px-4 py-2 text-sm text-primary-100 hover:bg-primary-900 hover:text-primary-100 active:ring-2 active:ring-primary-700 active:ring-offset-2" href="{{ route('requisitioner.itinerary.show', ['itinerary' => $proposed_itinerary]) }}" target="_blank">
-                                        <svg class="h-auto w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <span class="pl-2">
-                                            View Proposed Itinerary
-                                        </span>
-                                    </a>
+                                    @if (blank($proposed_itinerary->submitted_at))
+                                        <a class="flex w-fit rounded-full bg-primary-600 px-4 py-2 text-sm text-primary-100 hover:bg-primary-900 hover:text-primary-100 active:ring-2 active:ring-primary-700 active:ring-offset-2" href="{{ route('requisitioner.itinerary.edit', ['itinerary' => $proposed_itinerary]) }}">
+                                            <svg class="h-auto w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                                            </svg>
+                                            <span class="pl-2">Edit Proposed Itinerary</span>
+                                        </a>
+                                    @else
+                                        <a class="flex w-fit rounded-full bg-primary-600 px-4 py-2 text-sm text-primary-100 hover:bg-primary-900 hover:text-primary-100 active:ring-2 active:ring-primary-700 active:ring-offset-2" href="{{ route('requisitioner.itinerary.show', ['itinerary' => $proposed_itinerary]) }}" target="_blank">
+                                            <svg class="h-auto w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <span class="pl-2">
+                                                View Proposed Itinerary
+                                            </span>
+                                        </a>
+                                    @endif
                                 @elseif($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
                                     <a class="flex w-fit rounded-full bg-primary-600 px-4 py-2 text-sm text-primary-100 hover:bg-primary-900 hover:text-primary-100 active:ring-2 active:ring-primary-700 active:ring-offset-2" href="{{ route('requisitioner.itinerary.create', ['travel_order' => $travel_order]) }}" target="_blank">
                                         <svg class="h-auto w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -91,6 +111,11 @@
                                     </a>
                                 @endif
                             </div>
+                            @if ($proposed_itinerary)
+                                <p class="mt-3 text-right text-sm text-primary-500">
+                                    Proposed Itinerary Status: {{ blank($proposed_itinerary->submitted_at) ? 'Draft / Returned for editing' : 'Submitted' }}
+                                </p>
+                            @endif
                         @endif
                     </div>
                 </div>

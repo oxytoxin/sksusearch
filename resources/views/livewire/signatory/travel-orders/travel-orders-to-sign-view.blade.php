@@ -4,6 +4,15 @@
         $actingSignatory = $signatories->firstWhere('pivot.user_id', $from_oic ? $oic_signatory : auth()->id());
         $needs_approval = $signatories->where('pivot.is_approved', 0)->where('pivot.id', '<', $actingSignatory->pivot->id)->count() > 0;
         $rejectedAlready = $signatories->where('pivot.is_approved', 2)->where('pivot.id', '<', $actingSignatory->pivot->id)->count() > 0;
+        $travelOrderDraft = blank($travel_order->submitted_at);
+        $canActOnCurrentStep = $actingSignatory->pivot->is_approved == 0 && !$needs_approval && !$rejectedAlready && !$travelOrderDraft;
+        $itineraryBlockMessage = $hasCompleteSubmittedItineraries ? null : 'Action on the TO and itineraries cannot be performed because itineraries are not yet complete.';
+        $travelOrderBlockMessage = $travelOrderDraft
+            ? 'This travel order has been returned and is pending resubmission.'
+            : (($travel_order->needs_vehicle && !$travel_order->request_schedule)
+                ? 'Travel Order requires a vehicle but no vehicle request was created by applicants.'
+                : $itineraryBlockMessage);
+        $canApproveTravelOrder = $actingSignatory->pivot->is_approved == 0 && !$needs_approval && !$rejectedAlready && !$travelOrderBlockMessage;
     @endphp
     <div class="grid grid-cols-1 lg:grid-cols-3">
         <div class="col-span-1 flex-row lg:col-span-2">
@@ -51,26 +60,29 @@
                                                 $actual_itinerary = $itineraries->where('user_id', $applicant->id)->where('is_actual', true)->first();
                                             @endphp
                                             @if ($proposed_itinerary)
-                                                <div class="flex items-end space-x-2">
+                                                <div class="flex flex-wrap items-center justify-end gap-2">
                                                     <a class="font-semibold underline" href="{{ route('signatory.itinerary.show', ['itinerary' => $proposed_itinerary]) }}" target="_blank">View
                                                         Proposed Itinerary</a>
-                                                    @if ($proposed_itinerary->approved_at)
-                                                        <span class="text-primary-600">Approved</span>
+                                                    @if (filled($proposed_itinerary->submitted_at))
+                                                        <span class="rounded-full bg-primary-50 px-2 py-1 text-xs font-semibold text-primary-700">Submitted</span>
+                                                        @if ($canActOnCurrentStep)
+                                                            <x-filament-support::button color="warning" size="sm" wire:target="returnItinerary({{ $proposed_itinerary->id }})" wire:click="returnItinerary({{ $proposed_itinerary->id }})">Return</x-filament-support::button>
+                                                        @endif
                                                     @else
-                                                        <x-filament-support::button size="sm" wire:target="approveItinerary({{ $proposed_itinerary->id }})" wire:click="approveItinerary({{ $proposed_itinerary->id }})">Approve</x-filament-support::button>
+                                                        <span class="rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700">Not Submitted</span>
                                                     @endif
                                                 </div>
                                             @elseif($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
-                                                <span class="font-semibold text-amber-600 underline">No Itinerary Created</span>
+                                                <span class="font-semibold text-amber-600 underline">No Itinerary Submitted</span>
                                             @endif
                                             @if ($actual_itinerary)
-                                                <div class="flex items-end space-x-2">
+                                                <div class="flex flex-wrap items-center justify-end gap-2">
                                                     <a class="font-semibold underline" href="{{ route('signatory.itinerary.show', ['itinerary' => $actual_itinerary]) }}" target="_blank">
                                                         View Actual Itinerary</a>
-                                                    @if ($actual_itinerary->approved_at)
-                                                        <span class="text-primary-600">Approved</span>
+                                                    @if (filled($actual_itinerary->submitted_at))
+                                                        <span class="rounded-full bg-primary-50 px-2 py-1 text-xs font-semibold text-primary-700">Submitted</span>
                                                     @else
-                                                        <span class="text-amber-600">Needs Approval</span>
+                                                        <span class="rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700">Not Submitted</span>
                                                     @endif
                                                 </div>
                                             @endif
@@ -113,27 +125,37 @@
                             <p class="mt-4 text-amber-700">Travel Order needs approval on preliminary signatories.</p>
                         @elseif($rejectedAlready)
                             <p class="mt-4 text-amber-700">Travel Order already rejected by preliminary signatories.</p>
+                        @elseif($travelOrderDraft)
+                            <p class="mt-4 text-amber-700">This travel order has been returned and is pending resubmission.</p>
                         @elseif(!$actingSignatory->pivot->is_approved)
-                            @if ($travel_order->needs_vehicle && !$travel_order->request_schedule)
-                                <p class="mt-4 text-amber-700">Travel Order requires a vehicle but no vehicle request was created by applicants.</p>
-                            @elseif ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS && $itineraries->where('approved_at', '!=', null)->count() != $travel_order->applicants()->count())
-                                <p class="mt-4 text-amber-700">Incomplete approved itinerary entries from travel order's applicants.</p>
-                            @else
-                                <div class="flex flex-col rounded border border-primary-400 p-4">
-                                    <div class="flex w-full justify-evenly gap-4">
-                                        <button class="flex flex-1 justify-center rounded border-2 border-red-600 bg-red-600 p-2 text-sm text-white hover:bg-red-500" onclick="confirm('Are you sure you want to reject this travel order?') || event.stopImmediatePropagation()" wire:click="$set('modalRejection',true)">
-                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                                            </svg>
-                                            <span class="">Reject Travel Order</span>
-                                        </button>
+                            <div class="mt-4 flex flex-col rounded border border-primary-400 p-4">
+                                @if ($travelOrderBlockMessage)
+                                    <p class="mb-4 text-sm font-semibold text-amber-700">{{ $travelOrderBlockMessage }}</p>
+                                @endif
+                                <div class="flex w-full flex-wrap items-center gap-4">
+                                    <button class="flex flex-1 justify-center rounded border-2 border-amber-600 bg-amber-600 p-2 text-sm text-white hover:bg-amber-500" wire:target="returnTravelOrder" wire:click="returnTravelOrder">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M7.793 2.232a.75.75 0 0 1-.025 1.06L5.622 5.34h6.128a5.75 5.75 0 1 1 0 11.5h-1a.75.75 0 0 1 0-1.5h1a4.25 4.25 0 0 0 0-8.5H5.622l2.146 2.049a.75.75 0 0 1-1.036 1.085l-3.5-3.342a.75.75 0 0 1 0-1.085l3.5-3.34a.75.75 0 0 1 1.06.025Z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span>Return Travel Order</span>
+                                    </button>
+                                    @if ($canApproveTravelOrder)
                                         <button class="flex flex-1 justify-center rounded border-2 border-primary-600 bg-primary-600 p-2 text-sm text-white hover:bg-primary-400" onclick="confirm('Are you sure you want to approve this travel order?') || event.stopImmediatePropagation()" wire:click.prevent="approve">
                                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
                                             </svg>
                                             <span class="font-bold">Approve Travel Order</span>
                                         </button>
-                                    </div>
+                                    @else
+                                        <button class="flex flex-1 cursor-not-allowed justify-center rounded border-2 border-green-300 bg-green-200 p-2 text-sm text-green-800 opacity-70" type="button" disabled title="{{ $travelOrderBlockMessage }}">
+                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="font-bold">Approve Travel Order</span>
+                                        </button>
+                                    @endif
+                                </div>
+                                @if (!$travelOrderBlockMessage)
                                     <div class="mt-4 self-end">
                                         @if ($travel_order->travel_order_type_id == App\Models\TravelOrderType::OFFICIAL_BUSINESS)
                                             <x-filament::button class="!p-1 !text-xs" outlined onclick="confirm('Are you sure you want to convert this travel order?') || event.stopImmediatePropagation()" wire:click="toggleTravelOrderType" size="sm" wire:target="toggleTravelOrderType">Convert Travel Order Type to Official Time</x-filament::button>
@@ -141,8 +163,8 @@
                                             <x-filament::button onclick="confirm('Are you sure you want to convert this travel order?') || event.stopImmediatePropagation()" wire:click="toggleTravelOrderType" outlined size="sm" wire:target="toggleTravelOrderType">Convert Travel Order Type to Official Business</x-filament::button>
                                         @endif
                                     </div>
-                                </div>
-                            @endif
+                                @endif
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -242,6 +264,26 @@
             <x-button class="mt-2 border-primary-800 text-primary-900" type="submit">
                 <span class="text-primary-900">
                     Proceed
+                </span>
+            </x-button>
+        </form>
+    </x-modal.card>
+    <x-modal.card class="text-primary-600" title="Return Itinerary" description="Please provide the remarks for returning this itinerary." blur wire:model.defer="modalItineraryReturn">
+        <form class="space=y=2 flex-col" wire:submit.prevent='confirmReturnItinerary'>
+            <x-textarea class="text-primary-800 placeholder:text-primary-200" label="Remarks" placeholder="Write your remarks" wire:model.defer="itineraryReturnNote" />
+            <x-button class="mt-2 border-primary-800 text-primary-900" type="submit">
+                <span class="text-primary-900">
+                    Return Itinerary
+                </span>
+            </x-button>
+        </form>
+    </x-modal.card>
+    <x-modal.card class="text-primary-600" title="Return Travel Order" description="Please provide the remarks for returning this travel order." blur wire:model.defer="modalTravelOrderReturn">
+        <form class="space=y=2 flex-col" wire:submit.prevent='confirmReturnTravelOrder'>
+            <x-textarea class="text-primary-800 placeholder:text-primary-200" label="Remarks" placeholder="Write your remarks" wire:model.defer="travelOrderReturnNote" />
+            <x-button class="mt-2 border-primary-800 text-primary-900" type="submit">
+                <span class="text-primary-900">
+                    Return Travel Order
                 </span>
             </x-button>
         </form>

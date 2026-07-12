@@ -16,7 +16,9 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
 
     protected function getTableQuery()
     {
-        return TravelOrder::whereRelation('applicants', 'user_id', auth()->id())->latest();
+        return TravelOrder::with('signatories')
+            ->whereRelation('applicants', 'user_id', auth()->id())
+            ->latest();
     }
 
     protected function getTableColumns(): array
@@ -26,9 +28,10 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
             Tables\Columns\TextColumn::make('date_from')->label('From')->date()->searchable(),
             Tables\Columns\TextColumn::make('date_to')->label('To')->date()->searchable(),
             Tables\Columns\TextColumn::make('approved')->label('Status')
-                ->formatStateUsing(fn ($record) => $record->signatories->contains('pivot.is_approved', 2) ? 'Cancelled'
+                ->formatStateUsing(fn ($record) => blank($record->submitted_at) ? 'Draft'
+                    : ($record->signatories->contains('pivot.is_approved', 2) ? 'Cancelled'
                     : ($record->signatories->contains('pivot.is_approved', 0) ? 'Pending'
-                        : 'Approved')),
+                        : 'Approved'))),
 
         ];
     }
@@ -38,17 +41,21 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
         return [
             SelectFilter::make('status')
                 ->options([
+                    'draft' => 'Draft',
                     'pending' => 'Pending',
                     'approved' => 'Approved',
                     'cancelled' => 'Cancelled',
                 ])
                 ->query(function (Builder $query, array $data): Builder {
                     return match ($data['value'] ?? null) {
+                        'draft' => $query->whereNull('submitted_at'),
                         'cancelled' => $query->whereHas('signatories', fn (Builder $q) => $q->where('travel_order_signatories.is_approved', 2)),
                         'pending' => $query
+                            ->whereNotNull('submitted_at')
                             ->whereDoesntHave('signatories', fn (Builder $q) => $q->where('travel_order_signatories.is_approved', 2))
                             ->whereHas('signatories', fn (Builder $q) => $q->where('travel_order_signatories.is_approved', 0)),
                         'approved' => $query
+                            ->whereNotNull('submitted_at')
                             ->whereDoesntHave('signatories', fn (Builder $q) => $q->where('travel_order_signatories.is_approved', 2))
                             ->whereDoesntHave('signatories', fn (Builder $q) => $q->where('travel_order_signatories.is_approved', 0)),
                         default => $query,
@@ -75,6 +82,18 @@ class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
                 ->button()
                 ->url(fn (TravelOrder $record): string => route('requisitioner.travel-orders.view', $record))
                 ->icon('heroicon-o-eye'),
+            Action::make('edit_travel_order')
+                ->label('Edit TO')
+                ->button()
+                ->visible(fn (TravelOrder $record): bool => blank($record->submitted_at))
+                ->url(fn (TravelOrder $record): string => route('requisitioner.travel-orders.edit', $record))
+                ->icon('heroicon-o-pencil'),
+            Action::make('edit_proposed_iot')
+                ->label('Edit Itinerary')
+                ->button()
+                ->visible(fn (TravelOrder $record): bool => ($itinerary = $proposedItinerary($record)) !== null && blank($itinerary->submitted_at))
+                ->url(fn (TravelOrder $record): string => route('requisitioner.itinerary.edit', ['itinerary' => $proposedItinerary($record)]))
+                ->icon('heroicon-o-pencil'),
             ActionGroup::make([
                 Action::make('print_travel_order')
                     ->label('Print Travel Order')

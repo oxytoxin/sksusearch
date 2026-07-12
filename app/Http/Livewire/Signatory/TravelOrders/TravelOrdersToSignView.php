@@ -25,6 +25,16 @@ class TravelOrdersToSignView extends Component
 
     public $modalRejection = false;
 
+    public $modalItineraryReturn = false;
+
+    public $modalTravelOrderReturn = false;
+
+    public $itineraryReturnNote = '';
+
+    public $travelOrderReturnNote = '';
+
+    public $returningItineraryId;
+
     public $limit = 3;
 
     public $note = '';
@@ -153,9 +163,12 @@ class TravelOrdersToSignView extends Component
 
     public function render()
     {
+        $itineraries = $this->travel_order->itineraries()->with('user.employee_information')->get();
+
         return view('livewire.signatory.travel-orders.travel-orders-to-sign-view', [
             'sidenotes' => $this->travel_order->sidenotes()->limit($this->limit)->with('user.employee_information')->get(),
-            'itineraries' => $this->travel_order->itineraries()->with('user.employee_information')->get(),
+            'itineraries' => $itineraries,
+            'hasCompleteSubmittedItineraries' => $this->hasCompleteSubmittedItineraries($itineraries),
         ]);
     }
 
@@ -221,11 +234,90 @@ class TravelOrdersToSignView extends Component
 
     public function showDialog() {}
 
-    public function approveItinerary(Itinerary $itinerary)
+    public function returnItinerary(Itinerary $itinerary)
     {
+        abort_unless($itinerary->travel_order_id === $this->travel_order->id, 403);
+
+        $this->returningItineraryId = $itinerary->id;
+        $this->itineraryReturnNote = '';
+        $this->modalItineraryReturn = true;
+    }
+
+    public function confirmReturnItinerary()
+    {
+        $this->validate(['itineraryReturnNote' => 'required']);
+
+        $itinerary = $this->travel_order->itineraries()
+            ->with('user.employee_information')
+            ->findOrFail($this->returningItineraryId);
+
         $itinerary->update([
-            'approved_at' => now(),
+            'approved_at' => null,
+            'submitted_at' => null,
         ]);
+
+        $applicantName = $itinerary->user?->employee_information?->full_name ?? $itinerary->user?->name;
+        $this->travel_order->sidenotes()->create([
+            'content' => "Itinerary returned for editing ({$applicantName}): {$this->itineraryReturnNote}",
+            'user_id' => auth()->id(),
+        ]);
+
+        $this->modalItineraryReturn = false;
+        $this->returningItineraryId = null;
+        $this->itineraryReturnNote = '';
+        $this->travel_order->refresh();
+
+        $this->dialog()->success(
+            $title = 'Itinerary returned',
+            $description = 'The itinerary has been returned for editing.',
+            $icon = 'success',
+        );
+    }
+
+    public function returnTravelOrder()
+    {
+        $this->travelOrderReturnNote = '';
+        $this->modalTravelOrderReturn = true;
+    }
+
+    public function confirmReturnTravelOrder()
+    {
+        $this->validate(['travelOrderReturnNote' => 'required']);
+
+        DB::beginTransaction();
+
+        $this->travel_order->update(['submitted_at' => null]);
+
+        DB::table('travel_order_signatories')
+            ->where('travel_order_id', $this->travel_order->id)
+            ->update([
+                'is_approved' => false,
+                'approved_at' => null,
+                'approved_by_oic_id' => null,
+                'updated_at' => now(),
+            ]);
+
+        $this->travel_order->itineraries()->update([
+            'approved_at' => null,
+            'submitted_at' => null,
+        ]);
+
+        $this->travel_order->sidenotes()->create([
+            'content' => 'Travel order returned for editing: '.$this->travelOrderReturnNote,
+            'user_id' => auth()->id(),
+        ]);
+
+        DB::commit();
+
+        $this->modalTravelOrderReturn = false;
+        $this->travelOrderReturnNote = '';
+        $this->travel_order->refresh();
+
+        $this->dialog()->success(
+            $title = 'Travel order returned',
+            $description = 'The travel order and itineraries have been returned to draft.',
+            $icon = 'success',
+        );
     }
 
     public function showMore()
@@ -254,6 +346,38 @@ class TravelOrdersToSignView extends Component
 
     public function approve()
     {
+        $this->travel_order->refresh();
+
+        if (blank($this->travel_order->submitted_at)) {
+            $this->dialog()->error(
+                $title = 'Action unavailable',
+                $description = 'This travel order is pending resubmission.',
+                $icon = 'error',
+            );
+
+            return;
+        }
+
+        if (! $this->hasCompleteSubmittedItineraries()) {
+            $this->dialog()->error(
+                $title = 'Action unavailable',
+                $description = 'Action on the TO and itineraries cannot be performed because itineraries are not yet complete.',
+                $icon = 'error',
+            );
+
+            return;
+        }
+
+        if ($this->travel_order->needs_vehicle && ! $this->travel_order->request_schedule) {
+            $this->dialog()->error(
+                $title = 'Action unavailable',
+                $description = 'Travel Order requires a vehicle but no vehicle request was created by applicants.',
+                $icon = 'error',
+            );
+
+            return;
+        }
+
         $approvedAt = now();
         $oicId = $this->from_oic ? auth()->id() : null;
 
@@ -408,5 +532,27 @@ class TravelOrdersToSignView extends Component
             );
         }
         $this->travel_order->refresh();
+    }
+
+    private function hasCompleteSubmittedItineraries($itineraries = null): bool
+    {
+        if ($this->travel_order->travel_order_type_id !== TravelOrderType::OFFICIAL_BUSINESS) {
+            return true;
+        }
+
+        $applicantIds = $this->travel_order->applicants()->pluck('users.id');
+
+        if ($applicantIds->isEmpty()) {
+            return true;
+        }
+
+        $submittedItineraryCount = ($itineraries ?? $this->travel_order->itineraries()->get())
+            ->where('is_actual', false)
+            ->whereIn('user_id', $applicantIds)
+            ->filter(fn (Itinerary $itinerary) => filled($itinerary->submitted_at))
+            ->unique('user_id')
+            ->count();
+
+        return $submittedItineraryCount === $applicantIds->count();
     }
 }

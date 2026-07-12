@@ -37,6 +37,10 @@
 
         public $travel_order;
 
+        public $itinerary;
+
+        public bool $is_editing = false;
+
         public $itinerary_entries = [];
 
         public function getFormSchema(): array
@@ -46,8 +50,14 @@
                     ->label('Travel Order')
                     ->searchable()
                     ->preload()
-                    ->options(
-                        TravelOrder::whereDoesntHave('itineraries', function ($query) {
+                    ->options(function () {
+                        if ($this->is_editing && $this->travel_order) {
+                            return [
+                                $this->travel_order->id => "{$this->travel_order->purpose} ( {$this->travel_order->tracking_code} )",
+                            ];
+                        }
+
+                        return TravelOrder::whereDoesntHave('itineraries', function ($query) {
                             $query->where('user_id', auth()->id());
                         })
                             ->whereHas('applicants', function ($query) {
@@ -59,8 +69,9 @@
                                 DB::raw("CONCAT(purpose,' ( ',tracking_code,' )') AS tcAndP"),
                                 'id'
                             )
-                            ->pluck('tcAndP', 'id')
-                    )
+                            ->pluck('tcAndP', 'id');
+                    })
+                    ->disabled(fn() => $this->is_editing)
                     ->afterStateUpdated(function ($state) {
                         $this->travel_order = TravelOrder::find($state);
                         $this->generateItineraryEntries();
@@ -100,11 +111,22 @@
                 ];
             }
 
-            $itinerary = Itinerary::create([
-                'user_id' => auth()->id(),
-                'travel_order_id' => $this->travel_order_id,
-                'coverage' => $coverage,
-            ]);
+            if ($this->is_editing) {
+                $itinerary = $this->itinerary;
+                $itinerary->update([
+                    'coverage' => $coverage,
+                    'approved_at' => null,
+                    'submitted_at' => now(),
+                ]);
+                $itinerary->itinerary_entries()->delete();
+            } else {
+                $itinerary = Itinerary::create([
+                    'user_id' => auth()->id(),
+                    'travel_order_id' => $this->travel_order_id,
+                    'coverage' => $coverage,
+                    'submitted_at' => now(),
+                ]);
+            }
 
             foreach ($this->itinerary_entries as $itinerary_entry) {
                 foreach ($itinerary_entry['data']['itinerary_entries'] as $entry) {
@@ -120,10 +142,14 @@
                 }
             }
             DB::commit();
-            Notification::make()->title('Operation Success')->body('Itinerary has been created.')->success()->send();
+            Notification::make()
+                ->title('Operation Success')
+                ->body($this->is_editing ? 'Itinerary has been resubmitted.' : 'Itinerary has been created.')
+                ->success()
+                ->send();
 
             $travel_order = TravelOrder::find($this->travel_order_id);
-            if ($travel_order && $travel_order->needs_vehicle) {
+            if (!$this->is_editing && $travel_order && $travel_order->needs_vehicle) {
                 return redirect()->route('requisitioner.motorpool.create', ['travel_order' => $travel_order]);
             }
             return redirect()->route('requisitioner.itinerary.show', ['itinerary' => $itinerary]);
@@ -132,6 +158,24 @@
         public function mount()
         {
             $this->form->fill();
+            $itinerary = Itinerary::find(request()->route('itinerary'));
+            if ($itinerary?->exists) {
+                $itinerary->load(['travel_order.itineraries', 'itinerary_entries']);
+
+                if ($itinerary->user_id !== auth()->id() || filled($itinerary->submitted_at)) {
+                    abort(403);
+                }
+
+                $this->itinerary = $itinerary;
+                $this->travel_order = $itinerary->travel_order;
+                $this->travel_order_id = $itinerary->travel_order_id;
+                $this->is_editing = true;
+                $this->form->fill(['travel_order_id' => $this->travel_order_id]);
+                $this->generateItineraryEntries($itinerary);
+
+                return;
+            }
+
             if (request('travel_order')) {
                 $to = TravelOrder::find(request('travel_order'));
                 if (!$to->applicants()->where('users.id',

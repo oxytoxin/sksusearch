@@ -33,6 +33,10 @@
 
         public $data;
 
+        public $travel_order;
+
+        public bool $is_editing = false;
+
         protected function getFormStatePath(): ?string
         {
             return 'data';
@@ -128,6 +132,7 @@
                 'date_from' => $this->data['date_from'],
                 'date_to' => $this->data['date_to'],
                 'purpose' => $this->data['purpose'],
+                'submitted_at' => now(),
                 'has_registration' => $this->data['has_registration'] ?? false,
                 'needs_vehicle' => ($this->data['travel_order_type_id'] == TravelOrderType::OFFICIAL_BUSINESS && isset($this->data['needs_vehicle'])) ? $this->data['needs_vehicle'] : false,
                 'registration_amount' => $this->data['registration_amount'] ?? 0,
@@ -137,7 +142,40 @@
                 'other_details' => $this->data['other_details'] ?? null,
             ]);
 
-            foreach ($this->data['attachments'] as $key => $attachment) {
+            $this->persistAttachments($to);
+
+            return $to;
+        }
+
+        protected function updateTravelOrder()
+        {
+            $this->travel_order->update([
+                'travel_order_type_id' => $this->data['travel_order_type_id'],
+                'date_from' => $this->data['date_from'],
+                'date_to' => $this->data['date_to'],
+                'purpose' => $this->data['purpose'],
+                'submitted_at' => now(),
+                'has_registration' => $this->data['has_registration'] ?? false,
+                'needs_vehicle' => ($this->data['travel_order_type_id'] == TravelOrderType::OFFICIAL_BUSINESS && isset($this->data['needs_vehicle'])) ? $this->data['needs_vehicle'] : false,
+                'registration_amount' => $this->data['registration_amount'] ?? 0,
+                'philippine_region_id' => isset($this->data['region_code']) ? PhilippineRegion::firstWhere('region_code', $this->data['region_code'])?->id : null,
+                'philippine_province_id' => isset($this->data['province_code']) ? PhilippineProvince::firstWhere('province_code', $this->data['province_code'])?->id : null,
+                'philippine_city_id' => isset($this->data['city_code']) ? PhilippineCity::firstWhere('city_municipality_code', $this->data['city_code'])?->id : null,
+                'other_details' => $this->data['other_details'] ?? null,
+            ]);
+
+            $this->persistAttachments($this->travel_order, true);
+
+            return $this->travel_order;
+        }
+
+        protected function persistAttachments(TravelOrder $to, bool $replaceExisting = false): void
+        {
+            if ($replaceExisting) {
+                $to->attachments()->delete();
+            }
+
+            foreach (($this->data['attachments'] ?? []) as $attachment) {
                 // Skip if path is not set
                 if (!isset($attachment['path']) || empty($attachment['path'])) {
                     continue;
@@ -180,8 +218,6 @@
                     'description' => $attachment['description'] ?? '',
                 ]);
             }
-
-            return $to;
         }
 
         protected function fetchSignatories()
@@ -189,7 +225,11 @@
             $signatories = [];
             foreach ($this->data['signatories'] as $key => $signatory) {
                 $this->data['signatories'][$key]['role'] = str($signatory['designation'])->replace('/', '_')->lower()->replace(' ', '_')->value();
-                $signatories[$signatory['user_id']] = $this->data['signatories'][$key];
+                $signatories[$signatory['user_id']] = $this->data['signatories'][$key] + [
+                        'is_approved' => false,
+                        'approved_at' => null,
+                        'approved_by_oic_id' => null,
+                    ];
             }
 
             return $signatories;
@@ -216,7 +256,7 @@
             if (in_array(auth()->user()->id, $this->data['applicants'])) {
                 DB::beginTransaction();
                 try {
-                    $to = $this->createTravelOrder();
+                    $to = $this->is_editing ? $this->updateTravelOrder() : $this->createTravelOrder();
                     $to->applicants()->sync($this->data['applicants']);
 
                     $signatories = $this->fetchSignatories();
@@ -227,32 +267,7 @@
 
                     $to->signatories()->sync($signatories);
 
-                    // Send SMS notifications to all signatories
-                    $signatoryUsers = User::whereIn('id', array_keys($signatories))
-                        ->with('employee_information')
-                        ->get();
-
-                    $makerName = auth()->user()->employee_information->full_name;
-                    $message = "A travel order and its accompanying itinerary have been submitted to the SEARCH system by {$makerName} for your approval. Tracking Code: {$to->tracking_code}";
-
-                    // ========== SMS NOTIFICATION ==========
-                    foreach ($signatoryUsers as $signatory) {
-                        // Check if employee information and contact number exist
-                        if (!config('services.semaphore.api_key')) {
-                            break;
-                        }
-                        if ($signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
-
-                            SendSmsJob::dispatch(
-                                $signatory->employee_information->contact_number,
-                                $message,
-                                'travel_order_signatory_notification',
-                                $signatory->id,
-                                auth()->id()
-                            );
-                        }
-                    }
-                    // ========== SMS NOTIFICATION END ==========
+                    [$signatoryUsers, $message] = $this->notifySignatories($to, array_keys($signatories));
 
                     DB::commit();
 
@@ -272,13 +287,29 @@
                     }
                     // ========== REALTIME NOTIFICATION END ==========
 
-                    Notification::make()->title('Operation Success')->body('Travel Order has been created.')->success()->send();
+                    Notification::make()
+                        ->title('Operation Success')
+                        ->body($this->is_editing ? 'Travel Order has been resubmitted.' : 'Travel Order has been created.')
+                        ->success()
+                        ->send();
 
-                    if ($to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+                    if (!$this->is_editing && $to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
                         return redirect()->route('requisitioner.itinerary.create', ['travel_order' => $to]);
                     }
 
-                    return redirect()->route('requisitioner.travel-orders.index');
+                    if ($this->is_editing && $to->travel_order_type_id == TravelOrderType::OFFICIAL_BUSINESS) {
+                        $itinerary = $to->itineraries()
+                            ->where('user_id', auth()->id())
+                            ->whereIsActual(false)
+                            ->whereNull('submitted_at')
+                            ->first();
+
+                        if ($itinerary) {
+                            return redirect()->route('requisitioner.itinerary.edit', ['itinerary' => $itinerary]);
+                        }
+                    }
+
+                    return redirect()->route('requisitioner.travel-orders.view', $to);
                 } catch (\Exception $e) {
                     DB::rollBack();
                     \Log::error('Travel Order creation failed: '.$e->getMessage());
@@ -289,22 +320,101 @@
             }
         }
 
+        private function notifySignatories(TravelOrder $to, array $signatoryIds): array
+        {
+            // Send SMS notifications to all signatories
+            $signatoryUsers = User::whereIn('id', $signatoryIds)
+                ->with('employee_information')
+                ->get();
+
+            $makerName = auth()->user()->employee_information->full_name;
+            $message = "A travel order and its accompanying itinerary have been submitted to the SEARCH system by {$makerName} for your approval. Tracking Code: {$to->tracking_code}";
+
+            // ========== SMS NOTIFICATION ==========
+            foreach ($signatoryUsers as $signatory) {
+                // Check if employee information and contact number exist
+                if (!config('services.semaphore.api_key')) {
+                    break;
+                }
+                if ($signatory->employee_information && !empty($signatory->employee_information->contact_number)) {
+
+                    SendSmsJob::dispatch(
+                        $signatory->employee_information->contact_number,
+                        $message,
+                        'travel_order_signatory_notification',
+                        $signatory->id,
+                        auth()->id()
+                    );
+                }
+            }
+            // ========== SMS NOTIFICATION END ==========
+
+            return [$signatoryUsers, $message];
+        }
+
         public function mount()
         {
+            $travel_order = TravelOrder::find(request()->route('travel_order'));
             $this->form->fill();
-            $this->data['applicants'] = [auth()->id()];
-            $this->data['signatories'] = [
-                [
-                    'user_id' => null,
-                    'heading' => 'Noted:',
-                    'designation' => 'Immediate Supervisor',
+            if ($travel_order?->exists) {
+                $travel_order->load([
+                    'applicants',
+                    'signatories',
+                    'philippine_region',
+                    'philippine_province',
+                    'philippine_city',
+                    'attachments',
+                ]);
+
+                if (!$travel_order->applicants->contains('id', auth()->id()) || filled($travel_order->submitted_at)) {
+                    abort(403);
+                }
+
+                $this->travel_order = $travel_order;
+                $this->is_editing = true;
+
+                $this->form->fill([
+                    'travel_order_type_id' => $travel_order->travel_order_type_id,
+                    'applicants' => $travel_order->applicants->pluck('id')->toArray(),
+                    'signatories' => $travel_order->signatories->sortBy('pivot.id')->map(fn($signatory) => [
+                        'user_id' => $signatory->id,
+                        'heading' => $signatory->pivot->heading,
+                        'designation' => $signatory->pivot->designation,
+                    ])->values()->toArray(),
+                    'purpose' => $travel_order->purpose,
+                    'has_registration' => $travel_order->has_registration,
+                    'needs_vehicle' => $travel_order->needs_vehicle,
+                    'registration_amount' => $travel_order->registration_amount,
+                    'date_from' => $travel_order->date_from?->toDateString(),
+                    'date_to' => $travel_order->date_to?->toDateString(),
+                    'region_code' => $travel_order->philippine_region?->region_code,
+                    'province_code' => $travel_order->philippine_province?->province_code,
+                    'city_code' => $travel_order->philippine_city?->city_municipality_code,
+                    'other_details' => $travel_order->other_details,
+                    'attachments' => $travel_order->attachments->map(fn($attachment) => [
+                        'path' => $attachment->path,
+                        'description' => $attachment->description,
+                    ])->values()->toArray(),
+                ]);
+
+                return;
+            }
+
+            $this->form->fill([
+                'applicants' => [auth()->id()],
+                'signatories' => [
+                    [
+                        'user_id' => null,
+                        'heading' => 'Noted:',
+                        'designation' => 'Immediate Supervisor',
+                    ],
+                    [
+                        'user_id' => null,
+                        'heading' => 'Recommending Approval:',
+                        'designation' => 'VPAA / VPRDEX / VPFARG',
+                    ],
                 ],
-                [
-                    'user_id' => null,
-                    'heading' => 'Recommending Approval:',
-                    'designation' => 'VPAA / VPRDEX / VPFARG',
-                ],
-            ];
+            ]);
         }
 
         public function render()

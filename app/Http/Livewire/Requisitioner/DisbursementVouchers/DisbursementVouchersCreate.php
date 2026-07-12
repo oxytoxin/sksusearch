@@ -892,6 +892,7 @@
                         'user_id' => auth()->id(),
                         'travel_order_id' => $this->travel_order_id,
                         'coverage' => $coverage,
+                        'submitted_at' => now(),
                     ]);
 
                     foreach ($this->itinerary_entries as $itinerary_entry) {

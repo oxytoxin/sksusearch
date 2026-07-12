@@ -25,7 +25,7 @@
                         </p>
                         <p>Total Amount: <span>{{ $totalAmount }}</span>
                         </p>
-                        <p>Status: {{ $itinerary->approved_at ? 'Approved' : 'Pending' }}</p>
+                        <p>Status: {{ blank($itinerary->submitted_at) ? 'Draft / Returned for editing' : 'Submitted' }}</p>
                     </div>
                 </div>
             </div>
@@ -44,6 +44,12 @@
                     @if ($is_requisitioner)
                         <x-filament-support::button class="mr-4" type="submit" wire:target='save'>Save
                         </x-filament-support::button>
+                        @if (blank($itinerary->submitted_at))
+                            <a class="rounded-lg border border-primary-500 px-4 py-2 text-sm font-semibold tracking-wider text-primary-600 hover:bg-primary-50"
+                               href="{{ route('requisitioner.itinerary.edit', ['itinerary' => $itinerary]) }}">
+                                Edit Itinerary
+                            </a>
+                        @endif
                     @endif
                 </div>
             </form>

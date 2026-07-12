@@ -26,7 +26,7 @@ class OicSignatoryTravelOrders extends Component implements HasTable
 
     protected function getTableQuery()
     {
-        return TravelOrder::query();
+        return TravelOrder::query()->whereNotNull('submitted_at');
     }
 
     protected function getTableColumns()

@@ -33,17 +33,17 @@
                                 ])
                                     ->schema([
                                         Toggle::make('breakfast')->inline(false)->reactive()->columnSpan(1)
-                                            ->onColor('primary')->offColor('danger')
-                                            ->onIcon('heroicon-o-check-circle')->offIcon('heroicon-o-x-circle'),
+                                            ->offColor('primary')->onColor('danger')
+                                            ->offIcon('heroicon-o-check-circle')->onIcon('heroicon-o-x-circle'),
                                         Toggle::make('lunch')->inline(false)->reactive()->columnSpan(1)
-                                            ->onColor('primary')->offColor('danger')
-                                            ->onIcon('heroicon-o-check-circle')->offIcon('heroicon-o-x-circle'),
+                                            ->offColor('primary')->onColor('danger')
+                                            ->offIcon('heroicon-o-check-circle')->onIcon('heroicon-o-x-circle'),
                                         Toggle::make('dinner')->inline(false)->reactive()->columnSpan(1)
-                                            ->onColor('primary')->offColor('danger')
-                                            ->onIcon('heroicon-o-check-circle')->offIcon('heroicon-o-x-circle'),
+                                            ->offColor('primary')->onColor('danger')
+                                            ->offIcon('heroicon-o-check-circle')->onIcon('heroicon-o-x-circle'),
                                         Toggle::make('lodging')->inline(false)->reactive()->columnSpan(1)
-                                            ->onColor('primary')->offColor('danger')
-                                            ->onIcon('heroicon-o-check-circle')->offIcon('heroicon-o-x-circle'),
+                                            ->offColor('primary')->onColor('danger')
+                                            ->offIcon('heroicon-o-check-circle')->onIcon('heroicon-o-x-circle'),
                                     ])->columnSpan(1),
                             ])->columnSpan(1),
                             Fieldset::make('Total Amount')->schema([

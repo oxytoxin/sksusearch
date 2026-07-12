@@ -29,6 +29,7 @@ class TravelOrder extends Model
         'date_to' => 'immutable_date',
         'has_registration' => 'boolean',
         'needs_vehicle' => 'boolean',
+        'submitted_at' => 'immutable_datetime',
     ];
 
     public static function generateTrackingCode(): string
