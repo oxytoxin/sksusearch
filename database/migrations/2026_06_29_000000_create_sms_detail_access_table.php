@@ -1,24 +1,25 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+    use Illuminate\Database\Migrations\Migration;
+    use Illuminate\Database\Schema\Blueprint;
+    use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    public function up()
-    {
-        Schema::create('sms_detail_access', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->timestamps();
+    return new class extends Migration {
+        public function up()
+        {
+            if (!Schema::hasTable('sms_detail_access')) {
+                Schema::create('sms_detail_access', function (Blueprint $table) {
+                    $table->id();
+                    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+                    $table->timestamps();
 
-            $table->unique('user_id');
-        });
-    }
+                    $table->unique('user_id');
+                });
+            }
+        }
 
-    public function down()
-    {
-        Schema::dropIfExists('sms_detail_access');
-    }
-};
+        public function down()
+        {
+            Schema::dropIfExists('sms_detail_access');
+        }
+    };
