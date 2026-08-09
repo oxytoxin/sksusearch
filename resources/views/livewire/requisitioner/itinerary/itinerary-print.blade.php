@@ -1,7 +1,8 @@
 <div class="p-4" x-data>
+    @php($itineraryLabel = $itinerary->is_actual ? 'Actual Itinerary of Travel' : 'Proposed Itinerary of Travel')
     <div class="mb-4 flex justify-end print:hidden">
         <button class="flex rounded-md bg-primary-700 px-4 py-2 text-center text-primary-100 hover:bg-primary-900 hover:shadow-sm hover:shadow-primary-600"
-                @click="printOutData($refs.itineraryPrint.outerHTML, 'Itinerary of Travel')">
+                @click="printOutData($refs.itineraryPrint.outerHTML, '{{ $itineraryLabel }}')">
             <svg class="my-auto h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                  stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round"

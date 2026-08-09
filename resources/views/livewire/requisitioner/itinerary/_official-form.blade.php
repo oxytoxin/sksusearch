@@ -16,7 +16,7 @@
             <td class="border-0 text-right text-[13px] italic" colspan="9">Appendix 45</td>
         </tr>
         <tr>
-            <td class="h-5 border-0 text-center text-[14px] font-bold" colspan="9">ITINERARY OF TRAVEL</td>
+            <td class="h-5 border-0 text-center text-[14px] font-bold" colspan="9">{{ $itineraryForm['is_actual'] ? 'ACTUAL ITINERARY OF TRAVEL' : 'PROPOSED ITINERARY OF TRAVEL' }}</td>
         </tr>
         <tr>
             <td class="h-7 border-0" colspan="9"></td>

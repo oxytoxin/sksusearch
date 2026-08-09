@@ -1,4 +1,5 @@
 <div>
+    @php($itineraryLabel = $itinerary->is_actual ? 'Actual Itinerary of Travel' : 'Proposed Itinerary of Travel')
     <div class="flex-col space-y-5 text-md" x-data>
         <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-lg">
             <div class="flex-wrap items-center justify-between w-full -mt-4 -ml-4 sm:flex-nowrap">
@@ -56,11 +57,11 @@
         </div>
         <div class="px-4 py-5 bg-white border-b rounded-md border-primary-200 sm:px-6 md:rounded-lg">
             <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <h3 class="text-lg font-medium leading-6 text-primary-700">Itinerary of Travel</h3>
+                <h3 class="text-lg font-medium leading-6 text-primary-700">{{ $itineraryLabel }}</h3>
                 <div class="flex gap-2">
                     <button class="rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold tracking-wider text-white hover:bg-primary-200 hover:text-primary-500 active:bg-primary-700 active:text-white"
                             type="button"
-                            @click="printOutData($refs.itineraryPreview.outerHTML, 'Itinerary of Travel')">
+                            @click="printOutData($refs.itineraryPreview.outerHTML, '{{ $itineraryLabel }}')">
                         Print
                     </button>
                     <a class="rounded-lg border border-primary-500 px-4 py-2 text-sm font-semibold tracking-wider text-primary-600 hover:bg-primary-50"

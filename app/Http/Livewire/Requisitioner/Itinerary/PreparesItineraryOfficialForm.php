@@ -107,6 +107,7 @@
             }
 
             return [
+                'is_actual' => $itinerary->is_actual,
                 'tracking_code' => $travelOrder->tracking_code,
                 'fund_cluster' => $travelOrder->disbursement_vouchers?->first()?->fund_cluster?->name,
                 'date_of_travel' => $travelOrder->date_from?->format('M d, Y').' to '.$travelOrder->date_to?->format('M d, Y'),
