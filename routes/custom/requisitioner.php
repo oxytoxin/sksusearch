@@ -11,6 +11,7 @@
     use App\Http\Livewire\Requisitioner\Itinerary\ItineraryShow;
     use App\Http\Livewire\Requisitioner\Itinerary\ItineraryPrint;
     use App\Http\Livewire\Requisitioner\Itinerary\ItineraryCreate;
+    use App\Http\Livewire\Requisitioner\Itinerary\ItinerariesIndex;
     use App\Http\Livewire\LiquidationReports\LiquidationReportsShow;
     use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleShow;
     use App\Http\Livewire\Requisitioner\Motorpool\RequestVehicleIndex;
@@ -48,6 +49,7 @@
         Route::get('/travel-orders/view/{travel_order}', TravelOrdersView::class)->name('travel-orders.view');
         Route::get('/travel-orders/{travel_order}/edit', TravelOrdersCreate::class)->name('travel-orders.edit');
         Route::get('/travel-orders/{travel_order}', TravelOrdersShow::class)->name('travel-orders.show');
+        Route::get('/itinerary', ItinerariesIndex::class)->name('itinerary.index');
         Route::get('/itinerary/create', ItineraryCreate::class)->name('itinerary.create');
         Route::get('/itinerary/print/{itinerary}', ItineraryPrint::class)->name('itinerary.print');
         Route::get('/itinerary/{itinerary}/edit', ItineraryCreate::class)->name('itinerary.edit');
