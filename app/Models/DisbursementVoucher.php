@@ -55,6 +55,11 @@
             return $this->morphMany(PettyCashFundRecord::class, 'recordable');
         }
 
+        public function issued_payments()
+        {
+            return $this->hasMany(IssuedPayment::class);
+        }
+
         public static function generateTrackingNumber()
         {
             return 'dv-'.today()->format('y').'-'.Str::random(8);
