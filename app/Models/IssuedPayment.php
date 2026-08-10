@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class IssuedPayment extends Model
 {
@@ -81,6 +83,41 @@ class IssuedPayment extends Model
     public function bank_account_transaction(): BelongsTo
     {
         return $this->belongsTo(BankAccountTransaction::class);
+    }
+
+    public function bankAccountTransaction(): BelongsTo
+    {
+        return $this->bank_account_transaction();
+    }
+
+    public function bank_account_transactions(): MorphMany
+    {
+        return $this->morphMany(BankAccountTransaction::class, 'source');
+    }
+
+    public function notice_of_cash_allocation_transactions(): HasMany
+    {
+        return $this->hasMany(NoticeOfCashAllocationTransaction::class);
+    }
+
+    public function issued_by(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'issued_by_id');
+    }
+
+    public function cancelled_by(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by_id');
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === self::STATUS_CANCELLED || $this->cancelled_at !== null;
+    }
+
+    public function isIssued(): bool
+    {
+        return $this->status === self::STATUS_ISSUED && $this->cancelled_at === null;
     }
 
     protected function chequeNumber(): Attribute

@@ -13,6 +13,8 @@ class NoticeOfCashAllocationTransaction extends Model
 
     public const TYPE_ISSUED_PAYMENT = 'issued_payment';
 
+    public const TYPE_REVERSION = 'reversion';
+
     public const TYPE_ERROR_CORRECTION = 'error_correction';
 
     protected $guarded = [];
@@ -42,9 +44,19 @@ class NoticeOfCashAllocationTransaction extends Model
         return $this->belongsTo(BankAccountTransaction::class);
     }
 
+    public function bankAccountTransaction(): BelongsTo
+    {
+        return $this->bank_account_transaction();
+    }
+
     public function issued_payment(): BelongsTo
     {
         return $this->belongsTo(IssuedPayment::class);
+    }
+
+    public function issuedPayment(): BelongsTo
+    {
+        return $this->issued_payment();
     }
 
     public function posted_by(): BelongsTo
