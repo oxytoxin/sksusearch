@@ -1,22 +1,28 @@
 <?php
 
-namespace App\Models;
+    namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+    use App\Enums\BudgetCategoryType;
+    use Illuminate\Database\Eloquent\Factories\HasFactory;
+    use Illuminate\Database\Eloquent\Model;
 
-class BudgetCategory extends Model
-{
-    use HasFactory;
-    protected $guarded = [];
-
-    public function categoryItems()
+    class BudgetCategory extends Model
     {
-        return $this->hasMany(CategoryItems::class);
-    }
+        use HasFactory;
 
-    public function wfpDetails()
-    {
-        return $this->hasMany(WfpDetail::class);
+        protected $guarded = [];
+
+        protected $casts = [
+            'type' => BudgetCategoryType::class,
+        ];
+
+        public function categoryItems()
+        {
+            return $this->hasMany(CategoryItems::class);
+        }
+
+        public function wfpDetails()
+        {
+            return $this->hasMany(WfpDetail::class);
+        }
     }
-}

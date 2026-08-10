@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             DisbursementVoucherStepSeeder::class,
             TravelOrderTypeSeeder::class,
             MotSeeder::class,
+            FundClusterGroupSeeder::class,
             FundClusterSeeder::class,
         ]);
         if (app()->environment('local')) {

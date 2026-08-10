@@ -7,6 +7,7 @@
     use Filament\Resources\Form;
     use Filament\Resources\Table;
     use App\Models\FundCluster;
+    use Filament\Forms\Components\Select;
     use Filament\Resources\Resource;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Forms\Components\TextInput;
@@ -34,6 +35,9 @@
             return $form
                 ->schema([
                     TextInput::make('name')->required(),
+                    Select::make('fund_cluster_group_id')
+                        ->relationship('fund_cluster_group', 'name')
+                        ->required(),
                     TextInput::make('fund_source')->required(),
                 ]);
         }
@@ -43,6 +47,7 @@
             return $table
                 ->columns([
                     TextColumn::make('name')->searchable()->sortable(),
+                    TextColumn::make('fund_cluster_group.name')->label('Parent Fund'),
                     TextColumn::make('fund_source')->searchable()->sortable(),
                 ])
                 ->filters([

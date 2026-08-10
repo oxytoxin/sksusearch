@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\FundCluster;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\FundClusterGroup;
 use Illuminate\Database\Seeder;
 
 class FundClusterSeeder extends Seeder
@@ -15,16 +15,23 @@ class FundClusterSeeder extends Seeder
      */
     public function run()
     {
-        FundCluster::create([
-            'name' => '161',
-        ]);
+        $groups = collect(['101', '161', '163', '164'])
+            ->mapWithKeys(fn (string $name) => [
+                $name => FundClusterGroup::firstOrCreate(['name' => $name])->id,
+            ]);
 
-        FundCluster::create([
-            'name' => '163',
-        ]);
+        $fundClusters = [
+            ['name' => '101', 'fund_cluster_group_id' => $groups['101']],
+            ['name' => '161', 'fund_cluster_group_id' => $groups['161']],
+            ['name' => '163', 'fund_cluster_group_id' => $groups['163']],
+            ['name' => '164', 'fund_cluster_group_id' => $groups['164']],
+        ];
 
-        FundCluster::create([
-            'name' => '164',
-        ]);
+        foreach ($fundClusters as $fundCluster) {
+            FundCluster::updateOrCreate(
+                ['name' => $fundCluster['name']],
+                ['fund_cluster_group_id' => $fundCluster['fund_cluster_group_id']],
+            );
+        }
     }
 }

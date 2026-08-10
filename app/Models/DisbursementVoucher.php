@@ -20,6 +20,7 @@
             'closed_at' => 'immutable_date',
             'submitted_at' => 'immutable_date',
             'documents_verified_at' => 'immutable_datetime',
+            'cheque_number_added_at' => 'immutable_datetime',
             'due_date' => 'immutable_date',
             'journal_date' => 'immutable_date',
             'certified_by_accountant' => 'boolean',
@@ -29,6 +30,11 @@
             'related_documents' => 'array',
             'other_details' => 'array',
         ];
+
+        public function category_item_budget()
+        {
+            return $this->belongsTo(CategoryItemBudget::class);
+        }
 
         protected function totalAmount(): Attribute
         {

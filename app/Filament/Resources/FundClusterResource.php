@@ -6,6 +6,7 @@ use App\Filament\Resources\FundClusterResource\Pages;
 use App\Filament\Resources\FundClusterResource\RelationManagers;
 use App\Models\FundCluster;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -34,6 +35,9 @@ class FundClusterResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')->required(),
+                Select::make('fund_cluster_group_id')
+                    ->relationship('fund_cluster_group', 'name')
+                    ->required(),
 
             ]);
     }
@@ -53,6 +57,7 @@ class FundClusterResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('fund_cluster_group.name')->label('Parent Fund'),
             ])
             ->filters([
                 //

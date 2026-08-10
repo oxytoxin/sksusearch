@@ -4,6 +4,7 @@
 
     use Illuminate\Database\Console\Seeds\WithoutModelEvents;
     use App\Models\FundCluster;
+    use App\Models\FundClusterGroup;
     use App\Models\MfoFee;
     use Illuminate\Database\Seeder;
 
@@ -16,8 +17,12 @@
          */
         public function run()
         {
-            FundCluster::create([
+            $group = FundClusterGroup::firstOrCreate(['name' => '164']);
+
+            FundCluster::updateOrCreate([
                 'name' => '164FF/MF',
+            ], [
+                'fund_cluster_group_id' => $group->id,
             ]);
 
             $fees = [
