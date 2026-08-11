@@ -6,12 +6,14 @@ use App\Forms\Components\Flatpickr;
 use App\Forms\Components\RelatedDocumentsChecklist;
 use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
+use App\Models\BankAccount;
 use App\Models\CategoryItemBudget;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
 use App\Models\DvAdjustment;
 use App\Models\FundCluster;
 use App\Models\Mop;
+use App\Models\NoticeOfCashAllocation;
 use App\Models\TravelOrderType;
 use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 use Awcodes\FilamentTableRepeater\Components\TableRepeater;
@@ -443,7 +445,9 @@ trait OfficeDashboardActions
     {
         return [
             Action::make('cheque_ada')->label('Cheque/ADA')->button()->action(function ($record, $data) {
-                app(DisbursementVoucherWorkflowService::class)->makeChequeAda($record, $data['mop_id'], $data['cheque_number'], [
+                $record = app(DisbursementVoucherWorkflowService::class)->makeChequeAda($record, $data['mop_id'], '', [
+                    'bank_account_id' => $data['bank_account_id'],
+                    'notice_of_cash_allocation_id' => $data['notice_of_cash_allocation_id'] ?? null,
                     'is_oic' => $this->isOic(),
                     'actor' => auth()->user(),
                 ]);
@@ -456,7 +460,7 @@ trait OfficeDashboardActions
                 // Send SMS notification
                 $record->load(['user.employee_information']);
                 $trackingNumber = $record->tracking_number;
-                $chequeNumber = $data['cheque_number'];
+                $chequeNumber = $record->cheque_number;
                 $message = "Your DV with ref. no. {$trackingNumber} is ready for disbursement with check/ADA number {$chequeNumber}.";
 
                 $requestedBy = $record->user;
@@ -482,7 +486,12 @@ trait OfficeDashboardActions
 
                     return $record->current_step_id == 17000 && blank($record->cheque_number) && $record->for_cancellation == false && blank($record->pending_return_step_id);
                 })
-                ->form(function () {
+                ->form(function ($record) {
+                    $fundCluster = $record?->fund_cluster;
+                    $fundClusterGroupId = $fundCluster?->fund_cluster_group_id;
+                    $requiresNca = $fundCluster?->name === '101'
+                        || $fundCluster?->fund_cluster_group?->name === '101';
+
                     return [
                         Grid::make(2)
                             ->schema([
@@ -490,28 +499,54 @@ trait OfficeDashboardActions
                                 Placeholder::make('ors_burs')->label('ORS/BURS')->content(fn ($record) => $record->ors_burs ?? 'N/A'),
                             ]),
                         Placeholder::make('fund_cluster')->label('Fund Cluster')->content(fn ($record) => $record->fund_cluster->name ?? 'N/A'),
-                        TextInput::make('cheque_number')
-                            ->label('Cheque number/ADA')
-                            ->required(),
                         Select::make('mop_id')
                             ->label('Mode of Payment')
                             ->options(Mop::pluck('name', 'id'))
                             ->required(),
+                        Select::make('bank_account_id')
+                            ->label('Bank Account')
+                            ->options(function () use ($fundClusterGroupId) {
+                                if (blank($fundClusterGroupId)) {
+                                    return [];
+                                }
+
+                                return BankAccount::query()
+                                    ->with('bank')
+                                    ->whereHas('fund_cluster_groups', fn ($query) => $query->whereKey($fundClusterGroupId))
+                                    ->get()
+                                    ->mapWithKeys(fn ($account) => [
+                                        $account->getKey() => trim(($account->bank?->name ? $account->bank->name.' - ' : '').$account->number),
+                                    ]);
+                            })
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(fn (callable $set) => $set('notice_of_cash_allocation_id', null)),
+                        Select::make('notice_of_cash_allocation_id')
+                            ->label('Notice of Cash Allocation')
+                            ->options(function ($get) use ($fundClusterGroupId) {
+                                if (blank($fundClusterGroupId) || blank($get('bank_account_id'))) {
+                                    return [];
+                                }
+
+                                return NoticeOfCashAllocation::query()
+                                    ->eligibleForBankAccount((int) $get('bank_account_id'))
+                                    ->where('fund_cluster_group_id', $fundClusterGroupId)
+                                    ->orderBy('number')
+                                    ->pluck('number', 'id');
+                            })
+                            ->visible(fn () => $requiresNca)
+                            ->required(fn () => $requiresNca),
                     ];
                 })
                 ->requiresConfirmation(),
             Action::make('cancel')
                 ->requiresConfirmation()
                 ->action(function ($record, $data) {
-                    $record->update([
-                        'cancellation_remarks' => $data['cancellation_remarks'],
-                        'for_cancellation' => true,
-                        'cancelled_at' => now(),
+                    app(DisbursementVoucherWorkflowService::class)->cancelChequeAda($record, $data['cancellation_remarks'] ?? null, [
+                        'is_oic' => $this->isOic(),
+                        'actor' => auth()->user(),
                     ]);
-                    $description = 'Cheque/ADA cancelled.';
-                    $record->activity_logs()->create([
-                        'description' => $description,
-                    ]);
+                    Notification::make()->title('Cheque/ADA cancelled.')->success()->send();
                 })
                 ->form([
                     Textarea::make('cancellation_remarks'),
