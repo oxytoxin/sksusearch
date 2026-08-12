@@ -2,13 +2,21 @@
 
 namespace App\Services\DisbursementVouchers;
 
+use App\Enums\ModeOfPayments;
+use App\Models\BankAccount;
+use App\Models\BankAccountTransaction;
 use App\Models\CategoryItemBudget;
+use App\Models\CheckStub;
 use App\Models\DisbursementVoucher;
 use App\Models\DisbursementVoucherStep;
+use App\Models\IssuedPayment;
 use App\Models\Mop;
+use App\Models\NoticeOfCashAllocation;
+use App\Models\NoticeOfCashAllocationTransaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class DisbursementVoucherWorkflowService
@@ -402,10 +410,197 @@ class DisbursementVoucherWorkflowService
             ]);
         }
 
-        return DB::transaction(function () use ($voucher, $mopId, $chequeNumber, $options) {
+        $bankAccountId = $options['bank_account_id'] ?? null;
+        if (blank($bankAccountId)) {
+            throw ValidationException::withMessages([
+                'bank_account_id' => 'Select a bank account.',
+            ]);
+        }
+
+        $amount = $this->voucherPaymentAmount($voucher);
+        if ($amount <= 0) {
+            throw ValidationException::withMessages([
+                'voucher' => 'This disbursement voucher has no payable amount.',
+            ]);
+        }
+
+        $fundCluster = $voucher->fund_cluster()->with('fund_cluster_group')->first();
+        $fundClusterGroup = $fundCluster?->fund_cluster_group;
+        $requiresNca = $fundCluster?->name === '101' || $fundClusterGroup?->name === '101';
+        $noticeOfCashAllocationId = $options['notice_of_cash_allocation_id'] ?? null;
+
+        if ($requiresNca && blank($noticeOfCashAllocationId)) {
+            throw ValidationException::withMessages([
+                'notice_of_cash_allocation_id' => 'Select a Notice of Cash Allocation for Fund Cluster 101.',
+            ]);
+        }
+
+        return DB::transaction(function () use (
+            $voucher,
+            $mopId,
+            $chequeNumber,
+            $options,
+            $bankAccountId,
+            $amount,
+            $fundClusterGroup,
+            $noticeOfCashAllocationId,
+        ) {
+            // Lock all balances and number ranges before changing any of them. This
+            // keeps two cashier sessions from issuing the same check or spending the
+            // same balance concurrently.
+            $voucher = DisbursementVoucher::query()
+                ->with(['fund_cluster.fund_cluster_group', 'disbursement_voucher_particulars'])
+                ->lockForUpdate()
+                ->findOrFail($voucher->getKey());
+
+            if ($voucher->current_step_id != 17000 || filled($voucher->cheque_number) || $voucher->for_cancellation || filled($voucher->pending_return_step_id)) {
+                throw ValidationException::withMessages([
+                    'voucher' => 'Cheque/ADA can only be recorded at the Cashier receiving step.',
+                ]);
+            }
+
+            $bankAccount = BankAccount::query()->lockForUpdate()->find($bankAccountId);
+
+            if (! $bankAccount) {
+                throw ValidationException::withMessages([
+                    'bank_account_id' => 'Select a valid bank account.',
+                ]);
+            }
+
+            if ($fundClusterGroup && ! $bankAccount->fund_cluster_groups()->whereKey($fundClusterGroup->getKey())->exists()) {
+                throw ValidationException::withMessages([
+                    'bank_account_id' => 'The selected bank account is not enrolled for this fund cluster.',
+                ]);
+            }
+
+            $nca = null;
+            if (filled($noticeOfCashAllocationId)) {
+                $nca = NoticeOfCashAllocation::query()->lockForUpdate()->find($noticeOfCashAllocationId);
+
+                if (! $nca
+                    || (int) $nca->bank_account_id !== (int) $bankAccount->getKey()
+                    || ($fundClusterGroup && (int) $nca->fund_cluster_group_id !== (int) $fundClusterGroup->getKey())
+                    || ! $nca->hasAvailableBalance($amount)) {
+                    throw ValidationException::withMessages([
+                        'notice_of_cash_allocation_id' => 'The selected Notice of Cash Allocation is not valid or has insufficient balance.',
+                    ]);
+                }
+            }
+
+            $mop = Mop::query()->findOrFail($mopId);
+            $serialNumber = trim($chequeNumber);
+            $checkStub = null;
+            $isCheck = $this->isCheckMop($mop);
+            $isAda = $this->isAdaMop($mop);
+
+            if (blank($serialNumber) && $isCheck) {
+                $checkStub = CheckStub::query()
+                    ->forBankAccount($bankAccount)
+                    ->active()
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                    ->first(fn (CheckStub $stub) => $stub->hasAvailableChecks());
+
+                if (! $checkStub) {
+                    throw ValidationException::withMessages([
+                        'cheque_number' => 'No active check stub with an available number is registered for this bank account.',
+                    ]);
+                }
+
+                $serialNumber = $checkStub->consumeNextNumber();
+                $checkStub->save();
+            } elseif (blank($serialNumber) && $isAda) {
+                // ADA numbers are not drawn from a check range. The DV tracking
+                // number is unique and gives the payment a stable ledger serial.
+                $serialNumber = 'ADA-'.$voucher->tracking_number;
+            }
+
+            if (blank($serialNumber)) {
+                throw ValidationException::withMessages([
+                    'cheque_number' => 'Enter a cheque or ADA number.',
+                ]);
+            }
+
+            if (IssuedPayment::query()
+                ->where('bank_account_id', $bankAccount->getKey())
+                ->where('serial_number', $serialNumber)
+                ->exists()) {
+                throw ValidationException::withMessages([
+                    'cheque_number' => 'This cheque or ADA number has already been issued for the selected bank account.',
+                ]);
+            }
+
+            $actorId = $this->actorId($options);
+            $issuedAt = today();
+            $bankBalance = round((float) $bankAccount->balance, 2);
+            if ($bankBalance < $amount) {
+                throw ValidationException::withMessages([
+                    'bank_account_id' => 'The selected bank account has insufficient balance.',
+                ]);
+            }
+
+            $resultingBankBalance = round($bankBalance - $amount, 2);
+            $issuedPayment = IssuedPayment::create([
+                'disbursement_voucher_id' => $voucher->getKey(),
+                'mop_id' => $mop->getKey(),
+                'bank_account_id' => $bankAccount->getKey(),
+                'notice_of_cash_allocation_id' => $nca?->getKey(),
+                'check_stub_id' => $checkStub?->getKey(),
+                'fund_cluster_id' => $voucher->fund_cluster_id,
+                'serial_number' => $serialNumber,
+                'issued_at' => $issuedAt,
+                'amount' => $amount,
+                'payee' => $voucher->payee,
+                'dv_number' => $voucher->dv_number,
+                'ors_burs' => $voucher->ors_burs,
+                'responsibility_center' => $voucher->responsibility_center,
+                'status' => IssuedPayment::STATUS_ISSUED,
+                'source' => IssuedPayment::SOURCE_CASHIER,
+                'affects_balance' => true,
+                'posted_by_id' => $actorId,
+                'issued_by_id' => $actorId,
+            ]);
+
+            $bankTransactionData = [
+                'transacted_at' => $issuedAt,
+                'amount' => $amount,
+                'operator' => BankAccountTransaction::OPERATOR_DECREASE,
+                'bank_account_id' => $bankAccount->getKey(),
+                'category' => BankAccountTransaction::CATEGORY_ISSUED_PAYMENT,
+                'resulting_balance' => $resultingBankBalance,
+                'posted_by_id' => $actorId,
+                'remarks' => 'Issued payment '.$serialNumber.' for DV '.($voucher->dv_number ?: $voucher->tracking_number).'.',
+            ];
+            $this->addLegacyBankOperation($bankTransactionData);
+
+            $bankTransaction = $issuedPayment->bank_account_transactions()->create($bankTransactionData);
+            $issuedPayment->update(['bank_account_transaction_id' => $bankTransaction->getKey()]);
+            $bankAccount->update(['balance' => $resultingBankBalance]);
+
+            if ($nca) {
+                $resultingNcaBalance = round((float) $nca->remaining_amount - $amount, 2);
+                $nca->update([
+                    'remaining_amount' => $resultingNcaBalance,
+                    'status' => $resultingNcaBalance <= 0 ? NoticeOfCashAllocation::STATUS_EXHAUSTED : NoticeOfCashAllocation::STATUS_ACTIVE,
+                ]);
+
+                $nca->transactions()->create([
+                    'bank_account_transaction_id' => $bankTransaction->getKey(),
+                    'issued_payment_id' => $issuedPayment->getKey(),
+                    'transacted_at' => $issuedAt,
+                    'type' => NoticeOfCashAllocationTransaction::TYPE_ISSUED_PAYMENT,
+                    'amount' => $amount,
+                    'operator' => BankAccountTransaction::OPERATOR_DECREASE,
+                    'resulting_balance' => $resultingNcaBalance,
+                    'posted_by_id' => $actorId,
+                    'remarks' => 'Issued payment '.$serialNumber.' for DV '.($voucher->dv_number ?: $voucher->tracking_number).'.',
+                ]);
+            }
+
             $voucher->update([
                 'mop_id' => $mopId,
-                'cheque_number' => $chequeNumber,
+                'cheque_number' => $serialNumber,
                 'current_step_id' => $voucher->current_step_id + 1000,
                 'cheque_number_added_at' => now(),
             ]);
@@ -437,6 +632,149 @@ class DisbursementVoucherWorkflowService
 
             return $voucher->refresh();
         });
+    }
+
+    public function cancelChequeAda(DisbursementVoucher $voucher, ?string $remarks = null, array $options = []): DisbursementVoucher
+    {
+        $voucher->refresh();
+        if ($voucher->current_step_id != 18000 || blank($voucher->cheque_number) || $voucher->for_cancellation || filled($voucher->pending_return_step_id)) {
+            throw ValidationException::withMessages([
+                'voucher' => 'This disbursement voucher cannot cancel its cheque/ADA from the current state.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($voucher, $remarks, $options) {
+            $voucher = DisbursementVoucher::query()
+                ->lockForUpdate()
+                ->findOrFail($voucher->getKey());
+
+            if ($voucher->current_step_id != 18000 || blank($voucher->cheque_number) || $voucher->for_cancellation || filled($voucher->pending_return_step_id)) {
+                throw ValidationException::withMessages([
+                    'voucher' => 'This disbursement voucher cannot cancel its cheque/ADA from the current state.',
+                ]);
+            }
+
+            $payment = IssuedPayment::query()
+                ->where('disbursement_voucher_id', $voucher->getKey())
+                ->where('status', IssuedPayment::STATUS_ISSUED)
+                ->lockForUpdate()
+                ->first();
+            $actorId = $this->actorId($options);
+
+            if ($payment && $payment->affects_balance) {
+                $bankAccount = BankAccount::query()->lockForUpdate()->findOrFail($payment->bank_account_id);
+                $resultingBankBalance = round((float) $bankAccount->balance + (float) $payment->amount, 2);
+                $bankTransactionData = [
+                    'transacted_at' => today(),
+                    'amount' => $payment->amount,
+                    'operator' => BankAccountTransaction::OPERATOR_INCREASE,
+                    'bank_account_id' => $bankAccount->getKey(),
+                    'category' => BankAccountTransaction::CATEGORY_REVERSION,
+                    'resulting_balance' => $resultingBankBalance,
+                    'posted_by_id' => $actorId,
+                    'remarks' => 'Reversion of cancelled payment '.$payment->serial_number.'.',
+                ];
+                $this->addLegacyBankOperation($bankTransactionData);
+
+                $bankTransaction = $payment->bank_account_transactions()->create($bankTransactionData);
+                $bankAccount->update(['balance' => $resultingBankBalance]);
+
+                if ($payment->notice_of_cash_allocation_id) {
+                    $nca = NoticeOfCashAllocation::query()->lockForUpdate()->findOrFail($payment->notice_of_cash_allocation_id);
+                    $resultingNcaBalance = round((float) $nca->remaining_amount + (float) $payment->amount, 2);
+                    $nca->update([
+                        'remaining_amount' => $resultingNcaBalance,
+                        'status' => NoticeOfCashAllocation::STATUS_ACTIVE,
+                    ]);
+                    $nca->transactions()->create([
+                        'bank_account_transaction_id' => $bankTransaction->getKey(),
+                        'issued_payment_id' => $payment->getKey(),
+                        'transacted_at' => today(),
+                        'type' => NoticeOfCashAllocationTransaction::TYPE_REVERSION,
+                        'amount' => $payment->amount,
+                        'operator' => BankAccountTransaction::OPERATOR_INCREASE,
+                        'resulting_balance' => $resultingNcaBalance,
+                        'posted_by_id' => $actorId,
+                        'remarks' => 'Reversion of cancelled payment '.$payment->serial_number.'.',
+                    ]);
+                }
+            }
+
+            if ($payment) {
+                $payment->update([
+                    'status' => IssuedPayment::STATUS_CANCELLED,
+                    'cancelled_at' => now(),
+                    'cancelled_by_id' => $actorId,
+                    'cancellation_remarks' => $remarks,
+                ]);
+            }
+
+            $voucher->update([
+                'for_cancellation' => true,
+                'cancelled_at' => now(),
+                'cancellation_remarks' => $remarks,
+            ]);
+            $description = 'Cheque/ADA cancelled.';
+            if ($options['is_oic'] ?? false) {
+                $description .= "\nOIC: ".$this->baseActorName($options['actor'] ?? null).'.';
+            }
+            $voucher->activity_logs()->create([
+                'description' => $description,
+                'remarks' => $remarks,
+            ]);
+
+            return $voucher->refresh();
+        });
+    }
+
+    private function voucherPaymentAmount(DisbursementVoucher $voucher): float
+    {
+        $voucher->loadMissing('disbursement_voucher_particulars');
+        $amount = (float) $voucher->disbursement_voucher_particulars->sum('final_amount');
+
+        // Legacy and imported vouchers may not have particulars loaded or may
+        // only carry the denormalized gross amount.
+        if ($amount <= 0 && filled($voucher->gross_amount)) {
+            $amount = (float) $voucher->gross_amount;
+        }
+
+        return round($amount, 2);
+    }
+
+    private function isCheckMop(Mop $mop): bool
+    {
+        $name = strtolower(trim((string) $mop->name));
+
+        return filled($name)
+            ? str_contains($name, 'check')
+            : in_array((int) $mop->getKey(), ModeOfPayments::getCheckPayments(), true);
+    }
+
+    private function isAdaMop(Mop $mop): bool
+    {
+        $name = strtolower(trim((string) $mop->name));
+
+        return filled($name)
+            ? str_contains($name, 'ada')
+            : (int) $mop->getKey() === ModeOfPayments::ADA->value;
+    }
+
+    private function actorId(array $options): ?int
+    {
+        $actor = $options['actor'] ?? null;
+
+        return $actor?->getKey() ?? auth()->id();
+    }
+
+    private function addLegacyBankOperation(array &$data): void
+    {
+        // The operation column was removed by the cashier ledger migration. Keep
+        // compatibility with installations that have not applied that migration.
+        if (Schema::hasColumn('bank_account_transactions', 'operation')) {
+            $data['operation'] = ($data['operator'] ?? 0) === BankAccountTransaction::OPERATOR_DECREASE
+                ? BankAccountTransaction::OPERATION_DEBIT
+                : BankAccountTransaction::OPERATION_CREDIT;
+        }
     }
 
     public function canBeForwarded(DisbursementVoucher $voucher): bool

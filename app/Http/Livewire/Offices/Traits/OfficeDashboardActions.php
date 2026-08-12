@@ -25,6 +25,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Support\Exceptions\Halt;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\EditAction;
@@ -42,6 +43,40 @@ trait OfficeDashboardActions
     public function isOic()
     {
         return false;
+    }
+
+    protected function mountedTableActionValidationErrors(ValidationException $exception): array
+    {
+        $errors = [];
+
+        foreach ($exception->errors() as $field => $messages) {
+            $mountedField = str_starts_with($field, 'mountedTableActionData.')
+                ? $field
+                : 'mountedTableActionData.'.$field;
+            $errors[$mountedField] = (array) $messages;
+        }
+
+        return $errors;
+    }
+
+    protected function haltMountedTableActionForValidation(ValidationException $exception): never
+    {
+        $errors = $this->mountedTableActionValidationErrors($exception);
+
+        foreach ($errors as $field => $messages) {
+            foreach ($messages as $message) {
+                $this->addError($field, $message);
+            }
+        }
+
+        Notification::make()
+            ->title('Cheque/ADA could not be issued.')
+            ->body(collect($errors)->flatten()->unique()->implode("\n"))
+            ->danger()
+            ->persistent()
+            ->send();
+
+        throw new Halt;
     }
 
     /**
@@ -244,6 +279,7 @@ trait OfficeDashboardActions
                         'log_number' => $record->log_number,
                         'items' => collect($documents)->map(function ($doc) use ($existingByDoc) {
                             $existing = $existingByDoc->get($doc);
+
                             return [
                                 'document' => $doc,
                                 'status' => $existing['status'] ?? 'required',
@@ -372,7 +408,8 @@ trait OfficeDashboardActions
                     }
                     // ========== SMS NOTIFICATION END ==========
 
-                    $this->emit('refresh');Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
+                    $this->emit('refresh');
+                    Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
                 })
                 ->visible(function ($record) {
                     if (! $record) {
@@ -409,7 +446,8 @@ trait OfficeDashboardActions
                     app(DisbursementVoucherWorkflowService::class)->releaseReturn($record, auth()->user(), $data['release_log_number'], $data['release_note'] ?? null, [
                         'is_oic' => $this->isOic(),
                     ]);
-                    $this->emit('refresh');Notification::make()->title('Document released successfully.')->success()->send();
+                    $this->emit('refresh');
+                    Notification::make()->title('Document released successfully.')->success()->send();
                 })
                 ->visible(fn ($record) => $record && filled($record->pending_return_step_id)),
         ];
@@ -445,12 +483,16 @@ trait OfficeDashboardActions
     {
         return [
             Action::make('cheque_ada')->label('Cheque/ADA')->button()->action(function ($record, $data) {
-                $record = app(DisbursementVoucherWorkflowService::class)->makeChequeAda($record, $data['mop_id'], '', [
-                    'bank_account_id' => $data['bank_account_id'],
-                    'notice_of_cash_allocation_id' => $data['notice_of_cash_allocation_id'] ?? null,
-                    'is_oic' => $this->isOic(),
-                    'actor' => auth()->user(),
-                ]);
+                try {
+                    $record = app(DisbursementVoucherWorkflowService::class)->makeChequeAda($record, $data['mop_id'], '', [
+                        'bank_account_id' => $data['bank_account_id'],
+                        'notice_of_cash_allocation_id' => $data['notice_of_cash_allocation_id'] ?? null,
+                        'is_oic' => $this->isOic(),
+                        'actor' => auth()->user(),
+                    ]);
+                } catch (ValidationException $exception) {
+                    $this->haltMountedTableActionForValidation($exception);
+                }
                 $record->refresh();
 
                 $receiver = $record->user;
@@ -696,7 +738,8 @@ trait OfficeDashboardActions
                 app(DisbursementVoucherWorkflowService::class)->receive($record, auth()->user(), [
                     'is_oic' => $this->isOic(),
                 ]);
-                $this->emit('refresh');Notification::make()->title('Document Received')->success()->send();
+                $this->emit('refresh');
+                Notification::make()->title('Document Received')->success()->send();
             })
                 ->visible(function ($record) {
                     if (! $record) {
