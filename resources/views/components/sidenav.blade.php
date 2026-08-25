@@ -104,8 +104,9 @@
                     auth()->user()->employee_information->office_id == 51 &&
                     auth()->user()->employee_information->position_id == 34;
                 $is_accountant =
-                    auth()->user()->employee_information->office_id == 3 &&
-                    auth()->user()->employee_information->position_id == 15;
+                    (auth()->user()->employee_information->position_id == 15 &&
+                        auth()->user()->employee_information->office_id == 3) ||
+                    auth()->user()->employee_information->position_id == 41;
                 $is_auditor =
                     auth()->user()->employee_information->office_id == 61 &&
                     auth()->user()->employee_information->position_id == 31;
@@ -265,8 +266,9 @@
         @php
             $isCustodian = auth()->user()->petty_cash_fund()->exists();
             $isAccountant =
-                auth()->user()->employee_information->position_id == 15 &&
-                auth()->user()->employee_information->office_id == 3;
+                (auth()->user()->employee_information->position_id == 15 &&
+                    auth()->user()->employee_information->office_id == 3) ||
+                auth()->user()->employee_information->position_id == 41;
         @endphp
         <!-- Expandable link section, show/hide based on state. -->
         <div class="space-y-1" class="origin-top-left" id="sub-menu-1" x-show='open'
@@ -581,8 +583,9 @@
                 </button>
                 @php
                     $isAccountant =
-                        auth()->user()->employee_information->position_id == 15 &&
-                        auth()->user()->employee_information->office_id == 3;
+                        (auth()->user()->employee_information->position_id == 15 &&
+                            auth()->user()->employee_information->office_id == 3) ||
+                        auth()->user()->employee_information->position_id == 41;
                 @endphp
                 <!-- Expandable link section, show/hide based on state. -->
                 <div class="space-y-1" class="origin-top-left" id="sub-menu-1" x-show='open'
