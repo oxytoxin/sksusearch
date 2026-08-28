@@ -22,8 +22,9 @@
                                 (auth()->user()->employee_information->position_id == 12 ||
                                     auth()->user()->employee_information->position_id == 38);
                             $isAccountant =
-                                auth()->user()->employee_information->office_id == 3 &&
-                                auth()->user()->employee_information->position_id == 15;
+                                (auth()->user()->employee_information->position_id == 15 &&
+                                    auth()->user()->employee_information->office_id == 3) ||
+                                auth()->user()->employee_information->position_id == 41;
                             $isSupplyChief =
                                 auth()->user()->employee_information->office_id == 49 &&
                                 auth()->user()->employee_information->position_id == 15;
@@ -32,7 +33,7 @@
                                 ->where('position_id', 15)
                                 ->first();
                             $accountant = App\Models\EmployeeInformation::where('office_id', 3)
-                                ->where('position_id', 15)
+                                ->where('position_id', [41])
                                 ->first();
                             $finance = App\Models\EmployeeInformation::where('office_id', 25)
                                 ->where('position_id', 12)
@@ -107,18 +108,22 @@
                             <p class="mt-1 text-sm text-primary-500 ">Title Group : {{ $record->categoryGroups->name }}
                             </p>
                         @endif
-                        {{-- <p class="mt-1 text-sm text-primary-500 ">Date Added : <span class="italic underline ml-2 text-red-600">To be added by accounting</span></p> --}}
+                        {{-- <p class="mt-1 text-sm text-primary-500 ">Date Added : <span
+                                class="italic underline ml-2 text-red-600">To be added by accounting</span></p> --}}
 
                         {{-- @if ($is_motorpool_head)
-                                <button class="italic underline ml-2" wire:click="$set('modifyDates',true)">(Click to modify)</button>
-                            @endif
+                        <button class="italic underline ml-2" wire:click="$set('modifyDates',true)">(Click to
+                            modify)</button>
+                        @endif
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Vehicle :
 
                             @if (($is_president || $is_motorpool_head) && $request->vehicle_id == null)
-                            <button class="italic underline ml-2" wire:click="$set('assignVehicleModal',true)">(Assign Vehicle)</button>
+                            <button class="italic underline ml-2" wire:click="$set('assignVehicleModal',true)">(Assign
+                                Vehicle)</button>
                             @elseif(($is_president || $is_motorpool_head) && $request->vehicle_id != null)
-                            <button class="italic underline ml-2" wire:click="$set('modifyVehicleModal',true)">(Click to Modify)</button>
+                            <button class="italic underline ml-2" wire:click="$set('modifyVehicleModal',true)">(Click to
+                                Modify)</button>
                             @endif
                         </p>
 
@@ -127,73 +132,89 @@
                         <p class="mt-1 text-sm text-primary-500">Driver :
 
                             @if ($is_motorpool_head && $request->driver_id != null)
-                            <button class="italic underline ml-2" wire:click="$set('modifyDriverModal',true)">(Click to modify)</button>
+                            <button class="italic underline ml-2" wire:click="$set('modifyDriverModal',true)">(Click to
+                                modify)</button>
                             @endif
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Passengers :
                             @foreach ($request->applicants()->get() as $index => $applicant)
-                                {{ $applicant->employee_information->full_name }}
-                                @if ($index < count($request->applicants()->get()) - 1)
-                                    ,
+                            {{ $applicant->employee_information->full_name }}
+                            @if ($index < count($request->applicants()->get()) - 1)
+                                ,
                                 @endif
-                            @endforeach
+                                @endforeach
                         </p>
                         <p class="mt-1 text-sm text-primary-500">Purpose : </p>
                         <p class="mt-1 text-sm whitespace-pre-line text-primary-500"></p>
                         @if ($is_president && $request->status == 'Pending')
-                            <div class="flex justify-between w-full mt-10">
-                                <span>&nbsp;</span>
-                                <div class="flex space-x-3">
-                                    <button class="flex text-sm text-primary-600 hover:text-primary-400" wire:click.prevent="approveRequest({{ $request->id }})">
-                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                                        </svg>
-                                        <span class="">Approve Vehicle Request</span>
-                                    </button>
-                                    <button class="flex text-sm text-red-500 hover:text-red-300" wire:click="$set('rejectModal',true)">
-                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                                        </svg>
-                                        <span class="">Reject Vehicle Request</span>
-                                    </button>
-                                </div>
+                        <div class="flex justify-between w-full mt-10">
+                            <span>&nbsp;</span>
+                            <div class="flex space-x-3">
+                                <button class="flex text-sm text-primary-600 hover:text-primary-400"
+                                    wire:click.prevent="approveRequest({{ $request->id }})">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <span class="">Approve Vehicle Request</span>
+                                </button>
+                                <button class="flex text-sm text-red-500 hover:text-red-300"
+                                    wire:click="$set('rejectModal',true)">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path
+                                            d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                                    </svg>
+                                    <span class="">Reject Vehicle Request</span>
+                                </button>
                             </div>
+                        </div>
                         @endif --}}
 
 
                         {{-- @if ($is_motorpool_head)
-                            @if ($request->driver_id == null && $request->vehicle_id != null)
-                                <a class="flex float-right mt-4 mx-2 px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2" wire:click="$set('assignDriverModal',true)" target="_blank">
-                                    <svg class="w-5 h-auto" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                    </svg>
+                        @if ($request->driver_id == null && $request->vehicle_id != null)
+                        <a class="flex float-right mt-4 mx-2 px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
+                            wire:click="$set('assignDriverModal',true)" target="_blank">
+                            <svg class="w-5 h-auto" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                            </svg>
 
-                                    <span class="pl-2">
-                                        Assign Driver
-                                </a>
-                            @endif --}}
+                            <span class="pl-2">
+                                Assign Driver
+                        </a>
+                        @endif --}}
 
                         {{-- @if ($request->vehicle_id == null)
-                        <a class="flex float-right mx-2 mt-4 px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2" wire:click="$set('assignVehicleModal',true)" target="_blank">
-                            <svg class="w-5 h-auto" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <a class="flex float-right mx-2 mt-4 px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
+                            wire:click="$set('assignVehicleModal',true)" target="_blank">
+                            <svg class="w-5 h-auto" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                                    d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                             </svg>
                             <span class="pl-2">
                                 Assign Vehicle
                         </a>
-                    @endif
-                    @if ($request->driver_id != null && $request->vehicle_id != null)
-                        <a class="flex float-right px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2" href="{{ route('motorpool.request.show', $request) }}" target="_blank">
+                        @endif
+                        @if ($request->driver_id != null && $request->vehicle_id != null)
+                        <a class="flex float-right px-4 py-2 text-sm rounded-full bg-primary-600 text-primary-100 hover:text-primary-100 hover:bg-primary-900 active:ring-primary-700 w-fit active:ring-2 active:ring-offset-2"
+                            href="{{ route('motorpool.request.show', $request) }}" target="_blank">
 
-                            <svg class="w-5 h-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg class="w-5 h-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <span class="pl-2">
                                 Print Driver's Trip Ticket
                             </span>
                         </a>
-                    @endif --}}
+                        @endif --}}
                     </div>
                 </div>
             </div>
@@ -212,19 +233,19 @@
                         <p class="mt-1 text-sm text-primary-500">Approval Status:
                             {{ $record->is_approved_finance ? 'Approved' : 'Pending' }}</p>
                         {{-- @if ($request->status == 'Approved')
-                            <p class="mt-1 text-sm text-primary-500">Date Approved:
+                        <p class="mt-1 text-sm text-primary-500">Date Approved:
 
-                            </p>
-                            <p class="mt-1 text-sm text-primary-500">Time Approved:
+                        </p>
+                        <p class="mt-1 text-sm text-primary-500">Time Approved:
 
-                            </p>
+                        </p>
                         @elseif($request->status == 'Rejected')
-                            <p class="mt-1 text-sm text-primary-500">Date Rejected:
+                        <p class="mt-1 text-sm text-primary-500">Date Rejected:
 
-                            </p>
-                            <p class="mt-1 text-sm text-primary-500">Time Rejected:
+                        </p>
+                        <p class="mt-1 text-sm text-primary-500">Time Rejected:
 
-                            </p>
+                        </p>
                         @endif --}}
 
                     </div>
@@ -266,7 +287,8 @@
                                                                     class="font-medium text-gray-900">{{ $timeline->user->employee_information->full_name }}</a>
                                                             </div>
                                                             <p class="mt-0.5 text-sm text-gray-500">Requested:
-                                                                {{ Carbon\Carbon::parse($record->created_at)->format('F d, Y h:i A') }}
+                                                                {{ Carbon\Carbon::parse($record->created_at)->format('F d, Y h:i
+                                                                                                                                                                                                                                                                                                                        A') }}
                                                             </p>
                                                         </div>
                                                         <div class="mt-2 text-sm text-gray-700">
@@ -305,7 +327,8 @@
                                                                 class="font-medium text-gray-900">Forwarded to
                                                                 Supply</a>
                                                             <p class="mt-0.5 text-sm text-gray-500">Forwarded:
-                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A') }}
+                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y
+                                                                                                                                                                                                                                                                                                                        h:i A') }}
                                                             </p>
                                                             <div class="mt-2 text-sm text-gray-700">
                                                                 <p class="italic">To be assigned with supply code</p>
@@ -336,7 +359,8 @@
                                                                     class="font-medium text-gray-900">{{ $timeline->user->employee_information->full_name }}</a>
                                                             </div>
                                                             <p class="mt-0.5 text-sm text-gray-500">Assigned:
-                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A') }}
+                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y
+                                                                                                                                                                                                                                                                                                                        h:i A') }}
                                                             </p>
                                                         </div>
                                                         <div class="mt-2 text-sm text-gray-700">
@@ -380,7 +404,8 @@
                                                                     {{ $timeline->user->employee_information->full_name }}</a>
                                                             </div>
                                                             <p class="mt-0.5 text-sm text-gray-500">Forwarded:
-                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A') }}
+                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y
+                                                                                                                                                                                                                                                                                                                        h:i A') }}
                                                             </p>
                                                         </div>
                                                         <div class="mt-2 text-sm text-gray-700">
@@ -422,7 +447,8 @@
                                                                     {{ $timeline->user->employee_information->full_name }}</a>
                                                             </div>
                                                             <p class="mt-0.5 text-sm text-gray-500">Forwarded:
-                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A') }}
+                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y
+                                                                                                                                                                                                                                                                                                                        h:i A') }}
                                                             </p>
                                                         </div>
                                                         <div class="mt-2 text-sm text-gray-700">
@@ -461,7 +487,8 @@
                                                                 class="font-medium text-gray-900">Forwarded to
                                                                 Accounting</a>
                                                             <p class="mt-0.5 text-sm text-gray-500">Forwarded:
-                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A') }}
+                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y
+                                                                                                                                                                                                                                                                                                                        h:i A') }}
                                                             </p>
                                                             <div class="mt-2 text-sm text-gray-700">
                                                                 <p class="italic">To be assigned with UACS Code,
@@ -493,7 +520,8 @@
                                                                     class="font-medium text-gray-900">{{ $timeline->user->employee_information->full_name }}</a>
                                                             </div>
                                                             <p class="mt-0.5 text-sm text-gray-500">Assigned:
-                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A') }}
+                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y
+                                                                                                                                                                                                                                                                                                                        h:i A') }}
                                                             </p>
                                                         </div>
                                                         <div class="mt-2 text-sm text-gray-700">
@@ -538,7 +566,8 @@
                                                                     {{ $timeline->user->employee_information->full_name }}</a>
                                                             </div>
                                                             <p class="mt-0.5 text-sm text-gray-500">Forwarded:
-                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A') }}
+                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y
+                                                                                                                                                                                                                                                                                                                        h:i A') }}
                                                             </p>
                                                         </div>
                                                         <div class="mt-2 text-sm text-gray-700">
@@ -580,7 +609,8 @@
                                                                     {{ $timeline->user->employee_information->full_name }}</a>
                                                             </div>
                                                             <p class="mt-0.5 text-sm text-gray-500">Forwarded:
-                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y h:i A') }}
+                                                                {{ Carbon\Carbon::parse($timeline->created_at)->format('F d, Y
+                                                                                                                                                                                                                                                                                                                        h:i A') }}
                                                             </p>
                                                         </div>
                                                         <div class="mt-2 text-sm text-gray-700">
@@ -597,67 +627,80 @@
                                 @endforelse
 
                                 {{-- <li>
-                                <div class="relative pb-8">
-                                  <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                                  <div class="relative flex items-start space-x-3">
-                                    <div>
-                                      <div class="relative px-1">
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white">
-                                          <svg class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                                            <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-5.5-2.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 12a5.99 5.99 0 0 0-4.793 2.39A6.483 6.483 0 0 0 10 16.5a6.483 6.483 0 0 0 4.793-2.11A5.99 5.99 0 0 0 10 12Z" clip-rule="evenodd" />
-                                          </svg>
+                                    <div class="relative pb-8">
+                                        <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200"
+                                            aria-hidden="true"></span>
+                                        <div class="relative flex items-start space-x-3">
+                                            <div>
+                                                <div class="relative px-1">
+                                                    <div
+                                                        class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white">
+                                                        <svg class="h-5 w-5 text-gray-500" viewBox="0 0 20 20"
+                                                            fill="currentColor" aria-hidden="true" data-slot="icon">
+                                                            <path fill-rule="evenodd"
+                                                                d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-5.5-2.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 12a5.99 5.99 0 0 0-4.793 2.39A6.483 6.483 0 0 0 10 16.5a6.483 6.483 0 0 0 4.793-2.11A5.99 5.99 0 0 0 10 12Z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="min-w-0 flex-1 py-1.5">
+                                                <div class="text-sm text-gray-500">
+                                                    <a href="#" class="font-medium text-gray-900">Hilary Mahy</a>
+                                                    assigned
+                                                    <a href="#" class="font-medium text-gray-900">Kristin Watson</a>
+                                                    <span class="whitespace-nowrap">2d ago</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                      </div>
                                     </div>
-                                    <div class="min-w-0 flex-1 py-1.5">
-                                      <div class="text-sm text-gray-500">
-                                        <a href="#" class="font-medium text-gray-900">Hilary Mahy</a>
-                                        assigned
-                                        <a href="#" class="font-medium text-gray-900">Kristin Watson</a>
-                                        <span class="whitespace-nowrap">2d ago</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </li>
-                              <li>
-                                <div class="relative pb-8">
-                                  <div class="relative flex items-start space-x-3">
-                                    <div>
-                                      <div class="relative px-1">
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white">
-                                          <svg class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                                            <path fill-rule="evenodd" d="M4.5 2A2.5 2.5 0 0 0 2 4.5v3.879a2.5 2.5 0 0 0 .732 1.767l7.5 7.5a2.5 2.5 0 0 0 3.536 0l3.878-3.878a2.5 2.5 0 0 0 0-3.536l-7.5-7.5A2.5 2.5 0 0 0 8.38 2H4.5ZM5 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd" />
-                                          </svg>
+                                </li>
+                                <li>
+                                    <div class="relative pb-8">
+                                        <div class="relative flex items-start space-x-3">
+                                            <div>
+                                                <div class="relative px-1">
+                                                    <div
+                                                        class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white">
+                                                        <svg class="h-5 w-5 text-gray-500" viewBox="0 0 20 20"
+                                                            fill="currentColor" aria-hidden="true" data-slot="icon">
+                                                            <path fill-rule="evenodd"
+                                                                d="M4.5 2A2.5 2.5 0 0 0 2 4.5v3.879a2.5 2.5 0 0 0 .732 1.767l7.5 7.5a2.5 2.5 0 0 0 3.536 0l3.878-3.878a2.5 2.5 0 0 0 0-3.536l-7.5-7.5A2.5 2.5 0 0 0 8.38 2H4.5ZM5 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="min-w-0 flex-1 py-0">
+                                                <div class="text-sm leading-8 text-gray-500">
+                                                    <span class="mr-0.5">
+                                                        <a href="#" class="font-medium text-gray-900">Hilary Mahy</a>
+                                                        added tags
+                                                    </span>
+                                                    <span class="mr-0.5">
+                                                        <a href="#"
+                                                            class="inline-flex items-center gap-x-1.5 rounded-full px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
+                                                            <svg class="h-1.5 w-1.5 fill-red-500" viewBox="0 0 6 6"
+                                                                aria-hidden="true">
+                                                                <circle cx="3" cy="3" r="3" />
+                                                            </svg>
+                                                            Bug
+                                                        </a>
+                                                        <a href="#"
+                                                            class="inline-flex items-center gap-x-1.5 rounded-full px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
+                                                            <svg class="h-1.5 w-1.5 fill-indigo-500" viewBox="0 0 6 6"
+                                                                aria-hidden="true">
+                                                                <circle cx="3" cy="3" r="3" />
+                                                            </svg>
+                                                            Accessibility
+                                                        </a>
+                                                    </span>
+                                                    <span class="whitespace-nowrap">6h ago</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                      </div>
                                     </div>
-                                    <div class="min-w-0 flex-1 py-0">
-                                      <div class="text-sm leading-8 text-gray-500">
-                                        <span class="mr-0.5">
-                                          <a href="#" class="font-medium text-gray-900">Hilary Mahy</a>
-                                          added tags
-                                        </span>
-                                        <span class="mr-0.5">
-                                          <a href="#" class="inline-flex items-center gap-x-1.5 rounded-full px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
-                                            <svg class="h-1.5 w-1.5 fill-red-500" viewBox="0 0 6 6" aria-hidden="true">
-                                              <circle cx="3" cy="3" r="3" />
-                                            </svg>
-                                            Bug
-                                          </a>
-                                          <a href="#" class="inline-flex items-center gap-x-1.5 rounded-full px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
-                                            <svg class="h-1.5 w-1.5 fill-indigo-500" viewBox="0 0 6 6" aria-hidden="true">
-                                              <circle cx="3" cy="3" r="3" />
-                                            </svg>
-                                            Accessibility
-                                          </a>
-                                        </span>
-                                        <span class="whitespace-nowrap">6h ago</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </li> --}}
+                                </li> --}}
                             </ul>
                         </div>
                     </div>
@@ -669,7 +712,7 @@
                             <h3 class="flex justify-between text-sm font-semibold text-primary-800">
                                 <span class="absolute inset-0" aria-hidden="true"></span>
 
-                                    <span class="flex uppercase"></span>
+                                <span class="flex uppercase"></span>
 
                     <li class="py-5">
                         <div class="relative focus-within:ring-2 focus-within:ring-indigo-500">
@@ -872,7 +915,8 @@
         <div class="grid grid-cols-1 sm:grid-cols-1 mb-1">
             <div class="col-span-1">
                 <label for="requested_budget_category"
-                    class="block text-sm font-medium leading-6 text-gray-900">Budget Category</label>
+                    class="block text-sm font-medium leading-6 text-gray-900">Budget
+                    Category</label>
                 <div class="mt-2">
                     <select id="requested_budget_category" wire:model="requested_budget_category"
                         name="requested_budget_category" autocomplete="country-name"
