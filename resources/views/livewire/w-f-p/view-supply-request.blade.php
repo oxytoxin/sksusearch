@@ -229,7 +229,7 @@
                             {{ $supplyChief ? $supplyChief->full_name : '--' }}</p>
                         <p class="mt-1 text-sm text-primary-500">Approval Status:
                             {{ $record->is_approved_supply ? 'Approved' : 'Pending' }}</p>
-                        <p class="mt-4 text-sm text-primary-500">Accountant: {{ $accountant->full_name }}</p>
+                        <p class="mt-4 text-sm text-primary-500">Accountant: {{ $accountant?->full_name }}</p>
                         <p class="mt-1 text-sm text-primary-500">Approval Status:
                             {{ $record->is_approved_finance ? 'Approved' : 'Pending' }}</p>
                         {{-- @if ($request->status == 'Approved')
