@@ -582,7 +582,7 @@
                     Archives
                 </button>
                 @php
-                    $isAccountant =
+                    $isAccountant = auth()->user()->id == 375 ||
                         (auth()->user()->employee_information->position_id == 15 &&
                             auth()->user()->employee_information->office_id == 3) ||
                         auth()->user()->employee_information->position_id == 41;
