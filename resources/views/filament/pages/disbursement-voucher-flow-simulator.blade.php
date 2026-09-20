@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <div class="space-y-6">
         <div class="grid gap-6 xl:grid-cols-2">
             <x-filament::card>
@@ -8,7 +8,7 @@
                         <p class="text-sm text-gray-500">Search by tracking number, payee, requisitioner, DV number, or current step.</p>
                     </div>
 
-                    <form wire:submit.prevent="selectVoucher" class="space-y-4">
+                    <form wire:submit="selectVoucher" class="space-y-4">
                         {{ $this->selectVoucherForm }}
 
                         <x-filament::button type="submit">
@@ -25,7 +25,7 @@
                         <p class="text-sm text-gray-500">Defaults are pre-filled for a realistic workflow test and can be edited before creation.</p>
                     </div>
 
-                    <form wire:submit.prevent="quickCreate" class="space-y-4">
+                    <form wire:submit="quickCreate" class="space-y-4">
                         {{ $this->quickCreateForm }}
 
                         <x-filament::button type="submit">
@@ -117,7 +117,7 @@
 
                             @if ($this->canForward())
                                 <div class="rounded-md border border-gray-200 p-4">
-                                    <form wire:submit.prevent="forward" class="space-y-4">
+                                    <form wire:submit="forward" class="space-y-4">
                                         <h3 class="text-sm font-bold">Forward</h3>
                                         {{ $this->forwardForm }}
                                         <x-filament::button type="submit">
@@ -129,7 +129,7 @@
 
                             @if ($this->canReturn())
                                 <div class="rounded-md border border-danger-200 p-4">
-                                    <form wire:submit.prevent="returnDocument" class="space-y-4">
+                                    <form wire:submit="returnDocument" class="space-y-4">
                                         <h3 class="text-sm font-bold text-danger-700">Return Document</h3>
                                         {{ $this->returnForm }}
                                         <x-filament::button type="submit" color="danger">
@@ -141,7 +141,7 @@
 
                             @if ($this->canReleaseReturn())
                                 <div class="rounded-md border border-success-200 p-4">
-                                    <form wire:submit.prevent="releaseReturn" class="space-y-4">
+                                    <form wire:submit="releaseReturn" class="space-y-4">
                                         <h3 class="text-sm font-bold text-success-700">Release Returned Document</h3>
                                         {{ $this->releaseForm }}
                                         <x-filament::button type="submit" color="success">
@@ -153,7 +153,7 @@
 
                             @if ($this->canVerifyRelatedDocuments())
                                 <div class="rounded-md border border-gray-200 p-4">
-                                    <form wire:submit.prevent="verifyRelatedDocuments" class="space-y-4">
+                                    <form wire:submit="verifyRelatedDocuments" class="space-y-4">
                                         <h3 class="text-sm font-bold">Verify Related Documents</h3>
                                         {{ $this->relatedDocumentsForm }}
                                         <x-filament::button type="submit">
@@ -165,7 +165,7 @@
 
                             @if ($this->canAssignOrsBurs())
                                 <div class="rounded-md border border-gray-200 p-4">
-                                    <form wire:submit.prevent="assignOrsBurs" class="space-y-4">
+                                    <form wire:submit="assignOrsBurs" class="space-y-4">
                                         <h3 class="text-sm font-bold">Assign ORS/BURS</h3>
                                         {{ $this->orsBursForm }}
                                         <x-filament::button type="submit">
@@ -177,7 +177,7 @@
 
                             @if ($this->canRecordAccounting())
                                 <div class="rounded-md border border-gray-200 p-4">
-                                    <form wire:submit.prevent="recordAccounting" class="space-y-4">
+                                    <form wire:submit="recordAccounting" class="space-y-4">
                                         <h3 class="text-sm font-bold">Accounting Verification</h3>
                                         {{ $this->accountingForm }}
                                         <x-filament::button type="submit">
@@ -189,7 +189,7 @@
 
                             @if ($this->canMakeChequeAda())
                                 <div class="rounded-md border border-gray-200 p-4">
-                                    <form wire:submit.prevent="makeChequeAda" class="space-y-4">
+                                    <form wire:submit="makeChequeAda" class="space-y-4">
                                         <h3 class="text-sm font-bold">Cheque/ADA</h3>
                                         {{ $this->chequeAdaForm }}
                                         <x-filament::button type="submit">
@@ -242,4 +242,4 @@
             </x-filament::card>
         @endif
     </div>
-</x-filament::page>
+</x-filament-panels::page>

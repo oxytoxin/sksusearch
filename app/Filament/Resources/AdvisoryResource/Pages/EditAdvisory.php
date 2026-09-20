@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\AdvisoryResource\Pages;
 
 use App\Filament\Resources\AdvisoryResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditAdvisory extends EditRecord
@@ -17,7 +17,7 @@ class EditAdvisory extends EditRecord
         return $data;
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make(),

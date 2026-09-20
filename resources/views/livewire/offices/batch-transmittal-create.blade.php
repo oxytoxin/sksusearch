@@ -16,7 +16,7 @@
             <div class="flex items-center gap-2">
                 <span class="font-semibold text-gray-600">To:</span>
                 @if (count($availableDestinations) > 1)
-                    <select wire:model="destination" class="rounded-md border-gray-300 text-sm">
+                    <select wire:model.live="destination" class="rounded-md border-gray-300 text-sm">
                         <option value="">-- Select Destination --</option>
                         @foreach ($availableDestinations as $key => $label)
                             <option value="{{ $key }}">{{ $label }}</option>
@@ -32,7 +32,7 @@
     {{-- Scan input --}}
     <div class="rounded-lg border border-gray-300 bg-white p-4 shadow-sm">
         <input class="w-full rounded-md border-gray-300 py-2" type="text"
-               wire:model.lazy="scanInput"
+               wire:model.blur="scanInput"
                placeholder="Scan QR / Enter tracking number to add DV to batch">
         <p class="mt-1 text-xs text-blue-600"><strong class="italic">Tip:</strong> Click the input field, then scan the QR code.</p>
     </div>
@@ -75,7 +75,7 @@
                             <td class="px-3 py-2">
                                 @if (in_array($dv->id, $selectedDvs))
                                     <input type="text"
-                                           wire:model.lazy="dvRemarks.{{ $dv->id }}"
+                                           wire:model.blur="dvRemarks.{{ $dv->id }}"
                                            class="w-full rounded-md border-gray-300 text-xs"
                                            placeholder="Optional remarks">
                                 @endif

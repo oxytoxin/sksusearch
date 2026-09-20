@@ -13,7 +13,6 @@
     use App\Models\FundCluster;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Filters\Filter;
-    use Filament\Tables\Filters\Layout;
     use Filament\Forms\Components\Select;
     use Filament\Tables\Contracts\HasTable;
     use Filament\Forms\Components\TextInput;
@@ -21,13 +20,18 @@
     use Filament\Tables\Actions\ActionGroup;
     use Filament\Tables\Filters\SelectFilter;
     use Illuminate\Database\Eloquent\Builder;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Actions\ViewAction;
     use Filament\Tables\Columns\ViewColumn;
 
-    class FundAllocationQ1 extends Component implements HasTable
+    class FundAllocationQ1 extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable;
+        use InteractsWithForms;
+        use InteractsWithTable {
+            table as baseTable;
+        }
 
         public $wfp_type;
         public $fund_cluster;
@@ -204,9 +208,10 @@
             ];
         }
 
-        protected function getTableFiltersLayout(): ?string
+        public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
         {
-            return Layout::AboveContent;
+            return $this->baseTable($table)
+                ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
         }
 
         protected function getTableFilters(): array

@@ -11,8 +11,9 @@
     use Filament\Forms\Components\TextInput;
     use Livewire\Component;
     use Filament\Tables;
-    use Filament\Tables\Concerns\InteractsWithTable;
-    use Filament\Tables\Filters\Layout;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Filters\SelectFilter;
@@ -20,10 +21,10 @@
     use Filament\Notifications\Notification;
     use Filament\Tables\Actions\DeleteAction;
 
-    class AssignPersonnel extends Component implements HasTable
+    class AssignPersonnel extends Component implements HasForms, HasTable
     {
         public $fund_cluster;
-        use InteractsWithTable;
+        use InteractsWithForms, InteractsWithTable;
 
         public $costCenters = [];
         public $officesIds = [];

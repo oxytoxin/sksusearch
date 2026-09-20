@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\PriceListDocumentResource\Pages;
 
 use App\Filament\Resources\PriceListDocumentResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use App\Models\PriceListDocument;
 use Filament\Resources\Pages\ListRecords;
 
@@ -12,7 +12,7 @@ class ListPriceListDocuments extends ListRecords
     protected static string $resource = PriceListDocumentResource::class;
 
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

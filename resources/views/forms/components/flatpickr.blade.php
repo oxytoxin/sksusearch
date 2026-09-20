@@ -1,4 +1,4 @@
-<x-forms::field-wrapper :id="$getId()" :label="$getLabel()" :label-sr-only="$isLabelHidden()" :helper-text="$getHelperText()" :hint="$getHint()" :hint-icon="$getHintIcon()" :required="$isRequired()" :state-path="$getStatePath()">
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
     <div wire:ignore>
         @php
             $altFormat = '';
@@ -12,13 +12,13 @@
         <input type="text" placeholder="{{ $getPlaceholder() }}"
             {{ $attributes->class([
                 'block w-full transition duration-75 rounded-lg shadow-sm focus:border-primary-600 focus:ring-1 focus:ring-inset focus:ring-primary-600 disabled:opacity-70',
-                'dark:bg-gray-700 dark:text-white dark:focus:border-primary-600' => config('forms.dark_mode'),
+                'dark:bg-gray-700 dark:text-white dark:focus:border-primary-600',
                 'border-gray-300' => !$errors->has($getStatePath()),
-                'dark:border-gray-600' => !$errors->has($getStatePath()) && config('forms.dark_mode'),
+                'dark:border-gray-600' => !$errors->has($getStatePath()),
                 'border-danger-600 ring-danger-600' => $errors->has($getStatePath()),
             ]) }}
             x-data="{
-                value: @entangle($getStatePath()),
+                value: @entangle($getStatePath()).live,
                 instance: undefined,
                 init() {
                     $watch('value', value => this.instance.setDate(value, false));
@@ -33,4 +33,4 @@
                 }
             }" x-model.throttle="value" />
     </div>
-</x-forms::field-wrapper>
+</x-dynamic-component>

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CategoryItemBudgetResource\Pages;
 
 use App\Filament\Resources\CategoryItemBudgetResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListCategoryItemBudgets extends ListRecords
@@ -13,7 +13,7 @@ class ListCategoryItemBudgets extends ListRecords
     public static ?string $title = 'Account Title - Budget';
 
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

@@ -64,6 +64,6 @@ class PromptContactNumber extends Component
             return redirect()->route('requisitioner.dashboard');
         }
 
-        $this->dispatchBrowserEvent('contact-number-updated');
+        $this->dispatch('contact-number-updated');
     }
 }

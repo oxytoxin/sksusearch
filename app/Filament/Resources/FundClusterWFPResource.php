@@ -4,8 +4,8 @@
 
     use Filament\Forms;
     use Filament\Tables;
-    use Filament\Resources\Form;
-    use Filament\Resources\Table;
+    use Filament\Forms\Form;
+    use Filament\Tables\Table;
     use App\Models\FundCluster;
     use Filament\Forms\Components\Select;
     use Filament\Resources\Resource;

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\SupplyResource\Pages;
 
 use App\Filament\Resources\SupplyResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSupply extends CreateRecord

@@ -1,1 +1,1 @@
-<x-filament-support::button wire:target="save" wire:click='save'>Save</x-filament-support::button>
+<x-filament::button wire:target="save" wire:click='save'>Save</x-filament::button>

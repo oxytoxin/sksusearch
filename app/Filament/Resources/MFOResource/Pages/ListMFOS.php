@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\MFOResource\Pages;
 
 use App\Filament\Resources\MFOResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListMFOS extends ListRecords
@@ -12,7 +12,7 @@ class ListMFOS extends ListRecords
 
     protected static ?string $title = 'MFO';
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

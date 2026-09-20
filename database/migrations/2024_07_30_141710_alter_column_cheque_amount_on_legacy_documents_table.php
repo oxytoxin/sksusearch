@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('legacy_documents', function (Blueprint $table) {
-              $table->bigInteger('cheque_amount')->change();
+            $table->bigInteger('cheque_amount')->nullable()->after('cheque_date')->change();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('legacy_documents', function (Blueprint $table) {
-            $table->integer('cheque_amount')->change();
+            $table->integer('cheque_amount')->nullable()->after('cheque_date')->change();
         });
     }
 };

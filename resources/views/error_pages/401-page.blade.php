@@ -17,6 +17,7 @@
   
       <!-- Scripts -->
        @livewireStyles
+       @livewireScriptConfig
   </head>
   
   <body class="h-screen bg-slate-800">
@@ -49,9 +50,7 @@
             </div>
       </div>
       @stack('modals')
-  
-          @livewireScripts
+
   </body>
-  
+
   </html>
-  

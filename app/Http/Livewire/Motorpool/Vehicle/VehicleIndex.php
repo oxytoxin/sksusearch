@@ -4,14 +4,16 @@ namespace App\Http\Livewire\Motorpool\Vehicle;
 
 use App\Models\Vehicle;
 use Filament\Tables;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\Action;
 use Livewire\Component;
 
-class VehicleIndex extends Component implements HasTable
+class VehicleIndex extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     protected function getTableQuery()
     {

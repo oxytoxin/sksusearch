@@ -13,16 +13,21 @@
     use Filament\Tables\Actions\ActionGroup;
     use Filament\Tables\Actions\ViewAction;
     use Filament\Tables\Columns\TextColumn;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
     use Filament\Tables\Filters\SelectFilter;
     use Illuminate\Support\Facades\DB;
     use Illuminate\Support\HtmlString;
     use Livewire\Component;
 
-    class OicSignatoryLiquidationReports extends Component implements HasTable
+    class OicSignatoryLiquidationReports extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable;
+        use InteractsWithForms;
+        use InteractsWithTable {
+            table as baseTable;
+        }
 
         protected function getTableQuery()
         {
@@ -56,14 +61,11 @@
             ];
         }
 
-        protected function getTableFiltersLayout(): ?string
+        public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
         {
-            return \Filament\Tables\Filters\Layout::AboveContent;
-        }
-
-        protected function getTableFiltersFormColumns(): int
-        {
-            return 2;
+            return $this->baseTable($table)
+                ->filtersFormColumns(2)
+                ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
         }
 
         public function getTableActions()

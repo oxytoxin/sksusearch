@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\MFOResource\Pages;
 
 use App\Filament\Resources\MFOResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditMFO extends EditRecord
 {
     protected static string $resource = MFOResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
            // Actions\DeleteAction::make(),

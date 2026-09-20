@@ -6,9 +6,9 @@ use App\Filament\Resources\DisbursementVoucherStepResource\Pages;
 use App\Filament\Resources\DisbursementVoucherStepResource\RelationManagers;
 use App\Models\DisbursementVoucherStep;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -17,7 +17,7 @@ class DisbursementVoucherStepResource extends Resource
 {
     protected static ?string $model = DisbursementVoucherStep::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 20;
     protected static ?string $navigationGroup = 'Miscellaneous';

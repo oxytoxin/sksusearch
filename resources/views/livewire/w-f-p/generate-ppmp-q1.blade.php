@@ -39,7 +39,7 @@
         </div>
         <div class="mt-5">
             <div class="flex justify-start items-center">
-                <select wire:model.defer="selectedType" id="wfp_type" name="wfp_type"
+                <select wire:model="selectedType" id="wfp_type" name="wfp_type"
                         class="block w-1/2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500">
                     <option value="0" disabled selected>Select WFP Type</option>
                     @foreach ($wfp_types as $type)

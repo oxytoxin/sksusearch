@@ -8,12 +8,14 @@ use App\Models\LiquidationReportStep;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 
-class OfficeLiquidationReportsForwarded extends Component implements HasTable
+class OfficeLiquidationReportsForwarded extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     protected $listeners = ['refresh' => '$refresh'];
 

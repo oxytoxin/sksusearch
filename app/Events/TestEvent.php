@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use BeyondCode\LaravelWebSockets\WebSockets\Channels\Channel as ChannelsChannel;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;

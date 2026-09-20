@@ -1,4 +1,4 @@
-<div x-data="{ codeSent: @entangle('codeSent'), invalidCode: @entangle('invalid') }" x-cloak>
+<div x-data="{ codeSent: @entangle('codeSent').live, invalidCode: @entangle('invalid').live }" x-cloak>
 
     @if ($show_Edit == false)
         <div>
@@ -9,7 +9,7 @@
                 <div class="flex flex-col p-5 rounded-lg shadow-md bg-primary-200 shadow-primary-600">
                     <label for="enteredCode" class="block font-bold text-md text-primary-700">Verification Code</label>
                     <div class="mt-1" x-show="codeSent">
-                        <input type="text" name="enteredCode" id="enteredCode" wire:model.debounce.700ms="enteredCode"
+                        <input type="text" name="enteredCode" id="enteredCode" wire:model.live.debounce.700ms="enteredCode"
                             wire:key='asdafsdsdasdghjfas'
                             class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                         <span id="error" x-show="invalidCode" class="text-sm italic tracking-wide text-red-500">Code
@@ -56,15 +56,15 @@
                         Edit Uploaded Attachment(s)</a>
                 </div>
             </div>
-            <form wire:submit.prevent='save' class="flex flex-col gap-4">
+            <form wire:submit='save' class="flex flex-col gap-4">
 
                 <div>
                     {{ $this->form }}
                 </div>
                 <div>
-                    <x-filament-support::button type="submit" wire:target='save'
+                    <x-filament::button type="submit" wire:target='save'
                         class="capitalize border border-primary-500 hover:text-primary-100 bg-primary-300 text-primary-800 hover:shadow-md hover:shadow-slate-700">
-                        Save updated Information</x-filament-support::button>
+                        Save updated Information</x-filament::button>
                 </div>
             </form>
         </div>

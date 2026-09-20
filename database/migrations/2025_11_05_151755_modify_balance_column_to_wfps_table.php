@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('wfps', function (Blueprint $table) {
-               $table->decimal('balance', 15, 2)->nullable()->change();
+            $table->decimal('balance', 15, 2)->nullable()->after('specify_fund_source')->change();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('wfps', function (Blueprint $table) {
-            $table->decimal('balance', 10, 2)->nullable()->change();
+            $table->decimal('balance', 10, 2)->nullable()->after('specify_fund_source')->change();
         });
     }
 };

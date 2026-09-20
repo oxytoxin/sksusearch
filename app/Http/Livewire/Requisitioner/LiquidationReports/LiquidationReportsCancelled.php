@@ -9,11 +9,13 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class LiquidationReportsCancelled extends Component implements HasTable
+class LiquidationReportsCancelled extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     protected function getTableQuery()
     {

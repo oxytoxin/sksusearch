@@ -6,12 +6,12 @@ use App\Filament\Resources\BudgetCategoryResource\Pages;
 use App\Filament\Resources\BudgetCategoryResource\RelationManagers;
 use App\Models\BudgetCategory;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -22,7 +22,7 @@ class BudgetCategoryResource extends Resource
 
     protected static ?string $modelLabel = 'Budget Categories';
 
-    protected static ?string $navigationIcon = 'heroicon-o-menu';
+    protected static ?string $navigationIcon = 'heroicon-o-bars-3';
 
     protected static ?int $navigationSort = 29;
 

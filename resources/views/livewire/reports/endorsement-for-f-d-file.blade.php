@@ -1,6 +1,6 @@
 <div class="p-4 bg-white rounded-lg shadow">
 <div class="flex justify-start w-full mb-4  space-x-2">
-          <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()" >   Back</x-filament-support::button>
+          <x-filament::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()" >   Back</x-filament::button>
        
     </div>
 

@@ -8,14 +8,16 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Livewire\Component;
 
-class DisbursementVoucherNotices extends Component implements HasTable
+class DisbursementVoucherNotices extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     public DisbursementVoucher $disbursement_voucher;
 
@@ -88,7 +90,7 @@ class DisbursementVoucherNotices extends Component implements HasTable
                     ]))
                     ->button()
                     ->color('primary')
-                    ->icon('heroicon-o-exclamation')
+                    ->icon('heroicon-o-exclamation-triangle')
                     ->tooltip('View Show Cause Order')
                     ->visible(fn ($record) => $record->type === 'ENDORSEMENT'),
 
@@ -99,7 +101,7 @@ class DisbursementVoucherNotices extends Component implements HasTable
                     ]))
                     ->button()
                     ->color('primary')
-                    ->icon('heroicon-o-exclamation')
+                    ->icon('heroicon-o-exclamation-triangle')
                     ->tooltip('View Show Cause Order')
                     ->visible(fn ($record) => $record->type === 'SCO'),
 
@@ -122,7 +124,7 @@ class DisbursementVoucherNotices extends Component implements HasTable
                     ]))
                     ->button()
                     ->color('primary')
-                    ->icon('heroicon-o-document-download')
+                    ->icon('heroicon-o-document-arrow-down')
                     ->tooltip('View Uploaded FD File')
                     ->visible(fn ($record) => $record->type === 'FD'),
                 // ViewAction::make('View FD')

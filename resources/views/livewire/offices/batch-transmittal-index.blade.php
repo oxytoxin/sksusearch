@@ -10,7 +10,7 @@
         </a>
     </div>
 
-    <div x-data="{ tab: @entangle('tab') }" x-cloak>
+    <div x-data="{ tab: @entangle('tab').live }" x-cloak>
         <div class="inline-flex flex-row">
             <button class="mt-2 rounded-t-lg px-4 py-2 text-lg font-semibold hover:bg-primary-300"
                     @click="tab = 'incoming'"

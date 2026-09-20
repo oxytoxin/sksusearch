@@ -1,5 +1,4 @@
-<x-forms::field-wrapper :id="$getId()" :label="$getLabel()" :label-sr-only="$isLabelHidden()" :helper-text="$getHelperText()" :hint="$getHint()"
-    :hint-icon="$getHintIcon()" :required="$isRequired()" :state-path="$getStatePath()">
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
     @php
         $particulars = $evaluate(fn($get) => $get('disbursement_voucher_particulars'));
         $mop = $evaluate(fn($get) => $get('mop_id'));
@@ -12,7 +11,7 @@
 
     @endphp
 
-    <div x-data="{ state: $wire.entangle('{{ $getStatePath() }}').defer }">
+    <div x-data="{ state: $wire.$entangle('{{ $getStatePath() }}') }">
         <div id="dvPrint"
             style="flex border-collapse  max-w-8xl print:block print:w-[220mm] print:h-[297mm] print:max-w-[220mm] print:max-h-[297mm]">
             <div class="grid grid-cols-8 border-4 border-collapse border-black">
@@ -505,4 +504,4 @@
             </div>
         </div>
     </div>
-</x-forms::field-wrapper>
+</x-dynamic-component>

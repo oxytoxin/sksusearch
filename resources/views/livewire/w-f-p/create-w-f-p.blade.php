@@ -560,7 +560,7 @@
 
             <div wire:ignore.self>
                 <x-modal.card title="Work & Financial Plan Preview" fullscreen blur
-                    wire:model.defer="suppliesDetailModal">
+                    wire:model="suppliesDetailModal">
 
                     <div>
                         <div class="px-4 sm:px-6 lg:px-8">
@@ -1558,33 +1558,33 @@
             </div>
             {{-- remarks modal  --}}
             <div>
-                <x-modal.card title="Remarks" blur wire:model.defer="remarksModal">
+                <x-modal.card title="Remarks" blur wire:model="remarksModal">
                     <div>
                         <span>{{ $remarks_modal_title }}</span>
                         <div class="mt-2 w-full">
                             @switch($remarks_modal_title)
                                 @case('Supplies & Semi-Expendables')
-                                    <textarea id="about" disabled wire:model="supplies_remarks_details" name="about" rows="4"
+                                    <textarea id="about" disabled wire:model.live="supplies_remarks_details" name="about" rows="4"
                                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                                 @break
 
                                 @case('MOOE')
-                                    <textarea id="about" disabled wire:model="mooe_remarks_details" name="about" rows="4"
+                                    <textarea id="about" disabled wire:model.live="mooe_remarks_details" name="about" rows="4"
                                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                                 @break
 
                                 @case('Trainings')
-                                    <textarea id="about" disabled wire:model="training_remarks_details" name="about" rows="4"
+                                    <textarea id="about" disabled wire:model.live="training_remarks_details" name="about" rows="4"
                                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                                 @break
 
                                 @case('Machine & Equipment / Furniture & Fixtures / Bio / Vehicles')
-                                    <textarea id="about" disabled wire:model="machine_remarks_details" name="about" rows="4"
+                                    <textarea id="about" disabled wire:model.live="machine_remarks_details" name="about" rows="4"
                                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                                 @break
 
                                 @case('Building & Infrastructure')
-                                    <textarea id="about" disabled wire:model="building_remarks_details" name="about" rows="4"
+                                    <textarea id="about" disabled wire:model.live="building_remarks_details" name="about" rows="4"
                                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                                 @break
 
@@ -1613,7 +1613,7 @@
 
         {{-- end body --}}
         {{-- <div class="p-3 bg-gray-50 rounded-lg">
-        <form wire:submit.prevent="submit">
+        <form wire:submit="submit">
             {{ $this->form }}
             <div class="mt-5 p-3 border border-gray-300 rounded-lg">
                 <div class="flex py-2 justify-end">

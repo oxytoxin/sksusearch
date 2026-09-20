@@ -10,9 +10,9 @@ use App\Models\VoucherType;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
@@ -45,12 +45,12 @@ class VoucherTypeResource extends Resource
     }
 
 
-    protected static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
     }
 
-    protected static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): ?string
     {
         return 'success';
     }
@@ -75,13 +75,8 @@ class VoucherTypeResource extends Resource
                 // Tables\Actions\DeleteBulkAction::make(),
             ])
             ->reorderable('order_column')
+            ->paginatedWhileReordering()
             ->defaultSort('order_column');
-    }
-
-
-    protected function isTablePaginationEnabledWhileReordering(): bool
-    {
-        return true;
     }
 
     public static function getRelations(): array

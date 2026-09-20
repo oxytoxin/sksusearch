@@ -11,18 +11,22 @@ use Livewire\Component;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
-use Filament\Tables\Filters\Layout;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 
 
 
-class SupplyRequestedSupplies extends Component implements HasTable
+class SupplyRequestedSupplies extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms;
+    use InteractsWithTable {
+        table as baseTable;
+    }
     use Actions;
 
     public $record;
@@ -47,10 +51,10 @@ class SupplyRequestedSupplies extends Component implements HasTable
             ->label('Unit Cost')->searchable(),
             BadgeColumn::make('is_ppmp')
             ->label('PPMP')
-            ->enum([
+            ->formatStateUsing(fn ($state) => [
                 1 => 'Yes',
                 0 => 'No',
-            ])
+            ][$state] ?? $state)
             ->colors([
                 'success' => 1,
                 'danger' => 0,
@@ -75,9 +79,10 @@ class SupplyRequestedSupplies extends Component implements HasTable
             ];
     }
 
-    protected function getTableFiltersLayout(): ?string
+    public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
     {
-        return Layout::AboveContent;
+        return $this->baseTable($table)
+            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
     }
 
     protected function getTableFilters(): array

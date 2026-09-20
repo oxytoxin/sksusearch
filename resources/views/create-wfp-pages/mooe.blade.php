@@ -23,7 +23,7 @@
                     {{-- <label class="block text-xs font-medium leading-4 text-green-900 underline cursor-pointer"><a href="{{route('wfp.request-supply')}}">Request Supply</a></label> --}}
                 </div>
                 <div class="mt-2">
-                <select wire:model="mooe_particular_id" disabled id="mooe_particular_id" name="mooe_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
+                <select wire:model.live="mooe_particular_id" disabled id="mooe_particular_id" name="mooe_particulars" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
                     <option value="">Select One</option>
                     @foreach ($mooe_particulars as $item)
                     <option value="{{$item->id}}">{{ Str::limit($item->particulars, 50, '...') }}</option>
@@ -38,12 +38,12 @@
                 <div class="flex justify-between">
                     <label for="mooe_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
                     <div class="flex items center">
-                        <input {{$mooe_ppmp ? 'checked' : ''}} disabled wire:model="mooe_ppmp" id="mooe_ppmp" name="supplies_ppmp" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <input {{$mooe_ppmp ? 'checked' : ''}} disabled wire:model.live="mooe_ppmp" id="mooe_ppmp" name="supplies_ppmp" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                         <label for="mooe_ppmp" class="ml-2 block text-sm font-medium text-gray-900">PPMP</label>
                     </div>
                 </div>
                 <div class="mt-2">
-                  <input wire:model.defer="mooe_code" disabled id="mooe_code" name="mooe_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model="mooe_code" disabled id="mooe_code" name="mooe_code" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
         </div>
@@ -51,37 +51,37 @@
         <div class="sm:col-span-1">
             <label for="mooe_specs" class="block text-sm font-medium leading-6 text-gray-600">Specifications</label>
             <div class="mt-2">
-            <input wire:model.defer="mooe_specs" disabled id="mooe_specs" name="mooe_specs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            <input wire:model="mooe_specs" disabled id="mooe_specs" name="mooe_specs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             </div>
         </div>
           <div class="grid grid-cols-3 space-x-4 justify-center">
             <div class="sm:col-span-1">
                 <label for="mooe_uacs" class="block text-sm font-medium leading-6 text-gray-900">UACS Code</label>
                 <div class="mt-2">
-                  <input wire:model.defer="mooe_uacs" disabled id="mooe_uacs" name="mooe_uacs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model="mooe_uacs" disabled id="mooe_uacs" name="mooe_uacs" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
             <div class="sm:col-span-1">
                 <label for="mooe_account_title" class="block text-sm font-medium leading-6 text-gray-900">Account Title</label>
                 <div class="mt-2">
-                  <input wire:model.defer="mooe_account_title" disabled id="mooe_account_title" name="mooe_account_title" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model="mooe_account_title" disabled id="mooe_account_title" name="mooe_account_title" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
             <div class="sm:col-span-1">
                 <label for="mooe_title_group" class="block text-sm font-medium leading-6 text-gray-900">Title Group</label>
                 <div class="mt-2">
-                  <input wire:model.defer="mooe_title_group" disabled id="mooe_title_group" name="mooe_title_group" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model="mooe_title_group" disabled id="mooe_title_group" name="mooe_title_group" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
           </div>
           <div>
             <div class="flex items center">
-                <input wire:model="mooe_is_remarks" id="mooe_is_remarks" name="mooe_is_remarks" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                <input wire:model.live="mooe_is_remarks" id="mooe_is_remarks" name="mooe_is_remarks" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                 <label for="mooe_is_remarks" class="ml-2 block text-sm font-medium text-gray-900">Add Remarks</label>
             </div>
             @if ($mooe_is_remarks)
             <div class="mt-2 w-full">
-                <textarea id="about" wire:model="mooe_remarks" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                <textarea id="about" wire:model.live="mooe_remarks" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                 {{-- <p class="mt-3 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p> --}}
             </div>
             @endif
@@ -113,7 +113,7 @@
                           <tr>
                             @foreach ($mooe_quantity as $index => $value)
                                 <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
-                                    <input {{$mooe_particular_id === null ? 'disabled' : ''}} wire:model="mooe_quantity.{{$index}}" id="{{$index}}" name="{{$index}}" type="number" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                                    <input {{$mooe_particular_id === null ? 'disabled' : ''}} wire:model.live="mooe_quantity.{{$index}}" id="{{$index}}" name="{{$index}}" type="number" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                 </td>
                             @endforeach
                             </tr>
@@ -129,7 +129,7 @@
             {{-- checkbox input --}}
             {{-- <div class="mt-4">
                 <div class="flex items center">
-                    <input {{$mooe_ppmp ? 'checked' : ''}} disabled wire:model="mooe_ppmp" id="mooe_ppmp" name="supplies_ppmp" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                    <input {{$mooe_ppmp ? 'checked' : ''}} disabled wire:model.live="mooe_ppmp" id="mooe_ppmp" name="supplies_ppmp" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                     <label for="mooe_ppmp" class="ml-2 block text-sm font-medium text-gray-900">PPMP</label>
                 </div>
           </div> --}}
@@ -137,7 +137,7 @@
             <div class="sm:col-span-1">
                 <label for="mooe_total_quantity" class="block text-sm font-medium leading-6 text-gray-900">Total Quantity</label>
                 <div class="mt-2">
-                  <input disabled wire:model="mooe_total_quantity" disabled id="mooe_total_quantity" name="mooe_total_quantity" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input disabled wire:model.live="mooe_total_quantity" disabled id="mooe_total_quantity" name="mooe_total_quantity" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
                 @error('mooe_total_quantity')
                 <p class="mt-2 text-sm text-red-600" id="email-error">{{ $message }}</p>
@@ -146,10 +146,10 @@
             <div class="sm:col-span-1">
                 <label for="mooe_uom" class="block text-sm font-medium leading-6 text-gray-900">UOM</label>
                 <div class="mt-2">
-                  <input wire:model.defer="mooe_uom" disabled id="mooe_uom" name="mooe_uom" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model="mooe_uom" disabled id="mooe_uom" name="mooe_uom" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
                 {{-- <div class="mt-2">
-                    <select wire:model="mooe_uom" id="mooe_uom" name="mooe_uom" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
+                    <select wire:model.live="mooe_uom" id="mooe_uom" name="mooe_uom" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
                         <option value="">Select One</option>
                         <option value="pcs">pcs</option>
                         <option value="box">box</option>
@@ -165,7 +165,7 @@
             <div class="sm:col-span-1">
                 <label for="mooe_cost_per_unit" class="block text-sm font-medium leading-6 text-gray-900">Cost per unit</label>
                 <div class="mt-2">
-                  <input wire:model="mooe_cost_per_unit" {{$mooe_ppmp || $mooe_particular_id === null ? 'disabled' : ''}} id="mooe_cost_per_unit" name="mooe_cost_per_unit" type="number" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model.live="mooe_cost_per_unit" {{$mooe_ppmp || $mooe_particular_id === null ? 'disabled' : ''}} id="mooe_cost_per_unit" name="mooe_cost_per_unit" type="number" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
                 @error('mooe_cost_per_unit')
                 <p class="mt-2 text-sm text-red-600" id="email-error">{{ $message }}</p>
@@ -174,7 +174,7 @@
             <div class="sm:col-span-1">
                 <label for="mooe_estimated_budget" class="block text-sm font-medium leading-6 text-gray-900">Estimated Budget</label>
                 <div class="mt-2">
-                  <input wire:model.defer="mooe_estimated_budget" disabled id="mooe_estimated_budget" name="mooe_estimated_budget" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                  <input wire:model="mooe_estimated_budget" disabled id="mooe_estimated_budget" name="mooe_estimated_budget" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
           </div>
@@ -194,7 +194,7 @@
 </div>
 
 {{-- modal --}}
-<x-modal.card title="MOOE" fullscreen blur wire:model.defer="mooeDetailModal">
+<x-modal.card title="MOOE" fullscreen blur wire:model="mooeDetailModal">
 
     <div >
         <div class="px-4 sm:px-6 lg:px-8">

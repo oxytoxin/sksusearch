@@ -1,7 +1,7 @@
 <x-guest-layout>
-    <x-jet-authentication-card>
+    <x-authentication-card>
         <x-slot name="logo">
-            <x-jet-authentication-card-logo/>
+            <x-authentication-card-logo/>
         </x-slot>
         @env('local')
             <div class="space-y-2">
@@ -17,7 +17,7 @@
             </div>
         @endenv
 
-        <x-jet-validation-errors class="mb-4"/>
+        <x-validation-errors class="mb-4"/>
 
         @if (session('status'))
             <div class="mb-4 text-sm font-medium text-green-600">
@@ -29,20 +29,20 @@
             @csrf
             @if (app()->environment('local'))
                 <div>
-                    <x-jet-label class="font-bold text-white drop-shadow" for="email" value="{{ __('Email') }}"/>
-                    <x-jet-input class="block w-full mt-1" id="email" name="email" type="email" :value="old('email')"
+                    <x-label class="font-bold text-white drop-shadow" for="email" value="{{ __('Email') }}"/>
+                    <x-input class="block w-full mt-1" id="email" name="email" type="email" :value="old('email')"
                                  required autofocus/>
                 </div>
 
                 <div class="mt-4">
-                    <x-jet-label class="font-bold text-white drop-shadow" for="password" value="{{ __('Password') }}"/>
-                    <x-jet-input class="block w-full mt-1" id="password" name="password" type="password" required
+                    <x-label class="font-bold text-white drop-shadow" for="password" value="{{ __('Password') }}"/>
+                    <x-input class="block w-full mt-1" id="password" name="password" type="password" required
                                  autocomplete="current-password"/>
                 </div>
 
                 <div class="flex items-center justify-between mt-4">
                     <label class="flex items-center font-bold text-white drop-shadow" for="remember_me">
-                        <x-jet-checkbox
+                        <x-checkbox
                                 class="text-primary-600 focus:outline-none focus:outline-primary-600 focus:ring-0"
                                 id="remember_me" name="remember"/>
                         <span class="ml-2 text-sm ">{{ __('Remember me') }}</span>
@@ -58,10 +58,10 @@
 
                 <div class="flex items-center justify-end mt-1">
 
-                    <x-jet-button
+                    <x-button
                             class="inline-flex items-center w-full py-3 mt-2 text-xs font-semibold tracking-widest uppercase transition border rounded-md !border-primary-600 !bg-primary-600 from-primary-bg-alt to-secondary-bg hover:!bg-primary-500 hover:text-primary-text active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25">
                         <span class="mx-auto">{{ __('Log in') }}</span>
-                    </x-jet-button>
+                    </x-button>
 
                 </div>
                 <div class="mt-3">
@@ -97,5 +97,5 @@
                 </a>
             </div>
         </form>
-    </x-jet-authentication-card>
+    </x-authentication-card>
 </x-guest-layout>

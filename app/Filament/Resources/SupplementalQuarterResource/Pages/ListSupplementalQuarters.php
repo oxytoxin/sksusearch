@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\SupplementalQuarterResource\Pages;
 
 use App\Filament\Resources\SupplementalQuarterResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListSupplementalQuarters extends ListRecords
 {
     protected static string $resource = SupplementalQuarterResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

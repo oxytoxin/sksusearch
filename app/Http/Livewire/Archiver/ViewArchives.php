@@ -7,7 +7,9 @@
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Columns\ViewColumn;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
     use Filament\Tables\Filters\MultiSelectFilter;
     use Filament\Tables\Table;
@@ -16,9 +18,9 @@
     use Filament\Forms;
     use Filament\Tables\Filters\Filter;
 
-    class ViewArchives extends Component implements HasTable
+    class ViewArchives extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable;
+        use InteractsWithForms, InteractsWithTable;
 
         protected function getTableFilters(): array
         {

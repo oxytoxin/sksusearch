@@ -3,7 +3,7 @@
         <div class="mb-4 space-y-2 bg-white rounded-lg p-4">
             {{ $this->form }}
             <div class="flex justify-end">
-                <x-filament-support::button wire:click="save" wire:target="save">Save</x-filament-support::button>
+                <x-filament::button wire:click="save" wire:target="save">Save</x-filament::button>
             </div>
         </div>
     @endif

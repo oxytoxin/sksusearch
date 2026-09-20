@@ -18,11 +18,13 @@ use Filament\Forms\Components\Textarea;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class SupplyReportList extends Component implements HasTable
+class SupplyReportList extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
     use Actions;
 
     public $record;

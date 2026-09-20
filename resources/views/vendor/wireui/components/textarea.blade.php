@@ -15,7 +15,7 @@
                 />
             @endif
 
-            @if ($cornerHint)   
+            @if ($cornerHint)
                 <x-dynamic-component
                     :component="WireUi::component('label')"
                     :label="$cornerHint"
@@ -51,7 +51,7 @@
         ])->merge([
             'autocomplete' => 'off',
             'rows'         => 4
-        ]) }}></textarea>
+        ]) }}>{{ $slot }}</textarea>
 
         @if ($suffix || $rightIcon || ($hasError && !$append))
             <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none

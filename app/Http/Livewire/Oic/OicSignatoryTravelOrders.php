@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\DisbursementVoucher;
 use App\Models\EmployeeInformation;
 use Filament\Tables\Actions\Action;
-use Filament\Tables\Filters\Layout;
 use Filament\Forms\Components\Select;
 use App\Models\DisbursementVoucherStep;
 use App\Models\OicUser;
@@ -16,13 +15,18 @@ use App\Models\TravelOrder;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 
-class OicSignatoryTravelOrders extends Component implements HasTable
+class OicSignatoryTravelOrders extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable, OfficeDashboardActions;
+    use InteractsWithForms, OfficeDashboardActions;
+    use InteractsWithTable {
+        table as baseTable;
+    }
 
     protected function getTableQuery()
     {
@@ -73,14 +77,11 @@ class OicSignatoryTravelOrders extends Component implements HasTable
         ];
     }
 
-    protected function getTableFiltersFormColumns(): int
+    public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
     {
-        return 1;
-    }
-
-    protected function getTableFiltersLayout(): ?string
-    {
-        return Layout::AboveContent;
+        return $this->baseTable($table)
+            ->filtersFormColumns(1)
+            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
     }
 
     public function render()

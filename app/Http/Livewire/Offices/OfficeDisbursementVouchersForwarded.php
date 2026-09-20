@@ -6,16 +6,18 @@
     use App\Models\DisbursementVoucher;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Contracts\HasTable;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Forms;
     use Filament\Tables\Filters\Filter;
     use Illuminate\Database\Eloquent\Builder;
     use Filament\Forms\Components\Grid;
     use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 
-    class OfficeDisbursementVouchersForwarded extends Component implements HasTable
+    class OfficeDisbursementVouchersForwarded extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable, OfficeDashboardActions;
+        use InteractsWithForms, InteractsWithTable, OfficeDashboardActions;
 
         protected $listeners = ['refresh' => '$refresh'];
 

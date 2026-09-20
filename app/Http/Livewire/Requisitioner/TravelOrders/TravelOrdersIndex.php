@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Requisitioner\TravelOrders;
 
 use App\Models\TravelOrder;
+use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
@@ -10,8 +11,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
-class TravelOrdersIndex extends Component implements Tables\Contracts\HasTable
+class TravelOrdersIndex extends Component implements Forms\Contracts\HasForms, Tables\Contracts\HasTable
 {
+    use Forms\Concerns\InteractsWithForms;
     use Tables\Concerns\InteractsWithTable;
 
     protected function getTableQuery()

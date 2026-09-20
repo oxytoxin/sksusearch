@@ -23,7 +23,7 @@ class CreateAdvisory extends CreateRecord
         return $this->getResource()::getUrl('index');
     }
 
-    protected static function canCreateAnother(): bool
+    public static function canCreateAnother(): bool
     {
         return false;
     }

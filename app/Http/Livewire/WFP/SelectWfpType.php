@@ -14,16 +14,20 @@
     use App\Models\FundCluster;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Filters\Filter;
-    use Filament\Tables\Filters\Layout;
     use Illuminate\Support\Facades\Auth;
     use Filament\Tables\Contracts\HasTable;
     use Filament\Tables\Filters\SelectFilter;
     use Illuminate\Database\Eloquent\Builder;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
 
-    class SelectWfpType extends Component implements HasTable
+    class SelectWfpType extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable;
+        use InteractsWithForms;
+        use InteractsWithTable {
+            table as baseTable;
+        }
 
         public $types;
         public $user_wfp_id;
@@ -140,9 +144,10 @@
             ];
         }
 
-        protected function getTableFiltersLayout(): ?string
+        public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
         {
-            return Layout::AboveContent;
+            return $this->baseTable($table)
+                ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
         }
 
         protected function getTableFilters(): array

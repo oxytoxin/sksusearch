@@ -14,6 +14,8 @@
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\TextInput;
     use Filament\Notifications\Notification;
+    use Filament\Forms\Concerns\InteractsWithForms;
+    use Filament\Forms\Contracts\HasForms;
     use Filament\Tables\Actions\Action;
     use Filament\Tables\Actions\DeleteAction;
     use Filament\Tables\Actions\EditAction;
@@ -24,10 +26,10 @@
     use Illuminate\Validation\Rule;
     use Livewire\Component;
 
-    class OicAssign extends Component implements HasTable
+    class OicAssign extends Component implements HasForms, HasTable
     {
 
-        use InteractsWithTable;
+        use InteractsWithForms, InteractsWithTable;
 
         public $oic_id;
         public $type;
@@ -73,7 +75,10 @@
         {
             return [
                 TextColumn::make('oic.employee_information.full_name')->label('Name')->searchable(),
-                TextColumn::make('type')->enum(OicType::getOptions()),
+                TextColumn::make('type')->formatStateUsing(
+                    fn ($state) => OicType::getOptions()[$state instanceof OicType ? $state->value : $state]
+                        ?? ($state instanceof OicType ? $state->value : $state),
+                ),
                 TextColumn::make('valid_from')->dateTime('F d, Y'),
                 TextColumn::make('valid_to')->formatStateUsing(function ($state) {
                     return $state ? Carbon::parse($state)->format('F d, Y') : 'Present';

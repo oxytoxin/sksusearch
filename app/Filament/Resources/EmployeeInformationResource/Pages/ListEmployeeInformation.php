@@ -7,7 +7,7 @@ use App\Filament\Resources\EmployeeInformationResource;
 use App\Imports\EmployeeInformationImport;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -15,17 +15,17 @@ class ListEmployeeInformation extends ListRecords
 {
     protected static string $resource = EmployeeInformationResource::class;
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         return 'Employee Information';
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\Action::make('import')
                 ->label('Import Employees')
-                ->icon('heroicon-o-upload')
+                ->icon('heroicon-o-arrow-up-tray')
                 ->color('warning')
                 ->form([
                     FileUpload::make('file')
@@ -69,7 +69,7 @@ class ListEmployeeInformation extends ListRecords
                 }),
             Actions\Action::make('export_template')
                 ->label('Download Template')
-                ->icon('heroicon-o-download')
+                ->icon('heroicon-o-arrow-down-tray')
                 ->color('primary')
                 ->action(function () {
                     return Excel::download(new EmployeeTemplateExport(), 'employee_template.xlsx');

@@ -18,10 +18,9 @@
         }
     </style>
     @wireUiScripts
-    <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/alpine-tooltip@1.x.x/dist/cdn.min.js" defer></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
-    @livewireScripts
+    @livewireScriptConfig
     @stack('scripts')
 </head>
 

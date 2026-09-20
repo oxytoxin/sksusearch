@@ -4,7 +4,8 @@ namespace App\Http\Livewire;
 
 use App\Models\SmsDetailAccess;
 use App\Models\SmsLog;
-use Livewire\Component;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -12,17 +13,24 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Livewire\Component;
 
-class SmsDetails extends Component implements HasTable
+class SmsDetails extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     public $account = null;
+
     public $accountError = null;
+
     public $smsSentToday = 0;
+
     public $smsSentTotal = 0;
+
     public $filterContext = '';
+
     public $filterDateFrom = '';
+
     public $filterDateTo = '';
 
     public function mount()
@@ -41,6 +49,7 @@ class SmsDetails extends Component implements HasTable
 
             if (empty($apiKey)) {
                 $this->accountError = 'Semaphore API key is not configured.';
+
                 return;
             }
 
@@ -48,6 +57,7 @@ class SmsDetails extends Component implements HasTable
 
             if ($cached) {
                 $this->account = $cached;
+
                 return;
             }
 
@@ -59,10 +69,10 @@ class SmsDetails extends Component implements HasTable
                 $this->account = $response->json();
                 Cache::put('semaphore_account_details', $this->account, now()->addMinutes(5));
             } else {
-                $this->accountError = 'Failed to fetch account details (HTTP ' . $response->status() . ')';
+                $this->accountError = 'Failed to fetch account details (HTTP '.$response->status().')';
             }
         } catch (\Exception $e) {
-            Log::error('SMS Details - Failed to load account: ' . $e->getMessage());
+            Log::error('SMS Details - Failed to load account: '.$e->getMessage());
             $this->accountError = 'Could not connect to Semaphore API.';
         }
     }
@@ -87,7 +97,8 @@ class SmsDetails extends Component implements HasTable
                 ->label('Recipient')
                 ->formatStateUsing(function ($state, $record) {
                     $name = $state ?? $record->formatted_phone_number;
-                    return $state ? $name . ' (' . $record->formatted_phone_number . ')' : $name;
+
+                    return $state ? $name.' ('.$record->formatted_phone_number.')' : $name;
                 })
                 ->searchable(['formatted_phone_number']),
             Tables\Columns\TextColumn::make('message')

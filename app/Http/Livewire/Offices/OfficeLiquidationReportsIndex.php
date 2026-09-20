@@ -17,6 +17,8 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
@@ -24,17 +26,21 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\Layout;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
-class OfficeLiquidationReportsIndex extends Component implements HasTable
+class OfficeLiquidationReportsIndex extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms;
+    use InteractsWithTable {
+        table as baseTable;
+    }
 
     public bool $returnCameFromVerify = false;
 
@@ -89,9 +95,7 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
         $this->returnCameFromVerify = false;
         $this->mountedTableAction = null;
         $this->mountedTableActionRecord = null;
-        $this->dispatchBrowserEvent('close-modal', [
-            'id' => "{$this->id}-table-action",
-        ]);
+        $this->dispatch('close-modal', id: "{$this->getId()}-table-action");
     }
 
     protected function getTableQuery()
@@ -152,14 +156,11 @@ class OfficeLiquidationReportsIndex extends Component implements HasTable
         ];
     }
 
-    protected function getTableFiltersFormColumns(): int
+    public function table(Table $table): Table
     {
-        return 3;
-    }
-
-    protected function getTableFiltersLayout(): ?string
-    {
-        return Layout::AboveContent;
+        return $this->baseTable($table)
+            ->filtersFormColumns(3)
+            ->filtersLayout(FiltersLayout::AboveContent);
     }
 
     protected function getTableColumns()

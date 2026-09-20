@@ -4,8 +4,8 @@ namespace App\Filament\Resources;
 
 use Carbon\Carbon;
 use Filament\Tables;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use App\Models\Advisory;
 use Filament\Forms\Components\Grid;
@@ -25,7 +25,7 @@ class AdvisoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Advisories';
 
-    protected static ?string $navigationIcon = 'heroicon-o-speakerphone';
+    protected static ?string $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?string $navigationLabel = 'Advisories';
 

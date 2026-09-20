@@ -15,11 +15,13 @@
     use Filament\Notifications\Notification;
     use Filament\Tables\Actions\ActionGroup;
     use Filament\Forms\Components\RichEditor;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
 
-    class LiquidationReportsIndex extends Component implements HasTable
+    class LiquidationReportsIndex extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable;
+        use InteractsWithForms, InteractsWithTable;
 
         protected function getTableQuery()
         {

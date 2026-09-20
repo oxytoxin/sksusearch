@@ -6,11 +6,10 @@ use App\Forms\Components\ArrayField;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
-use Filament\Tables\Contracts\HasRelationshipTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -19,9 +18,7 @@ class VoucherSubtypesRelationManager extends RelationManager
 {
     protected static string $relationship = 'voucher_subtypes';
 
-    protected static ?string $recordTitleAttribute = 'name';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -31,9 +28,10 @@ class VoucherSubtypesRelationManager extends RelationManager
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
             ])
@@ -44,7 +42,7 @@ class VoucherSubtypesRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make()
                     ->modalHeading('Add Voucher Subtype')
                     ->label('Add Voucher Subtype')
-                    ->using(function (HasRelationshipTable $livewire, array $data): Model {
+                    ->using(function (RelationManager $livewire, array $data): Model {
                         $documents = [];
                         if (isset($data['documents'])) {
                             $documents = $data['documents'];

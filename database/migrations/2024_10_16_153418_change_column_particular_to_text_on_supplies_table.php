@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('supplies', function (Blueprint $table) {
-            $table->text('particulars')->nullable()->change();
+            $table->text('particulars')->nullable()->after('supply_code')->change();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('supplies', function (Blueprint $table) {
-            $table->string('particulars')->nullable()->change();
+            $table->string('particulars', 255)->nullable()->after('supply_code')->change();
         });
     }
 };

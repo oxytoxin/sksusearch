@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\InternetAccountNumberResource\Pages;
 
 use App\Filament\Resources\InternetAccountNumberResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateInternetAccountNumber extends CreateRecord

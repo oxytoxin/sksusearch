@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Requisitioner\Itinerary;
 
 use App\Models\Itinerary;
+use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -11,8 +12,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
-class ItinerariesIndex extends Component implements Tables\Contracts\HasTable
+class ItinerariesIndex extends Component implements Forms\Contracts\HasForms, Tables\Contracts\HasTable
 {
+    use Forms\Concerns\InteractsWithForms;
     use Tables\Concerns\InteractsWithTable;
 
     protected function getTableQuery()

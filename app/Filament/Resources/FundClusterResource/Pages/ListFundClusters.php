@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\FundClusterResource\Pages;
 
 use App\Filament\Resources\FundClusterResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListFundClusters extends ListRecords
 {
     protected static string $resource = FundClusterResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

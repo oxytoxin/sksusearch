@@ -13,16 +13,16 @@ The three channels are **independent**: realtime in-app, SMS, and (future) email
 
 | Item | Result |
 |---|---|
-| Laravel | `^9.19` (9.52 installed) |
-| PHP | 8.3 (Resend needs 8.1+) ✅ |
-| Filament | `^2.0` — uses Laravel mail underneath, inherits any mailer automatically |
+| Laravel | `^13.17` (13.32 locked) |
+| PHP | `^8.3` (Resend needs 8.1+) ✅ |
+| Filament | `^3.3.55` — uses Laravel mail underneath, inherits any mailer automatically |
 | `config/mail.php` | Already defines `smtp`, `ses`, `mailgun`, `postmark`, `sendmail`, `log`, `array`, `failover` |
 | Resend via **SMTP** | ✅ Works today, **no package needed** |
-| Resend via **API driver** | ⚠️ Needs version pin `resend/resend-laravel:^0.23` (v1.x requires Laravel 10+) |
+| Resend via **API driver** | Optional; `resend/resend-laravel:^1.5` supports Laravel 13 but is not installed |
 | Recipient email | `User.email` — **real institutional addresses** (`@sksu.edu.ph`), unique + required, `Notifiable` trait present |
 
 ### Corrections to the original integration guide
-- The project uses **beyondcode/laravel-websockets** (Pusher protocol), **not** Reverb/Echo.
+- The project uses **Laravel Reverb** with Echo and private, authorized notification channels.
 - SMS in this project is **not** a notification `via()` channel — it is dispatched via `SendSmsJob::dispatch()` at each call site with its own `sms_logs` audit table. **Email will mirror this SMS job-dispatch pattern** (not `via()`), so we get the same per-message logging and transparency.
 
 ---
@@ -91,7 +91,7 @@ MAIL_FROM_NAME="S.E.A.R.C.H"
 ### 3d. Production Option B — Resend API driver (later; richer tracking)
 Adds delivery/bounce/open events via the Resend dashboard & webhooks.
 ```bash
-composer require resend/resend-laravel:^0.23   # pin: required for Laravel 9
+composer require resend/resend-laravel:^1.5
 ```
 Add a mailer in `config/mail.php` under `'mailers'`:
 ```php

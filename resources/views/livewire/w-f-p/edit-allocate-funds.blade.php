@@ -24,7 +24,7 @@
 
                         </dd>
                         <dd>
-                            <select wire:model="selectedType" id="small"
+                            <select wire:model.live="selectedType" id="small"
                                 class="block w-1/2 p-2 mb-6 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                 <option value="" selected>Select WFP Period</option>
                                 @foreach ($wfp_type as $type)
@@ -73,7 +73,7 @@
                                                                         </div>
                                                                         <input type="number" name="price"
                                                                             id="price_{{ $item->id }}"
-                                                                            wire:model.lazy="amounts.{{ $item->id }}"
+                                                                            wire:model.blur="amounts.{{ $item->id }}"
                                                                             {{-- wire:change="updatedAmounts" --}}
                                                                             class="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                             placeholder="0.00"
@@ -174,7 +174,7 @@
                                                         class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                                         <span class="text-gray-500 sm:text-sm">₱</span>
                                                     </div>
-                                                    <input wire:model="fundInitialAmount" type="number"
+                                                    <input wire:model.live="fundInitialAmount" type="number"
                                                         name="price" id="price"
                                                         class="block w-full rounded-md border-0 py-1.5 pl-7 pr-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                         placeholder="0.00" aria-describedby="price-currency">
@@ -190,7 +190,7 @@
                                             <span class="text-sm text-red-600">{{ $message }}</span>
                                         @enderror
                                         <div class="py-3">
-                                            <textarea wire:model="fund_description" id="message" rows="4"
+                                            <textarea wire:model.live="fund_description" id="message" rows="4"
                                                 class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                 placeholder="Description"></textarea>
                                             @error('fund_description')

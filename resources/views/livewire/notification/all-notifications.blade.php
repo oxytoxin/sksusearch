@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold">All Notifications</h1>
         <div class="flex justify-end space-x-2">
 
-            <x-filament-support::button icon="heroicon-s-arrow-left" type="button" color="secondary" onclick="window.history.back()" >   Back</x-filament-support::button>
+            <x-filament::button icon="heroicon-s-arrow-left" type="button" color="gray" onclick="window.history.back()" >   Back</x-filament::button>
             @if (auth()->user()->unreadNotifications->count())
             <button wire:click="markAllAsRead"
             class="text-sm font-medium text-white bg-primary-600 px-3 py-1.5 rounded-md shadow hover:bg-primary-700 ">
@@ -77,9 +77,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             if ({{ auth()->check() ? 'true' : 'false' }}) {
-                window.Echo.channel(`notifications.{{ auth()->id() }}`)
+                window.Echo.private(`notifications.{{ auth()->id() }}`)
                     .listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (notification) => {
-                        Livewire.emit('refreshNotifications');
+                        Livewire.dispatch('refreshNotifications');
                     });
             }
         });

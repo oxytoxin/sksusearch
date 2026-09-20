@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('wfps', function (Blueprint $table) {
-            $table->integer('is_approved')->change()->default(0);
+            $table->integer('is_approved')->default(0)->after('total_allocated_fund')->change();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('wfps', function (Blueprint $table) {
-            $table->boolean('is_approved')->change();
+            $table->boolean('is_approved')->default(false)->after('total_allocated_fund')->change();
         });
     }
 };

@@ -4,7 +4,7 @@ namespace App\Filament\Resources\BondResource\Pages;
 
 use App\Filament\Resources\BondResource;
 use App\Models\EmployeeInformation;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +47,7 @@ class EditBond extends EditRecord
     }
 
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             // Actions\DeleteAction::make(),

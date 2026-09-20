@@ -11,13 +11,15 @@ use Livewire\Component;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 
-class SupplyRequestList extends Component implements HasTable
+class SupplyRequestList extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
     use Actions;
 
     public $record;
@@ -37,10 +39,10 @@ class SupplyRequestList extends Component implements HasTable
             ->label('Unit Cost')->searchable(),
             BadgeColumn::make('is_ppmp')
             ->label('PPMP')
-            ->enum([
+            ->formatStateUsing(fn ($state) => [
                 1 => 'Yes',
                 0 => 'No',
-            ])
+            ][$state] ?? $state)
             ->colors([
                 'success' => 1,
                 'danger' => 0,

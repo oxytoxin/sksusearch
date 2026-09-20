@@ -18,6 +18,7 @@
     use Filament\Forms\Components\Select;
     use Filament\Forms\Components\Textarea;
     use Filament\Forms\Components\TextInput;
+    use Filament\Facades\Filament;
     use Filament\Notifications\Notification;
     use Filament\Pages\Page;
     use Illuminate\Validation\ValidationException;
@@ -26,7 +27,7 @@
     {
         protected static ?string $navigationGroup = 'Testing Tools and Settings';
 
-        protected static ?string $navigationIcon = 'heroicon-o-switch-horizontal';
+        protected static ?string $navigationIcon = 'heroicon-o-arrows-right-left';
 
         protected static ?string $navigationLabel = 'DV Flow Simulator';
 
@@ -62,7 +63,9 @@
 
         public function mount(): void
         {
-            abort_unless(auth()->user()?->canAccessFilament(), 403);
+            $panel = Filament::getCurrentPanel() ?? Filament::getDefaultPanel();
+
+            abort_unless(auth()->user()?->canAccessPanel($panel), 403);
 
             $this->selectVoucherForm->fill();
             $this->quickCreateForm->fill($this->defaultQuickCreateData());
@@ -104,7 +107,9 @@
 
         public static function shouldRegisterNavigation(): bool
         {
-            return auth()->user()?->canAccessFilament() ?? false;
+            $panel = Filament::getCurrentPanel() ?? Filament::getDefaultPanel();
+
+            return auth()->user()?->canAccessPanel($panel) ?? false;
         }
 
         public function updatedSelectedVoucherId(): void

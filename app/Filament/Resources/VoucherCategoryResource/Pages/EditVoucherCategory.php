@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\VoucherCategoryResource\Pages;
 
 use App\Filament\Resources\VoucherCategoryResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditVoucherCategory extends EditRecord
 {
     protected static string $resource = VoucherCategoryResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             // Actions\DeleteAction::make(),

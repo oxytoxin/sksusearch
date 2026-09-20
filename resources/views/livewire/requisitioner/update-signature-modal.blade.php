@@ -227,10 +227,10 @@
                                     </p>
                                     <canvas class="block bg-red-200 w-full rounded" id="update-signature-canvas" style="height: 220px;"></canvas>
                                     <div class="mt-3 flex items-center justify-evenly gap-4">
-                                        <x-filament-support::button class="w-full" type="button" color="danger"
-                                            @click="sig.clear()">Clear</x-filament-support::button>
-                                        <x-filament-support::button class="w-full" type="button" wire:target="saveSignature"
-                                            @click="$wire.saveSignature(sig.toDataURL('image/png'))">Save Drawing</x-filament-support::button>
+                                        <x-filament::button class="w-full" type="button" color="danger"
+                                            @click="sig.clear()">Clear</x-filament::button>
+                                        <x-filament::button class="w-full" type="button" wire:target="saveSignature"
+                                            @click="$wire.saveSignature(sig.toDataURL('image/png'))">Save Drawing</x-filament::button>
                                     </div>
                                 </div>
                             @endif
@@ -258,7 +258,7 @@
                                     @endif
 
                                     <input type="file" x-ref="uploadFileInput" hidden accept="image/png,image/jpeg"
-                                        wire:model="uploadedSignature">
+                                        wire:model.live="uploadedSignature">
 
                                     {{-- UPLOADING --}}
                                     <div wire:loading wire:target="uploadedSignature" class="py-8 text-center">
@@ -290,17 +290,17 @@
                                             </div>
 
                                             <div class="flex gap-2">
-                                                <x-filament-support::button class="w-full" type="button" color="secondary"
+                                                <x-filament::button class="w-full" type="button" color="gray"
                                                     wire:click="$set('uploadedSignature', null)"
                                                     wire:loading.attr="disabled" wire:target="saveUploadedSignature">
                                                     Choose Another
-                                                </x-filament-support::button>
-                                                <x-filament-support::button class="w-full" type="button"
+                                                </x-filament::button>
+                                                <x-filament::button class="w-full" type="button"
                                                     wire:click="saveUploadedSignature" wire:loading.attr="disabled"
                                                     wire:target="saveUploadedSignature">
                                                     <span wire:loading.remove wire:target="saveUploadedSignature">Save Image</span>
                                                     <span wire:loading wire:target="saveUploadedSignature">Saving…</span>
-                                                </x-filament-support::button>
+                                                </x-filament::button>
                                             </div>
                                         </div>
                                     @endif
@@ -370,14 +370,14 @@
                                         <p class="text-xs text-green-600 mb-3" x-text="'✓ Processed in ' + elapsed + 's'"></p>
 
                                         <div class="flex gap-2">
-                                            <x-filament-support::button class="w-full" type="button" color="secondary"
+                                            <x-filament::button class="w-full" type="button" color="gray"
                                                 @click="reset()">
                                                 Try Another
-                                            </x-filament-support::button>
-                                            <x-filament-support::button class="w-full" type="button"
+                                            </x-filament::button>
+                                            <x-filament::button class="w-full" type="button"
                                                 @click="$wire.saveSignature(cleanedDataUrl)">
                                                 Save Cleaned Signature
-                                            </x-filament-support::button>
+                                            </x-filament::button>
                                         </div>
                                     </div>
                                 </div>

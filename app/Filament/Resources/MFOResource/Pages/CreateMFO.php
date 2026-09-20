@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\MFOResource\Pages;
 
 use App\Filament\Resources\MFOResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateMFO extends CreateRecord

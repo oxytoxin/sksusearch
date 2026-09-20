@@ -14,6 +14,8 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,9 +25,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
-class CashAdvanceReminders extends Component implements HasTable
+class CashAdvanceReminders extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     public $accounting;
 
@@ -128,7 +130,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         'type' => 'FMR',
                     ]);
 
-                    $this->emit('historyCreated');
+                    $this->dispatch('historyCreated');
 
 
                     NotificationController::sendCASystemReminder(
@@ -253,7 +255,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         // 'user_id' => Auth::id(),
                     ]);
 
-                    $this->emit('historyCreated');
+                    $this->dispatch('historyCreated');
 
                     // Send FMD
                     NotificationController::sendCASystemReminder(
@@ -384,7 +386,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         // 'user_id' => Auth::id(),
                     ]);
 
-                    $this->emit('historyCreated');
+                    $this->dispatch('historyCreated');
 
                     // Send SCO
                     NotificationController::sendCASystemReminder(
@@ -512,7 +514,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         // 'user_id' => Auth::id(),
                     ]);
 
-                    $this->emit('historyCreated');
+                    $this->dispatch('historyCreated');
 
                     // Send FD
                     NotificationController::sendCASystemReminder(
@@ -725,7 +727,7 @@ class CashAdvanceReminders extends Component implements HasTable
                         $record->disbursement_voucher
                     );
 
-                    $this->emit('historyCreated');
+                    $this->dispatch('historyCreated');
 
                     // ========== SMS NOTIFICATION START (FORMAL DEMAND) ==========
                     try {

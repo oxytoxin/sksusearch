@@ -3,7 +3,7 @@ const colors = require('tailwindcss/colors')
 const defaultTheme = require('tailwindcss/defaultTheme')
 module.exports = {
     presets: [
-
+        require('./vendor/filament/support/tailwind.config.preset.js').default,
         require('./vendor/wireui/wireui/tailwind.config.js')
     ],
     content: [

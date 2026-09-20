@@ -33,9 +33,7 @@ class ViewSchedules extends Component
 
     public function updatedVehicle($value)
     {
-        $this->dispatchBrowserEvent('refreshCalendar', [
-            'events' => $this->getFormattedEvents()
-        ]);
+        $this->dispatch('refreshCalendar', events: $this->getFormattedEvents());
     }
 
     private function getFormattedEvents()

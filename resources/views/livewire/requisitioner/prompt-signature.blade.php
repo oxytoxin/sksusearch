@@ -230,10 +230,10 @@
                                 </p>
                                 <canvas class="block bg-red-200 w-full rounded" id="signature" style="height: 220px;"></canvas>
                                 <div class="mt-3 flex items-center justify-evenly gap-4">
-                                    <x-filament-support::button class="w-full" type="button" color="danger"
-                                        @click="sig.clear()">Clear</x-filament-support::button>
-                                    <x-filament-support::button class="w-full" type="button" wire:target="saveSignature"
-                                        @click="$wire.saveSignature(sig.toDataURL('image/png'))">Save Drawing</x-filament-support::button>
+                                    <x-filament::button class="w-full" type="button" color="danger"
+                                        @click="sig.clear()">Clear</x-filament::button>
+                                    <x-filament::button class="w-full" type="button" wire:target="saveSignature"
+                                        @click="$wire.saveSignature(sig.toDataURL('image/png'))">Save Drawing</x-filament::button>
                                 </div>
                             </div>
                         @endif
@@ -244,7 +244,7 @@
                                 <p class="text-xs text-gray-600 mb-2">
                                     PNG or JPG, max 2 MB. Transparent PNG works best.
                                 </p>
-                                <input type="file" accept="image/png,image/jpeg" wire:model="uploadedSignature"
+                                <input type="file" accept="image/png,image/jpeg" wire:model.live="uploadedSignature"
                                     class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none p-2 mb-2">
 
                                 <div wire:loading wire:target="uploadedSignature" class="text-xs text-gray-500 mb-2">
@@ -262,10 +262,10 @@
                                     </div>
                                 @endif
 
-                                <x-filament-support::button class="w-full" type="button" wire:click="saveUploadedSignature" wire:loading.attr="disabled" wire:target="saveUploadedSignature">
+                                <x-filament::button class="w-full" type="button" wire:click="saveUploadedSignature" wire:loading.attr="disabled" wire:target="saveUploadedSignature">
                                     <span wire:loading.remove wire:target="saveUploadedSignature">Save Uploaded Image</span>
                                     <span wire:loading wire:target="saveUploadedSignature">Saving...</span>
-                                </x-filament-support::button>
+                                </x-filament::button>
                             </div>
                         @endif
 
@@ -332,14 +332,14 @@
                                     <p class="text-xs text-green-600 mb-3" x-text="'✓ Processed in ' + elapsed + 's'"></p>
 
                                     <div class="flex gap-2">
-                                        <x-filament-support::button class="w-full" type="button" color="secondary"
+                                        <x-filament::button class="w-full" type="button" color="gray"
                                             @click="reset()">
                                             Try Another
-                                        </x-filament-support::button>
-                                        <x-filament-support::button class="w-full" type="button"
+                                        </x-filament::button>
+                                        <x-filament::button class="w-full" type="button"
                                             @click="$wire.saveSignature(cleanedDataUrl)">
                                             Save Cleaned Signature
-                                        </x-filament-support::button>
+                                        </x-filament::button>
                                     </div>
                                 </div>
                             </div>

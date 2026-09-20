@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\ElectricityMeterResource\Pages;
 
 use App\Filament\Resources\ElectricityMeterResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListElectricityMeters extends ListRecords
 {
     protected static string $resource = ElectricityMeterResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

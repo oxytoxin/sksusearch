@@ -2,9 +2,8 @@
 
 namespace App\Forms\Components;
 
-use Filament\Forms\Components\Repeater;
+use Awcodes\FilamentTableRepeater\Components\TableRepeater;
 
-class SlimRepeater extends Repeater
+class SlimRepeater extends TableRepeater
 {
-    protected string $view = 'forms.components.slim-repeater';
 }

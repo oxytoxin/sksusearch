@@ -5,19 +5,23 @@ namespace App\Http\Livewire\Archiver;
 use App\Models\ArchivedCheque;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Actions\Position;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Livewire\Component;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Filters\MultiSelectFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 
-class ViewStaleCheques extends Component implements HasTable
+class ViewStaleCheques extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms;
+    use InteractsWithTable {
+        table as baseTable;
+    }
 
     public function mount()
     {
@@ -83,10 +87,10 @@ class ViewStaleCheques extends Component implements HasTable
 
             TextColumn::make('cheque_state')
                 ->label('Cheque State')
-                ->enum([
+                ->formatStateUsing(fn ($state) => [
                     '1' => 'Cancelled',
                     '2' => 'Stale',
-                ]),
+                ][$state] ?? $state),
             TextColumn::make('created_at')
                 ->label('Date uploaded')
                 ->searchable()->date(),
@@ -123,9 +127,10 @@ class ViewStaleCheques extends Component implements HasTable
 
         ];
     }
-    protected function getTableActionsPosition(): ?string
+    public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
     {
-        return Position::AfterCells;
+        return $this->baseTable($table)
+            ->actionsPosition(\Filament\Tables\Enums\ActionsPosition::AfterCells);
     }
     public function render()
     {

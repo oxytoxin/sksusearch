@@ -382,13 +382,13 @@
         </div>
     </div>
 
-    <x-modal.card title="Travel Dates" align="center" blur wire:model.defer="modifyDates">
+    <x-modal.card title="Travel Dates" align="center" blur wire:model="modifyDates">
         {{-- <span class="italic text-md">Uncheck the dates that the vehicle will be available</span> --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
             <div class="col-span-1 space-y-3 sm:col-span-2">
                 {{ $this->form }}
                 {{-- @foreach (json_decode($travel_dates) as $travel_date)
-                    <x-checkbox id="right-label" lg label="{{ \Carbon\Carbon::parse($travel_date)->format('F d, Y') }}" wire:model.defer="travelDates.{{ $travel_date }}" />
+                    <x-checkbox id="right-label" lg label="{{ \Carbon\Carbon::parse($travel_date)->format('F d, Y') }}" wire:model="travelDates.{{ $travel_date }}" />
                 @endforeach --}}
             </div>
         </div>
@@ -403,11 +403,11 @@
         </x-slot>
     </x-modal.card>
 
-    <x-modal.card title="Reject Vehicle Request" align="center" blur wire:model.defer="rejectModal">
+    <x-modal.card title="Reject Vehicle Request" align="center" blur wire:model="rejectModal">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div class="col-span-1 sm:col-span-2">
-                <x-textarea label="Remarks" placeholder="Reason for rejection..." wire:model="remarks" />
+                <x-textarea label="Remarks" placeholder="Reason for rejection..." wire:model.live="remarks" />
             </div>
         </div>
 
@@ -421,11 +421,11 @@
         </x-slot>
     </x-modal.card>
 
-    <x-modal.card title="Assign Driver" align="center" blur wire:model.defer="assignDriverModal">
+    <x-modal.card title="Assign Driver" align="center" blur wire:model="assignDriverModal">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div class="col-span-1 sm:col-span-2">
-                <x-native-select label="Driver" wire:model="assigned_driver">
+                <x-native-select label="Driver" wire:model.live="assigned_driver">
                     <option>Select Driver</option>
                     @foreach ($drivers as $drive)
                         <option value="{{ $drive->id }}">{{ $drive->full_name }}</option>
@@ -444,11 +444,11 @@
         </x-slot>
     </x-modal.card>
 
-    <x-modal.card title="Assign Vehicle" align="center" blur wire:model.defer="assignVehicleModal">
+    <x-modal.card title="Assign Vehicle" align="center" blur wire:model="assignVehicleModal">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div class="col-span-1 px-8 sm:col-span-2">
-                <x-native-select label="Vehicle" wire:model="assign_vehicle">
+                <x-native-select label="Vehicle" wire:model.live="assign_vehicle">
                     <option>Select Vehicle</option>
                     @foreach ($vehicles as $vehicle)
                         <option value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }} - ({{ $vehicle->plate_number }})
@@ -469,11 +469,11 @@
         </x-slot>
     </x-modal.card>
 
-    <x-modal.card title="Change Vehicle" align="center" blur wire:model.defer="modifyVehicleModal">
+    <x-modal.card title="Change Vehicle" align="center" blur wire:model="modifyVehicleModal">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div class="col-span-1 px-8 sm:col-span-2">
-                <x-native-select label="Vehicle" wire:model="change_vehicle">
+                <x-native-select label="Vehicle" wire:model.live="change_vehicle">
                     <option>Select Vehicle</option>
                     @foreach ($vehicles_for_update as $vehicle)
                         <option value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }} - ({{ $vehicle->plate_number }})
@@ -494,11 +494,11 @@
         </x-slot>
     </x-modal.card>
 
-    <x-modal.card title="Change Driver" align="center" blur wire:model.defer="modifyDriverModal">
+    <x-modal.card title="Change Driver" align="center" blur wire:model="modifyDriverModal">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div class="col-span-1 px-8 sm:col-span-2">
-                <x-native-select label="Driver" wire:model="change_driver">
+                <x-native-select label="Driver" wire:model.live="change_driver">
                     <option>Select Driver</option>
 
                     @foreach ($drivers_for_update as $driver)

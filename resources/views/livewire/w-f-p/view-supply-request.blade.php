@@ -789,12 +789,12 @@
 
 
 
-    <x-modal.card title="Assign Supply Code" align="center" blur wire:model.defer="assignSupplyCode">
+    <x-modal.card title="Assign Supply Code" align="center" blur wire:model="assignSupplyCode">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div class="col-span-1 px-2 sm:col-span-2">
                 <label for="supply_code" class="block text-sm font-medium leading-6 text-gray-900">Supply Code</label>
-                <input wire:model="supply_code" id="supply_code" name="supply_code" type="text" autocomplete=""
+                <input wire:model.live="supply_code" id="supply_code" name="supply_code" type="text" autocomplete=""
                     class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             </div>
         </div>
@@ -809,13 +809,13 @@
         </x-slot>
     </x-modal.card>
     {{-- Request Modification --}}
-    <x-modal.card title="Modify Request" align="center" blur wire:model.defer="modifyRequestModal">
+    <x-modal.card title="Modify Request" align="center" blur wire:model="modifyRequestModal">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="col-span-full">
                 <label for="modify_request_remarks"
                     class="block text-sm font-medium leading-6 text-gray-900">Remarks</label>
                 <div class="mt-2">
-                    <textarea id="modify_request_remarks" wire:model="modify_request_remarks" name="modify_request_remarks"
+                    <textarea id="modify_request_remarks" wire:model.live="modify_request_remarks" name="modify_request_remarks"
                         rows="3"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                 </div>
@@ -839,13 +839,13 @@
     {{-- End Request Modification --}}
 
     {{-- Modify Supply Code --}}
-    <x-modal.card title="Modify Supply Code" align="center" blur wire:model.defer="modifySupplyCode">
+    <x-modal.card title="Modify Supply Code" align="center" blur wire:model="modifySupplyCode">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div class="col-span-1 px-2 sm:col-span-2">
                 <label for="modify_supply_code" class="block text-sm font-medium leading-6 text-gray-900">Supply
                     Code</label>
-                <input wire:model="modify_supply_code" id="modify_supply_code" name="modify_supply_code"
+                <input wire:model.live="modify_supply_code" id="modify_supply_code" name="modify_supply_code"
                     type="text" autocomplete=""
                     class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             </div>
@@ -863,13 +863,13 @@
     {{-- End Modify Supply Code --}}
 
     {{-- Request Rejection --}}
-    <x-modal.card title="Reject Request" align="center" blur wire:model.defer="rejectRequestModal">
+    <x-modal.card title="Reject Request" align="center" blur wire:model="rejectRequestModal">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="col-span-full">
                 <label for="reject_request_remarks"
                     class="block text-sm font-medium leading-6 text-gray-900">Remarks</label>
                 <div class="mt-2">
-                    <textarea id="reject_request_remarks" wire:model="reject_request_remarks" name="reject_request_remarks"
+                    <textarea id="reject_request_remarks" wire:model.live="reject_request_remarks" name="reject_request_remarks"
                         rows="3"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                 </div>
@@ -893,7 +893,7 @@
     {{-- End Request Rejection --}}
 
     {{-- Accounting Assignment --}}
-    <x-modal.card title="Assign" align="center" blur wire:model.defer="accountingAssignModal">
+    <x-modal.card title="Assign" align="center" blur wire:model="accountingAssignModal">
         <div class="grid grid-cols-1 sm:grid-cols-1 mb-1">
             <div class="col-span-1">
                 <div class="flex justify-between">
@@ -904,7 +904,7 @@
                 <div class="mt-2">
                     <div
                         class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 w-full">
-                        <input type="text" wire:model="uacs_code" name="uacs_code" disabled id="uacs_code"
+                        <input type="text" wire:model.live="uacs_code" name="uacs_code" disabled id="uacs_code"
                             autocomplete="uacs_code"
                             class="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                             placeholder="">
@@ -918,7 +918,7 @@
                     class="block text-sm font-medium leading-6 text-gray-900">Budget
                     Category</label>
                 <div class="mt-2">
-                    <select id="requested_budget_category" wire:model="requested_budget_category"
+                    <select id="requested_budget_category" wire:model.live="requested_budget_category"
                         name="requested_budget_category" autocomplete="country-name"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         <option>Select One</option>
@@ -937,7 +937,7 @@
                 <label for="requested_account_title" class="block text-sm font-medium leading-6 text-gray-900">Account
                     Title (Accounting)</label>
                 <div class="mt-2">
-                    <select id="requested_account_title" wire:model="requested_account_title"
+                    <select id="requested_account_title" wire:model.live="requested_account_title"
                         name="requested_account_title" autocomplete="country-name"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         <option>Select One</option>
@@ -956,7 +956,7 @@
                 <label for="requested_account_title_budget"
                     class="block text-sm font-medium leading-6 text-gray-900">Account Title (Budget)</label>
                 <div class="mt-2">
-                    <select id="requested_account_title_budget" wire:model="requested_account_title_budget"
+                    <select id="requested_account_title_budget" wire:model.live="requested_account_title_budget"
                         name="requested_account_title_budget" autocomplete="country-name"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         <option>Select One</option>
@@ -975,7 +975,7 @@
                 <label for="requested_category_group" class="block text-sm font-medium leading-6 text-gray-900">Title
                     Group</label>
                 <div class="mt-2">
-                    <select id="requested_category_group" wire:model="requested_category_group"
+                    <select id="requested_category_group" wire:model.live="requested_category_group"
                         name="requested_category_group" autocomplete="country-name"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                         <option>Select One</option>
@@ -1007,13 +1007,13 @@
     {{-- End Accounting Assignment --}}
 
     {{-- Accounting Request Modification --}}
-    <x-modal.card title="Forward Request to Supply" align="center" blur wire:model.defer="forwardRequestToSupply">
+    <x-modal.card title="Forward Request to Supply" align="center" blur wire:model="forwardRequestToSupply">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="col-span-full">
                 <label for="accounting_modify_request_remarks"
                     class="block text-sm font-medium leading-6 text-gray-900">Remarks</label>
                 <div class="mt-2">
-                    <textarea id="accounting_modify_request_remarks" wire:model="accounting_modify_request_remarks"
+                    <textarea id="accounting_modify_request_remarks" wire:model.live="accounting_modify_request_remarks"
                         name="accounting_modify_request_remarks" rows="3"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                 </div>
@@ -1040,13 +1040,13 @@
     {{-- End Request Modification --}}
 
     {{-- Accounting Request Rejection --}}
-    <x-modal.card title="Reject Request" align="center" blur wire:model.defer="accountingRejectRequestModal">
+    <x-modal.card title="Reject Request" align="center" blur wire:model="accountingRejectRequestModal">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="col-span-full">
                 <label for="accounting_reject_request_remarks"
                     class="block text-sm font-medium leading-6 text-gray-900">Remarks</label>
                 <div class="mt-2">
-                    <textarea id="accounting_reject_request_remarks" wire:model="accounting_reject_request_remarks"
+                    <textarea id="accounting_reject_request_remarks" wire:model.live="accounting_reject_request_remarks"
                         name="accounting_reject_request_remarks" rows="3"
                         class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
                 </div>

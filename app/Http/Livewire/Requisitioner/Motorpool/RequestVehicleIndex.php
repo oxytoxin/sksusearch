@@ -4,6 +4,8 @@ namespace App\Http\Livewire\Requisitioner\Motorpool;
 
 use Livewire\Component;
 use Filament\Tables;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\Action;
@@ -12,9 +14,9 @@ use Filament\Tables\Actions\ViewAction;
 use App\Models\RequestSchedule;
 use Filament\Tables\Columns\ViewColumn;
 
-class RequestVehicleIndex extends Component implements HasTable
+class RequestVehicleIndex extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     protected function getTableQuery()
     {

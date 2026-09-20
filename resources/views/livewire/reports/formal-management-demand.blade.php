@@ -1,9 +1,9 @@
 <div>
     <div class="flex justify-start w-full mb-4  space-x-2 ">
-        <x-filament-support::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()">
-            Back</x-filament-support::button>
-        <x-filament-support::button class="" type="button" color="primary" onclick="printDiv('printableDiv')">Print
-            Document</x-filament-support::button>
+        <x-filament::button icon="heroicon-s-arrow-left" type="button" onclick="window.history.back()">
+            Back</x-filament::button>
+        <x-filament::button class="" type="button" color="primary" onclick="printDiv('printableDiv')">Print
+            Document</x-filament::button>
         {{-- <button  class="px-4 py-2 bg-primary-500 text-white rounded text-sm"> --}}
 
         </button>

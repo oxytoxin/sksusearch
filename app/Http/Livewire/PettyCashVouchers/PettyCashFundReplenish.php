@@ -19,9 +19,9 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
-class PettyCashFundReplenish extends Component implements HasTable
+class PettyCashFundReplenish extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     public $disbursement_voucher_id;
     public $petty_cash_fund;

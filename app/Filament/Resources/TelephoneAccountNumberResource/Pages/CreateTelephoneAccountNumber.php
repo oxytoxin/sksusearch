@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\TelephoneAccountNumberResource\Pages;
 
 use App\Filament\Resources\TelephoneAccountNumberResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateTelephoneAccountNumber extends CreateRecord

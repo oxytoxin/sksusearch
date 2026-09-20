@@ -4,7 +4,7 @@ namespace App\Filament\Resources\ProvinceResource\Pages;
 
 use App\Filament\Resources\ProvinceResource;
 use App\Models\PhilippineProvince;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 

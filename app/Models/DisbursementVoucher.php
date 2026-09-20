@@ -212,7 +212,7 @@
             }
             $endDate = $cashAdvanceReminder->voucher_end_date;
 
-            return $endDate ? Carbon::now()->diffInDays(Carbon::parse($endDate)) : null;
+            return $endDate ? (int) Carbon::now()->diffInDays(Carbon::parse($endDate), true) : null;
         }
 
         /**

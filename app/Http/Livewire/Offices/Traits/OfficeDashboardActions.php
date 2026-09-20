@@ -110,9 +110,7 @@ trait OfficeDashboardActions
         $this->icuReturnCameFromVerify = false;
         $this->mountedTableAction = null;
         $this->mountedTableActionRecord = null;
-        $this->dispatchBrowserEvent('close-modal', [
-            'id' => "{$this->id}-table-action",
-        ]);
+        $this->dispatch('close-modal', id: "{$this->getId()}-table-action");
     }
 
     /**
@@ -364,9 +362,9 @@ trait OfficeDashboardActions
                     $recordId = $action->getRecord()?->getKey();
 
                     return $action->makeModalAction('cancel')
-                        ->label(__('filament-support::actions/modal.actions.cancel.label'))
+                        ->label(__('filament-actions::modal.actions.cancel.label'))
                         ->action('handleIcuReturnCancel', $recordId ? [(string) $recordId] : [])
-                        ->color('secondary');
+                        ->color('gray');
                 })
                 ->form(function () {
                     return [
@@ -408,7 +406,7 @@ trait OfficeDashboardActions
                     }
                     // ========== SMS NOTIFICATION END ==========
 
-                    $this->emit('refresh');
+                    $this->dispatch('refresh');
                     Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
                 })
                 ->visible(function ($record) {
@@ -446,7 +444,7 @@ trait OfficeDashboardActions
                     app(DisbursementVoucherWorkflowService::class)->releaseReturn($record, auth()->user(), $data['release_log_number'], $data['release_note'] ?? null, [
                         'is_oic' => $this->isOic(),
                     ]);
-                    $this->emit('refresh');
+                    $this->dispatch('refresh');
                     Notification::make()->title('Document released successfully.')->success()->send();
                 })
                 ->visible(fn ($record) => $record && filled($record->pending_return_step_id)),
@@ -472,7 +470,7 @@ trait OfficeDashboardActions
                     app(DisbursementVoucherWorkflowService::class)->resolveReturn($record, auth()->user(), $data['resolve_note'] ?? null, [
                         'is_oic' => $this->isOic(),
                     ]);
-                    $this->emit('refresh');
+                    $this->dispatch('refresh');
                     Notification::make()->title('Return resolved successfully.')->success()->send();
                 })
                 ->visible(fn ($record) => $record && filled($record->pending_return_step_id)),
@@ -738,7 +736,7 @@ trait OfficeDashboardActions
                 app(DisbursementVoucherWorkflowService::class)->receive($record, auth()->user(), [
                     'is_oic' => $this->isOic(),
                 ]);
-                $this->emit('refresh');
+                $this->dispatch('refresh');
                 Notification::make()->title('Document Received')->success()->send();
             })
                 ->visible(function ($record) {
@@ -783,7 +781,7 @@ trait OfficeDashboardActions
                     // }
                     // ========== SMS NOTIFICATION END ==========
 
-                    $this->emit('refresh');
+                    $this->dispatch('refresh');
                     Notification::make()->title('Document Forwarded')->success()->send();
                 } else {
                     Notification::make()->title('Document cannot be forwarded.')->body('Document may have been updated. Please refresh this page.')->success()->send();

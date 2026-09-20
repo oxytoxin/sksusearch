@@ -5,7 +5,7 @@ namespace App\Filament\Resources\BondResource\Pages;
 use App\Filament\Resources\BondResource;
 use App\Models\Bond;
 use App\Models\EmployeeInformation;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;

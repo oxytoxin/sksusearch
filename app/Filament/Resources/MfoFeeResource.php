@@ -5,8 +5,8 @@
     use Filament\Forms;
     use Filament\Tables;
     use App\Models\MfoFee;
-    use Filament\Resources\Form;
-    use Filament\Resources\Table;
+    use Filament\Forms\Form;
+    use Filament\Tables\Table;
     use Filament\Resources\Resource;
     use Filament\Forms\Components\Select;
     use Filament\Tables\Columns\TextColumn;
@@ -22,7 +22,7 @@
 
         protected static ?string $modelLabel = 'MFO Fees';
 
-        protected static ?string $navigationIcon = 'heroicon-o-archive';
+        protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
         protected static ?int $navigationSort = 31;
 

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\PriceListDocumentResource\Pages;
 
 use App\Filament\Resources\PriceListDocumentResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePriceListDocument extends CreateRecord
@@ -17,7 +17,7 @@ class CreatePriceListDocument extends CreateRecord
         return $this->getResource()::getUrl('index');
     }
 
-    protected static function canCreateAnother(): bool
+    public static function canCreateAnother(): bool
     {
         return false;
     }

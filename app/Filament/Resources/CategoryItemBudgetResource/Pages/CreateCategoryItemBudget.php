@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CategoryItemBudgetResource\Pages;
 
 use App\Filament\Resources\CategoryItemBudgetResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateCategoryItemBudget extends CreateRecord

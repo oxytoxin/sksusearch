@@ -18,10 +18,23 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-// Broadcast::channel('notifications.{userId}', function ($user, $userId) {
-//     return (int) $user->id === (int) $userId; // Allow only the owner to listen
-// });
+Broadcast::channel('notifications.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
 
-// Broadcast::channel('messages.{disbursementVoucherId}', function ($user, $disbursementVoucherId) {
-//     return true;
-// });
+Broadcast::channel('messages.{disbursementVoucherId}', function ($user, $disbursementVoucherId) {
+    $voucher = DisbursementVoucher::find($disbursementVoucherId);
+
+    if (! $voucher) {
+        return false;
+    }
+
+    $participantIds = [
+        $voucher->user_id,
+        EmployeeInformation::accountantUser()?->user_id,
+        EmployeeInformation::presidentUser()?->user_id,
+        EmployeeInformation::auditorUser()?->user_id,
+    ];
+
+    return in_array((int) $user->id, array_map('intval', array_filter($participantIds)), true);
+});

@@ -1,7 +1,7 @@
 <div class="p-10">
     <div class="bg-primary-200 p-4 rounded-md">
         <div class="grid grid-cols-4 mb-4">
-            <x-native-select class="col-span-1" id="vehicle-select" label="Vehicle" wire:model="vehicle">
+            <x-native-select class="col-span-1" id="vehicle-select" label="Vehicle" wire:model.live="vehicle">
                 <option value="" selected>All</option>
                 @forelse ($vehicles as $vehicle)
                     <option class="uppercase" value="{{ $vehicle->id }}">{{ $vehicle->campus->name }} - {{ $vehicle->model }}, {{$vehicle->plate_number}}</option>

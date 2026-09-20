@@ -12,18 +12,22 @@
     use App\Models\WfpApprovalRemark;
     use Filament\Tables;
     use Filament\Tables\Contracts\HasTable;
-    use Filament\Tables\Filters\Layout;
     use Filament\Tables\Filters\SelectFilter;
     use Illuminate\Database\Eloquent\Builder;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Filters\Filter;
     use App\Jobs\SendSmsJob;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\Log;
 
-    class WfpSubmissionsQ1 extends Component implements HasTable
+    class WfpSubmissionsQ1 extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable;
+        use InteractsWithForms;
+        use InteractsWithTable {
+            table as baseTable;
+        }
 
         public $wfp_type;
         public $fund_cluster;
@@ -264,7 +268,7 @@
                     ->label('Request Modification')
                     ->color('danger')
                     ->button()
-                    ->icon('heroicon-o-pencil-alt')
+                    ->icon('heroicon-o-pencil-square')
                     ->form([
                         Forms\Components\Textarea::make('reason')
                             ->label('Reason for Modification')
@@ -407,9 +411,10 @@
             ];
         }
 
-        protected function getTableFiltersLayout(): ?string
+        public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
         {
-            return Layout::AboveContent;
+            return $this->baseTable($table)
+                ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
         }
 
         protected function getTableFilters(): array

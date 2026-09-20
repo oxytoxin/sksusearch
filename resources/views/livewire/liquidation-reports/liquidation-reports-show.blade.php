@@ -240,7 +240,7 @@
     </div>
 
     <div class="mt-4" onclick="printDiv('dvPrint')">
-        <x-filament-support::button>PRINT</x-filament-support::button>
+        <x-filament::button>PRINT</x-filament::button>
     </div>
 
     <style>

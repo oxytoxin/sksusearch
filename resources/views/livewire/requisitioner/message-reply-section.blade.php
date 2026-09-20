@@ -37,7 +37,7 @@
                         </div>
                         @if ($replyingTo === $message->id)
                             <div class="mt-2 ml-4">
-                                <textarea wire:model="replyContent" class="w-full p-2 border rounded-lg focus:ring focus:ring-primary-200 transition duration-200 ease-in-out" placeholder="Type your reply..."></textarea>
+                                <textarea wire:model.live="replyContent" class="w-full p-2 border rounded-lg focus:ring focus:ring-primary-200 transition duration-200 ease-in-out" placeholder="Type your reply..."></textarea>
                                 @error('replyContent')
                                     <span class="text-red-500 text-xs block mt-1">{{ $message }}</span>
                                 @enderror
@@ -76,7 +76,7 @@
         </div>
     </div>
     <div class="mt-2 p-3">
-        <textarea wire:model="messageContent" class="w-full p-2 border rounded-lg focus:ring focus:ring-primary-200 transition duration-200 ease-in-out" placeholder="Type your message..."></textarea>
+        <textarea wire:model.live="messageContent" class="w-full p-2 border rounded-lg focus:ring focus:ring-primary-200 transition duration-200 ease-in-out" placeholder="Type your message..."></textarea>
         @error('messageContent')
             <span class="text-red-500 text-xs block mt-1">{{ $message }}</span>
         @enderror
@@ -90,18 +90,18 @@
             const disbursementVoucherId = @json($disbursement_voucher->id);
             console.log(`Subscribing to messages.${disbursementVoucherId}`);
             console.log("Echo is available");
-            window.Echo.channel(`messages.${disbursementVoucherId}`)
+            window.Echo.private(`messages.${disbursementVoucherId}`)
                 .listen('MessageSent', (message) => {
                     console.log("New Message:", message);
-                    Livewire.emit('refreshMessages'); // Ensure this line is present
+                    Livewire.dispatch('refreshMessages'); // Ensure this line is present
                 })
                 .listen('ReplyAdded', (reply) => {
                     console.log("New Reply:", reply);
-                    Livewire.emit('refreshMessages'); // Ensure this line is present
+                    Livewire.dispatch('refreshMessages'); // Ensure this line is present
                 })
                 .listen('MessageDeleted', (message) => {
                     console.log("Message Deleted:", message);
-                    Livewire.emit('refreshMessages'); // Ensure this line is present
+                    Livewire.dispatch('refreshMessages'); // Ensure this line is present
                 });
 
         });

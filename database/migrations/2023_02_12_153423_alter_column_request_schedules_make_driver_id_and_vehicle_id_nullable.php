@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::table('request_schedules', function (Blueprint $table) {
-            $table->string('driver_id')->nullable()->change();
-            $table->string('vehicle_id')->nullable()->change();
-            $table->string('time_start')->nullable()->change();
-            $table->string('time_end')->nullable()->change();
+            $table->string('driver_id', 255)->nullable()->after('travel_order_id')->change();
+            $table->string('vehicle_id', 255)->nullable()->after('driver_id')->change();
+            $table->string('time_start', 255)->nullable()->after('date_of_travel')->change();
+            $table->string('time_end', 255)->nullable()->after('time_start')->change();
         });
     }
 
@@ -29,10 +29,10 @@ return new class extends Migration
     public function down()
     {
         Schema::table('request_schedules', function (Blueprint $table) {
-            $table->string('driver_id')->change();
-            $table->string('vehicle_id')->change();
-            $table->string('time_start')->change();
-            $table->string('time_end')->change();
+            $table->string('driver_id', 255)->after('travel_order_id')->change();
+            $table->string('vehicle_id', 255)->after('driver_id')->change();
+            $table->string('time_start', 255)->after('date_of_travel')->change();
+            $table->string('time_end', 255)->after('time_start')->change();
         });   
     }
 };

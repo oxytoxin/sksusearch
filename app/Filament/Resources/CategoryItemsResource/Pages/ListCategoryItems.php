@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CategoryItemsResource\Pages;
 
 use App\Filament\Resources\CategoryItemsResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListCategoryItems extends ListRecords
@@ -12,7 +12,7 @@ class ListCategoryItems extends ListRecords
 
     public static ?string $title = 'Account Titles';
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

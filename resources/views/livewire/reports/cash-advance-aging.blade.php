@@ -38,13 +38,13 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4">
             <div class="md:col-span-2">
                 <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">As of date</label>
-                <input type="date" wire:model="asOfDate"
+                <input type="date" wire:model.live="asOfDate"
                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm" />
             </div>
 
             <div class="md:col-span-3">
                 <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Fund cluster</label>
-                <select wire:model="fundClusterId"
+                <select wire:model.live="fundClusterId"
                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm">
                     <option value="">All funds</option>
                     @foreach ($fundClusters as $fc)
@@ -82,7 +82,7 @@
 
             <div class="md:col-span-3">
                 <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Search</label>
-                <input type="text" wire:model.debounce.400ms="search" placeholder="DV no, name, office…"
+                <input type="text" wire:model.live.debounce.400ms="search" placeholder="DV no, name, office…"
                     class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm" />
             </div>
         </div>

@@ -7001,7 +7001,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function decreaseStep()
     {
-        $this->emit('refreshComponent');
+        $this->dispatch('refreshComponent');
         $this->supplies_particular = null;
         //$this->form->fill();
         $this->global_index--;
@@ -7009,7 +7009,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function increaseStep()
     {
-        $this->emit('refreshComponent');
+        $this->dispatch('refreshComponent');
         //$this->form->fill();
         $this->supplies_particular = null;
         $this->global_index++;
@@ -8459,7 +8459,7 @@ class CreateWFP extends Component implements Forms\Contracts\HasForms
 
     public function setStep($step)
     {
-        $this->emit('refreshComponent');
+        $this->dispatch('refreshComponent');
 
         // dd($this->supplies_particular);
         $this->supplies_particular = null;

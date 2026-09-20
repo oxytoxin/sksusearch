@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\CategoryGroupResource\Pages;
 
-use Filament\Pages\Actions;
-use App\Models\CategoryGroup;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\CategoryGroupResource;
 
@@ -14,12 +14,13 @@ class ListCategoryGroups extends ListRecords
 
     public static ?string $title = 'Account Groups';
 
-    protected function getTableQuery(): Builder
+    public function table(Table $table): Table
     {
-        return CategoryGroup::query()->orderBy('sort_id');
+        return parent::table($table)
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->orderBy('sort_id'));
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

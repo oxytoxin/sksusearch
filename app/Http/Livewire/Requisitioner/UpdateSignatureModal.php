@@ -60,7 +60,7 @@ class UpdateSignatureModal extends Component
             ->send();
 
         $this->closeModal();
-        $this->dispatchBrowserEvent('signature-updated');
+        $this->dispatch('signature-updated');
     }
 
     public function saveUploadedSignature()
@@ -91,6 +91,6 @@ class UpdateSignatureModal extends Component
             ->send();
 
         $this->closeModal();
-        $this->dispatchBrowserEvent('signature-updated');
+        $this->dispatch('signature-updated');
     }
 }

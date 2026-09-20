@@ -4,7 +4,7 @@ namespace App\Filament\Resources\DailyTravelExpensesResource\Pages;
 
 use App\Filament\Resources\DailyTravelExpensesResource;
 use App\Models\PhilippineRegion;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,7 +36,7 @@ class EditDailyTravelExpenses extends EditRecord
         return $this->getResource()::getUrl('index');
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             // Actions\DeleteAction::make(),

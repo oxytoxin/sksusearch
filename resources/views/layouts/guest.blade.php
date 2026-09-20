@@ -12,6 +12,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireScriptConfig
     </head>
     <body>
         <div class="font-sans antialiased text-gray-900">

@@ -57,7 +57,7 @@
         @if (auth()->user()->employee_information->office->office_group_id == 3)
             <div class="mt-4">
                 <a href="{{ route('icu.verified_documents', ['disbursement_voucher' => $disbursement_voucher]) }}" target="_blank">
-                    <x-filament-support::button>View Report</x-filament-support::button>
+                    <x-filament::button>View Report</x-filament::button>
                 </a>
             </div>
         @endif

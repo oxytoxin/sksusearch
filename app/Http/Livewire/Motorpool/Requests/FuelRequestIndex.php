@@ -5,6 +5,8 @@ namespace App\Http\Livewire\Motorpool\Requests;
 use App\Models\FuelRequisition;
 use Livewire\Component;
 use Filament\Tables;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\ViewAction;
@@ -12,9 +14,9 @@ use Filament\Tables\Actions\Action;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 
-class FuelRequestIndex extends Component implements HasTable
+class FuelRequestIndex extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     protected function getTableQuery()
     {

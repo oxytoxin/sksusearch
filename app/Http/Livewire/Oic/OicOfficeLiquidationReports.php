@@ -19,16 +19,20 @@
     use Filament\Tables\Actions\ActionGroup;
     use Filament\Tables\Actions\ViewAction;
     use Filament\Tables\Columns\TextColumn;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
-    use Filament\Tables\Filters\Layout;
     use Filament\Tables\Filters\SelectFilter;
     use Illuminate\Support\Facades\DB;
     use Livewire\Component;
 
-    class OicOfficeLiquidationReports extends Component implements HasTable
+    class OicOfficeLiquidationReports extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable;
+        use InteractsWithForms;
+        use InteractsWithTable {
+            table as baseTable;
+        }
 
         public function isOic()
         {
@@ -66,14 +70,11 @@
             ];
         }
 
-        protected function getTableFiltersFormColumns(): int
+        public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
         {
-            return 2;
-        }
-
-        protected function getTableFiltersLayout(): ?string
-        {
-            return Layout::AboveContent;
+            return $this->baseTable($table)
+                ->filtersFormColumns(2)
+                ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
         }
 
         public function getTableActions()

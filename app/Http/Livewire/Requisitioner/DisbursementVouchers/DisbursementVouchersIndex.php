@@ -8,15 +8,17 @@ use App\Models\DisbursementVoucher;
 use Filament\Forms\Components\RichEditor;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
-class DisbursementVouchersIndex extends Component implements HasTable
+class DisbursementVouchersIndex extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable, OfficeDashboardActions;
+    use InteractsWithForms, InteractsWithTable, OfficeDashboardActions;
 
     protected function getTableQuery()
     {

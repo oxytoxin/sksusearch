@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\ViewAction;
 use App\Models\WpfPersonnel;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class WfpHistoryQ1 extends Component implements HasTable
+class WfpHistoryQ1 extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
     public $cost_centers;
 
     public $supplementalQuarterId= null;

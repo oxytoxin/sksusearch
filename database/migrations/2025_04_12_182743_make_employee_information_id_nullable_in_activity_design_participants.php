@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('activity_design_coordinators', function (Blueprint $table) {
-            $table->foreignId('employee_information_id')->nullable()->change();
+            $table->foreignId('employee_information_id')->nullable()->after('activity_design_id')->change();
         });
 
         Schema::table('activity_design_participants', function (Blueprint $table) {
-            $table->foreignId('employee_information_id')->nullable()->change();
+            $table->foreignId('employee_information_id')->nullable()->after('activity_design_id')->change();
         });
     }
 

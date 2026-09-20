@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\ErrorQueryResource\Pages;
 
 use App\Filament\Resources\ErrorQueryResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateErrorQuery extends CreateRecord

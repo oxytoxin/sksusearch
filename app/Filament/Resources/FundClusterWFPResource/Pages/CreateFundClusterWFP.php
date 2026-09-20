@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\FundClusterWFPResource\Pages;
 
 use App\Filament\Resources\FundClusterWFPResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateFundClusterWFP extends CreateRecord

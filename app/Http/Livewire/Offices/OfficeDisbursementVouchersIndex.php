@@ -6,7 +6,6 @@
     use Illuminate\Support\Facades\DB;
     use App\Models\DisbursementVoucher;
     use Filament\Tables\Actions\Action;
-    use Filament\Tables\Filters\Layout;
     use Filament\Forms\Components\Select;
     use App\Models\DisbursementVoucherStep;
     use Filament\Tables\Contracts\HasTable;
@@ -17,7 +16,9 @@
     use Filament\Tables\Filters\Filter;
     use Illuminate\Database\Eloquent\Builder;
     use Filament\Forms\Components\Grid;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
     use Carbon\Carbon;
     use Illuminate\Support\Facades\Request;
@@ -28,9 +29,12 @@
     use App\Models\VoucherSubType;
     use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
-    class OfficeDisbursementVouchersIndex extends Component implements HasTable
+    class OfficeDisbursementVouchersIndex extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable, OfficeDashboardActions;
+        use InteractsWithForms, OfficeDashboardActions;
+        use InteractsWithTable {
+            table as baseTable;
+        }
 
         public $tracking_num_from_scan;
 
@@ -149,14 +153,11 @@
         }
 
 
-        protected function getTableFiltersFormColumns(): int
+        public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
         {
-            return 3;
-        }
-
-        protected function getTableFiltersLayout(): ?string
-        {
-            return Layout::AboveContent;
+            return $this->baseTable($table)
+                ->filtersFormColumns(3)
+                ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
         }
 
         protected function getTableColumns()
@@ -212,7 +213,7 @@
                     }
                     // ========== SMS NOTIFICATION END ==========
 
-                    $this->emit('refresh');
+                    $this->dispatch('refresh');
                     Notification::make()->title('DV marked for return. Use "Release Document" when the hardcopy is picked up.')->success()->send();
                 })
                     ->color('danger')

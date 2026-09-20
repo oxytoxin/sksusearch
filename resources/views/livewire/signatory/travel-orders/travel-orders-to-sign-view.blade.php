@@ -66,7 +66,7 @@
                                                     @if (filled($proposed_itinerary->submitted_at))
                                                         <span class="rounded-full bg-primary-50 px-2 py-1 text-xs font-semibold text-primary-700">Submitted</span>
                                                         @if ($canActOnCurrentStep)
-                                                            <x-filament-support::button color="warning" size="sm" wire:target="returnItinerary({{ $proposed_itinerary->id }})" wire:click="returnItinerary({{ $proposed_itinerary->id }})">Return</x-filament-support::button>
+                                                            <x-filament::button color="warning" size="sm" wire:target="returnItinerary({{ $proposed_itinerary->id }})" wire:click="returnItinerary({{ $proposed_itinerary->id }})">Return</x-filament::button>
                                                         @endif
                                                     @else
                                                         <span class="rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700">Not Submitted</span>
@@ -248,9 +248,9 @@
             @endif
         </div>
     </div>
-    <x-modal.card class="text-primary-600" title="Add Note" blur wire:model.defer="modal">
-        <form class="space=y=2 flex-col" wire:submit.prevent='addNote'>
-            <x-textarea class="text-primary-800 placeholder:text-primary-200" label="Your notes" placeholder="Write your notes" wire:model.defer="note" />
+    <x-modal.card class="text-primary-600" title="Add Note" blur wire:model="modal">
+        <form class="space=y=2 flex-col" wire:submit='addNote'>
+            <x-textarea class="text-primary-800 placeholder:text-primary-200" label="Your notes" placeholder="Write your notes" wire:model="note" />
             <x-button class="mt-2 border-primary-800 text-primary-900" type="submit">
                 <span class="text-primary-900">
                     Save Note
@@ -258,9 +258,9 @@
             </x-button>
         </form>
     </x-modal.card>
-    <x-modal.card class="text-primary-600" title="Rejection Note" description="Please provide further explanation for rejection of this travel order" blur wire:model.defer="modalRejection">
-        <form class="space=y=2 flex-col" wire:submit.prevent='reject'>
-            <x-textarea class="text-primary-800 placeholder:text-primary-200" label="Your notes" placeholder="Write your notes" wire:model.defer="rejectionNote" />
+    <x-modal.card class="text-primary-600" title="Rejection Note" description="Please provide further explanation for rejection of this travel order" blur wire:model="modalRejection">
+        <form class="space=y=2 flex-col" wire:submit='reject'>
+            <x-textarea class="text-primary-800 placeholder:text-primary-200" label="Your notes" placeholder="Write your notes" wire:model="rejectionNote" />
             <x-button class="mt-2 border-primary-800 text-primary-900" type="submit">
                 <span class="text-primary-900">
                     Proceed

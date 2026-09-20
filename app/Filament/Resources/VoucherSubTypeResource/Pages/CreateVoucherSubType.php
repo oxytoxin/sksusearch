@@ -4,7 +4,7 @@ namespace App\Filament\Resources\VoucherSubTypeResource\Pages;
 
 use App\Filament\Resources\VoucherSubTypeResource;
 use App\Models\VoucherSubType;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 

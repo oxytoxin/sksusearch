@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\VoucherCategoryResource\Pages;
 
 use App\Filament\Resources\VoucherCategoryResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateVoucherCategory extends CreateRecord

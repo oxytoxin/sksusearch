@@ -8,8 +8,8 @@
     use App\Models\FundCluster;
     use App\Models\Office;
     use App\Models\CostCenter;
-    use Filament\Resources\Form;
-    use Filament\Resources\Table;
+    use Filament\Forms\Form;
+    use Filament\Tables\Table;
     use Filament\Resources\Resource;
     use Filament\Forms\Components\Grid;
     use Filament\Forms\Components\Select;
@@ -26,7 +26,7 @@
 
         protected static ?string $modelLabel = 'Cost Center';
 
-        protected static ?string $navigationIcon = 'heroicon-o-library';
+        protected static ?string $navigationIcon = 'heroicon-o-building-library';
 
         protected static ?int $navigationSort = 36;
 

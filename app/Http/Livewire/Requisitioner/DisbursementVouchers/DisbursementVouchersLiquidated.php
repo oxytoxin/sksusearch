@@ -4,6 +4,8 @@ namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
 use Livewire\Component;
 use App\Models\DisbursementVoucher;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use Filament\Tables\Actions\Action;
@@ -13,9 +15,9 @@ use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
-class DisbursementVouchersLiquidated extends Component implements HasTable
+class DisbursementVouchersLiquidated extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable, OfficeDashboardActions;
+    use InteractsWithForms, InteractsWithTable, OfficeDashboardActions;
 
     protected function getTableQuery(): Builder|Relation
     {

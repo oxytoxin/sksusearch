@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\ArchiveDocumentResource\Pages;
 
 use App\Filament\Resources\ArchiveDocumentResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateArchiveDocument extends CreateRecord

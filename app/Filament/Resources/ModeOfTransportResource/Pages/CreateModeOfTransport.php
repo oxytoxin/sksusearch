@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\ModeOfTransportResource\Pages;
 
 use App\Filament\Resources\ModeOfTransportResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateModeOfTransport extends CreateRecord

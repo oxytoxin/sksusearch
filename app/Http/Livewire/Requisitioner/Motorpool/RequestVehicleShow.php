@@ -108,7 +108,6 @@ class RequestVehicleShow extends Component implements HasForms
             ];
         }
 
-
         $this->date_and_time = $data;
         $this->request = RequestSchedule::find($request);
         $this->travel_dates = $this->request->travel_dates;
@@ -217,45 +216,45 @@ class RequestVehicleShow extends Component implements HasForms
             //     ->where('id', '!=', $item->id)
             //     ->first();
 
-               $driverId = $this->request_schedule->driver_id;
+            $driverId = $this->request_schedule->driver_id;
 
-$conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId, $driverId) {
-        $query->where('status', 'Approved')
-            ->where(function ($q) use ($vehicleId, $driverId) {
-                $q->where('vehicle_id', $vehicleId);
+            $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($query) use ($vehicleId, $driverId) {
+                $query->where('status', 'Approved')
+                    ->where(function ($q) use ($vehicleId, $driverId) {
+                        $q->where('vehicle_id', $vehicleId);
 
-                if (!is_null($driverId)) {
-                    $q->orWhere('driver_id', $driverId);
-                }
-            });
-    })
-    ->where('travel_date', $item->travel_date)
-    ->where(function ($q) use ($item) {
+                        if (! is_null($driverId)) {
+                            $q->orWhere('driver_id', $driverId);
+                        }
+                    });
+            })
+                ->where('travel_date', $item->travel_date)
+                ->where(function ($q) use ($item) {
 
-        // CASE 1: Existing overlaps the start of NEW
-        $q->where(function ($sub) use ($item) {
-            $sub->whereTime('time_from', '<=', $item->time_from)
-                ->whereTime('time_to', '>', $item->time_from);
-        })
+                    // CASE 1: Existing overlaps the start of NEW
+                    $q->where(function ($sub) use ($item) {
+                        $sub->whereTime('time_from', '<=', $item->time_from)
+                            ->whereTime('time_to', '>', $item->time_from);
+                    })
 
-        // CASE 2: Existing overlaps the end of NEW
-        ->orWhere(function ($sub) use ($item) {
-            $sub->whereTime('time_from', '<', $item->time_to)
-                ->whereTime('time_to', '>=', $item->time_to);
-        })
+                    // CASE 2: Existing overlaps the end of NEW
+                        ->orWhere(function ($sub) use ($item) {
+                            $sub->whereTime('time_from', '<', $item->time_to)
+                                ->whereTime('time_to', '>=', $item->time_to);
+                        })
 
-        // CASE 3: Existing is fully inside NEW
-        ->orWhere(function ($sub) use ($item) {
-            $sub->whereTime('time_from', '>=', $item->time_from)
-                ->whereTime('time_to', '<=', $item->time_to);
-        });
-    })
-    ->where('id', '!=', $item->id)
-    ->first();
+                    // CASE 3: Existing is fully inside NEW
+                        ->orWhere(function ($sub) use ($item) {
+                            $sub->whereTime('time_from', '>=', $item->time_from)
+                                ->whereTime('time_to', '<=', $item->time_to);
+                        });
+                })
+                ->where('id', '!=', $item->id)
+                ->first();
             if ($conflict) {
-                $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
-                $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
-                $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
+                $date = Carbon::parse($conflict->travel_date)->format('F d, Y');
+                $time_from = Carbon::parse($conflict->time_from)->format('h:i A');
+                $time_to = Carbon::parse($conflict->time_to)->format('h:i A');
                 $this->dialog()->error(
                     $title = 'Operation Failed',
                     $description = "The vehicle is unavailable on {$date} between {$time_from} and {$time_to} due to a conflict in the approved schedules."
@@ -268,7 +267,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
         // Every day is conflict-free — approve the whole request (do NOT short-circuit
         // on the first clear day; the loop above already validated all of them).
         $this->request_schedule->status = 'Approved';
-        $this->request_schedule->approved_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
+        $this->request_schedule->approved_at = Carbon::parse(now())->format('Y-m-d H:i:s');
         $this->request_schedule->save();
         $this->dialog()->success(
             $title = 'Success',
@@ -296,7 +295,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
     {
         $this->request_schedule->status = 'Rejected';
         $this->request_schedule->remarks = $this->remarks;
-        $this->request_schedule->rejected_at = \Carbon\Carbon::parse(now())->format('Y-m-d H:i:s');
+        $this->request_schedule->rejected_at = Carbon::parse(now())->format('Y-m-d H:i:s');
         $this->request_schedule->save();
         $this->dialog()->success(
             $title = 'Success',
@@ -387,7 +386,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
             $description = 'Vehicle is assigned'
         );
         $this->assignVehicleModal = false;
-        $this->emit('refreshComponent');
+        $this->dispatch('refreshComponent');
     }
 
     public function changeVehicle($id)
@@ -450,7 +449,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                     'philippine_city',
                     'vehicle',
                     'date_and_times',
-                    'applicants.employee_information'
+                    'applicants.employee_information',
                 ]);
 
                 // Get new vehicle details
@@ -476,7 +475,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                     if ($this->request_schedule->other_details) {
                         $destinationParts[] = $this->request_schedule->other_details;
                     }
-                    $destination = !empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
+                    $destination = ! empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
                 }
 
                 // Get date range
@@ -500,7 +499,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
 
                 // ========== SMS NOTIFICATION ==========
                 foreach ($applicants as $applicant) {
-                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
+                    if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
                         SendSmsJob::dispatch(
                             $applicant->employee_information->contact_number,
                             $message,
@@ -524,7 +523,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                         );
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                    \Log::error('Realtime notification failed: '.$e->getMessage());
                 }
                 // ========== REALTIME NOTIFICATION END ==========
 
@@ -533,7 +532,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                     $description = 'Vehicle is updated'
                 );
                 $this->modifyVehicleModal = false;
-                $this->emit('refreshComponent');
+                $this->dispatch('refreshComponent');
             } else {
                 $this->dialog()->error(
                     $title = 'Vehicle Unavailable',
@@ -546,7 +545,6 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
 
     public function changeDriver($id)
     {
-
 
         $this->request_schedule = RequestSchedule::find($id);
         $this->request_schedule_date_and_time = RequestScheduleTimeAndDate::where('request_schedule_id', $id)->get();
@@ -603,7 +601,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                     'philippine_city',
                     'driver',
                     'date_and_times',
-                    'applicants.employee_information'
+                    'applicants.employee_information',
                 ]);
 
                 // Get new driver details
@@ -628,7 +626,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                     if ($this->request_schedule->other_details) {
                         $destinationParts[] = $this->request_schedule->other_details;
                     }
-                    $destination = !empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
+                    $destination = ! empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
                 }
 
                 // Get date range
@@ -652,7 +650,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
 
                 // ========== SMS NOTIFICATION ==========
                 foreach ($applicants as $applicant) {
-                    if ($applicant->employee_information && !empty($applicant->employee_information->contact_number)) {
+                    if ($applicant->employee_information && ! empty($applicant->employee_information->contact_number)) {
                         SendSmsJob::dispatch(
                             $applicant->employee_information->contact_number,
                             $message,
@@ -676,7 +674,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                         );
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Realtime notification failed: ' . $e->getMessage());
+                    \Log::error('Realtime notification failed: '.$e->getMessage());
                 }
                 // ========== REALTIME NOTIFICATION END ==========
 
@@ -685,7 +683,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                     $description = 'Driver is updated'
                 );
                 $this->modifyDriverModal = false;
-                $this->emit('refreshComponent');
+                $this->dispatch('refreshComponent');
             } else {
                 $this->dialog()->error(
                     $title = 'Driver Unavailable',
@@ -698,7 +696,6 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
 
     public function assignDriver($id)
     {
-
 
         $this->request_schedule = RequestSchedule::find($id);
         $this->validate([
@@ -739,9 +736,9 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                 ->first();
 
             if ($conflict) {
-                $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
-                $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
-                $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
+                $date = Carbon::parse($conflict->travel_date)->format('F d, Y');
+                $time_from = Carbon::parse($conflict->time_from)->format('h:i A');
+                $time_to = Carbon::parse($conflict->time_to)->format('h:i A');
                 $this->dialog()->error(
                     $title = 'Driver Unavailable',
                     $description = "The driver is unavailable on {$date} between {$time_from} and {$time_to} due to a conflict in the approved schedules."
@@ -766,7 +763,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
             'vehicle',
             'driver',
             'date_and_times',
-            'applicants.employee_information'
+            'applicants.employee_information',
         ]);
 
         // Determine tracking code and destination based on whether it has a travel order
@@ -790,7 +787,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
             if ($this->request_schedule->other_details) {
                 $destinationParts[] = $this->request_schedule->other_details;
             }
-            $destination = !empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
+            $destination = ! empty($destinationParts) ? implode(', ', $destinationParts) : 'N/A';
         }
 
         // Get date range from date_and_times
@@ -860,7 +857,7 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                 );
             }
         } catch (\Exception $e) {
-            \Log::error('Realtime notification failed: ' . $e->getMessage());
+            \Log::error('Realtime notification failed: '.$e->getMessage());
         }
         // ========== REALTIME NOTIFICATION END ==========
 
@@ -948,9 +945,9 @@ $conflict = RequestScheduleTimeAndDate::whereHas('request_schedule', function ($
                     );
                 }
             } else {
-                $date = \Carbon\Carbon::parse($conflict->travel_date)->format('F d, Y');
-                $time_from = \Carbon\Carbon::parse($conflict->time_from)->format('h:i A');
-                $time_to = \Carbon\Carbon::parse($conflict->time_to)->format('h:i A');
+                $date = Carbon::parse($conflict->travel_date)->format('F d, Y');
+                $time_from = Carbon::parse($conflict->time_from)->format('h:i A');
+                $time_to = Carbon::parse($conflict->time_to)->format('h:i A');
                 $this->dialog()->error(
                     $title = 'Operation Failed',
                     $description = "The date {$date} - ({$time_from} to  {$time_to}) has a conflict in the approved schedules"

@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\ErrorQueryResource\Pages;
 
 use App\Filament\Resources\ErrorQueryResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListErrorQueries extends ListRecords
 {
     protected static string $resource = ErrorQueryResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

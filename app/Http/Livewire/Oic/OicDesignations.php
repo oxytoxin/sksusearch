@@ -5,14 +5,16 @@
     use App\Enums\OicType;
     use App\Models\OicUser;
     use Carbon\Carbon;
+    use Filament\Forms\Concerns\InteractsWithForms;
+    use Filament\Forms\Contracts\HasForms;
     use Filament\Tables\Columns\TextColumn;
     use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
     use Livewire\Component;
 
-    class OicDesignations extends Component implements HasTable
+    class OicDesignations extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable;
+        use InteractsWithForms, InteractsWithTable;
 
         public function getTableQuery()
         {
@@ -23,7 +25,10 @@
         {
             return [
                 TextColumn::make('signatory.employee_information.full_name')->label('For')->searchable(),
-                TextColumn::make('type')->enum(OicType::getOptions()),
+                TextColumn::make('type')->formatStateUsing(
+                    fn ($state) => OicType::getOptions()[$state instanceof OicType ? $state->value : $state]
+                        ?? ($state instanceof OicType ? $state->value : $state),
+                ),
                 TextColumn::make('valid_from')->date()->sortable(),
                 TextColumn::make('valid_to')->formatStateUsing(function ($state) {
                     return $state ? Carbon::parse($state)->format('F d, Y') : 'Present';

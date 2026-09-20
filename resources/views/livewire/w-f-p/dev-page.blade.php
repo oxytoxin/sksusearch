@@ -7,17 +7,17 @@
             <div class="mt-8 flow-root">
                 <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div class="flex space-x-5">
-                        <input type="text" placeholder="Supply Code..." wire:model="supply_code" name=""
+                        <input type="text" placeholder="Supply Code..." wire:model.live="supply_code" name=""
                             id="">
                         <select name="category_item_budget_id" id="category_item_budget_id"
-                            wire:model.defer="category_item_budget_id">
+                            wire:model="category_item_budget_id">
                             @foreach ($category_items as $key => $category_item)
                                 <option value="{{ $category_item->id }}" wire:key="category_item_{{ $key }}">
                                     {{ $category_item->name }}</option>
                             @endforeach
                         </select>
                         <select name="fund_cluster_id" id="fund_cluster_id"
-                            wire:model.defer="fund_cluster_id">
+                            wire:model="fund_cluster_id">
                             @foreach ($fund_clusters as $key => $fund_cluster)
                                 <option value="{{ $fund_cluster->id }}" wire:key="fund_cluster_{{ $key }}">
                                     {{ $fund_cluster->name }}</option>

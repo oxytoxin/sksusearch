@@ -4,7 +4,6 @@ namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 
 use Livewire\Component;
 use App\Models\EmployeeInformation;
-use Filament\Tables\Filters\Layout;
 use App\Models\CaReminderStepHistory;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -12,11 +11,13 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class SentNotificationHistory extends Component implements HasTable
+class SentNotificationHistory extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
 
     protected $listeners = ['historyCreated' => '$refresh'];
@@ -42,11 +43,6 @@ class SentNotificationHistory extends Component implements HasTable
     return $query;
 }
 
-
-//     protected function getTableFiltersLayout(): ?string
-// {
-//     return Layout::AboveContentCollapsible;
-// }
 
     protected function getTableActions(): array
     {

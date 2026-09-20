@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -37,7 +36,7 @@ class MessageDeleted implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel('messages.' . $this->disbursement_voucher_id);
+        return new PrivateChannel('messages.' . $this->disbursement_voucher_id);
     }
 
     /**

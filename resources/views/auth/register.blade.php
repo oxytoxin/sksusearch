@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="flex flex-col items-center min-h-screen pt-6 bg-gray-100 sm:justify-center sm:pt-0">
         <div>
-            <x-jet-authentication-card-logo />
+            <x-authentication-card-logo />
         </div>
         <div class="font-extrabold tracking-widest text-md text-primary md:text-2xl sm:text-md">
             <span class="uppercase">SKSU<span class="capitalize"> electronic archiving, retrieval <span class="lowercase">and</span> content handling</span></span>
@@ -97,36 +97,36 @@
 
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <x-jet-label class="font-bold text-white drop-shadow" for="first_name" value="First Name *" />
-                                    <x-jet-input class="block w-full mt-1 uppercase" id="first_name" name="first_name" type="text" :value="old('first_name')" required style="text-transform: uppercase;" />
+                                    <x-label class="font-bold text-white drop-shadow" for="first_name" value="First Name *" />
+                                    <x-input class="block w-full mt-1 uppercase" id="first_name" name="first_name" type="text" :value="old('first_name')" required style="text-transform: uppercase;" />
                                     @error('first_name') <span class="text-xs text-red-300">{{ $message }}</span> @enderror
                                 </div>
                                 <div>
-                                    <x-jet-label class="font-bold text-white drop-shadow" for="last_name" value="Last Name *" />
-                                    <x-jet-input class="block w-full mt-1 uppercase" id="last_name" name="last_name" type="text" :value="old('last_name')" required style="text-transform: uppercase;" />
+                                    <x-label class="font-bold text-white drop-shadow" for="last_name" value="Last Name *" />
+                                    <x-input class="block w-full mt-1 uppercase" id="last_name" name="last_name" type="text" :value="old('last_name')" required style="text-transform: uppercase;" />
                                     @error('last_name') <span class="text-xs text-red-300">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
                             <div>
-                                <x-jet-label class="font-bold text-white drop-shadow" for="full_name" value="Full Name (as it appears in documents) *" />
-                                <x-jet-input class="block w-full mt-1 uppercase" id="full_name" name="full_name" type="text" :value="old('full_name')" placeholder="JUAN M. DELA CRUZ" required style="text-transform: uppercase;" />
+                                <x-label class="font-bold text-white drop-shadow" for="full_name" value="Full Name (as it appears in documents) *" />
+                                <x-input class="block w-full mt-1 uppercase" id="full_name" name="full_name" type="text" :value="old('full_name')" placeholder="JUAN M. DELA CRUZ" required style="text-transform: uppercase;" />
                                 @error('full_name') <span class="text-xs text-red-300">{{ $message }}</span> @enderror
                             </div>
 
                             <div>
-                                <x-jet-label class="font-bold text-white drop-shadow" for="email" value="Institutional Email *" />
-                                <x-jet-input class="block w-full mt-1" id="email" name="email" type="email" :value="old('email')" placeholder="yourname@sksu.edu.ph" required />
+                                <x-label class="font-bold text-white drop-shadow" for="email" value="Institutional Email *" />
+                                <x-input class="block w-full mt-1" id="email" name="email" type="email" :value="old('email')" placeholder="yourname@sksu.edu.ph" required />
                                 @error('email') <span class="text-xs text-red-300">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <x-jet-label class="font-bold text-white drop-shadow" for="address" value="Address" />
-                                    <x-jet-input class="block w-full mt-1" id="address" name="address" type="text" :value="old('address')" />
+                                    <x-label class="font-bold text-white drop-shadow" for="address" value="Address" />
+                                    <x-input class="block w-full mt-1" id="address" name="address" type="text" :value="old('address')" />
                                 </div>
                                 <div>
-                                    <x-jet-label class="font-bold text-white drop-shadow" for="contact_number" value="Contact Number *" />
+                                    <x-label class="font-bold text-white drop-shadow" for="contact_number" value="Contact Number *" />
                                     <div class="flex mt-1">
                                         <span class="inline-flex items-center px-3 text-sm text-gray-700 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">09</span>
                                         <input class="block w-full rounded-r-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" id="contact_number_suffix" type="text" value="{{ old('contact_number') ? substr(old('contact_number'), 2) : '' }}" maxlength="9" minlength="9" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
@@ -137,8 +137,8 @@
                             </div>
 
                             <div>
-                                <x-jet-label class="font-bold text-white drop-shadow" for="birthday" value="Birthday" />
-                                <x-jet-input class="block w-full mt-1" id="birthday" name="birthday" type="date" :value="old('birthday')" />
+                                <x-label class="font-bold text-white drop-shadow" for="birthday" value="Birthday" />
+                                <x-input class="block w-full mt-1" id="birthday" name="birthday" type="date" :value="old('birthday')" />
                             </div>
 
                             {{-- Assignment --}}
@@ -147,7 +147,7 @@
 
                                 <div class="space-y-3">
                                     <div>
-                                        <x-jet-label class="font-bold text-white drop-shadow" for="campus_id" value="Campus *" />
+                                        <x-label class="font-bold text-white drop-shadow" for="campus_id" value="Campus *" />
                                         <select class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
                                                 id="campus_id" name="campus_id" onchange="loadOffices(this.value)">
                                             <option value="">-- Select Campus --</option>
@@ -159,7 +159,7 @@
                                     </div>
 
                                     <div>
-                                        <x-jet-label class="font-bold text-white drop-shadow" for="office_id" value="Office *" />
+                                        <x-label class="font-bold text-white drop-shadow" for="office_id" value="Office *" />
                                         <select class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 opacity-50"
                                                 id="office_id" name="office_id" disabled>
                                             <option value="">-- Select Campus first --</option>
@@ -168,7 +168,7 @@
                                     </div>
 
                                     <div>
-                                        <x-jet-label class="font-bold text-white drop-shadow" for="position_id" value="Position *" />
+                                        <x-label class="font-bold text-white drop-shadow" for="position_id" value="Position *" />
                                         <select class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50"
                                                 id="position_id" name="position_id">
                                             <option value="">-- Select Position --</option>

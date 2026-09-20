@@ -66,7 +66,7 @@ class MessageReplySection extends Component
 
         $message->save();
 
-        $this->emit('messageAdded', $message->id);
+        $this->dispatch('messageAdded', messageId: $message->id);
         event(new MessageSent($message, $this->disbursement_voucher->id));
 
         $this->messageContent = '';
@@ -205,8 +205,8 @@ class MessageReplySection extends Component
     // Reset and emit
     $this->replyContent = '';
     $this->replyingTo = null;
-    $this->emit('replyAdded', $reply->id);
-    $this->emit('refreshMessages');
+    $this->dispatch('replyAdded', replyId: $reply->id);
+    $this->dispatch('refreshMessages');
     event(new ReplyAdded($reply, $voucher->id));
 
     // (Optional) Send notification
@@ -243,8 +243,8 @@ class MessageReplySection extends Component
         $message = Message::find($messageId);
         if ($message) {
             $message->delete();
-            $this->emit('messageDeleted', $messageId);
-            $this->emit('refreshMessages');
+            $this->dispatch('messageDeleted', messageId: $messageId);
+            $this->dispatch('refreshMessages');
             event(new MessageDeleted($messageId, $this->disbursement_voucher->id));
         }
     }

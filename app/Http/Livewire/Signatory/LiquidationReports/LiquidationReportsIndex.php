@@ -16,15 +16,17 @@
     use Filament\Tables\Actions\ActionGroup;
     use Filament\Tables\Actions\ViewAction;
     use Filament\Tables\Columns\TextColumn;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
     use Illuminate\Support\Facades\DB;
     use Illuminate\Support\HtmlString;
     use Livewire\Component;
 
-    class LiquidationReportsIndex extends Component implements HasTable
+    class LiquidationReportsIndex extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable;
+        use InteractsWithForms, InteractsWithTable;
 
         protected function getTableQuery()
         {

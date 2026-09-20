@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\CategoryItemBudgetResource\Pages;
 
 use App\Filament\Resources\CategoryItemBudgetResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditCategoryItemBudget extends EditRecord
 {
     protected static string $resource = CategoryItemBudgetResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             // Actions\DeleteAction::make(),

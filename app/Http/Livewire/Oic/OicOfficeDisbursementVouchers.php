@@ -8,23 +8,27 @@
     use App\Models\DisbursementVoucher;
     use App\Models\EmployeeInformation;
     use Filament\Tables\Actions\Action;
-    use Filament\Tables\Filters\Layout;
     use Filament\Forms\Components\Select;
     use App\Models\DisbursementVoucherStep;
     use App\Models\OicUser;
     use App\Models\User;
     use Filament\Notifications\Notification;
     use Filament\Forms\Components\RichEditor;
-    use Filament\Tables\Concerns\InteractsWithTable;
+    use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Concerns\InteractsWithTable;
     use Filament\Tables\Contracts\HasTable;
     use Filament\Tables\Filters\SelectFilter;
     use App\Http\Controllers\NotificationController;
     use App\Jobs\SendSmsJob;
     use App\Services\DisbursementVouchers\DisbursementVoucherWorkflowService;
 
-    class OicOfficeDisbursementVouchers extends Component implements HasTable
+    class OicOfficeDisbursementVouchers extends Component implements HasForms, HasTable
     {
-        use InteractsWithTable, OfficeDashboardActions;
+        use InteractsWithForms, OfficeDashboardActions;
+        use InteractsWithTable {
+            table as baseTable;
+        }
 
         public function isOic()
         {
@@ -149,14 +153,11 @@
             ];
         }
 
-        protected function getTableFiltersFormColumns(): int
+        public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
         {
-            return 2;
-        }
-
-        protected function getTableFiltersLayout(): ?string
-        {
-            return Layout::AboveContent;
+            return $this->baseTable($table)
+                ->filtersFormColumns(2)
+                ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
         }
 
         public function render()

@@ -73,7 +73,7 @@
                             </div>
                             @if ($isFinance && $record->status == 'Pending')
                             <div class="mt-4">
-                                <textarea wire:model="newReply" class="w-full p-2 border rounded-md" placeholder="Add a reply..."></textarea>
+                                <textarea wire:model.live="newReply" class="w-full p-2 border rounded-md" placeholder="Add a reply..."></textarea>
                                 @error('newReply')
                                     <span class="text-sm text-red-600">{{$message}}</span>
                                 @enderror
@@ -129,21 +129,21 @@
 
 
 
-    <x-modal.card title="Modify Supply Details" align="center" blur wire:model.defer="modifySupplyModal">
+    <x-modal.card title="Modify Supply Details" align="center" blur wire:model="modifySupplyModal">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div class="col-span-1 px-2 sm:col-span-2">
                 <label for="supply_code" class="block text-sm font-medium leading-6 text-gray-900">Particulars</label>
-                <textarea id="about" wire:model="supply_particular" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
+                <textarea id="about" wire:model.live="supply_particular" name="about" rows="4" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"></textarea>
             </div>
             <div class="col-span-1 px-2 sm:col-span-2">
                 <label for="supply_codes" class="block text-sm font-medium leading-6 text-gray-900">Specification</label>
-                <input wire:model="supply_specification" id="supply_specification" name="supply_codes" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                <input wire:model.live="supply_specification" id="supply_specification" name="supply_codes" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             </div>
             <div class="col-span-1 px-2 sm:col-span-2">
                 <label for="supplies_uom" class="block text-sm font-medium leading-6 text-gray-900">Account Title</label>
                 <div class="mt-2">
-                    <select wire:model="supply_account_title" id="supplies_uom" name="supplies_uom" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
+                    <select wire:model.live="supply_account_title" id="supplies_uom" name="supplies_uom" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
                         <option value="">Select One</option>
                         @foreach ($account_titles as $item)
                         <option value="{{$item->id}}">{{$item->name}}</option>
@@ -154,7 +154,7 @@
             <div class="col-span-1 px-2 sm:col-span-2">
                 <label for="supplies_uom" class="block text-sm font-medium leading-6 text-gray-900">Title Group</label>
                 <div class="mt-2">
-                    <select wire:model="supply_title_group" id="supplies_uom" name="supplies_uom" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
+                    <select wire:model.live="supply_title_group" id="supplies_uom" name="supplies_uom" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-full sm:text-sm sm:leading-6">
                         <option value="">Select One</option>
                         @foreach ($title_groups as $item)
                         <option value="{{$item->id}}">{{$item->name}}</option>
@@ -164,11 +164,11 @@
             </div>
             <div class="col-span-1 px-2 sm:col-span-2">
                 <label for="supply_codes" class="block text-sm font-medium leading-6 text-gray-900">UOM</label>
-                <input wire:model="supply_uom" id="supply_codes" name="supply_codes" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                <input wire:model.live="supply_uom" id="supply_codes" name="supply_codes" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             </div>
             <div class="col-span-1 px-2 sm:col-span-2">
                 <label for="supply_codes" class="block text-sm font-medium leading-6 text-gray-900">Unit Cost</label>
-                <input wire:model="supply_unit_cost" id="supply_codes" name="supply_codes" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                <input wire:model.live="supply_unit_cost" id="supply_codes" name="supply_codes" type="text" autocomplete="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             </div>
             </div>
 

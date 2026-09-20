@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\DailyTravelExpensesResource\Pages;
 
 use App\Filament\Resources\DailyTravelExpensesResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListDailyTravelExpenses extends ListRecords
 {
     protected static string $resource = DailyTravelExpensesResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             // Actions\CreateAction::make(),

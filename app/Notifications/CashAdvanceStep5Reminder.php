@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -52,6 +51,6 @@ class CashAdvanceStep5Reminder extends Notification implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new Channel('notifications.' . $this->receiver->id);
+        return new PrivateChannel('notifications.' . $this->receiver->id);
     }
 }

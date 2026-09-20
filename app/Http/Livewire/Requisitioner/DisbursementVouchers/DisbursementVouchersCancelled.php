@@ -5,13 +5,15 @@ namespace App\Http\Livewire\Requisitioner\DisbursementVouchers;
 use App\Http\Livewire\Offices\Traits\OfficeDashboardActions;
 use App\Models\DisbursementVoucher;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Livewire\Component;
 
-class DisbursementVouchersCancelled extends Component implements HasTable
+class DisbursementVouchersCancelled extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable, OfficeDashboardActions;
+    use InteractsWithForms, InteractsWithTable, OfficeDashboardActions;
 
     protected function getTableQuery()
     {

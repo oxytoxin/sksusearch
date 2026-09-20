@@ -2,16 +2,16 @@
 
 namespace App\Filament\Resources\OfficeResource\RelationManagers;
 
+use App\Filament\Resources\EmployeeInformationResource;
 use App\Models\EmployeeInformation;
 use App\Models\Position;
-use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\AttachAction;
@@ -19,7 +19,6 @@ use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -28,9 +27,7 @@ class EmployeeInformationRelationManager extends RelationManager
 {
     protected static string $relationship = 'employee_information';
 
-    protected static ?string $recordTitleAttribute = 'full_name';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -40,19 +37,12 @@ class EmployeeInformationRelationManager extends RelationManager
             ]);
     }
 
-    protected function getTableHeading(): string|Htmlable|Closure|null
-    {
-        return 'Employees Under This Office';
-    }
-
-    protected function getTableRecordUrlUsing(): ?Closure
-    {
-        return fn (Model $record): string => route('filament.resources.employee-informations.edit', ['record' => $record]);
-    }
-
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->heading('Employees Under This Office')
+            ->recordTitleAttribute('full_name')
+            ->recordUrl(fn (Model $record): string => EmployeeInformationResource::getUrl('edit', ['record' => $record]))
             ->columns([
                 TextColumn::make('full_name')->label('Name')->searchable(),
                 TextColumn::make('position.description')->label('Position'),
@@ -95,7 +85,7 @@ class EmployeeInformationRelationManager extends RelationManager
                 DeleteAction::make()
                     ->label('Unassign')
                     ->modalHeading('Unassign Employee')
-                    ->modalSubheading('Are you sure you want to unassign this employee?')
+                    ->modalDescription('Are you sure you want to unassign this employee?')
                     ->action(function ($record) {
                         $record->update([
                             'position_id' => null,

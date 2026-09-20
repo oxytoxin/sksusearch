@@ -4,7 +4,7 @@
         <div class="flex rounded-md py-1">
             <div class="w-full">
                 <div class="flex">
-                    <input class="w-full rounded-md py-1" id="tracking_num_from_scan" id="tracking_num_from_scan" name="tracking_num_from_scan" type="text" x-ref="tracking_num_from_scan" wire:model.lazy="tracking_num_from_scan" placeholder="Click me to start Scan-to-Receive">
+                    <input class="w-full rounded-md py-1" id="tracking_num_from_scan" id="tracking_num_from_scan" name="tracking_num_from_scan" type="text" x-ref="tracking_num_from_scan" wire:model.blur="tracking_num_from_scan" placeholder="Click me to start Scan-to-Receive">
                 </div>
             </div>
         </div>

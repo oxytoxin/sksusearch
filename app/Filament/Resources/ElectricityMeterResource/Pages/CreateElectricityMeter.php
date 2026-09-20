@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\ElectricityMeterResource\Pages;
 
 use App\Filament\Resources\ElectricityMeterResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateElectricityMeter extends CreateRecord

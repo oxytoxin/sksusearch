@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\SupplyResource\Pages;
 
 use App\Filament\Resources\SupplyResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditSupply extends EditRecord
@@ -12,7 +12,7 @@ class EditSupply extends EditRecord
 
     public static ?string $title = 'Edit Item';
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
            // Actions\DeleteAction::make(),

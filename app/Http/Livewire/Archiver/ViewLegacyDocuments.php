@@ -11,8 +11,6 @@ use App\Models\LegacyDocument;
 use App\Models\DisbursementVoucher;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\Layout;
-use Filament\Tables\Actions\Position;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -22,11 +20,16 @@ use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class ViewLegacyDocuments extends Component implements HasTable
+class ViewLegacyDocuments extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms;
+    use InteractsWithTable {
+        table as baseTable;
+    }
     //use WithPagination;
 
     public function mount($document_code)
@@ -136,20 +139,20 @@ class ViewLegacyDocuments extends Component implements HasTable
 
             TextColumn::make('cheque_state')
                 ->label('Cheque State')
-                ->enum([
+                ->formatStateUsing(fn ($state) => [
                     '1' => 'Encashed',
                     '2' => 'Cancelled',
                     '3' => 'Stale',
-                ]),
+                ][$state] ?? $state),
             TextColumn::make('fund_cluster.name')->label('Fund Cluster')
                 ->searchable()->sortable(),
 
             TextColumn::make('document_category')
                 ->label('Document Category')
-                ->enum([
+                ->formatStateUsing(fn ($state) => [
                     '1' => 'Disbursement Voucher',
                     '2' => 'Liquidation Report',
-                ])
+                ][$state] ?? $state)
                 ->searchable()->sortable(),
             TextColumn::make('uploader.email')
                 ->label('Uploaded By')
@@ -200,9 +203,10 @@ class ViewLegacyDocuments extends Component implements HasTable
 
         ];
     }
-    protected function getTableActionsPosition(): ?string
+    public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
     {
-        return Position::AfterCells;
+        return $this->baseTable($table)
+            ->actionsPosition(\Filament\Tables\Enums\ActionsPosition::AfterCells);
     }
     public function render()
     {

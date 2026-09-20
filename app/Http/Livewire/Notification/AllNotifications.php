@@ -17,14 +17,14 @@ class AllNotifications extends Component
         $notification = auth()->user()->notifications()->find($id);
         if ($notification && is_null($notification->read_at)) {
             $notification->markAsRead();
-            $this->emit('refreshNotifications'); // Refresh dropdown too
+            $this->dispatch('refreshNotifications'); // Refresh dropdown too
         }
     }
 
     public function markAllAsRead()
     {
         auth()->user()->unreadNotifications->markAsRead();
-        $this->emit('refreshNotifications'); // Refresh dropdown too
+        $this->dispatch('refreshNotifications'); // Refresh dropdown too
     }
 
     public function refreshNotifications()

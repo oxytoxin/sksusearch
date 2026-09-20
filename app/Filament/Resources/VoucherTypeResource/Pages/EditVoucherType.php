@@ -5,14 +5,14 @@ namespace App\Filament\Resources\VoucherTypeResource\Pages;
 use App\Filament\Resources\VoucherTypeResource;
 use DB;
 use Filament\Notifications\Notification;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditVoucherType extends EditRecord
 {
     protected static string $resource = VoucherTypeResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make()
@@ -25,7 +25,7 @@ class EditVoucherType extends EditRecord
                     $record->delete();
                     DB::commit();
                     Notification::make()->title('Deleted.')->success()->send();
-                    $this->redirect(route('filament.resources.voucher-types.index'));
+                    $this->redirect(VoucherTypeResource::getUrl('index'));
                 }),
         ];
     }

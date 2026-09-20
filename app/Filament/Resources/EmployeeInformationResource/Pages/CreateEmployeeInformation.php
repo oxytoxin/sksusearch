@@ -6,7 +6,7 @@
     use App\Models\EmployeeInformation;
     use App\Models\User;
     use Filament\Notifications\Notification;
-    use Filament\Pages\Actions;
+    use Filament\Actions;
     use Filament\Resources\Pages\CreateRecord;
     use Illuminate\Database\Eloquent\Model;
     use Illuminate\Support\Facades\Hash;

@@ -12,11 +12,13 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class MyNotices extends Component implements HasTable
+class MyNotices extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
 
 
@@ -111,7 +113,7 @@ class MyNotices extends Component implements HasTable
                     ]))
                     ->button()
                     ->color('primary')
-                    ->icon('heroicon-o-exclamation')
+                    ->icon('heroicon-o-exclamation-triangle')
                     ->tooltip('View Show Endorsement For FD')
                     ->visible(fn ($record) => $record->type === 'ENDORSEMENT'),
 

@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\ModeOfTransportResource\Pages;
 
 use App\Filament\Resources\ModeOfTransportResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListModeOfTransports extends ListRecords
 {
     protected static string $resource = ModeOfTransportResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

@@ -9,7 +9,6 @@ use App\Models\PettyCashVoucher;
 use App\Models\PettyCashFundRecord;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\Layout;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -17,15 +16,20 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Http\Controllers\NotificationController;
 use App\Jobs\SendSmsJob;
 
-class PettyCashVouchersIndex extends Component implements HasTable
+class PettyCashVouchersIndex extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms;
+    use InteractsWithTable {
+        table as baseTable;
+    }
 
     public $petty_cash_fund;
 
@@ -140,7 +144,7 @@ class PettyCashVouchersIndex extends Component implements HasTable
 
                     Notification::make()->title('Petty Cash Voucher liquidated.')->success()->send();
                 })
-                ->icon('heroicon-o-cash')
+                ->icon('heroicon-o-banknotes')
                 ->form(function ($record) {
                     return [
                         TextInput::make('amount_paid')->minValue(0)->label('Amount Paid')->numeric()->required(),
@@ -166,14 +170,11 @@ class PettyCashVouchersIndex extends Component implements HasTable
         ];
     }
 
-    protected function getTableFiltersFormColumns(): int
+    public function table(\Filament\Tables\Table $table): \Filament\Tables\Table
     {
-        return 1;
-    }
-
-    protected function getTableFiltersLayout(): ?string
-    {
-        return Layout::AboveContent;
+        return $this->baseTable($table)
+            ->filtersFormColumns(1)
+            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent);
     }
 
     public function mount()

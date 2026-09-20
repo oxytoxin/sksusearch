@@ -4,6 +4,8 @@ namespace App\Http\Livewire\Signatory\Motorpool;
 
 use Livewire\Component;
 use Filament\Tables;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Actions\Action;
@@ -12,9 +14,9 @@ use Filament\Tables\Actions\ViewAction;
 use App\Models\RequestSchedule;
 use Filament\Tables\Columns\ViewColumn;
 
-class RequestVehicleSigned extends Component implements HasTable
+class RequestVehicleSigned extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithForms, InteractsWithTable;
 
     protected function getTableQuery()
     {

@@ -5,10 +5,10 @@
     <div class="w-full rounded-lg bg-white p-4">
         <div class="flex justify-between">
             <div>
-                <x-filament-support::button wire:click="redirectBack">Back</x-filament-support::button>
+                <x-filament::button wire:click="redirectBack">Back</x-filament::button>
             </div>
             <div class="flex space-x-4">
-                <x-select label="Year" placeholder="" wire:model="year">
+                <x-select label="Year" placeholder="" wire:model.live="year">
                     <x-select.option label="All" value="all" />
                     @foreach ($legacy_document_years as $item)
                     <x-select.option label="{{$item->year}}" value="{{$item->year}}" />

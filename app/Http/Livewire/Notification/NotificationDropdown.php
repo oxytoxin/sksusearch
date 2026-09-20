@@ -18,7 +18,7 @@ class NotificationDropdown extends Component
     public function mount()
     {
         $this->loadNotifications();
-        //  $this->dispatchBrowserEvent('emitToAllNotifications');
+        //  $this->dispatch('emitToAllNotifications');
     }
 
     public function loadNotifications()
@@ -39,7 +39,7 @@ class NotificationDropdown extends Component
         $this->loadNotifications();
 
         // ✅ Fire event once so the JS listener refreshes other dropdowns if open
-        $this->dispatchBrowserEvent('emitToAllNotifications');
+        $this->dispatch('emitToAllNotifications');
     }
 
    public function markAllAsRead()
@@ -49,7 +49,7 @@ class NotificationDropdown extends Component
         $user->unreadNotifications()->update(['read_at' => now()]);
 
         $this->loadNotifications();
-        $this->dispatchBrowserEvent('emitToAllNotifications');
+        $this->dispatch('emitToAllNotifications');
     }
 }
 

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CategoryGroupResource\Pages;
 
 use App\Filament\Resources\CategoryGroupResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditCategoryGroup extends EditRecord
@@ -12,7 +12,7 @@ class EditCategoryGroup extends EditRecord
 
     public static ?string $title = 'Edit Account Group';
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             // Actions\DeleteAction::make(),

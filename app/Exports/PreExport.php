@@ -32,7 +32,7 @@ class PreExport implements FromView
 
     public $showPre = false;
 
-    public function __construct($selectedType, $fund_allocation, $ppmp_details, $total_allocated, $total_programmed, $balance,$non_supplemental_fund_allocation, $forwarded_ppmp_details,$non_supplemental_total_programmed, $is_q1 = false, $activeButton)
+    public function __construct($selectedType, $fund_allocation, $ppmp_details, $total_allocated, $total_programmed, $balance,$non_supplemental_fund_allocation, $forwarded_ppmp_details,$non_supplemental_total_programmed, $is_q1 = false, $activeButton = null)
     {
         $this->fund_allocation = $fund_allocation;
         $this->ppmp_details = $ppmp_details;

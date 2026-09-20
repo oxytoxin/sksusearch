@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\SupplyResource\Pages;
 
 use App\Filament\Resources\SupplyResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListSupplies extends ListRecords
@@ -12,7 +12,7 @@ class ListSupplies extends ListRecords
 
     public static ?string $title = 'Account Items';
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()

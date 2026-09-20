@@ -3,30 +3,31 @@
 namespace App\Filament\Resources\VoucherSubTypeResource\Pages;
 
 use App\Filament\Resources\VoucherSubTypeResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListVoucherSubTypes extends ListRecords
 {
     protected static string $resource = VoucherSubTypeResource::class;
 
-    protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
+    public function table(Table $table): Table
     {
-        return parent::getTableQuery()->orderBy('voucher_type_id')->orderBy('order_column');
+        return parent::table($table)
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query
+                ->orderBy('voucher_type_id')
+                ->orderBy('order_column'))
+            ->paginatedWhileReordering();
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
                 ->label('New Voucher Sub Type')
                 ->color('success'),
         ];
-    }
-
-    protected function isTablePaginationEnabledWhileReordering(): bool
-    {
-        return true;
     }
 
     protected function getRedirectUrl(): string

@@ -7,7 +7,7 @@ Traceability for every realtime in-app notification (the bell icon) in the syste
 - Helper: `NotificationController::sendGeneralNotification($type, $title, $message, $receiver, $route = null, $senderId = null)` — `app/Http/Controllers/NotificationController.php`
 - It sends `App\Notifications\SystemReminder` over channels `['database', 'broadcast']`:
   - **database** → row in `notifications` table (shown in the bell dropdown)
-  - **broadcast** → pushed live on channel `notifications.{user_id}` via laravel-websockets (Pusher protocol)
+  - **broadcast** → pushed live on the private, authorized `notifications.{user_id}` channel via Laravel Reverb
 - Every call site is **additive** (sits beside the SMS/action code), wrapped in its own `try/catch`, and **null-guards the recipient** — a notification failure can never crash the action.
 - Future email: add `'mail'` to `SystemReminder::via()` once and every site below inherits it.
 
