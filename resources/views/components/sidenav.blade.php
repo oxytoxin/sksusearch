@@ -409,7 +409,8 @@
                 $isSupplyChief =
                     auth()->user()->employee_information->office_id == 49 &&
                     auth()->user()->employee_information->position_id == 15;
-                $isSupply = auth()->user()->employee_information->office_id == 49;
+                $isSupply = auth()->user()->employee_information->office_id == 49 ||
+                    auth()->user()->employee_information->user_id == 375;
                 $isFinance =
                     auth()->user()->employee_information->office_id == 25 &&
                     (auth()->user()->employee_information->position_id == 12 ||
@@ -582,7 +583,7 @@
                     Archives
                 </button>
                 @php
-                    $isAccountant =
+                    $isAccountant = auth()->user()->id == 375 ||
                         (auth()->user()->employee_information->position_id == 15 &&
                             auth()->user()->employee_information->office_id == 3) ||
                         auth()->user()->employee_information->position_id == 41;
