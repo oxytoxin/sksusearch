@@ -72,17 +72,21 @@
                             ->preload()
                             ->reactive()
                             ->options(function ($get) {
-                                if ($get('fund_cluster_id') === '3') {
-                                    return EmployeeInformation::where('position_id', 39)
-                                        ->whereNotIn('id', [auth()->user()->employee_information->id])
-                                        ->whereDoesntHave('user.wfp_personnel')
-                                        ->pluck('full_name', 'user_id');
-                                } else {
-                                    return EmployeeInformation::whereNotIn('id',
-                                        [auth()->user()->employee_information->id])
-                                        ->whereDoesntHave('user.wfp_personnel')
-                                        ->pluck('full_name', 'user_id');
-                                }
+                                // if ($get('fund_cluster_id') === '3') {
+                                //     return EmployeeInformation::where('position_id', 39)
+                                //         ->whereNotIn('id', [auth()->user()->employee_information->id])
+                                //         ->whereDoesntHave('user.wfp_personnel')
+                                //         ->pluck('full_name', 'user_id');
+                                // } else {
+                                //     return EmployeeInformation::whereNotIn('id',
+                                //         [auth()->user()->employee_information->id])
+                                //         ->whereDoesntHave('user.wfp_personnel')
+                                //         ->pluck('full_name', 'user_id');
+                                // }
+                                //
+                               return EmployeeInformation::whereNotIn('id',
+                                    [auth()->user()->employee_information->id])
+                                    ->pluck('full_name', 'user_id');
                             }),
                         //  ->options(fn () => EmployeeInformation::where('campus_id', auth()->user()->employee_information->campus_id)
                         // ->whereNotIn('id', [auth()->user()->employee_information->id])
