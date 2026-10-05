@@ -105,11 +105,7 @@
                             ->searchable()
                             ->preload()
                             ->reactive()
-                            ->options(fn($get) => CostCenter::whereHas('office', function ($query) {
-                                $query->where('id', auth()->user()->employee_information->office_id);
-                            })
-                                ->whereDoesntHave('wpfPersonnel')
-                                ->where('fund_cluster_id', $get('fund_cluster_id'))->pluck('name',
+                            ->options(fn($get) => CostCenter::pluck('name',
                                     'id'))
                     ])
                     ->action(function ($data) {
