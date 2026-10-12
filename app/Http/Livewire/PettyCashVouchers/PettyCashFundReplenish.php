@@ -26,11 +26,17 @@ class PettyCashFundReplenish extends Component implements HasTable
     public $disbursement_voucher_id;
     public $petty_cash_fund;
 
+    protected function replenishmentRecords(): Builder
+    {
+        return PettyCashFundRecord::query()
+            ->whereMorphedTo('recordable', DisbursementVoucher::class)
+            ->where('type', PettyCashFundRecord::REPLENISHMENT)
+            ->where('petty_cash_fund_id', $this->petty_cash_fund->id);
+    }
+
     protected function getTableQuery(): Builder|Relation
     {
-        return PettyCashFundRecord::whereRecordableType(DisbursementVoucher::class)
-            ->latest()
-            ->wherePettyCashFundId($this->petty_cash_fund->id);
+        return $this->replenishmentRecords()->latest();
     }
 
     protected function getTableColumns(): array
@@ -44,8 +50,7 @@ class PettyCashFundReplenish extends Component implements HasTable
 
     protected function getFormSchema(): array
     {
-        $used_dvs = PettyCashFundRecord::whereRecordableType(DisbursementVoucher::class)
-            ->wherePettyCashFundId($this->petty_cash_fund->id)
+        $used_dvs = $this->replenishmentRecords()
             ->pluck('recordable_id')
             ->toArray();
         return [
@@ -67,19 +72,38 @@ class PettyCashFundReplenish extends Component implements HasTable
     public function replenish()
     {
         $this->form->validate();
-        $dv = DisbursementVoucher::findOrFail($this->disbursement_voucher_id);
-        DB::beginTransaction();
-        foreach ($dv->disbursement_voucher_particulars as $key => $particular) {
-            $dv->petty_cash_fund_records()->create([
-                'type' => PettyCashFundRecord::REPLENISHMENT,
-                'nature_of_payment' => $particular->purpose,
-                'amount' => $particular->amount,
-                'petty_cash_fund_id' => $this->petty_cash_fund->id,
-                'running_balance' => ((PettyCashFundRecord::wherePettyCashFundId($this->petty_cash_fund->id)->latest()->first()?->running_balance) ?? 0) + $particular->amount,
-            ]);
-            $this->petty_cash_fund->refresh();
+        $replenished = DB::transaction(function () {
+            $dv = DisbursementVoucher::query()
+                ->whereKey($this->disbursement_voucher_id)
+                ->whereUserId(auth()->id())
+                ->whereNotNull('cheque_number')
+                ->whereVoucherSubtypeId(69)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$dv || $this->replenishmentRecords()->where('recordable_id', $dv->id)->exists()) {
+                return false;
+            }
+
+            foreach ($dv->disbursement_voucher_particulars as $particular) {
+                $dv->petty_cash_fund_records()->create([
+                    'type' => PettyCashFundRecord::REPLENISHMENT,
+                    'nature_of_payment' => $particular->purpose,
+                    'amount' => $particular->amount,
+                    'petty_cash_fund_id' => $this->petty_cash_fund->id,
+                    'running_balance' => ((PettyCashFundRecord::wherePettyCashFundId($this->petty_cash_fund->id)->latest()->first()?->running_balance) ?? 0) + $particular->amount,
+                ]);
+            }
+
+            return true;
+        });
+
+        if (!$replenished) {
+            Notification::make()->title('Disbursement voucher is unavailable or already used.')->danger()->send();
+
+            return;
         }
-        DB::commit();
+
         Notification::make()->title('Petty Cash Fund Replenished')->success()->send();
         redirect()->route('pcv.index');
     }
