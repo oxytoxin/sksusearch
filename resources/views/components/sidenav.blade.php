@@ -475,7 +475,7 @@
 
                 @if ($isAccountant)
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
-                        href="{{ route('wfp.accounting-requested-suppluies') }}">
+                        href="{{ config('app.wfp_url') }}/wfp/supply-requests">
                         Requested Supplies
                     </a>
                 @endif
@@ -486,7 +486,7 @@
                     </a>
                 @endif
                 <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
-                    href="{{ route('wfp.request-supply-list') }}">
+                    href="{{ config('app.wfp_url') }}/wfp/supply-requests">
                     Request Supply
                 </a>
                 @if (($isOfficeHead && $costCenterExist) || $isAssignedPersonnel)
@@ -514,7 +514,7 @@
                 @endif
                 @if ($isSupply)
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
-                        href="{{ route('wfp.supply-requested-suppluies') }}">
+                        href="{{ config('app.wfp_url') }}/wfp/supply-requests">
                         Requested Supplies
                     </a>
                 @endif
