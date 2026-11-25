@@ -487,7 +487,7 @@
                 @endif
                 <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                     href="{{ config('app.wfp_url') }}/wfp/supply-requests">
-                    Request Supply
+                    Request Item
                 </a>
                 @if (($isOfficeHead && $costCenterExist) || $isAssignedPersonnel)
                     {{-- <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
