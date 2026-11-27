@@ -428,26 +428,27 @@
                 x-transition:leave-start='opacity-100 scale-100' x-transition:leave-end='opacity-0 scale-95'>
                 <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium  bg-primary-100 text-primary-900"
                     href="{{ config('app.wfp_url') }}/dashboard">
-                    ✨Try new WFP✨
+                    Try new WFP ✨
                 </a>
+
                 <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
-                    href="{{ route('wfp.pricelist-document') }}">
-                    Pricelist Document
+                    href="{{ config('app.wfp_url') }}/wfp/supplies">
+                    Pricelist Document ✨
                 </a>
 
                 @if ($isFinance)
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.wfp-types') }}">
-                        WFP Period
+                        WFP Period ✨
                     </a>
                 @endif
-                @if ($isFinance || $isPresident)
+                <!--@if ($isFinance || $isPresident)
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.fund-allocation', 1) }}">
                         Fund Allocation
                     </a>
-                @endif
-                @if ($isFinance || $is_reizza || $is_nolaila)
+                @endif-->
+                <!--@if ($isFinance || $is_reizza || $is_nolaila)
                     {{-- <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.wfp-submissions', 1) }}">
                         WFP Submissions
@@ -456,8 +457,8 @@
                         href="{{ config('app.wfp_url') }}/wfp/wfps/submitted/wfp">
                         WFP Submissions
                     </a>
-                @endif
-                @if ($isFinance)
+                @endif-->
+                <!--@if ($isFinance)
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.generate-wfp-ppmp') }}">
                         Generate PPMP
@@ -471,12 +472,12 @@
                         href="{{ route('wfp.reported-supply-list') }}">
                         Reported Supplies
                     </a>
-                @endif
+                @endif-->
 
                 @if ($isAccountant)
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ config('app.wfp_url') }}/wfp/supply-requests">
-                        Requested Supplies
+                        Requested Supplies ✨
                     </a>
                 @endif
                 @if ($isOfficeHead && $costCenterExist)
@@ -487,35 +488,35 @@
                 @endif
                 <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                     href="{{ config('app.wfp_url') }}/wfp/supply-requests">
-                    Request Item
+                    Request Item ✨
                 </a>
                 @if (($isOfficeHead && $costCenterExist) || $isAssignedPersonnel)
-                    {{-- <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                    <!--<a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.select-wfp') }}">
                         Create WFP
-                    </a> --}}
+                    </a> -->
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ config('app.wfp_url') }}/wfp/fund-allocation-batches">
                         Create WFP
                     </a>
 
-                    <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                    <!--<a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.report-supply-list') }}">
                         Report Supply
-                    </a>
+                    </a>-->
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ config('app.wfp_url') }}/wfp/wfps/submitted/wfp">
-                        WFP Submissions
+                        WFP Submissions ✨
                     </a>
-                    {{-- <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
+                    <!--<a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ route('wfp.wfp-history') }}">
                         WFP History
-                    </a> --}}
+                    </a> -->
                 @endif
                 @if ($isSupply)
                     <a class="group flex w-full items-center rounded-md py-2 pl-10 pr-2 text-sm font-medium text-primary-600 hover:bg-primary-100 hover:text-primary-900"
                         href="{{ config('app.wfp_url') }}/wfp/supply-requests">
-                        Requested Supplies
+                        Requested Supplies ✨
                     </a>
                 @endif
 
